@@ -1,0 +1,61 @@
+name: Swordofmagic7
+version: '${project.version}'
+main: swordofmagic7.System
+api-version: 1.18
+authors: [ MomiNeko ]
+description: Swordofmagic7
+
+commands:
+  gm:
+    permission: debug.som7
+    description: description
+    usage: /<command> 1|2|3
+  get:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  mobSpawn:
+    aliases: ms
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  playMode:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  save:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  load:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+
+  menu:
+    aliases: m
+    description: description
+    usage: /<command>
+  skill:
+    aliases: s
+    description: description
+    usage: /<command>
+  attribute:
+    aliases: attr, a
+    description: description
+    usage: /<command>
+  damageLog:
+    description: description
+    usage: /<command>
+  expLog:
+    description: description
+    usage: /<command>
+  pvpMode:
+    description: description
+    usage: /<command>
+  viewFormat:
+    description: description
+    usage: /<command>
+  spawn:
+    description: description
+    usage: /<command>
