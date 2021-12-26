@@ -1,5 +1,10 @@
 package swordofmagic7;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.Door;
@@ -7,29 +12,37 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Lever;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.util.*;
 
+import static swordofmagic7.CustomSound.playSound;
 import static swordofmagic7.DataBase.*;
-import static swordofmagic7.Function.colored;
-import static swordofmagic7.Function.unColored;
-import static swordofmagic7.MobManager.getEnemyTable;
-import static swordofmagic7.MobManager.mobSpawn;
+import static swordofmagic7.Function.*;
+import static swordofmagic7.MapManager.TeleportGateSelector;
+import static swordofmagic7.MobManager.*;
+import static swordofmagic7.SoundList.Nope;
+import static swordofmagic7.System.tagGame;
 
 public class Events implements Listener {
 
@@ -50,9 +63,17 @@ public class Events implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        playerData(player).save();
-        playerData(player).remove();
+        PlayerData playerData = playerData(player);
+        List<PetParameter> PetSummon = new ArrayList<>(playerData.PetSummon);
+        for (PetParameter pet : PetSummon) {
+            pet.cage();
+        }
+        playerData.save();
+        playerData.remove();
         PlayerList.load();
+        if (tagGame.isPlayer(player)) {
+            tagGame.leave(player);
+        }
     }
 
     @EventHandler
@@ -86,34 +107,58 @@ public class Events implements Listener {
     }
 
     @EventHandler
+    public void onEntityInteract(EntityInteractEvent event) {
+        Block block = event.getBlock();
+        if(block != null && block.getType() == Material.FARMLAND) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() instanceof Door) event.setCancelled(true);
-        if (event.getClickedBlock() instanceof TrapDoor) event.setCancelled(true);
-        if (event.getClickedBlock() instanceof Gate) event.setCancelled(true);
-        if (event.getClickedBlock() instanceof Lever) event.setCancelled(true);
-        if (event.getClickedBlock() instanceof ItemFrame) event.setCancelled(true);
+        Player player = event.getPlayer();
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            event.setCancelled(true);
+        } else if (event.getAction() == Action.PHYSICAL) {
+            if(event.getClickedBlock().getType() == Material.FARMLAND) {
+                event.setCancelled(true);
+            }
+        }
 
         Action action = event.getAction();
-        Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
             Block block = event.getClickedBlock();
             if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
                 if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
-                    if (playerData.CastType.isLegacy()) {
+                    if (playerData.CastMode.isLegacy()) {
                         if (player.isSneaking()) {
                             playerData.HotBar.use(4);
                         } else {
                             playerData.HotBar.use(0);
                         }
-                    } else if (playerData.CastType.isRenewed()) {
+                    } else if (playerData.CastMode.isRenewed()) {
                         playerData.setRightClickHold();
+                    } else if (playerData.CastMode.isHold()) {
+                        int slot = player.getInventory().getHeldItemSlot();
+                        if (slot < 9) {
+                            if (player.isSneaking()) slot += 8;
+                            playerData.HotBar.use(slot);
+                        }
+                    }
+                    if (PetManager.usingBaton(player)) {
+                        PetManager.PetAITarget(player);
                     }
                 } else if ((action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
                     if (player.isSneaking()) {
-                        playerData.HotBar.use(3);
+                        if (playerData.CastMode.isLegacy()) {
+                            playerData.HotBar.use(3);
+                        }
+                        if (PetManager.usingBaton(player)) {
+                            PetManager.PetAISelect(player);
+                        }
                     } else {
-                        playerData.Skill.SkillProcess.normalAttack();
+                        playerData.Skill.SkillProcess.normalAttackTargetSelect();
                     }
                 }
             }
@@ -137,10 +182,52 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         Entity entity = event.getRightClicked();
-        if (entity.getCustomName() != null) {
+        if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
             String shop = unColored(entity.getCustomName());
             if (ShopList.containsKey(shop)) {
                 playerData.Menu.ShopOpen(getShopData(shop));
+            } else if (shop.equalsIgnoreCase("ペットショップ")) {
+                playerData.Menu.PetShop();
+            } else if (shop.equalsIgnoreCase("ルーン職人")) {
+                playerData.Menu.RuneMenuView();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPressurePlate(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (event.getAction().equals(Action.PHYSICAL)) {
+            if (event.getClickedBlock().getType() == Material.STONE_PRESSURE_PLATE) {
+                Material Under1 = event.getClickedBlock().getLocation().add(0, -1,0).getBlock().getType();
+                Material Under2 = event.getClickedBlock().getLocation().add(0, -2,0).getBlock().getType();
+                if (Under1 == Material.IRON_BLOCK) {
+                    playSound(player, SoundList.Shoot);
+                    player.setVelocity(player.getLocation().getDirection().multiply(0.4).setY(0.5));
+                } else if (Under1 == Material.GOLD_BLOCK || Under2 == Material.GOLD_BLOCK) {
+                    event.setCancelled(true);
+                    player.setGravity(false);
+                    new BukkitRunnable() {
+                        double y = 1;
+                        @Override
+                        public void run() {
+                            y -= 0.08;
+                            player.setVelocity(player.getLocation().getDirection().multiply(2).setY(y));
+                            if (y < -1 || player.isSneaking()) {
+                                this.cancel();
+                                player.setGravity(true);
+                            }
+                        }
+                    }.runTaskTimerAsynchronously(plugin, 0, 1);
+                    playSound(player, SoundList.Shoot);
+
+                } else if (Under1 == Material.EMERALD_BLOCK || Under2 == Material.EMERALD_BLOCK) {
+                    event.setCancelled(true);
+                    Vector vec = new Vector(0, 2.8, 0);
+                    player.setVelocity(vec);
+                    playSound(player, SoundList.Shoot);
+
+                }
             }
         }
     }
@@ -150,35 +237,58 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
-            if (playerData.CastType.isRenewed() && event.getNewSlot() < 8) {
+            if (playerData.CastMode.isRenewed() && event.getNewSlot() < 8) {
                 int x = 0;
                 if (player.isSneaking()) x += 8;
                 if (playerData.isRightClickHold()) x += 16;
                 player.getInventory().setHeldItemSlot(8);
                 playerData.HotBar.use(event.getNewSlot() + x);
             }
-            if (!playerData.CastType.isHold()) event.setCancelled(true);
+            if (!playerData.CastMode.isHold()) event.setCancelled(true);
         }
     }
 
     @EventHandler
     void onDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            event.setCancelled(true);
+            return;
+        }
         if (victim instanceof Player) {
             event.setDamage(0.01);
-        } else if (getEnemyTable().containsKey(victim.getUniqueId())) {
+        } else if (isEnemy(victim)) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                if (MobManager.isEnemy(victim)) {
+                    MobManager.EnemyTable(victim.getUniqueId()).delete();
+                    return;
+                }
+            }
             event.setDamage(0.01);
         }
     }
 
     @EventHandler
     void onDamageEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player attacker) {
-            if (getEnemyTable().containsKey(event.getEntity().getUniqueId())) {
-                PlayerData playerData = playerData(attacker);
-                playerData.Skill.SkillProcess.normalAttack();
-                event.setCancelled(true);
+        if (event.getDamager() instanceof Player attacker && attacker.getGameMode() != GameMode.CREATIVE) {
+            SkillProcess skillProcess = playerData(attacker).Skill.SkillProcess;
+            if (skillProcess.isEnemy(event.getEntity())) {
+                List<LivingEntity> victims = new ArrayList<>();
+                victims.add((LivingEntity) event.getEntity());
+                skillProcess.normalAttack(victims);
             }
+            if (event.getEntity() instanceof Player victim) {
+                if (tagGame.isPlayer(attacker) || tagGame.isPlayer(victim)) {
+                    if (!attacker.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+                        tagGame.tagChange(attacker, victim);
+                    }
+                }
+            } else if (event.getEntity() instanceof LivingEntity victim) {
+                if (PetManager.usingBaton(attacker)) {
+                    PetManager.PetSelect(attacker, victim);
+                }
+            }
+            event.setCancelled(true);
         }
     }
 
@@ -192,7 +302,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
-            if (playerData.CastType.isLegacy()) {
+            if (playerData.CastMode.isLegacy()) {
                 if (player.isSneaking()) {
                     playerData.HotBar.use(5);
                 } else {
@@ -208,7 +318,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
-            if (playerData.CastType.isLegacy()) {
+            if (playerData.CastMode.isLegacy()) {
                 if (player.isSneaking()) {
                     playerData.HotBar.use(6);
                 } else {
@@ -221,23 +331,107 @@ public class Events implements Listener {
 
     @EventHandler
     void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
         if (event.getMessage().contains("${")) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage("Trigger");
+        }
+        String message = event.getMessage();
+        if (message.contains("%item%")) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if (item.getType() != Material.AIR && item.hasItemMeta()) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null && meta.hasDisplayName() && meta.hasLore()) {
+                    String Display = unDecoText(meta.getDisplayName());
+                    StringBuilder Lore = new StringBuilder(meta.getDisplayName());
+                    for (String str : meta.getLore()) {
+                        Lore.append("<nl>").append(str);
+                    }
+                    event.setMessage(message.replace("%item%", "§e[" + Display + "]<tag>" + Lore + "<end>"));
+                }
+            }
         }
     }
 
     @EventHandler
     void onBlockPlace(BlockPlaceEvent event) {
-        if (!event.getPlayer().isOp()) {
+        Player player = event.getPlayer();
+        if (!player.isOp() || playerData(player).PlayMode) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
-        if (!event.getPlayer().isOp()) {
+        Player player = event.getPlayer();
+        if (!player.isOp() || playerData(player).PlayMode) {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler
+    void onTarget(EntityTargetEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    void onSlimeSplit(SlimeSplitEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    void onJump(PlayerJumpEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
+        playerData.Strafe = 2;
+        if (playerData(player).StrafeMode.isDoubleJump() || player.getGameMode() == GameMode.CREATIVE) {
+            player.setAllowFlight(true);
+        } else {
+            player.setAllowFlight(false);
+        }
+    }
+
+    @EventHandler
+    void onSneakToggle(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isSneaking()) {
+            TeleportGateSelector(player);
+        }
+        CharaController.WallKick(player);
+    }
+
+    @EventHandler
+    void onSprintToggle(PlayerToggleSprintEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isSprinting() && playerData(player).StrafeMode.isAirDash()) {
+            CharaController.Strafe(player);
+        }
+    }
+
+    @EventHandler
+    void onFlightToggle(PlayerToggleFlightEvent event) {
+        Player player = event.getPlayer();
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            event.setCancelled(true);
+            player.setFlying(false);
+            player.setAllowFlight(false);
+            if (!player.isFlying() && playerData(player).StrafeMode.isDoubleJump()) {
+                CharaController.Strafe(player);
+            }
+        }
+    }
+
+    @EventHandler
+    void onChunkLoad(ChunkLoadEvent event) {
+        Bukkit.getScheduler().runTaskLater(System.plugin, () -> {
+            for (Entity entity : event.getChunk().getEntities()) {
+                if (isEnemy(entity)) {
+                    EnemyTable(entity.getUniqueId()).updateEntity();
+                } else if (entity.getName().contains("§c§l《")) {
+                    entity.remove();
+                }
+            }
+        }, 5);
+    }
+
+
 }

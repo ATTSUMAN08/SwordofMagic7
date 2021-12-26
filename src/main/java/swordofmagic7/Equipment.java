@@ -74,13 +74,13 @@ public class Equipment {
         EquipSlot.put(slot, param.clone());
         playerData.ItemInventory.removeItemParameter(param, 1);
 
-        player.sendMessage(colored("&e[" + param.Display + "]&aを&e装備&aしました"));
+        player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
     }
 
     void unEquip(EquipmentSlot slot) {
         if (EquipSlot.containsKey(slot)) {
             playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
-            player.sendMessage(colored("&e[" + getEquip(slot).Display + "]&aを外しました"));
+            player.sendMessage("§e[" + getEquip(slot).Display + "]§aを外しました");
             EquipSlot.remove(slot);
         }
     }

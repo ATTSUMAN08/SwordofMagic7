@@ -82,8 +82,12 @@ public class HotBar {
 
     void use(int index) {
         switch (HotBarData[index].category) {
-            case Skill -> playerData.Skill.CastSkill(getSkillData(HotBarData[index].Icon));
-            default -> player.sendMessage(colored("&e[ホットバー" + (index+1) + "]&aは&eセット&aされていません"));
+            case Skill -> {
+                if (playerData.Skill.isCastReady()) {
+                    playerData.Skill.CastSkill(getSkillData(HotBarData[index].Icon));
+                }
+            }
+            default -> player.sendMessage("§e[ホットバー" + (index+1) + "]§aは§eセット§aされていません");
         }
     }
 
@@ -119,7 +123,7 @@ public class HotBar {
                 return;
             }
         }
-        player.sendMessage(colored("&e[ホットバー]&aに空きがありません"));
+        player.sendMessage("§e[ホットバー]§aに空きがありません");
     }
 
     HotBarData[] getHotBar() {
@@ -132,6 +136,7 @@ public class HotBar {
 
     void viewBottom() {
         for (int i = 0; i < 8; i++) {
+            if (HotBarData[i] == null) HotBarData[i] = new HotBarData();
             player.getInventory().setItem(i, HotBarData[i].view(playerData.ViewFormat(), SelectSlot == i));
         }
     }

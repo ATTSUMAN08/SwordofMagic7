@@ -27,6 +27,7 @@ public class Item {
 enum ItemCategory {
     Item("アイテム"),
     Material("素材"),
+    PetEgg("ペットエッグ"),
     Equipment("装備"),
     ;
     String Display;
@@ -47,10 +48,11 @@ enum ItemCategory {
 
 enum EquipmentCategory {
     Blade("刃剣", Material.STONE_SWORD),
-    Rapier("突剣", Material.GOLDEN_SWORD),
-    Rod("法杖", Material.BLAZE_ROD),
+    Hammer("大槌", Material.STONE_AXE),
+    Rod("法杖", Material.STONE_HOE),
     ActGun("法銃", Material.GOLDEN_HOE),
     Shield("盾", Material.SHIELD),
+    Baton("指揮杖", Material.BLAZE_ROD),
     Armor("アーマー", Material.IRON_CHESTPLATE),
     ;
     String Display;
@@ -72,6 +74,7 @@ enum EquipmentCategory {
 }
 
 class ItemParameter implements Cloneable {
+    String Id;
     String Display = "Display";
     List<String> Lore = new ArrayList<>();
     Material Icon = Material.BARRIER;
@@ -85,19 +88,22 @@ class ItemParameter implements Cloneable {
     int ReqLevel = 0;
     int Sell = 0;
     int Plus = 0;
-    int ModuleSlot = 0;
-    private List<ModuleParameter> Module = new ArrayList<>();
+    int RuneSlot = 0;
+    private List<RuneParameter> Rune = new ArrayList<>();
+    String PetId;
+    int PetMaxLevel;
+    int PetLevel;
 
-    List<ModuleParameter> getModule() {
-        return new ArrayList<>(Module);
+    List<RuneParameter> getRune() {
+        return new ArrayList<>(Rune);
     }
 
-    int getModuleSize() {
-        return getModule().size();
+    int getRuneSize() {
+        return getRune().size();
     }
 
-    ModuleParameter getModule(int i) {
-        return getModule().get(i);
+    RuneParameter getRune(int i) {
+        return getRune().get(i);
     }
 
     Material getIcon() {
@@ -105,16 +111,16 @@ class ItemParameter implements Cloneable {
         return Icon;
     }
 
-    void addModule(ModuleParameter module) {
-        List<ModuleParameter> List = getModule();
-        List.add(module);
-        Module = List;
+    void addRune(RuneParameter rune) {
+        List<RuneParameter> List = getRune();
+        List.add(rune);
+        Rune = List;
     }
 
-    void removeModule(int i) {
-        List<ModuleParameter> List = getModule();
+    void removeRune(int i) {
+        List<RuneParameter> List = getRune();
         List.remove(i);
-        Module = List;
+        Rune = List;
     }
 
     boolean isEmpty() {
@@ -133,26 +139,26 @@ class ItemParameter implements Cloneable {
         if (Category == ItemCategory.Equipment) {
             Lore.add(itemParameter);
             Lore.add(decoLore("装備部位") + EquipmentSlot.Display);
-            if (isZero(Parameter.get(MaxMana))) Lore.add(StatusParameter.MaxMana.DecoDisplay + String.format(format, Parameter.get(MaxMana)) + " (" +String.format(format, this.Parameter.get(MaxMana)) + ")");
-            if (isZero(Parameter.get(ManaRegen))) Lore.add(StatusParameter.ManaRegen.DecoDisplay + String.format(format, Parameter.get(ManaRegen)) + " (" +String.format(format, this.Parameter.get(ManaRegen)) + ")");
-            if (isZero(Parameter.get(ATK))) Lore.add(StatusParameter.ATK.DecoDisplay + String.format(format, Parameter.get(ATK)) + " (" +String.format(format, this.Parameter.get(ATK)) + ")");
-            if (isZero(Parameter.get(DEF))) Lore.add(StatusParameter.DEF.DecoDisplay + String.format(format, Parameter.get(DEF)) + " (" +String.format(format, this.Parameter.get(DEF)) + ")");
-            if (isZero(Parameter.get(SkillCastTime))) Lore.add(StatusParameter.SkillCastTime.DecoDisplay +  String.format(format, Parameter.get(SkillCastTime)) + " (" +String.format(format, this.Parameter.get(SkillCastTime)) + ")");
-            if (isZero(Parameter.get(SkillRigidTime))) Lore.add(StatusParameter.SkillRigidTime.DecoDisplay +  String.format(format, Parameter.get(SkillRigidTime)) + " (" +String.format(format, this.Parameter.get(SkillRigidTime)) + ")");
-            if (isZero(Parameter.get(SkillCooltime))) Lore.add(StatusParameter.SkillCooltime.DecoDisplay + String.format(format, Parameter.get(SkillCooltime)) + " (" +String.format(format, this.Parameter.get(SkillCooltime)) + ")");
+            Lore.add(decoLore("装備種") + EquipmentCategory.Display);
+            for (StatusParameter param : StatusParameter.values()) {
+                if (isZero(Parameter.get(param))) {
+                    Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param) * (1+Plus*0.02)) + " (" +String.format(format, this.Parameter.get(param)) + ")");
+                }
+            }
             Lore.add(decoLore("強化値") + Plus);
             Lore.add(decoLore("耐久値") + Durable + "/" + MaxDurable);
             Lore.add(decoLore("必要レベル") + ReqLevel);
-            Lore.add(itemModule);
-            for (int i = 0; i < ModuleSlot; i++) {
-                if (i < Module.size()) {
-                    ModuleParameter moduleParameter = Module.get(i);
-                    Lore.add(colored("&7・&e&l" + moduleParameter.Display + " Lv" + moduleParameter.Level + " (" + String.format(format, moduleParameter.Quality*100) + "%)"));
+            Lore.add(itemRune);
+            for (int i = 0; i < RuneSlot; i++) {
+                if (i < Rune.size()) {
+                    RuneParameter runeParameter = Rune.get(i);
+                    Lore.add("§7・§e§l" + runeParameter.Display + " Lv" + runeParameter.Level + " (" + String.format(format, runeParameter.Quality*100) + "%)");
                 } else {
-                    Lore.add(colored("&7・&lモジュール未装着"));
+                    Lore.add("§7・§lルーン未装着");
                 }
             }
         }
+        meta.setUnbreakable(true);
         meta.setLore(Lore);
         for (ItemFlag flag : ItemFlag.values()) {
             meta.addItemFlags(flag);
@@ -171,8 +177,8 @@ class ItemParameter implements Cloneable {
         HashMap<StatusParameter, Double> Parameter = new HashMap<>();
         for (StatusParameter statusParameter : StatusParameter.values()) {
             double parameter = this.Parameter.get(statusParameter);
-            for (ModuleParameter module : Module) {
-                parameter += module.Parameter(statusParameter);
+            for (RuneParameter rune : Rune) {
+                parameter += rune.Parameter(statusParameter);
             }
             Parameter.put(statusParameter, parameter);
         }
@@ -197,14 +203,15 @@ class ItemParameter implements Cloneable {
     }
 }
 
-class ModuleParameter implements Cloneable{
-    String Display = "モジュール";
+class RuneParameter implements Cloneable{
+    String Id;
+    String Display = "ルーン";
     List<String> Lore = new ArrayList<>();
     double Quality = 0.5;
     int Level = 0;
     HashMap<StatusParameter, Double> Parameter = new HashMap<>();
 
-    ModuleParameter() {
+    RuneParameter() {
         for (StatusParameter param : StatusParameter.values()) {
             Parameter.put(param, 0d);
         }
@@ -218,29 +225,26 @@ class ModuleParameter implements Cloneable{
         return (Parameter.get(param)/2 + (Quality * Parameter.get(param))) * (Math.pow(Level, 1.4) / Level);
     }
 
-    ItemStack viewModule(String format) {
+    ItemStack viewRune(String format) {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(decoText(colored(Display)));
+        meta.setDisplayName(decoText(Display));
         List<String> Lore = loreText(this.Lore);
-        Lore.add(decoText("&3&lパラメーター"));
-        Lore.add(decoLore("&e&l品質") + String.format(format, Quality*100) + "%");
-        if (isZero(Parameter.get(MaxMana))) Lore.add(StatusParameter.MaxMana.DecoDisplay +  String.format(format, Parameter(MaxMana)));
-        if (isZero(Parameter.get(ManaRegen))) Lore.add(StatusParameter.ManaRegen.DecoDisplay +  String.format(format, Parameter(ManaRegen)));
-        if (isZero(Parameter.get(ATK))) Lore.add(StatusParameter.ATK.DecoDisplay +  String.format(format, Parameter(ATK)));
-        if (isZero(Parameter.get(DEF))) Lore.add(StatusParameter.DEF.DecoDisplay +  String.format(format, Parameter(DEF)));
-        if (isZero(Parameter.get(SkillCastTime))) Lore.add(StatusParameter.SkillCastTime.DecoDisplay +  String.format(format, Parameter(SkillCastTime)));
-        if (isZero(Parameter.get(SkillRigidTime))) Lore.add(StatusParameter.SkillRigidTime.DecoDisplay +  String.format(format, Parameter(SkillRigidTime)));
-        if (isZero(Parameter.get(SkillCooltime))) Lore.add(StatusParameter.SkillCooltime.DecoDisplay +  String.format(format, Parameter(SkillCooltime)));
+        Lore.add(decoText("§3§lパラメーター"));
+        Lore.add(decoLore("§e§lレベル") + Level);
+        Lore.add(decoLore("§e§l品質") + String.format(format, Quality*100) + "%");
+        for (StatusParameter param : StatusParameter.values()) {
+            if (isZero(Parameter.get(param))) Lore.add(param.DecoDisplay +  String.format(format, Parameter(param)));
+        }
         meta.setLore(Lore);
         item.setItemMeta(meta);
         return item;
     }
 
     @Override
-    public ModuleParameter clone() {
+    public RuneParameter clone() {
         try {
-            ModuleParameter clone = (ModuleParameter) super.clone();
+            RuneParameter clone = (RuneParameter) super.clone();
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
             return clone;
         } catch (CloneNotSupportedException e) {

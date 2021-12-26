@@ -10,9 +10,9 @@ import org.bukkit.util.RayTraceResult;
 
 import java.util.function.Predicate;
 
-public class RayTrace {
+public final class RayTrace {
 
-    public Ray rayLocation(Location loc, double distance, double size, boolean ignore, Predicate predicate) {
+    public static Ray rayLocation(Location loc, double distance, double size, boolean ignore, Predicate predicate) {
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTrace(loc, loc.getDirection(), distance, FluidCollisionMode.NEVER, ignore, size, predicate);
         Ray ray = new Ray();
@@ -20,6 +20,9 @@ public class RayTrace {
             ray.HitPosition = loc.add(loc.getDirection().multiply(distance));
         } else {
             ray.HitPosition = rayData.getHitPosition().toLocation(world);
+            if (rayData.getHitBlock() != null) {
+                ray.HitBlock = rayData.getHitBlock();
+            }
             if (rayData.getHitEntity() != null) {
                 ray.HitEntity = (LivingEntity) rayData.getHitEntity();
             }
@@ -27,7 +30,7 @@ public class RayTrace {
         return ray;
     }
 
-    public Ray rayLocationBlock(Location loc, double distance, boolean ignore) {
+    public static Ray rayLocationBlock(Location loc, double distance, boolean ignore) {
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTraceBlocks(loc, loc.getDirection(), distance, FluidCollisionMode.NEVER, ignore);
         Ray ray = new Ray();
@@ -42,7 +45,7 @@ public class RayTrace {
         return ray;
     }
 
-    public Ray rayLocationEntity(Location loc, double distance, double size, Predicate<Entity> predicate) {
+    public static Ray rayLocationEntity(Location loc, double distance, double size, Predicate<Entity> predicate) {
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTraceEntities(loc, loc.getDirection(), distance, size, predicate);
         Ray ray = new Ray();
@@ -52,6 +55,9 @@ public class RayTrace {
             ray.HitPosition = rayData.getHitPosition().toLocation(world);
             if (rayData.getHitBlock() != null) {
                 ray.HitBlock = rayData.getHitBlock();
+            }
+            if (rayData.getHitEntity() != null) {
+                ray.HitEntity = (LivingEntity) rayData.getHitEntity();
             }
         }
         return ray;

@@ -4,6 +4,7 @@ main: swordofmagic7.System
 api-version: 1.18
 authors: [ MomiNeko ]
 description: Swordofmagic7
+softdepend: [ HolographicDisplays ]
 
 commands:
   gm:
@@ -31,9 +32,19 @@ commands:
     permission: debug.som7
     description: description
     usage: /<command>
+  flySpeed:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  test:
+    permission: debug.som7
+    description: description
+    usage: /<command>
 
   menu:
-    aliases: m
+    description: description
+    usage: /<command>
+  m:
     description: description
     usage: /<command>
   skill:
@@ -41,7 +52,7 @@ commands:
     description: description
     usage: /<command>
   attribute:
-    aliases: attr, a
+    aliases: [attr, a]
     description: description
     usage: /<command>
   damageLog:
@@ -50,12 +61,34 @@ commands:
   expLog:
     description: description
     usage: /<command>
+  dropLog:
+    description: description
+    usage: /<command>
   pvpMode:
+    description: description
+    usage: /<command>
+  strafeMode:
+    description: description
+    usage: /<command>
+  castMode:
     description: description
     usage: /<command>
   viewFormat:
     description: description
     usage: /<command>
   spawn:
+    description: description
+    usage: /<command>
+  info:
+    aliases: i
+    description: description
+    usage: /<command>
+  tickTime:
+    description: description
+    usage: /<command>
+  reqExp:
+    description: description
+    usage: /<command>
+  taggame:
     description: description
     usage: /<command>

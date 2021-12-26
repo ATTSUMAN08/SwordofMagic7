@@ -30,7 +30,7 @@ class ShopData implements Cloneable {
                 ItemStack item = data.itemParameter.viewItem(1, format);
                 ItemMeta meta = item.getItemMeta();
                 List<String> Lore = new ArrayList<>(meta.getLore());
-                Lore.add(decoText("&3&l販売情報"));
+                Lore.add(decoText("§3§l販売情報"));
                 Lore.add(decoLore("メル") + data.Mel);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);

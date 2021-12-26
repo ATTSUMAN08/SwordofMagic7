@@ -1,16 +1,16 @@
 package swordofmagic7;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static swordofmagic7.System.plugin;
 
 enum ParticleType {
     General,
@@ -18,7 +18,7 @@ enum ParticleType {
     EnemyCollider,
 }
 
-class ParticleData {
+class ParticleData implements Cloneable {
     Particle particle = Particle.REDSTONE;
     Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
     ParticleType particleType = ParticleType.General;
@@ -46,18 +46,28 @@ class ParticleData {
         this.particleType = particleType;
         this.speed = speed;
     }
+
+    @Override
+    public ParticleData clone() {
+        try {
+            ParticleData clone = (ParticleData) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
 
-public class ParticleManager {
+public final class ParticleManager {
 
-    private final RayTrace RayTrace = new RayTrace();
-    private final Random random = new Random();
+    private static final Random random = new Random();
 
-    double angle(Vector vector) {
+    static double angle(Vector vector) {
         return angle(new Vector(), vector);
     }
 
-    double angle(Vector vector, Vector vector2) {
+    static double angle(Vector vector, Vector vector2) {
         double angle = Math.atan2(vector.getZ() - vector2.getZ(), vector.getX() - vector2.getX());
         if (angle < 0) {
             angle += 2 * Math.PI;
@@ -65,7 +75,7 @@ public class ParticleManager {
         return Math.floor(angle * 360 / (2 * Math.PI));
     }
 
-    List<LivingEntity> FanShapedCollider(Location location, List<LivingEntity> targetList, double angle) {
+    static List<LivingEntity> FanShapedCollider(Location location, List<LivingEntity> targetList, double angle) {
         List<LivingEntity> Return = new ArrayList<>();
         for (LivingEntity target : targetList) {
             Location location2 = target.getLocation();
@@ -85,7 +95,7 @@ public class ParticleManager {
         return Return;
     }
 
-    List<LivingEntity> RectangleCollider(Location location, List<LivingEntity> targetList, double length, double width) {
+    static List<LivingEntity> RectangleCollider(Location location, List<LivingEntity> targetList, double length, double width) {
         final double posX0 = -width/2;
         final double posY0 = length;
         final double posX1 = width/2;
@@ -104,7 +114,7 @@ public class ParticleManager {
         return Return;
     }
 
-    boolean LineCollider(Location locationA, Location locationA2, Location locationB, Location locationB2) {
+    static boolean LineCollider(Location locationA, Location locationA2, Location locationB, Location locationB2) {
         double x0 = locationA.getX();
         double y0 = locationA.getZ();
         double x1 = locationA2.getX();
@@ -133,7 +143,7 @@ public class ParticleManager {
         return 0 < r0 && r0 < 1 && 0 < r1 && r1 < 1;
     }
 
-    void spawnParticle(ParticleData particleData, Location location) {
+    static void spawnParticle(ParticleData particleData, Location location) {
         if (particleData.particle != Particle.REDSTONE) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.spawnParticle(particleData.particle, location.clone().add(0, 0.1, 0), 0, particleData.vector.getX(), particleData.vector.getY(), particleData.vector.getZ(), particleData.speed);
@@ -145,7 +155,7 @@ public class ParticleManager {
         }
     }
 
-    void FanShapedParticle(ParticleData particleData, Location location, double radius, double angle, double density) {
+    static void FanShapedParticle(ParticleData particleData, Location location, double radius, double angle, double density) {
         angle /= 2;
         double multiply = 1 / density;
         location.setPitch(0);
@@ -170,7 +180,24 @@ public class ParticleManager {
         }
     }
 
-    void FanShapedFillAnimParticle(ParticleData particleData, Location location, double radius, double angle, double density, double Anim) {
+    static void ShapedParticle(ParticleData particleData, Location location, double length, double angle, double density, double offsetY, boolean randomLength) {
+        angle /= 2;
+        double multiply = angle/density;
+        float maxAngle = (float) (location.getYaw()+angle);
+        float minAngle = (float) (location.getYaw()-angle);
+        location.setPitch(0);
+        location.add(0, offsetY, 0);
+        for (float yaw = minAngle; yaw < maxAngle; yaw+=multiply) {
+            location.setYaw(yaw);
+            Location loc = location.clone();
+            double locLength = length;
+            if (randomLength) locLength = (random.nextDouble()*0.9+0.1)*locLength;
+            loc.add(loc.getDirection().multiply(locLength));
+            spawnParticle(particleData, loc);
+        }
+    }
+
+    static void FanShapedFillAnimParticle(ParticleData particleData, Location location, double radius, double angle, double density, double Anim) {
         FanShapedParticle(particleData, location, radius, angle, density);
         if (Anim > 1) Anim = 1;
         angle /= 2;
@@ -189,14 +216,14 @@ public class ParticleManager {
         }
     }
 
-    void CylinderParticle(ParticleData particleData, Location location, double radius, double height, double density, double density2) {
+    static void CylinderParticle(ParticleData particleData, Location location, double radius, double height, double density, double density2) {
         density2 = 1/density2;
         for (double i = 0; i < height; i += density2) {
             CircleParticle(particleData, location.clone().add(0, i,0), radius, density);
         }
     }
 
-    void CircleParticle(ParticleData particleData, Location location, double radius, double density) {
+    static void CircleParticle(ParticleData particleData, Location location, double radius, double density) {
         if (density/radius > 10) density = radius * 10;
         density = 1/density;
         for (double i=0; i < 2 * Math.PI ; i += density) {
@@ -206,7 +233,7 @@ public class ParticleManager {
         }
     }
 
-    void CircleFillAnimParticle(ParticleData particleData, Location location, double radius, double density, double Anim) {
+    static void CircleFillAnimParticle(ParticleData particleData, Location location, double radius, double density, double Anim) {
         CircleParticle(particleData, location, radius, density);
         double gap = 90/(density * radius);
         for (double anim = gap; anim < (radius - gap) * Anim; anim += gap) {
@@ -214,7 +241,7 @@ public class ParticleManager {
         }
     }
 
-    void RectangleParticle(ParticleData particleData, Location location, double length, double width, double density) {
+    static void RectangleParticle(ParticleData particleData, Location location, double length, double width, double density) {
         location.setPitch(0);
         double multiply = 1/density;
         Location locR = location.clone().add(location.getDirection().rotateAroundY(90).multiply(width/2));
@@ -235,11 +262,11 @@ public class ParticleManager {
         }
     }
 
-    void LineParticle(ParticleData particleData, Location location, double length, double width, double density) {
+    static void LineParticle(ParticleData particleData, Location location, double length, double width, double density) {
         LineParticle(particleData, location, location.clone().add(location.getDirection().multiply(length)), width, density);
     }
 
-    void LineParticle(ParticleData particleData, Location location, Location location2, double width, double density) {
+    static void LineParticle(ParticleData particleData, Location location, Location location2, double width, double density) {
         final double multiply = 1/density;
         Vector vector = location2.toVector().subtract(location.toVector()).normalize().multiply(multiply);
         double distance = location.distance(location2);
@@ -250,5 +277,36 @@ public class ParticleManager {
             spawnParticle(particleData, locWidth);
             loc.add(vector);
         }
+    }
+
+    static void RandomVectorParticle(ParticleData particleData, Location location, int density) {
+        for (int i = 0; i < density; i++) {
+            ParticleData clone = particleData.clone();
+            clone.vector = new Vector(random.nextDouble()*2-1, random.nextDouble()*2, random.nextDouble()*2-1);
+            spawnParticle(clone, location);
+        }
+    }
+
+    static void WarpGateParticle(Location loc, Particle particle) {
+        new BukkitRunnable() {
+            int i = 0;
+            final double increment = (2 * Math.PI) / 90;
+            final double radius = 2;
+            final World world = loc.getWorld();
+            final ParticleData particleData = new ParticleData(particle);
+            @Override
+            public void run() {
+                for (int loop = 0; loop < 3; loop++) {
+                    i++;
+                    double angle = i * increment;
+                    double x = radius * Math.cos(angle);
+                    double z = radius * Math.sin(angle);
+                    Location nLoc = new Location(world, loc.getX() + x, loc.getY(), loc.getZ() + z);
+                    Location nLoc2 = new Location(world, loc.getX() - x, loc.getY(), loc.getZ() - z);
+                    spawnParticle(particleData, nLoc);
+                    spawnParticle(particleData, nLoc2);
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 0 , 1);
     }
 }
