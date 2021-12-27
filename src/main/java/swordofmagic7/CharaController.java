@@ -4,10 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import swordofmagic7.Data.PlayerData;
 
-import static swordofmagic7.DataBase.playerData;
+import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.inAir;
-import static swordofmagic7.MapManager.TeleportGateSelector;
 
 public class CharaController {
 

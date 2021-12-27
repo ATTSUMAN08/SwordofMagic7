@@ -3,15 +3,10 @@ package swordofmagic7;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.block.data.type.Gate;
-import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,23 +20,31 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Lever;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Mob.MobManager;
+import swordofmagic7.Pet.PetManager;
+import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Skill.SkillProcess;
+import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import static swordofmagic7.CustomSound.playSound;
-import static swordofmagic7.DataBase.*;
-import static swordofmagic7.Function.*;
-import static swordofmagic7.MapManager.TeleportGateSelector;
-import static swordofmagic7.MobManager.*;
-import static swordofmagic7.SoundList.Nope;
+import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.unColored;
+import static swordofmagic7.Function.unDecoText;
+import static swordofmagic7.Map.MapManager.TeleportGateSelector;
+import static swordofmagic7.Mob.MobManager.*;
+import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.tagGame;
 
 public class Events implements Listener {
@@ -109,7 +112,7 @@ public class Events implements Listener {
     @EventHandler
     public void onEntityInteract(EntityInteractEvent event) {
         Block block = event.getBlock();
-        if(block != null && block.getType() == Material.FARMLAND) {
+        if(block.getType() == Material.FARMLAND) {
             event.setCancelled(true);
         }
     }
@@ -146,16 +149,16 @@ public class Events implements Listener {
                             playerData.HotBar.use(slot);
                         }
                     }
-                    if (PetManager.usingBaton(player)) {
-                        PetManager.PetAITarget(player);
+                    if (playerData.PetManager.usingBaton()) {
+                        playerData.PetManager.PetAITarget();
                     }
                 } else if ((action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
                     if (player.isSneaking()) {
                         if (playerData.CastMode.isLegacy()) {
                             playerData.HotBar.use(3);
                         }
-                        if (PetManager.usingBaton(player)) {
-                            PetManager.PetAISelect(player);
+                        if (playerData.PetManager.usingBaton()) {
+                            playerData.PetManager.PetAISelect();
                         }
                     } else {
                         playerData.Skill.SkillProcess.normalAttackTargetSelect();
@@ -185,11 +188,11 @@ public class Events implements Listener {
         if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
             String shop = unColored(entity.getCustomName());
             if (ShopList.containsKey(shop)) {
-                playerData.Menu.ShopOpen(getShopData(shop));
+                playerData.Shop.ShopOpen(getShopData(shop));
             } else if (shop.equalsIgnoreCase("ペットショップ")) {
-                playerData.Menu.PetShop();
+                playerData.PetManager.PetShop();
             } else if (shop.equalsIgnoreCase("ルーン職人")) {
-                playerData.Menu.RuneMenuView();
+                playerData.RuneInventory.RuneMenuView();
             }
         }
     }
@@ -284,8 +287,9 @@ public class Events implements Listener {
                     }
                 }
             } else if (event.getEntity() instanceof LivingEntity victim) {
-                if (PetManager.usingBaton(attacker)) {
-                    PetManager.PetSelect(attacker, victim);
+                PlayerData playerData = playerData(attacker);
+                if (playerData.PetManager.usingBaton()) {
+                    playerData.PetManager.PetSelect(victim);
                 }
             }
             event.setCancelled(true);

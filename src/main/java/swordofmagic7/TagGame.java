@@ -4,20 +4,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import swordofmagic7.Effect.EffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import static swordofmagic7.DataBase.playerData;
+import static swordofmagic7.Data.PlayerData.playerData;
 
 public class TagGame {
-    final String Prefix = "§c[鬼ごっこ]§r ";
-    Player Tag;
-    int tagTime = 0;
-    List<Player> Players = new ArrayList<>();
-    HashMap<Player, Boolean> Stun = new HashMap<>();
+    public final String Prefix = "§c[鬼ごっこ]§r ";
+    public Player Tag;
+    public int tagTime = 0;
+    public List<Player> Players = new ArrayList<>();
+    public HashMap<Player, Boolean> Stun = new HashMap<>();
 
     TagGame() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(System.plugin, () -> {
@@ -69,7 +70,7 @@ public class TagGame {
         if (attacker == null) {
             Tag = victim;
         } else if (isPlayer(attacker) && isPlayer(victim) && Tag == attacker) {
-            if (playerData(attacker).Effect.hasEffect(EffectType.Stun)) return;
+            if (playerData(attacker).EffectManager.hasEffect(EffectType.Stun)) return;
             Tag = victim;
             victim.setGlowing(false);
             attacker.setGlowing(true);

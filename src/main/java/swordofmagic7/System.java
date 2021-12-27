@@ -8,20 +8,40 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import swordofmagic7.Data.DataBase;
+import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Map.WarpGateParameter;
+import swordofmagic7.Mob.EnemyData;
+import swordofmagic7.Mob.MobData;
+import swordofmagic7.Mob.MobManager;
+import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-import static swordofmagic7.CustomSound.playSound;
-import static swordofmagic7.DataBase.*;
-import static swordofmagic7.Function.*;
-import static swordofmagic7.MobManager.getEnemyTable;
-import static swordofmagic7.ParticleManager.WarpGateParticle;
+import static swordofmagic7.Data.DataBase.MapList;
+import static swordofmagic7.Data.DataBase.SpawnLocation;
+import static swordofmagic7.Data.DataBase.WarpGateList;
+import static swordofmagic7.Data.DataBase.getItemList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.getMobData;
+import static swordofmagic7.Data.DataBase.getMobList;
+import static swordofmagic7.Data.DataBase.playerData;
+import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Mob.MobManager.getEnemyTable;
+import static swordofmagic7.Particle.ParticleManager.WarpGateParticle;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class System extends JavaPlugin {
 
-    static Plugin plugin;
-    static HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
-    static TagGame tagGame;
+    public static Plugin plugin;
+    public static TagGame tagGame;
+
+    private static HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -181,11 +201,11 @@ public final class System extends JavaPlugin {
                 playSound(player, SoundList.MenuOpen);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("skill")) {
-                playerData.Menu.SkillMenuView();
+                playerData.Skill.SkillMenuView();
                 playSound(player, SoundList.MenuOpen);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("attribute")) {
-                playerData.Menu.AttributeMenuView();
+                playerData.Attribute.AttributeMenuView();
                 playSound(player, SoundList.MenuOpen);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("damageLog")) {
@@ -257,52 +277,5 @@ public final class System extends JavaPlugin {
             }
         }
         return false;
-    }
-}
-
-final class PlayerList {
-    private static final List<Player> PlayerList = new ArrayList<>();
-
-    static void load() {
-        PlayerList.clear();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.isOnline()) {
-                PlayerList.add(player);
-            }
-        }
-    }
-
-    static List<Player> get() {
-        return PlayerList;
-    }
-
-    static List<Player> getNear(Location loc, double radius) {
-        List<Player> List = new ArrayList<>();
-        for (Player player : PlayerList) {
-            if (player.getLocation().distance(loc) <= radius) List.add(player);
-        }
-        return List;
-    }
-
-    static List<LivingEntity> getNearLivingEntity(Location loc, double radius) {
-        List<LivingEntity> List = new ArrayList<>();
-        for (Player player : PlayerList) {
-            if (player.getLocation().distance(loc) <= radius) List.add(player);
-        }
-        return List;
-    }
-}
-
-class ReturnPackage {
-    boolean bool;
-    String string;
-
-    ReturnPackage(boolean bool) {
-        this.bool = bool;
-    }
-
-    ReturnPackage(boolean bool, String string) {
-        this.bool = bool;
-        this.string = string;
     }
 }
