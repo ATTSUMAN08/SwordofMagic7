@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.DamageLogType;
 import swordofmagic7.Mob.EnemyData;
@@ -20,14 +21,41 @@ import java.util.List;
 import java.util.Random;
 
 import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.System.BTTSet;
 import static swordofmagic7.System.plugin;
 
 public final class Damage {
 
     private static final Random random = new Random();
 
+    public static void makeHeal(Player healer, Player victim, double healMultiply) {
+        PlayerData healerData = playerData(healer);
+        PlayerData victimData = playerData(victim);
+        double heal = healerData.Status.HLP * healMultiply;
+        victimData.changeHealth(heal);
+        String Text = "§b≫§e" + String.format("%.1f", heal);
+        String M = " §f[M:" + String.format("%.0f", healMultiply*100) + "%]";
+        String SPI = " §b[SPI:" + healerData.Attribute.getAttribute(AttributeType.SPI) + "]";
+        String HLP = " §e[HPL:" + String.format("%.0f", healerData.Status.HLP) + "]";
+        if (healerData.DamageLog.isDamageOnly()) {
+            String healText = Text;
+            if (healerData.DamageLog.isDetail()) {
+                healText += M + SPI + HLP;
+            }
+            healer.sendMessage(healText + " -> " + victimData.Nick);
+        }
+        if (healer != victim && victimData.DamageLog.isDetail()) {
+            String healText = Text;
+            if (healerData.DamageLog.isDetail()) {
+                healText += M + SPI + HLP;
+            }
+            victim.sendMessage(healText + " <- " + healerData.Nick);
+        }
+    }
+
     public static void makeDamage(LivingEntity attacker, List<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, int wait) {
-        new BukkitRunnable() {
+        BTTSet(new BukkitRunnable() {
             int i = 0;
 
             @Override
@@ -37,7 +65,7 @@ public final class Damage {
                 }
                 i++;
             }
-        }.runTaskTimerAsynchronously(plugin, 0, wait);
+        }.runTaskTimerAsynchronously(plugin, 0, wait), "makeDamage");
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
@@ -115,8 +143,8 @@ public final class Damage {
         baseDamage *= damageMultiply;
         baseDamage *= Multiply;
         baseDamage /= Resistance;
-        hitRate = ACC / (EVA * 2);
-        criRate = (Math.pow(CriticalRate, 2) / (CriticalRate + CriticalResist * 2)) / CriticalRate;
+        hitRate = (Math.pow(ACC, 2) / (ACC + EVA/2)) / ACC;
+        criRate = (Math.pow(CriticalRate, 2) / (CriticalRate + CriticalResist/2)) / CriticalRate;
         Attack = ATK;
         Defence = DEF;
 
@@ -143,16 +171,22 @@ public final class Damage {
         }
 
         String damageText;
-        if (hitCount > 0) {
+        if (hitCount + criCount > 0) {
             damageText = "§e" + String.format("%.1f", baseDamage) + "§ax" + hitCount + " §b" + String.format("%.1f", baseDamage * CriticalMultiply) + "§ax" + criCount;
         } else damageText = "§7Miss";
 
+        boolean victimDead = false;
         if (victim instanceof Player player) {
             PlayerData playerData = playerData(player);
             if (playerData.Status.Health - damage > 0) {
                 playerData.Status.Health -= damage;
             } else {
+                victimDead = true;
                 playerData.dead();
+                if (attacker instanceof Player player2) {
+                    PlayerData playerData2 = playerData(player2);
+                    playerData2.Status.Health += playerData.Status.MaxHealth/5;
+                }
             }
 
             victimMaxHealth = playerData.Status.MaxHealth;
@@ -164,6 +198,7 @@ public final class Damage {
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);
             } else {
+                victimDead = true;
                 enemyData.dead();
             }
             victimMaxHealth = enemyData.MaxHealth;
@@ -173,6 +208,7 @@ public final class Damage {
             if (petStatus.Health - damage > 0) {
                 petStatus.Health -= damage;
             } else {
+                victimDead = true;
                 petStatus.dead();
             }
             victimMaxHealth = petStatus.MaxHealth;
@@ -180,7 +216,11 @@ public final class Damage {
         }
 
         if (PetManager.isPet(attacker)) {
-            attacker = PetManager.PetParameter(attacker).player;
+            PetParameter pet = PetManager.PetParameter(attacker);
+            attacker = pet.player;
+            if (victimDead) {
+                pet.target = null;
+            }
         }
         if (PetManager.isPet(victim)) {
             victim = PetManager.PetParameter(victim).player;

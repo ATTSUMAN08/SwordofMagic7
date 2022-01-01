@@ -12,16 +12,23 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.System;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.BTTSet;
 
 public class PetInventory extends BasicInventory {
-    private final java.util.List<PetParameter> List = new ArrayList<>();
+    private final List<PetParameter> List = new ArrayList<>();
+    private final HashMap<UUID, PetParameter> HashMap = new HashMap<>();
     public BukkitTask task;
     public PetInventory(Player player, PlayerData playerData) {
         super(player, playerData);
+    }
+
+    public void start() {
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(System.plugin, () -> {
             if (List.size() > 0) {
                 if (!player.isOnline() || !System.plugin.isEnabled()) {
@@ -42,10 +49,15 @@ public class PetInventory extends BasicInventory {
                 }
             }
         }, 0, 20);
+        BTTSet(task, "PetInventory");
     }
 
     public List<PetParameter> getList() {
         return List;
+    }
+
+    public HashMap<UUID, PetParameter> getHashMap() {
+        return HashMap;
     }
 
     public void clear() {
@@ -54,12 +66,13 @@ public class PetInventory extends BasicInventory {
 
     public void addPetParameter(PetParameter pet) {
         if (List.size() < 100) {
+            HashMap.put(pet.petUUID, pet);
             List.add(pet);
             if (List.size() >= 95) {
-                player.sendMessage("§e§インベントリ§aが§c残り" + (100 - List.size()) +"スロット§aです");
+                player.sendMessage("§e[ペットケージ]§aが§c残り" + (100 - List.size()) +"スロット§aです");
             }
         } else {
-            player.sendMessage("§e§インベントリ§aが§c満杯§aです");
+            player.sendMessage("§e[ペットケージ]§aが§c満杯§aです");
             playSound(player, SoundList.Nope);
         }
 

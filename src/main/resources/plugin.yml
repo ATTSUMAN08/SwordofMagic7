@@ -4,7 +4,7 @@ main: swordofmagic7.System
 api-version: 1.18
 authors: [ MomiNeko ]
 description: Swordofmagic7
-softdepend: [ HolographicDisplays ]
+softdepend: [ HolographicDisplays, Citizens, LibsDisguises ]
 
 commands:
   gm:
@@ -15,12 +15,17 @@ commands:
     permission: debug.som7
     description: description
     usage: /<command>
+  getRune:
+    permission: debug.som7
+    description: description
+    usage: /<command>
   mobSpawn:
     aliases: ms
     permission: debug.som7
     description: description
     usage: /<command>
   playMode:
+    aliases: pm
     permission: debug.som7
     description: description
     usage: /<command>
@@ -33,6 +38,15 @@ commands:
     description: description
     usage: /<command>
   flySpeed:
+    aliases: fs
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  bukkitTasks:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  loadedPlayer:
     permission: debug.som7
     description: description
     usage: /<command>

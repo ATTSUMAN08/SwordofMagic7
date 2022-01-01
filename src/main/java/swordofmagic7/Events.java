@@ -1,6 +1,12 @@
 package swordofmagic7;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
+import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.NPCClickEvent;
+import net.citizensnpcs.api.event.NPCRightClickEvent;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -10,10 +16,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -29,6 +34,7 @@ import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.Npc.NpcMessage;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
@@ -40,11 +46,10 @@ import java.util.Random;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.unColored;
-import static swordofmagic7.Function.unDecoText;
-import static swordofmagic7.Map.MapManager.TeleportGateSelector;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.BTTSet;
 import static swordofmagic7.System.tagGame;
 
 public class Events implements Listener {
@@ -72,11 +77,11 @@ public class Events implements Listener {
             pet.cage();
         }
         playerData.save();
-        playerData.remove();
         PlayerList.load();
-        if (tagGame.isPlayer(player)) {
-            tagGame.leave(player);
+        if (TagGame.isPlayer(player)) {
+            TagGame.leave(player);
         }
+        playerData.remove();
     }
 
     @EventHandler
@@ -86,6 +91,8 @@ public class Events implements Listener {
         if (playerData.PlayMode) {
             playerData.Menu.MenuClick(event);
             playerData.viewUpdate();
+        } else if (event.getCurrentItem() != null) {
+            playerData.MapManager.TeleportGateMenuClick(event.getView(), event.getSlot());
         }
     }
 
@@ -100,13 +107,17 @@ public class Events implements Listener {
 
     @EventHandler
     void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
-            playerData.viewUpdate();
-            playerData.Menu.MenuClose(event);
-            playerData.Status.StatusUpdate();
-        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Player player = (Player) event.getPlayer();
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                if (playerData.PlayMode) {
+                    playerData.viewUpdate();
+                    playerData.Menu.MenuClose(event);
+                    playerData.Status.StatusUpdate();
+                }
+            }
+        }, 1);
     }
 
     @EventHandler
@@ -118,20 +129,34 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    void onPlayerInteract(PlayerInteractEvent event) {
+    void onPlayerLectern(PlayerTakeLecternBookEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            if (block != null) {
+                if (block.getType() != Material.LECTERN) {
+                    event.setCancelled(true);
+                }
+            } else {
+                event.setCancelled(true);
+            }
         } else if (event.getAction() == Action.PHYSICAL) {
-            if(event.getClickedBlock().getType() == Material.FARMLAND) {
+            if(block != null && block.getType() == Material.FARMLAND) {
                 event.setCancelled(true);
             }
         }
 
         Action action = event.getAction();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
-            Block block = event.getClickedBlock();
+        if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
             if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
                 if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
                     if (playerData.CastMode.isLegacy()) {
@@ -171,28 +196,43 @@ public class Events implements Listener {
                     Random random = new Random();
                     mobSpawn(getMobData("訓練用ダミー"), 1, sign.getLocation().add(random.nextDouble(), 0, random.nextDouble()));
                 }
-
-                if (sign.getLine(0).equals("モジュラーブレード")) {
-                    playerData.ItemInventory.addItemParameter(getItemParameter("モジュラーブレード"), 1);
-                    playerData.viewUpdate();
-                }
             }
         }
     }
 
     @EventHandler
-    void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+    void onRecipeBookClick(PlayerRecipeBookClickEvent event) {
+        event.setCancelled(true);
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
+        playerData.Menu.UserMenuView();
+    }
+
+    @EventHandler
+    void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        event.setCancelled(true);
         Entity entity = event.getRightClicked();
         if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
-            String shop = unColored(entity.getCustomName());
-            if (ShopList.containsKey(shop)) {
-                playerData.Shop.ShopOpen(getShopData(shop));
-            } else if (shop.equalsIgnoreCase("ペットショップ")) {
-                playerData.PetManager.PetShop();
-            } else if (shop.equalsIgnoreCase("ルーン職人")) {
-                playerData.RuneInventory.RuneMenuView();
+            NPCRegistry npcRegistry = CitizensAPI.getNPCRegistry();
+            if (npcRegistry.isNPC(entity)) {
+                Player player = event.getPlayer();
+                PlayerData playerData = playerData(player);
+                NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
+                String shop = unColored(entity.getCustomName());
+                if (ShopList.containsKey(shop)) {
+                    playerData.Shop.ShopOpen(getShopData(shop));
+                } else if (shop.equalsIgnoreCase("ペットショップ")) {
+                    playerData.PetManager.PetShop();
+                } else if (shop.equalsIgnoreCase("ルーン職人")) {
+                    playerData.RuneShop.RuneMenuView();
+                } else if (shop.equalsIgnoreCase("転職神官")) {
+                    playerData.Classes.ClassSelectView(0);
+                } else if (shop.equalsIgnoreCase("買取屋")) {
+                    playerData.Shop.ShopSellOpen();
+                }
+                if (NpcList.containsKey(npc.getId())) {
+                    NpcMessage.ShowMessage(player, npc);
+                }
             }
         }
     }
@@ -210,7 +250,7 @@ public class Events implements Listener {
                 } else if (Under1 == Material.GOLD_BLOCK || Under2 == Material.GOLD_BLOCK) {
                     event.setCancelled(true);
                     player.setGravity(false);
-                    new BukkitRunnable() {
+                    BTTSet(new BukkitRunnable() {
                         double y = 1;
                         @Override
                         public void run() {
@@ -221,7 +261,7 @@ public class Events implements Listener {
                                 player.setGravity(true);
                             }
                         }
-                    }.runTaskTimerAsynchronously(plugin, 0, 1);
+                    }.runTaskTimerAsynchronously(plugin, 0, 1), "PressurePlate:" + player.getName());
                     playSound(player, SoundList.Shoot);
 
                 } else if (Under1 == Material.EMERALD_BLOCK || Under2 == Material.EMERALD_BLOCK) {
@@ -374,7 +414,9 @@ public class Events implements Listener {
 
     @EventHandler
     void onTarget(EntityTargetEvent event) {
-        event.setCancelled(true);
+        if (MobManager.isEnemy(event.getEntity())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -387,7 +429,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         playerData.Strafe = 2;
-        if (playerData(player).StrafeMode.isDoubleJump() || player.getGameMode() == GameMode.CREATIVE) {
+        if (playerData.StrafeMode.isDoubleJump() || player.getGameMode() == GameMode.CREATIVE) {
             player.setAllowFlight(true);
         } else {
             player.setAllowFlight(false);
@@ -397,17 +439,25 @@ public class Events implements Listener {
     @EventHandler
     void onSneakToggle(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
         if (!player.isSneaking()) {
-            TeleportGateSelector(player);
+            playerData.MapManager.WarpGateSelector();
+            playerData.MapManager.TeleportGateSelector();
         }
         CharaController.WallKick(player);
+        if (playerData.isDead) {
+            playerData.deadTime = 0;
+        }
     }
 
     @EventHandler
     void onSprintToggle(PlayerToggleSprintEvent event) {
         Player player = event.getPlayer();
-        if (!player.isSprinting() && playerData(player).StrafeMode.isAirDash()) {
+        PlayerData playerData = playerData(player);
+        if (!player.isSprinting() && playerData.StrafeMode.isAirDash()) {
             CharaController.Strafe(player);
+        } else if (playerData.isDead) {
+
         }
     }
 
@@ -435,6 +485,16 @@ public class Events implements Listener {
                 }
             }
         }, 5);
+    }
+
+    @EventHandler
+    void onBlockExplode(BlockExplodeEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    void onBlockDamage(BlockDamageEvent event) {
+        event.setCancelled(true);
     }
 
 

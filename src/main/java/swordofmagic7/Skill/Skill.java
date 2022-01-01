@@ -39,7 +39,7 @@ public class Skill {
         SkillProcess = new SkillProcess(player, playerData, plugin, this);
     }
 
-    void setCastReady(boolean bool) {
+    public void setCastReady(boolean bool) {
         CastReady = bool;
         SkillProcess.SkillCastTime = 0;
     }
@@ -64,11 +64,14 @@ public class Skill {
                     }.runTaskTimerAsynchronously(plugin, 0, 1);
                     switch (skillData.Id) {
                         case "Slash" -> SkillProcess.Slash(skillData, 5, 70);
+                        case "Bash" -> SkillProcess.Slash(skillData, 6, 90);
                         case "Vertical" -> SkillProcess.Vertical(skillData, 10, 2.5);
-                        case "HammerStole" -> SkillProcess.Slash(skillData, 8, 110);
+                        case "Thrust" -> SkillProcess.Vertical(skillData, 10, 3);
+                        case "Smite" -> SkillProcess.Smite(skillData, 4);
                         case "Rain" -> SkillProcess.Rain(skillData, 5);
                         case "DoubleTrigger" -> SkillProcess.DoubleTrigger(skillData);
                         case "Infall" -> SkillProcess.Infall(skillData, 10);
+                        case "Heal" -> SkillProcess.Heal(skillData, 15);
                     }
                     setSkillCoolTime(skillData);
                 } else {
@@ -84,12 +87,16 @@ public class Skill {
             @Override
             public void run() {
                 SkillCoolTime.put(skillData, SkillCoolTime.get(skillData) - 1);
-                if (SkillCoolTime.get(skillData) <= 0) {
+                if (SkillCoolTime.get(skillData) < 1) {
                     this.cancel();
                     SkillCoolTime.remove(skillData);
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 0, 1);
+    }
+
+    public int getSkillCoolTime(SkillData skillData) {
+        return SkillCoolTime.getOrDefault(skillData, 0);
     }
 
     private boolean CategoryCheck(EquipmentSlot slot, EquipmentCategory category) {
@@ -137,7 +144,7 @@ public class Skill {
             } else {
                 Display += ", " + category.Display;
             }
-            if (playerData.Equipment.getEquip(slot).EquipmentCategory == category) {
+            if (playerData.Equipment.getEquip(slot).itemEquipmentData.EquipmentCategory == category) {
                 check = true;
                 break;
             }
@@ -145,7 +152,8 @@ public class Skill {
         if (check) {
             return true;
         } else {
-            player.sendMessage("§aこの§eスキル§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります");
+            player.sendMessage("§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります");
+            playSound(player, SoundList.Nope);
             return false;
         }
     }
@@ -172,7 +180,7 @@ public class Skill {
         if (equalInv(view, SkillMenuDisplay)) {
             SkillData skillData = getSkillData(SkillMenuCache.get(Slot));
             if (skillData.SkillType.isActive()) {
-                playerData.HotBar.addHotbar(new HotBarData(skillData));
+                playerData.Menu.Trigger.TriggerMenuView();
                 playSound(player, SoundList.Click);
             } else {
                 player.sendMessage("§e[" + skillData.Display + "]§aは§eパッシブスキル§aです");

@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 public enum EquipmentCategory {
     Blade("刃剣", Material.STONE_SWORD),
-    Hammer("大槌", Material.STONE_AXE),
+    Mace("鈍器", Material.STONE_SHOVEL),
     Rod("法杖", Material.STONE_HOE),
     ActGun("法銃", Material.GOLDEN_HOE),
     Shield("盾", Material.SHIELD),

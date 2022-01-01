@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 public final class RayTrace {
 
     public static Ray rayLocation(Location loc, double distance, double size, boolean ignore, Predicate<Entity> predicate) {
+        loc = loc.clone();
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTrace(loc, loc.getDirection(), distance, FluidCollisionMode.NEVER, ignore, size, predicate);
         Ray ray = new Ray();
@@ -30,6 +31,7 @@ public final class RayTrace {
     }
 
     public static Ray rayLocationBlock(Location loc, double distance, boolean ignore) {
+        loc = loc.clone();
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTraceBlocks(loc, loc.getDirection(), distance, FluidCollisionMode.NEVER, ignore);
         Ray ray = new Ray();
@@ -45,6 +47,7 @@ public final class RayTrace {
     }
 
     public static Ray rayLocationEntity(Location loc, double distance, double size, Predicate<Entity> predicate) {
+        loc = loc.clone();
         World world = loc.getWorld();
         RayTraceResult rayData = world.rayTraceEntities(loc, loc.getDirection(), distance, size, predicate);
         Ray ray = new Ray();

@@ -5,6 +5,7 @@ import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -19,8 +20,14 @@ import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
+import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.System;
@@ -30,11 +37,13 @@ import java.util.*;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.BTTSet;
 
 public class PetParameter implements Cloneable {
     public Player player;
     public PlayerData playerData;
 
+    public UUID petUUID = UUID.randomUUID();
     public UUID uuid;
     public LivingEntity entity;
     public PetData petData;
@@ -54,41 +63,18 @@ public class PetParameter implements Cloneable {
     public double Mana;
     public double ATK;
     public double DEF;
+    public double HLP;
     public double ACC;
     public double EVA;
     public double CriticalRate;
     public double CriticalResist;
     public PetAIState AIState = PetAIState.Follow;
-    public List<RuneParameter> Rune = new ArrayList<>();
-    public HashMap<StatusParameter, Double> RuneStatus = new HashMap<>();
+    public ItemParameter[] Equipment = new ItemParameter[3];
+    public HashMap<StatusParameter, Double> EquipmentStatus = new HashMap<>();
 
     public boolean Summoned = false;
 
-    List<RuneParameter> getRune() {
-        return new ArrayList<>(Rune);
-    }
-
-    int getRuneSize() {
-        return getRune().size();
-    }
-
-    RuneParameter getRune(int i) {
-        return getRune().get(i);
-    }
-
-    void addRune(RuneParameter rune) {
-        List<RuneParameter> List = getRune();
-        List.add(rune);
-        Rune = List;
-    }
-
-    void removeRune(int i) {
-        List<RuneParameter> List = getRune();
-        List.remove(i);
-        Rune = List;
-    }
-
-    Entity target;
+    public LivingEntity target;
     private final Random random = new Random();
 
     PetParameter() {
@@ -105,6 +91,9 @@ public class PetParameter implements Cloneable {
         this.Exp = Exp;
         this.GrowthRate = GrowthRate;
         updateStatus();
+        Stamina = MaxStamina;
+        Health = MaxHealth;
+        Mana = MaxMana;
     }
 
     public void addExp(int add) {
@@ -130,35 +119,44 @@ public class PetParameter implements Cloneable {
     }
 
     private double StatusMultiply() {
-        return Math.pow(0.8 + (Level / 5f), 1.2) * GrowthRate;
+        return Math.pow(0.95 + (Level / 20f), 1.2) * GrowthRate;
     }
 
-    double RuneStatus(StatusParameter param) {
-        RuneStatus.putIfAbsent(param, 0d);
-        return RuneStatus.get(param);
+    double EquipmentStatus(StatusParameter param) {
+        if (!EquipmentStatus.containsKey(param)) {
+            EquipmentStatus.put(param, 0d);
+        }
+        return EquipmentStatus.get(param);
     }
 
     void updateStatus() {
         for (StatusParameter param : StatusParameter.values()) {
-            RuneStatus.put(param, 0d);
+            EquipmentStatus.put(param, 0d);
         }
-        for (RuneParameter rune : Rune) {
-            for (StatusParameter param : StatusParameter.values()) {
-                RuneStatus.put(param, RuneStatus.get(param) + rune.Parameter.get(param));
+        for (ItemParameter equipment : Equipment) {
+            if (equipment != null) {
+                for (StatusParameter param : StatusParameter.values()) {
+                    EquipmentStatus.put(param, EquipmentStatus.getOrDefault(param, 0d) + equipment.itemEquipmentData.Parameter.getOrDefault(param, 0d));
+                }
             }
         }
         double Multiply = StatusMultiply();
-        MaxStamina = petData.MaxStamina * (Multiply / 10 + 1);
-        MaxHealth = petData.MaxHealth * Multiply + RuneStatus(StatusParameter.MaxHealth);
-        HealthRegen = petData.HealthRegen * (Multiply / 10 + 1) + RuneStatus(StatusParameter.HealthRegen);
-        MaxMana = petData.MaxMana * Multiply + RuneStatus(StatusParameter.MaxMana);
-        ManaRegen = petData.ManaRegen * (Multiply / 10 + 1) + RuneStatus(StatusParameter.ManaRegen);
-        ATK = petData.ATK * Multiply + RuneStatus(StatusParameter.ATK);
-        DEF = petData.DEF * Multiply + RuneStatus(StatusParameter.DEF);
-        ACC = petData.ACC * Multiply + RuneStatus(StatusParameter.ACC);
-        EVA = petData.EVA * Multiply + RuneStatus(StatusParameter.EVA);
-        CriticalRate = petData.CriticalRate * Multiply + RuneStatus(StatusParameter.CriticalRate);
-        CriticalResist = petData.CriticalResist * Multiply + RuneStatus(StatusParameter.CriticalResist);
+        SkillData basicTamer = getSkillData("BasicTamer");
+        if (playerData.Classes.getPassiveSkillList().contains(basicTamer)) {
+            Multiply *= 1+basicTamer.Parameter.get(1).Value/100;
+        }
+        MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
+        MaxHealth = petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth);
+        HealthRegen = petData.HealthRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.HealthRegen);
+        MaxMana = petData.MaxMana * Multiply + EquipmentStatus(StatusParameter.MaxMana);
+        ManaRegen = petData.ManaRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.ManaRegen);
+        ATK = petData.ATK * Multiply + EquipmentStatus(StatusParameter.ATK);
+        DEF = petData.DEF * Multiply + EquipmentStatus(StatusParameter.DEF);
+        HLP = petData.HLP * Multiply + EquipmentStatus(StatusParameter.HLP);
+        ACC = petData.ACC * Multiply + EquipmentStatus(StatusParameter.ACC);
+        EVA = petData.EVA * Multiply + EquipmentStatus(StatusParameter.EVA);
+        CriticalRate = petData.CriticalRate * Multiply + EquipmentStatus(StatusParameter.CriticalRate);
+        CriticalResist = petData.CriticalResist * Multiply + EquipmentStatus(StatusParameter.CriticalResist);
 
         if (entity != null) {
             String DisplayName = "§e§l《" + petData.Display + "Lv" + Level + "》";
@@ -166,6 +164,13 @@ public class PetParameter implements Cloneable {
         }
     }
 
+    public void spawn() {
+        if (playerData.PetSummon.size() == 0) {
+            spawn(player.getLocation());
+        } else if (Summoned) {
+            cage();
+        }
+    }
     public void spawn(Location location) {
         target = null;
         if (Stamina / MaxStamina < 0.05) {
@@ -243,31 +248,33 @@ public class PetParameter implements Cloneable {
         if (runPathfinderTask != null) runPathfinderTask.cancel();
     }
 
+    public Location LastLocation;
     void runAI() {
         stopAI();
+        LastLocation = entity.getLocation();
         if (entity instanceof Mob mob) {
             runPathfinderTask = Bukkit.getScheduler().runTaskTimer(System.plugin, () -> {
                 Vector vector;
                 Location location;
+                double range;
                 if (target != null && AIState.isAttack()) {
-                    vector = target.getLocation().toVector().subtract(entity.getLocation().toVector());
                     location = target.getLocation();
-                    entity.getLocation().setDirection(vector);
-                    Pathfinder pathfinder = mob.getPathfinder();
-                    pathfinder.moveTo(location, 1.5d);
-
+                    range = 2;
                 } else {
-                    vector = player.getLocation().toVector().subtract(entity.getLocation().toVector());
-                    entity.getLocation().setDirection(vector);
-                    if (entity.getLocation().distance(player.getLocation()) > 5) {
-                        location = player.getLocation().add(player.getLocation().getDirection().setY(0).normalize());
-                        Pathfinder pathfinder = mob.getPathfinder();
-                        pathfinder.moveTo(location, 1.5d);
-                    }
+                    location = player.getEyeLocation();
+                    range = 4;
                 }
+                vector = location.toVector().subtract(entity.getLocation().toVector());
+                mob.lookAt(location);
+                Pathfinder pathfinder = mob.getPathfinder();
+                pathfinder.moveTo(location, 1.5d);
+                if (LastLocation.distance(entity.getLocation()) < 0.5 && location.distance(entity.getLocation()) > range) {
+                    entity.setVelocity(vector.normalize().multiply(0.5).setY(0.5));
+                }
+                LastLocation = entity.getLocation();
             }, 0, 10);
             runAITask = Bukkit.getScheduler().runTaskTimer(System.plugin, () -> {
-                if (entity.getLocation().distance(player.getLocation()) > 64) {
+                if (entity.getLocation().distance(player.getLocation()) > 32) {
                     entity.teleportAsync(player.getLocation());
                 }
 
@@ -283,22 +290,18 @@ public class PetParameter implements Cloneable {
                     }
                 }
                 if (target != null) {
-                    if (target.getLocation().distance(entity.getLocation()) < 2) {
-                        Damage.makeDamage(entity, (LivingEntity) target, DamageCause.ATK, "attack", 1, 1);
-                    }
-                    if (target instanceof Player player) {
-                        if (player.getGameMode() != GameMode.SURVIVAL) {
-                            target = null;
-                        }
-                    } else if (MobManager.isEnemy(target)) {
-                        if (MobManager.EnemyTable(target.getUniqueId()).isDead) {
-                            target = null;
-                        }
-                    } else if (target.getLocation().distance(entity.getLocation()) > 32) {
+                    if ((target.getLocation().distance(entity.getLocation()) > 32)
+                    || (MobManager.isEnemy(target) && MobManager.EnemyTable(target.getUniqueId()).isDead)
+                    || (target instanceof Player player && player.getGameMode() != GameMode.SURVIVAL)
+                    || target.isDead()) {
                         target = null;
+                    } else if (target.getLocation().distance(entity.getLocation()) < 2) {
+                        Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
                     }
                 }
             }, 0, 20);
+            BTTSet(runPathfinderTask, "PetPathfinder");
+            BTTSet(runAITask, "PetAI");
         }
     }
 
@@ -342,9 +345,11 @@ public class PetParameter implements Cloneable {
         this.player = player;
         this.playerData = playerData;
         if (!data.equals("None")) {
-            String[] split = data.split(",");
-            if (DataBase.PetList.containsKey(split[0])) {
-                petData = getPetData(split[0]);
+            String[] split = data.split(",pet");
+            petUUID = UUID.fromString(split[0]);
+            split[1] = split[1].replace("Id:", "");
+            if (DataBase.PetList.containsKey(split[1])) {
+                petData = getPetData(split[1]);
                 for (String str : split) {
                     if (str.contains("Level:")) {
                         Level = Integer.parseInt(str.replace("Level:", ""));
@@ -367,28 +372,38 @@ public class PetParameter implements Cloneable {
                     if (str.contains("Mana:")) {
                         Mana = Double.parseDouble(str.replace("Mana:", ""));
                     }
-                    if (str.contains("Rune:")) {
-                        addRune(stringToRune(str.replace("Rune:", "")));
+                    for (int i = 0; i < 3; i++) {
+                        if (str.contains("Equipment" + i + ":")) {
+                            Equipment[i] = ItemParameterStack.fromString(str.replace("Equipment" + i + ":", "")).itemParameter;
+                        }
                     }
                 }
                 updateStatus();
             } else {
-                Log("§cError NotFoundItemData: " + split[0]);
+                Log("§cError NotFoundItemData: " + split[0], true);
             }
         }
     }
 
+    @Override
     public String toString() {
         final String format = "%.1f";
         StringBuilder data = new StringBuilder(
-                petData.Id + ",Level:" + Level + ",LevelMax:" + MaxLevel + ",Exp:" + Exp
-                        + ",GrowthRate:" + String.format("%.4f", GrowthRate)
-                        + ",Stamina:" + String.format(format, Stamina)
-                        + ",Health:" + String.format(format, Health)
-                        + ",Mana:" + String.format(format, Mana));
-        for (RuneParameter runeParameter : getRune()) {
-            if (!runeToString(runeParameter).equals("None"))
-                data.append(",Rune:").append(runeToString(runeParameter));
+                petUUID
+                + ",petId:" + petData.Id
+                + ",petLevel:" + Level
+                + ",petLevelMax:" + MaxLevel
+                + ",petExp:" + Exp
+                + ",petGrowthRate:" + String.format("%.4f", GrowthRate)
+                + ",petStamina:" + String.format(format, Stamina)
+                + ",petHealth:" + String.format(format, Health)
+                + ",petMana:" + String.format(format, Mana)
+        );
+
+        for (int i = 0; i < 3; i++) {
+            if (Equipment[i] != null) {
+                data.append(",petEquipment").append(i).append(":").append(new ItemParameterStack(Equipment[i]));
+            }
         }
         return data.toString();
     }

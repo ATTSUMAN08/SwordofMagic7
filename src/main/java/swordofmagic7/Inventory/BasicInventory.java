@@ -6,12 +6,12 @@ import swordofmagic7.Sound.CustomSound;
 import swordofmagic7.Sound.SoundList;
 
 public class BasicInventory {
-    final Player player;
-    final PlayerData playerData;
+    public final Player player;
+    public final PlayerData playerData;
 
     int ScrollTick = 0;
 
-    BasicInventory(Player player, PlayerData playerData) {
+    public BasicInventory(Player player, PlayerData playerData) {
         this.player = player;
         this.playerData = playerData;
     }

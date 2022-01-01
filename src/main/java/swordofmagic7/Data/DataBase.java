@@ -4,6 +4,7 @@ import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.watchers.SlimeWatcher;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,12 +22,15 @@ import swordofmagic7.HotBar.HotBarCategory;
 import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
+import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Map.MapData;
+import swordofmagic7.Map.TeleportGateParameter;
 import swordofmagic7.Map.WarpGateParameter;
 import swordofmagic7.Mob.*;
+import swordofmagic7.Npc.NpcData;
 import swordofmagic7.Pet.PetData;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Shop.ShopSlot;
@@ -35,6 +39,7 @@ import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Skill.SkillType;
 import swordofmagic7.Status.StatusParameter;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +61,6 @@ public final class DataBase {
     public static final String itemInformation = decoText("§3§lアイテム情報");
     public static final String itemParameter = decoText("§3§lパラメーター");
     public static final String itemRune = decoText("§3§lルーン");
-    public static final HashMap<Player, PlayerData> playerData = new HashMap<>();
     public static final HashMap<String, ItemParameter> ItemList = new HashMap<>();
     public static final HashMap<String, RuneParameter> RuneList = new HashMap<>();
     public static final HashMap<String, ClassData> ClassList = new HashMap<>();
@@ -66,8 +70,11 @@ public final class DataBase {
     public static final HashMap<String, MobSpawnerData> MobSpawnerList = new HashMap<>();
     public static final HashMap<String, ShopData> ShopList = new HashMap<>();
     public static final HashMap<String, WarpGateParameter> WarpGateList = new HashMap<>();
+    public static final HashMap<String, TeleportGateParameter> TeleportGateList = new HashMap<>();
     public static final HashMap<String, MapData> MapList = new HashMap<>();
     public static final HashMap<String, PetData> PetList = new HashMap<>();
+    public static final HashMap<Integer, NpcData> NpcList = new HashMap<>();
+    public static final HashMap<Integer, String> TeleportGateMenu = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(Player player) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
@@ -114,9 +121,18 @@ public final class DataBase {
     }
 
     static void DataLoad() {
+        File npcDirectories = new File(DataBasePath, "Npc");
+        List<File> npcFiles = dumpFile(npcDirectories);
+        for (File file : npcFiles) {
+            String fileName = file.getName().replace(".yml", "");
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            NpcData npcData = new NpcData();
+            npcData.Message = data.getStringList("Message");
+            NpcList.put(Integer.valueOf(fileName), npcData);
+        }
+
         File itemDirectories = new File(DataBasePath, "ItemData");
         List<File> itemFiles = dumpFile(itemDirectories);
-        //Log(String.valueOf(itemFiles));
         for (File file : itemFiles) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -126,28 +142,37 @@ public final class DataBase {
             itemParameter.Lore = data.getStringList("Lore");
             itemParameter.Sell = data.getInt("Sell");
             itemParameter.Category = ItemCategory.Item.getItemCategory(data.getString("Category"));
-            if (itemParameter.Category == ItemCategory.PetEgg) {
-                itemParameter.PetId = data.getString("PetId");
-                itemParameter.PetMaxLevel = data.getInt("PetMaxLevel");
-                itemParameter.PetLevel = data.getInt("PetLevel");
+            if (data.isSet("Color.R")) {
+                itemParameter.color = Color.fromRGB(data.getInt("Color.R"), data.getInt("Color.G"), data.getInt("Color.B"));
             }
-            itemParameter.EquipmentCategory = EquipmentCategory.Blade.getEquipmentCategory(data.getString("EquipmentCategory"));
+            if (itemParameter.Category == ItemCategory.PetEgg) {
+                itemParameter.itemPetEgg.PetId = data.getString("PetId");
+                itemParameter.itemPetEgg.PetMaxLevel = data.getInt("PetMaxLevel");
+                itemParameter.itemPetEgg.PetLevel = data.getInt("PetLevel");
+            } else if (itemParameter.Category == ItemCategory.Potion) {
+                itemParameter.itemPotion.PotionType = ItemPotionType.valueOf(data.getString("Potion.Type"));
+                itemParameter.itemPotion.CoolTime = data.getInt("Potion.CoolTime");
+                for (int i = 0; i < 4; i++) {
+                    itemParameter.itemPotion.Value[i] = data.getDouble("Potion.Value." + i);
+                }
+            }
+            itemParameter.itemEquipmentData.EquipmentCategory = EquipmentCategory.Blade.getEquipmentCategory(data.getString("EquipmentCategory"));
             if (data.isSet("Material")) {
                 itemParameter.Icon = Material.getMaterial(data.getString("Material", "BARRIER"));
             } else if (itemParameter.Category == ItemCategory.Equipment) {
-                itemParameter.Icon = itemParameter.EquipmentCategory.material;
+                itemParameter.Icon = itemParameter.itemEquipmentData.EquipmentCategory.material;
             }
-            itemParameter.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
+            itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
             for (StatusParameter param : StatusParameter.values()) {
                 if (data.isSet(param.toString())) {
-                    itemParameter.Parameter.put(param, data.getDouble(param.toString()));
+                    itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()));
                 }
             }
-            if (data.isSet("ReqLevel")) itemParameter.ReqLevel = data.getInt("ReqLevel");
-            if (data.isSet("RuneSlot")) itemParameter.RuneSlot = data.getInt("RuneSlot");
+            if (data.isSet("ReqLevel")) itemParameter.itemEquipmentData.ReqLevel = data.getInt("ReqLevel");
+            if (data.isSet("RuneSlot")) itemParameter.itemEquipmentData.RuneSlot = data.getInt("RuneSlot");
             if (data.isSet("Durable")) {
-                itemParameter.Durable = data.getInt("Durable");
-                itemParameter.MaxDurable = itemParameter.Durable;
+                itemParameter.itemEquipmentData.Durable = data.getInt("Durable");
+                itemParameter.itemEquipmentData.MaxDurable = itemParameter.itemEquipmentData.Durable;
             }
             ItemList.put(itemParameter.Id, itemParameter);
         }
@@ -159,6 +184,7 @@ public final class DataBase {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             RuneParameter runeData = new RuneParameter();
             runeData.Id = fileName;
+            runeData.Icon = Material.getMaterial(data.getString("Icon"));
             runeData.Display = data.getString("Display");
             runeData.Lore = data.getStringList("Lore");
             for (StatusParameter param : StatusParameter.values()) {
@@ -172,7 +198,7 @@ public final class DataBase {
         }
 
         File petDirectories = new File(DataBasePath, "PetData/");
-        File[] petFile = petDirectories.listFiles();
+        List<File> petFile = dumpFile(petDirectories);
         for (File file : petFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -197,6 +223,7 @@ public final class DataBase {
             petData.ManaRegen = data.getDouble("ManaRegen");
             petData.ATK = data.getDouble("ATK");
             petData.DEF = data.getDouble("DEF");
+            petData.HLP = data.getDouble("HLP");
             petData.ACC = data.getDouble("ACC");
             petData.EVA = data.getDouble("EVA");
             petData.CriticalRate = data.getDouble("CriticalRate");
@@ -211,6 +238,7 @@ public final class DataBase {
             String fileName = file.getName().replace(".yml", "");
             MapData mapData = new MapData();
             mapData.Display = data.getString("Display");
+            mapData.Color = data.getString("Color");
             mapData.Level = data.getInt("Level");
             mapData.Safe = data.getBoolean("Safe");
             MapList.put(fileName, mapData);
@@ -229,10 +257,59 @@ public final class DataBase {
             float pitch = (float) data.getDouble("Location.pitch");
             Location loc = new Location(world, x, y, z, yaw, pitch);
             WarpGateParameter warp = new WarpGateParameter();
+            warp.Id = fileName;
             warp.Location = loc;
-            warp.Target = data.getString("Target");
+            if (data.isSet("Target")) {
+                warp.Target = data.getString("Target");
+            } else {
+                double xT = data.getDouble("TargetLocation.x");
+                double yT = data.getDouble("TargetLocation.y");
+                double zT = data.getDouble("TargetLocation.z");
+                float yawT = (float) data.getDouble("TargetLocation.yaw");
+                float pitchT = (float) data.getDouble("TargetLocation.pitch");
+                warp.TargetLocation = new Location(world, xT, yT, zT, yawT, pitchT);
+            }
             warp.NextMap = MapList.get(data.getString("NextMap"));
+            warp.Trigger = data.getString("Trigger");
+            warp.start();
+            if (data.getBoolean("Default", true)) {
+                warp.Active();
+            } else {
+                warp.Disable();
+            }
             WarpGateList.put(fileName, warp);
+        }
+
+        File teleportDirectories = new File(DataBasePath, "TeleportGateData/");
+        File[] teleportFile = teleportDirectories.listFiles();
+        for (File file : teleportFile) {
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            String fileName = file.getName().replace(".yml", "");
+            if (!fileName.equalsIgnoreCase("GUI")) {
+                World world = Bukkit.getWorld(data.getString("Location.w", "world"));
+                double x = data.getDouble("Location.x");
+                double y = data.getDouble("Location.y");
+                double z = data.getDouble("Location.z");
+                float yaw = (float) data.getDouble("Location.yaw");
+                float pitch = (float) data.getDouble("Location.pitch");
+                Location loc = new Location(world, x, y, z, yaw, pitch);
+                TeleportGateParameter teleport = new TeleportGateParameter();
+                teleport.Id = fileName;
+                teleport.Display = data.getString("Display");
+                teleport.Icon = Material.getMaterial(data.getString("Icon"));
+                teleport.Title = data.getString("Title");
+                teleport.Subtitle = data.getString("Subtitle");
+                teleport.Location = loc;
+                teleport.DefaultActive = data.getBoolean("DefaultActive");
+                TeleportGateList.put(fileName, teleport);
+                teleport.start();
+            } else {
+                for (int i = 0; i < 54; i++) {
+                    if (data.isSet("TeleportGateMenu." + i)) {
+                        TeleportGateMenu.put(i, data.getString("TeleportGateMenu." + i));
+                    }
+                }
+            }
         }
 
         File skillActiveDirectories = new File(DataBasePath, "SkillData/Active/");
@@ -307,14 +384,16 @@ public final class DataBase {
         }
 
         File classDirectories = new File(DataBasePath, "ClassData/");
-        File[] classFile = classDirectories.listFiles();
+        List<File> classFile = dumpFile(classDirectories);
         for (File file : classFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             ClassData classData = new ClassData();
             classData.Id = fileName;
             classData.Color = data.getString("Color");
+            classData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
             classData.Display = data.getString("Display");
+            classData.Lore = data.getStringList("Lore");
             classData.Nick = data.getString("Nick");
             classData.Tier = data.getInt("Tier");
             List<SkillData> Skills = new ArrayList<>();
@@ -328,7 +407,7 @@ public final class DataBase {
         }
 
         File mobDirectories = new File(DataBasePath, "MobData/");
-        File[] mobFile = mobDirectories.listFiles();
+        List<File> mobFile = dumpFile(mobDirectories);
         for (File file : mobFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -435,7 +514,7 @@ public final class DataBase {
         }
 
         File mobSpawnerDirectories = new File(DataBasePath, "MobSpawner/");
-        File[] mobSpawner = mobSpawnerDirectories.listFiles();
+        List<File> mobSpawner = dumpFile(mobSpawnerDirectories);
         for (File file : mobSpawner) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -480,12 +559,12 @@ public final class DataBase {
         }
     }
 
-    static void removePlayerData(Player player) {
-        playerData.remove(player);
-    }
-
     public static HashMap<String, ItemParameter> getItemList() {
         return ItemList;
+    }
+
+    public static HashMap<String, RuneParameter> getRuneList() {
+        return RuneList;
     }
 
     public static HashMap<String, ClassData> getClassList() {
@@ -504,6 +583,15 @@ public final class DataBase {
         return PetList;
     }
 
+    public static NpcData getNpcData(int id) {
+        if (NpcList.containsKey(id)) {
+            return NpcList.get(id);
+        } else {
+            Log("§cNon-NpcData: " + id, true);
+            return new NpcData();
+        }
+    }
+
     public static ItemParameter getItemParameter(String str) {
         if (ItemList.containsKey(str)) {
             return ItemList.get(str).clone();
@@ -513,7 +601,7 @@ public final class DataBase {
         }
     }
 
-    static RuneParameter getRuneParameter(String str) {
+    public static RuneParameter getRuneParameter(String str) {
         if (RuneList.containsKey(str)) {
             return RuneList.get(str).clone();
         } else {
@@ -578,100 +666,12 @@ public final class DataBase {
         }
     }
 
-    static String itemToString(ItemParameterStack item) {
-        StringBuilder data;
-        if (!item.isEmpty()) {
-            ItemParameter itemParameter = item.itemParameter;
-            ItemCategory category = itemParameter.Category;
-            data = new StringBuilder(itemParameter.Id + ",Amount:" + item.Amount);
-            if (category == ItemCategory.Equipment) {
-                data.append(",Plus:").append(itemParameter.Plus).append(",Durable:").append(itemParameter.Durable);
-                for (RuneParameter runeParameter : itemParameter.getRune()) {
-                    if (!runeToString(runeParameter).equals("None"))
-                        data.append(",Rune:").append(runeToString(runeParameter));
-                }
-            }
+    public static WarpGateParameter getWarpGate(String str) {
+        if (WarpGateList.containsKey(str)) {
+            return WarpGateList.get(str);
         } else {
-            data = new StringBuilder("None");
+            Log("§cNon-WarpGate: " + str, true);
+            return new WarpGateParameter();
         }
-        return data.toString();
-    }
-
-    public static String runeToString(RuneParameter rune) {
-        String data;
-        if (!rune.isEmpty()) {
-            data = rune.Id + ";Level:" + rune.Level + ";Quality:" + String.format("%.5f", rune.Quality);
-        } else {
-            data = "None";
-        }
-        return data;
-    }
-
-    static String hotBarToString(HotBarData hotBarData) {
-        String data = "None";
-        if (hotBarData != null) {
-            if (hotBarData.category != HotBarCategory.None) {
-                data = hotBarData.Icon + "," + hotBarData.category;
-            }
-        }
-        return data;
-    }
-
-    static ItemParameterStack stringToItem(String data) {
-        ItemParameterStack parameterStack = new ItemParameterStack();
-        if (!data.equals("None")) {
-            String[] split = data.split(",");
-            if (DataBase.ItemList.containsKey(split[0])) {
-                ItemParameter itemParameter = getItemParameter(split[0]);
-                for (String str : split) {
-                    if (str.contains("Amount:")) {
-                        parameterStack.Amount = Integer.parseInt(str.replace("Amount:", ""));
-                    }
-                    if (str.contains("Durable:")) {
-                        itemParameter.Durable = Integer.parseInt(str.replace("Durable:", ""));
-                    }
-                    if (str.contains("Plus:")) {
-                        itemParameter.Plus = Integer.parseInt(str.replace("Plus:", ""));
-                    }
-                    if (str.contains("Rune:")) {
-                        itemParameter.addRune(stringToRune(str.replace("Rune:", "")));
-                    }
-                }
-                parameterStack.itemParameter = itemParameter;
-            } else {
-                Log("§cError NotFoundItemData: " + split[0]);
-            }
-        }
-        return parameterStack;
-    }
-
-    public static RuneParameter stringToRune(String data) {
-        RuneParameter runeParameter = new RuneParameter();
-        if (!data.equals("None")) {
-            String[] split = data.split(";");
-            if (DataBase.RuneList.containsKey(split[0])) {
-                runeParameter = getRuneParameter(split[0]);
-                for (String str : split) {
-                    if (str.contains("Level:")) {
-                        runeParameter.Level = Integer.parseInt(str.replace("Level:", ""));
-                    } else if (str.contains("Quality:")) {
-                        runeParameter.Quality = Double.parseDouble((str.replace("Quality:", "")));
-                    }
-                }
-            } else {
-                Log("§cError NotFoundRuneData: " + split[0]);
-            }
-        }
-        return runeParameter;
-    }
-
-    static HotBarData stringToHotBar(String data) {
-        HotBarData hotBarData = new HotBarData();
-        if (!data.equals("None")) {
-            String[] split = data.split(",");
-            hotBarData.Icon = split[0];
-            hotBarData.category = HotBarCategory.valueOf(split[1]);
-        }
-        return hotBarData;
     }
 }

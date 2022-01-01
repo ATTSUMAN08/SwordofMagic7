@@ -18,6 +18,7 @@ import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.System;
+import swordofmagic7.TagGame;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.List;
 import static swordofmagic7.Attribute.AttributeType.*;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
+import static swordofmagic7.System.BTTSet;
 
 public class Status {
     private final Player player;
@@ -47,6 +49,7 @@ public class Status {
     public double Mana;
     public double ATK;
     public double DEF;
+    public double HLP;
     public double ACC;
     public double EVA;
     public double CriticalRate;
@@ -128,7 +131,7 @@ public class Status {
         }
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             for (StatusParameter param : StatusParameter.values()) {
-                EquipStatus.put(param, EquipStatus.get(param) + playerData.Equipment.getEquip(slot).Parameter().get(param));
+                EquipStatus.put(param, EquipStatus.get(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter().get(param));
             }
         }
         for (AttributeType attr: AttributeType.values()) {
@@ -140,6 +143,8 @@ public class Status {
                     MultiplyStatusAdd(StatusParameter.ATK, param.Value/100);
                 } else if (param.Display.equalsIgnoreCase("防御力")) {
                     MultiplyStatusAdd(StatusParameter.DEF, param.Value/100);
+                } else if (param.Display.equalsIgnoreCase("治癒力")) {
+                    MultiplyStatusAdd(StatusParameter.HLP, param.Value/100);
                 } else if (param.Display.equalsIgnoreCase("物理与ダメージ")) {
                     DamageCauseMultiplyAdd(DamageCause.ATK, param.Value/100);
                 } else if (param.Display.equalsIgnoreCase("魔法与ダメージ")) {
@@ -164,22 +169,24 @@ public class Status {
         BaseStatus.put(StatusParameter.MaxMana, (M*100) * (1+Attribute(SPI)*0.008) * MultiplyStatus.get(StatusParameter.MaxMana));
         BaseStatus.put(StatusParameter.ManaRegen, (M*5) * (1+Attribute(SPI)*0.006) * MultiplyStatus.get(StatusParameter.ManaRegen));
         BaseStatus.put(StatusParameter.ATK, (M*10) * (1+Attribute(STR)*0.005+Attribute.get(INT)*0.005) * MultiplyStatus.get(StatusParameter.ATK));
-        BaseStatus.put(StatusParameter.DEF, (M*3) * (1+Attribute(VIT)*0.005+Attribute.get(SPI)*0.002) * MultiplyStatus.get(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.DEF, (M*5) * (1+Attribute(VIT)*0.005) * MultiplyStatus.get(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.HLP, (M*5) * (1+Attribute(SPI)*0.005) * MultiplyStatus.get(StatusParameter.HLP));
         BaseStatus.put(StatusParameter.ACC, (M*10) * (1+Attribute(TEC)*0.008) * MultiplyStatus.get(StatusParameter.ACC));
-        BaseStatus.put(StatusParameter.EVA, (M*3) * (1+Attribute(DEX)*0.008) * MultiplyStatus.get(StatusParameter.EVA));
+        BaseStatus.put(StatusParameter.EVA, (M*5) * (1+Attribute(DEX)*0.008) * MultiplyStatus.get(StatusParameter.EVA));
         BaseStatus.put(StatusParameter.CriticalRate, (M*10) * (1+Attribute(TEC)*0.01) * MultiplyStatus.get(StatusParameter.CriticalRate));
         BaseStatus.put(StatusParameter.CriticalResist, (M*3) * (1+Attribute(SPI)*0.02) * MultiplyStatus.get(StatusParameter.CriticalResist));
 
         MaxHealth = BaseStatus.get(StatusParameter.MaxHealth) + EquipStatus.get(StatusParameter.MaxHealth);
-        HealthRegen = BaseStatus.get(StatusParameter.HealthRegen) * MultiplyStatus.get(StatusParameter.HealthRegen) + EquipStatus.get(StatusParameter.HealthRegen);
-        MaxMana = BaseStatus.get(StatusParameter.MaxMana) * MultiplyStatus.get(StatusParameter.MaxMana) + EquipStatus.get(StatusParameter.MaxMana);
-        ManaRegen = BaseStatus.get(StatusParameter.ManaRegen) * MultiplyStatus.get(StatusParameter.ManaRegen) + EquipStatus.get(StatusParameter.ManaRegen);
-        ATK = BaseStatus.get(StatusParameter.ATK) * MultiplyStatus.get(StatusParameter.ATK) + EquipStatus.get(StatusParameter.ATK);
-        DEF = BaseStatus.get(StatusParameter.DEF) * MultiplyStatus.get(StatusParameter.DEF) + EquipStatus.get(StatusParameter.DEF);
-        ACC = BaseStatus.get(StatusParameter.ACC) * MultiplyStatus.get(StatusParameter.ACC) + EquipStatus.get(StatusParameter.ACC);
-        EVA = BaseStatus.get(StatusParameter.EVA) * MultiplyStatus.get(StatusParameter.ATK) + EquipStatus.get(StatusParameter.EVA);
-        CriticalRate = BaseStatus.get(StatusParameter.CriticalRate) * MultiplyStatus.get(StatusParameter.CriticalRate) + EquipStatus.get(StatusParameter.CriticalRate);
-        CriticalResist = BaseStatus.get(StatusParameter.CriticalResist) * MultiplyStatus.get(StatusParameter.CriticalResist) + EquipStatus.get(StatusParameter.CriticalResist);
+        HealthRegen = BaseStatus.get(StatusParameter.HealthRegen) + EquipStatus.get(StatusParameter.HealthRegen);
+        MaxMana = BaseStatus.get(StatusParameter.MaxMana) + EquipStatus.get(StatusParameter.MaxMana);
+        ManaRegen = BaseStatus.get(StatusParameter.ManaRegen) + EquipStatus.get(StatusParameter.ManaRegen);
+        ATK = BaseStatus.get(StatusParameter.ATK) + EquipStatus.get(StatusParameter.ATK);
+        DEF = BaseStatus.get(StatusParameter.DEF) + EquipStatus.get(StatusParameter.DEF);
+        HLP = BaseStatus.get(StatusParameter.HLP) + EquipStatus.get(StatusParameter.HLP);
+        ACC = BaseStatus.get(StatusParameter.ACC) + EquipStatus.get(StatusParameter.ACC);
+        EVA = BaseStatus.get(StatusParameter.EVA) + EquipStatus.get(StatusParameter.EVA);
+        CriticalRate = BaseStatus.get(StatusParameter.CriticalRate) + EquipStatus.get(StatusParameter.CriticalRate);
+        CriticalResist = BaseStatus.get(StatusParameter.CriticalResist) + EquipStatus.get(StatusParameter.CriticalResist);
         SkillCastTime = EquipStatus.get(StatusParameter.SkillCastTime);
         SkillRigidTime = EquipStatus.get(StatusParameter.SkillRigidTime);
         SkillCooltime = EquipStatus.get(StatusParameter.SkillCooltime);
@@ -194,8 +201,10 @@ public class Status {
     public void tickUpdate() {
         player.setHealthScaled(true);
         player.setGlowing(false);
-        player.setFlying(false);
-        player.setAllowFlight(false);
+        if (playerData.PlayMode) {
+            player.setFlying(false);
+            player.setAllowFlight(false);
+        }
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective sidebarObject = board.registerNewObjective("Sidebar", "dummy", decoText("§bSword of Magic Ⅶ"));
         sidebarObject.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -221,7 +230,7 @@ public class Status {
                     if (ExpPercentBar > 0.99) ExpPercentBar = 0.99f;
                     player.setLevel(Level);
                     player.setExp(ExpPercentBar);
-                    player.sendActionBar("§6§l《" + topClass.Display + " Lv" + Level + "§6§l》" +
+                    player.sendActionBar("§6§l《" + topClass.Color + "§l" + topClass.Display + " §e§lLv" + Level + "§6§l》" +
                             "§c§l《Health: " + (int) Math.round(Health) + "/" + (int) Math.round(MaxHealth) + "》" +
                             "§b§l《Mana: " + (int) Math.round(Mana) + "/" + (int) Math.round(MaxMana) + "》" +
                             "§a§l《Exp: " + String.format("%.3f", ExpPercent) + "%》"
@@ -232,9 +241,16 @@ public class Status {
                     }
                     ScoreKey.clear();
                     ScoreKey.add(decoLore("メル") + playerData.Mel);
-                    if (swordofmagic7.System.tagGame.isPlayer(player)) {
+                    if (TagGame.isPlayer(player)) {
                         ScoreKey.add(decoText("鬼ごっこ"));
-                        ScoreKey.addAll(List.of(swordofmagic7.System.tagGame.info()));
+                        ScoreKey.addAll(List.of(TagGame.info()));
+                    }
+                    ScoreKey.add(decoText("スキルクールタイム"));
+                    for (SkillData skillData : playerData.Classes.getActiveSkillList()) {
+                        int cooltime = playerData.Skill.getSkillCoolTime(skillData);
+                        if (cooltime > 0) {
+                            ScoreKey.add(decoLore(skillData.Display) + String.format("%.1f", cooltime / 20f) + "秒");
+                        }
                     }
                     int i = 15;
                     for (String scoreName : ScoreKey) {
@@ -253,12 +269,10 @@ public class Status {
                     Health += HealthRegen / 20;
                     Mana += ManaRegen / 20;
 
-                    if (Health > MaxHealth) Health = MaxHealth;
-                    if (Mana > MaxMana) Mana = MaxMana;
-
-                    double ManaPercent = Mana / MaxMana;
-
                     Bukkit.getScheduler().runTask(swordofmagic7.System.plugin, () -> {
+                        if (Health > MaxHealth) Health = MaxHealth;
+                        if (Mana > MaxMana) Mana = MaxMana;
+                        double ManaPercent = Mana / MaxMana;
                         player.setAbsorptionAmount(0);
                         player.setMaxHealth(MaxHealth);
                         player.setHealth(Health);
@@ -266,9 +280,12 @@ public class Status {
                         player.removePotionEffect(PotionEffectType.JUMP);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 19, 0, false, false));
                     });
+
+                    playerData.HotBar.UpdateHotBar();
                 }
             }
         }.runTaskTimerAsynchronously(System.plugin, 0, 10);
+        BTTSet(tickUpdateTask, "StatusUpdate:" + player.getName());
     }
 }
 

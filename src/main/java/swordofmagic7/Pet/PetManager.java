@@ -34,11 +34,12 @@ public class PetManager {
         return entity -> entity != player && isPet((LivingEntity) entity) && PetParameter((LivingEntity) entity).player == player;
     }
 
-    public static boolean isPet(LivingEntity entity) {
+    public static boolean isPet(Entity entity) {
+        if (entity == null) return false;
         return PetSummonedList.containsKey(entity.getUniqueId());
     }
 
-    public static PetParameter PetParameter(LivingEntity entity) {
+    public static PetParameter PetParameter(Entity entity) {
         if (isPet(entity)) {
             return PetSummonedList.get(entity.getUniqueId());
         }
@@ -46,8 +47,8 @@ public class PetManager {
         return new PetParameter();
     }
 
-    private Player player;
-    private PlayerData playerData;
+    private final Player player;
+    private final PlayerData playerData;
 
     public PetManager(Player player, PlayerData playerData) {
         this.player = player;
@@ -57,6 +58,7 @@ public class PetManager {
     public void PetShop() {
         Inventory inv = decoInv(PetShopDisplay, 1);
         inv.setItem(0, new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l無料配布のペットです").view());
+        player.openInventory(inv);
     }
 
     public void PetSelect(LivingEntity entity) {
@@ -80,7 +82,7 @@ public class PetManager {
     public boolean usingBaton() {
         PlayerData playerData = playerData(player);
         if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
-            EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).EquipmentCategory;
+            EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
             if (category == EquipmentCategory.Baton) {
                 return true;
             }
@@ -153,8 +155,7 @@ public class PetManager {
             if (currentItem.getType() == Material.WOLF_SPAWN_EGG) {
                 if (playerData.PetInventory.getList().size() == 0) {
                     PetData petData = getPetData("オースオオカミ");
-                    Random random = new Random();
-                    PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, random.nextDouble() + 0.5);
+                    PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, 1);
                     playerData.PetInventory.addPetParameter(petParameter);
                     player.sendMessage("§e[" + petData.Display + "]§aを受け取りました");
                     playSound(player, SoundList.LevelUp);

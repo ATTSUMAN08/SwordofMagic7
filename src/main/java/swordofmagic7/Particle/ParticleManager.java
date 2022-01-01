@@ -8,11 +8,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import swordofmagic7.RayTrace.Ray;
+import swordofmagic7.RayTrace.RayTrace;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static swordofmagic7.Function.Log;
 import static swordofmagic7.System.plugin;
 
 public final class ParticleManager {
@@ -218,8 +221,18 @@ public final class ParticleManager {
         }
     }
 
+
     public static void LineParticle(ParticleData particleData, Location location, double length, double width, double density) {
-        LineParticle(particleData, location, location.clone().add(location.getDirection().multiply(length)), width, density);
+        LineParticle(particleData, location, length, width, density, false);
+    }
+    public static void LineParticle(ParticleData particleData, Location location, double length, double width, double density, boolean collision) {
+        Location loc;
+        if (collision) {
+            loc = RayTrace.rayLocationBlock(location, length, true).HitPosition;
+        } else {
+            loc = location.clone().add(location.getDirection().multiply(length));
+        }
+        LineParticle(particleData, location, loc, width, density);
     }
 
     public static void LineParticle(ParticleData particleData, Location location, Location location2, double width, double density) {
@@ -241,28 +254,5 @@ public final class ParticleManager {
             clone.vector = new Vector(random.nextDouble()*2-1, random.nextDouble()*2, random.nextDouble()*2-1);
             spawnParticle(clone, location);
         }
-    }
-
-    public static void WarpGateParticle(Location loc, Particle particle) {
-        new BukkitRunnable() {
-            int i = 0;
-            final double increment = (2 * Math.PI) / 90;
-            final double radius = 2;
-            final World world = loc.getWorld();
-            final ParticleData particleData = new ParticleData(particle);
-            @Override
-            public void run() {
-                for (int loop = 0; loop < 3; loop++) {
-                    i++;
-                    double angle = i * increment;
-                    double x = radius * Math.cos(angle);
-                    double z = radius * Math.sin(angle);
-                    Location nLoc = new Location(world, loc.getX() + x, loc.getY(), loc.getZ() + z);
-                    Location nLoc2 = new Location(world, loc.getX() - x, loc.getY(), loc.getZ() - z);
-                    spawnParticle(particleData, nLoc);
-                    spawnParticle(particleData, nLoc2);
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 0 , 1);
     }
 }

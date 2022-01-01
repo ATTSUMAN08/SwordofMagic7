@@ -1,7 +1,7 @@
 package swordofmagic7.Skill;
 
 public enum CastType {
-    Legacy("レガジー"),
+    Legacy("レガシー"),
     Renewed("リニュード"),
     Hold("ホールド"),
     ;

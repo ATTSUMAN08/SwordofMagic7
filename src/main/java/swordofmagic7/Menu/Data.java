@@ -27,7 +27,10 @@ public record Data() {
     static final String StatusInfoDisplay = "§lステータス情報";
 
     public static final String AttributeMenuDisplay = "§lアトリビュートメニュー";
+
     public static final String RuneMenuDisplay = "§lルーンメニュー";
+    public static final String RuneEquipMenuDisplay = "§lルーン装着";
+    public static final String RuneCrushMenuDisplay = "§lルーン粉砕";
 
     static final String SettingMenuDisplay = "§l設定メニュー";
     static final ItemStack SettingMenu_DamageLogIcon = new ItemStackData(Material.RED_DYE, decoText("ダメージログ"), "§a§lダメージログ表記を切り替えます").view();
@@ -36,6 +39,7 @@ public record Data() {
     static final ItemStack SettingMenu_StrafeModeIcon = new ItemStackData(Material.FEATHER, decoText("ストレイフモード"), "§a§lストレイフの発動条件を切り替えます").view();
     static final ItemStack SettingMenu_CastModeIcon = new ItemStackData(Material.END_CRYSTAL, decoText("キャストモード"), "§a§lスキルの発動方法を切り替えます").view();
     static final ItemStack SettingMenu_PvPModeIcon = new ItemStackData(Material.IRON_SWORD, decoText("PvPモード"), "§a§lPvPモードを切り替えます").view();
+    static final ItemStack SettingMenu_ShopAmountResetIcon = new ItemStackData(Material.GOLD_NUGGET, decoText("ショップ購入数初期化"), "§a§l[ショップ/買取屋]を開くたびに[購入数/売却数]を\n§a§lリセットするか切り替えます").view();
 
     public static final String PetShopDisplay = "§lペットショップ";
 

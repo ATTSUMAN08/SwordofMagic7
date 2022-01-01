@@ -19,7 +19,7 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
-    public static final int MaxTier = 3;
+    public static final int MaxTier = 1;
     private final Player player;
     private final PlayerData playerData;
     private final HashMap<ClassData, Integer> ClassLevel = new HashMap<>();
@@ -55,7 +55,9 @@ public class Classes {
     }
 
     public int getLevel(ClassData classData) {
-        ClassLevel.putIfAbsent(classData, 1);
+        if (ClassLevel.getOrDefault(classData, 0) <= 0) {
+            ClassLevel.put(classData, 1);
+        }
         return ClassLevel.get(classData);
     }
 
@@ -107,18 +109,36 @@ public class Classes {
         return list;
     }
 
+    public List<SkillData> getActiveSkillList() {
+        List<SkillData> list = new ArrayList<>();
+        for (ClassData classData : classTier) {
+            if (classData != null) {
+                for (SkillData skillData : classData.SkillList) {
+                    if (skillData.SkillType.isActive()) {
+                        list.add(skillData);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
     public void ClassChange(ClassData classData) {
         classTier[classData.Tier] = classData;
         player.sendMessage("§e[クラスT" + classData.Tier + "]§aを" + classData.Color + "[" + classData.Display + "]§aに§b転職§aしました");
+        playSound(player, SoundList.LevelUp);
     }
 
     private final ClassData[] ClassSelectCache = new ClassData[9];
+    private int SelectTier = 0;
     public void ClassSelectView(int tier) {
         Inventory inv = decoInv("クラスカウンター", 1);
+        SelectTier = tier;
         switch (tier) {
             case 0 -> {
                 ItemStack tier1 = new ItemStackData(Material.END_CRYSTAL, decoText("クラス一覧 [T1]")).view();
                 inv.setItem(0, tier1);
+                playSound(player, SoundList.MenuOpen);
             }
             case 1 -> {
                 int i = 0;
@@ -126,8 +146,10 @@ public class Classes {
                     if (classData.Tier == 1) {
                         ClassSelectCache[i] = classData;
                         inv.setItem(i, classData.view());
+                        i++;
                     }
                 }
+                playSound(player, SoundList.Click);
             }
         }
         player.openInventory(inv);
@@ -135,8 +157,12 @@ public class Classes {
 
     public void ClassSelectClick(InventoryView view, int slot) {
         if (equalInv(view, "クラスカウンター")) {
-            ClassData classData = ClassSelectCache[slot];
-            ClassChange(classData);
+            if (SelectTier > 0 && ClassSelectCache[slot] != null) {
+                ClassData classData = ClassSelectCache[slot];
+                ClassChange(classData);
+            } else if (0 <= slot && slot < MaxTier){
+                ClassSelectView(slot+1);
+            }
         }
     }
 }

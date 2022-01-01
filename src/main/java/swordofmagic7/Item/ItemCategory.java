@@ -2,6 +2,7 @@ package swordofmagic7.Item;
 
 public enum ItemCategory {
     Item("アイテム"),
+    Potion("ポーション"),
     Material("素材"),
     PetEgg("ペットエッグ"),
     Equipment("装備"),
@@ -19,5 +20,25 @@ public enum ItemCategory {
             }
         }
         return ItemCategory.Item;
+    }
+
+    public boolean isItem() {
+        return this == Item;
+    }
+
+    public boolean isPotion() {
+        return this == Potion;
+    }
+
+    public boolean isMaterial() {
+        return this == Material;
+    }
+
+    public boolean isPetEgg() {
+        return this == PetEgg;
+    }
+
+    public boolean isEquipment() {
+        return this == Equipment;
     }
 }

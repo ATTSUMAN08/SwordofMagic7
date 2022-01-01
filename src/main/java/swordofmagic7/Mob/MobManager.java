@@ -1,10 +1,15 @@
 package swordofmagic7.Mob;
 
 import me.libraryaddict.disguise.disguisetypes.Disguise;
+import net.minecraft.world.entity.EntityCreature;
+import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.world.entity.ai.goal.PathfinderGoalSelector;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.UUID;
 

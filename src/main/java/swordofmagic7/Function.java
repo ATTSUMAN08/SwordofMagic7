@@ -1,11 +1,14 @@
 package swordofmagic7;
 
+import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +80,10 @@ public final class Function {
         return lore;
     }
 
+    public static boolean ignoreEntity(Entity entity) {
+        return (entity instanceof ItemFrame || entity instanceof ArmorStand || entity instanceof Minecart || CitizensAPI.getNPCRegistry().isNPC(entity));
+    }
+
     public static String decoLore(String str) {
         return "§7・" + colored(str, "§e§l") + "§7: §a§l";
     }
@@ -108,6 +115,10 @@ public final class Function {
         return Bukkit.createInventory(null, size*9, name);
     }
 
+    public static Inventory decoAnvil(String name) {
+        return Bukkit.createInventory(null, InventoryType.ANVIL, name);
+    }
+
     public static boolean inAir(Player player) {
         return !player.isOnGround();
     }
@@ -131,5 +142,8 @@ public final class Function {
     public static boolean isZero(double a) {
         return a != 0;
     }
+
+    public static final Vector VectorUp = new Vector(0, 1, 0);
+    public static final Vector VectorDown = new Vector(0, -1, 0);
 
 }

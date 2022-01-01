@@ -14,6 +14,7 @@ public class CharaController {
     static void WallKick(Player player) {
         PlayerData playerData = playerData(player);
         Location loc = player.getLocation();
+        loc.setPitch(0);
         Material type = loc.clone().add(loc.getDirection().setY(0.1).normalize()).getBlock().getType();
         if (!player.isFlying() && player.isSneaking() && inAir(player)
                 && type.isSolid() && type != Material.BARRIER) {

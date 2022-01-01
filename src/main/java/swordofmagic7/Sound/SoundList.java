@@ -16,6 +16,9 @@ public enum SoundList {
     Shoot(Sound.ENTITY_WITHER_SHOOT, 1, SoundCategory.PLAYERS),
     Warp(Sound.ENTITY_PLAYER_LEVELUP, 0.5f, SoundCategory.PLAYERS),
     Death("custom.object.break", 1, SoundCategory.PLAYERS),
+    DungeonTrigger(Sound.ENTITY_ENDER_DRAGON_GROWL, 1, SoundCategory.PLAYERS),
+    Tick(Sound.BLOCK_LEVER_CLICK, 1, SoundCategory.PLAYERS),
+    Heal(Sound.ENTITY_ENDER_EYE_DEATH, 1, SoundCategory.PLAYERS),
     ;
 
     Object data;

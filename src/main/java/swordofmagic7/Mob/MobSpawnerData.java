@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static swordofmagic7.Function.VectorDown;
+
 public class MobSpawnerData {
     public MobData mobData;
     public Location location;
@@ -55,13 +57,13 @@ public class MobSpawnerData {
             Location origin = new Location(location.getWorld(), x, y, z, 0, 90);
             Location loc = origin.clone();
             for (int i2 = 0; i2 < RadiusY * 2; i2++) {
-                boolean spawnAble = !loc.getBlock().getType().isSolid() && loc.clone().add(0, -1, 0).getBlock().getType().isSolid();
+                boolean spawnAble = !loc.getBlock().getType().isSolid() && loc.clone().add(VectorDown).getBlock().getType().isSolid();
                 if (spawnAble) {
                     EnemyData enemyData = MobManager.mobSpawn(mobData, Level, loc);
                     SpawnedList.add(enemyData);
                     return;
                 }
-                loc.add(0, -1, 0);
+                loc.add(VectorDown);
             }
         }
     }

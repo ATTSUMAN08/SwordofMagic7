@@ -22,6 +22,7 @@ public class PetData {
     public double ManaRegen;
     public double ATK;
     public double DEF;
+    public double HLP;
     public double ACC;
     public double EVA;
     public double CriticalRate;

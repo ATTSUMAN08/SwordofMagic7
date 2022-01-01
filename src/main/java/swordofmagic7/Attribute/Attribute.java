@@ -102,7 +102,7 @@ public class Attribute {
         } else if (type == AttributeType.SPI) {
             Lore.add(decoLore("最大マナ") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
             Lore.add(decoLore("マナ自動回復") + "+" + String.format(format, Parameter.get(type) * 0.6) + "%");
-            Lore.add(decoLore("防御力") + "+" + String.format(format, Parameter.get(type) * 0.2) + "%");
+            Lore.add(decoLore("治癒力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
             Lore.add(decoLore("クリティカル耐性") + "+" + String.format(format, Parameter.get(type) * 0.2) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
         } else if (type == AttributeType.VIT) {

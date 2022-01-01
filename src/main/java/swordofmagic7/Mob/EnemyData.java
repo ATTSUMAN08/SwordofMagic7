@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -29,7 +30,9 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.Log;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.BTTSet;
 
 public class EnemyData {
     private final Plugin plugin = System.plugin;
@@ -87,11 +90,25 @@ public class EnemyData {
         if (runPathfinderTask != null) runPathfinderTask.cancel();
     }
 
+    public Location LastLocation;
     void runAI() {
         stopAI();
         SpawnLocation = entity.getLocation();
+        LastLocation = SpawnLocation;
         if (entity instanceof Mob mob) {
             runPathfinderTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                if (target != null) {
+                    Vector vector = target.getEyeLocation().toVector().subtract(entity.getLocation().toVector());
+                    mob.lookAt(target);
+                    Pathfinder pathfinder = mob.getPathfinder();
+                    pathfinder.moveTo(target, mobData.Mov);
+                    if (LastLocation.distance(entity.getLocation()) < 0.5 && target.getLocation().distance(entity.getLocation()) > mobData.Reach) {
+                        entity.setVelocity(vector.normalize().multiply(0.5).setY(0.5));
+                    }
+                }
+                LastLocation = entity.getLocation();
+            }, 0, 10);
+            runAITask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
                 double topPriority = 0;
                 for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
                     if (topPriority < priority.getValue()) {
@@ -100,16 +117,8 @@ public class EnemyData {
                     }
                 }
 
-                if (target != null) {
-                    Vector vector = target.getLocation().toVector().subtract(entity.getLocation().toVector());
-                    entity.getLocation().setDirection(vector);
-                    Pathfinder pathfinder = mob.getPathfinder();
-                    pathfinder.moveTo(target, mobData.Mov);
-                }
-            }, 0, 5);
-            runAITask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
                 if (target == null && mobData.Hostile) {
-                    for (Player player : PlayerList.getNear(entity.getLocation(), 16)) {
+                    for (Player player : PlayerList.getNear(entity.getLocation(), 48)) {
                         target = player;
                         break;
                     }
@@ -136,8 +145,10 @@ public class EnemyData {
                     }
                 }
 
-                if (SpawnLocation.distance(entity.getLocation()) > 32) delete();
+                if (SpawnLocation.distance(entity.getLocation()) > 64) entity.teleportAsync(SpawnLocation);
             }, 0, 20);
+            BTTSet(runAITask, "EnemyAI");
+            BTTSet(runPathfinderTask, "EnemyPathfinder");
         }
     }
 
@@ -175,7 +186,9 @@ public class EnemyData {
 
                 @Override
                 public void run() {
-                    if (i < CastTime) {
+                    if (isDead) {
+                        this.cancel();
+                    } else if (i < CastTime) {
                         ParticleManager.FanShapedParticle(particleCasting, origin, radius, angle, 3);
                     } else {
                         this.cancel();
@@ -192,7 +205,9 @@ public class EnemyData {
     }
 
     public void addPriority(LivingEntity entity, double addPriority) {
-        Priority.putIfAbsent(entity, addPriority);
+        if (!Priority.containsKey(entity)) {
+            Priority.put(entity, addPriority);
+        }
         Priority.put(entity, Priority.get(entity) + addPriority);
     }
 
@@ -226,7 +241,16 @@ public class EnemyData {
         for (Player player : Involved) {
             PlayerData playerData = playerData(player);
             Classes classes = playerData.Classes;
-            classes.addExp(classes.classTier[0], exp);
+            List<ClassData> classList = new ArrayList<>();
+            for (ClassData classData : classes.classTier) {
+                if (classData != null) {
+                    classList.add(classData);
+                } else break;
+            }
+            int expSplit = Math.round((float) exp/classList.size());
+            for (ClassData classData : classList) {
+                classes.addExp(classData, expSplit);
+            }
             for (PetParameter pet : playerData.PetSummon) {
                 pet.addExp(exp);
             }

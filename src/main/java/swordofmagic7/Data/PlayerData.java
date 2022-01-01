@@ -6,7 +6,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
@@ -29,9 +31,11 @@ import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Item.Upgrade;
 import swordofmagic7.Map.MapData;
+import swordofmagic7.Map.MapManager;
 import swordofmagic7.Menu.Menu;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Shop.RuneShop;
 import swordofmagic7.Shop.Shop;
 import swordofmagic7.Skill.CastType;
 import swordofmagic7.Skill.Skill;
@@ -40,28 +44,33 @@ import swordofmagic7.Status.Status;
 import swordofmagic7.System;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static swordofmagic7.Classes.Classes.MaxTier;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.BTTSet;
 
 public class PlayerData {
 
+    private static final HashMap<UUID, PlayerData> playerData = new HashMap<>();
     public static PlayerData playerData(Player player) {
         if (player.isOnline()) {
-            playerData.putIfAbsent(player, new PlayerData(player));
-            return playerData.get(player);
+            if (!playerData.containsKey(player.getUniqueId())) {
+                playerData.put(player.getUniqueId(), new PlayerData(player));
+            }
+            return playerData.get(player.getUniqueId());
         }
         Log("§c" + player.getName() + "§c, " + player.getUniqueId() + " is Offline or Npc", true);
         return new PlayerData(null);
     }
+    public static HashMap<UUID, PlayerData> playerDataList() {
+        return playerData;
+    }
 
 
-    private final Plugin plugin;
+    private final Plugin plugin = System.plugin;
     private final Player player;
     private boolean able = false;
     public swordofmagic7.Inventory.ItemInventory ItemInventory;
@@ -77,7 +86,9 @@ public class PlayerData {
     public EffectManager EffectManager;
     public Upgrade Upgrade;
     public Shop Shop;
+    public RuneShop RuneShop;
     public PetManager PetManager;
+    public MapManager MapManager;
 
     public String Nick;
 
@@ -95,13 +106,15 @@ public class PlayerData {
     public boolean WallKicked = false;
     public BukkitTask WallKickedTask;
     public List<PetParameter> PetSummon = new ArrayList<>();
+    public List<String> ActiveTeleportGate = new ArrayList<>();
     public PetParameter PetSelect;
+    public boolean isDead = false;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
     PlayerData(Player player) {
-        plugin = System.plugin;
         this.player = player;
+        if (player == null) return;
         ItemInventory = new ItemInventory(player, this);
         HotBar = new HotBar(player, this);
         RuneInventory = new RuneInventory(player, this);
@@ -112,14 +125,17 @@ public class PlayerData {
         Status = new Status(player, this, Classes, Skill);
         Menu = new Menu(player, this);
         Attribute = new Attribute(player, this);
-        EffectManager = new EffectManager(player, this);
+        EffectManager = new EffectManager(player, this, plugin);
         Upgrade = new Upgrade(player, this);
         Shop = new Shop(player, this);
+        RuneShop = new RuneShop(player, this);
         PetManager = new PetManager(player, this);
+        MapManager = new MapManager(player, this);
 
         Nick = player.getName();
 
         able = true;
+        PetInventory.start();
     }
 
     public void DamageLog() {
@@ -178,9 +194,9 @@ public class PlayerData {
 
     void PvPMode(boolean bool) {
         PvPMode = bool;
-        String msg = "§ePvP§aを";
-        if (bool) msg += "§b有効";
-        else msg += "§c無効";
+        String msg = "§e[PvPモード]§aを";
+        if (bool) msg += "§b[有効]";
+        else msg += "§c[無効]";
         msg += "§aにしました";
         player.sendMessage(msg);
         playSound(player, SoundList.Click);
@@ -233,7 +249,8 @@ public class PlayerData {
 
     public void remove() {
         Status.tickUpdateTask.cancel();
-        removePlayerData(player);
+        PetInventory.task.cancel();
+        playerData.remove(player.getUniqueId());
     }
 
     public void save() {
@@ -280,8 +297,10 @@ public class PlayerData {
         data.set("Setting.PvPMode", PvPMode);
         data.set("Setting.CastMode", CastMode.toString());
         data.set("Setting.StrafeMode", StrafeMode.toString());
+        data.set("Setting.ShopAmountReset", Shop.AmountReset);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.PlayMode", PlayMode);
+        data.set("ActiveTeleportGate", ActiveTeleportGate);
 
         for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
             data.set("ClassData." + classData.getKey() + ".Level", Classes.getLevel(classData.getValue()));
@@ -302,17 +321,17 @@ public class PlayerData {
         }
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            data.set("Inventory." + slot.toString(), itemToString(new ItemParameterStack(Equipment.getEquip(slot))));
+            data.set("Inventory." + slot.toString(), new ItemParameterStack(Equipment.getEquip(slot)).toString());
         }
         List<String> itemList = new ArrayList<>();
         for (ItemParameterStack stack : ItemInventory.getList()) {
-            itemList.add(itemToString(stack));
+            itemList.add(stack.toString());
         }
         data.set("Inventory.ItemList", itemList);
 
         List<String> runeList = new ArrayList<>();
         for (RuneParameter rune : RuneInventory.getList()) {
-            runeList.add(runeToString(rune));
+            runeList.add(rune.toString());
         }
         data.set("Inventory.RuneList", runeList);
 
@@ -324,7 +343,11 @@ public class PlayerData {
 
         List<String> hotBarList = new ArrayList<>();
         for (HotBarData hotBarData : HotBar.getHotBar()) {
-            hotBarList.add(hotBarToString(hotBarData));
+            if (hotBarData != null) {
+                hotBarList.add(hotBarData.toString());
+            } else {
+                hotBarList.add("None");
+            }
         }
         data.set("Inventory.HotBar", hotBarList);
 
@@ -358,8 +381,10 @@ public class PlayerData {
             DropLog = DropLogType.fromString(data.getString("Setting.DropLog"));
             CastMode = CastType.valueOf(data.getString("Setting.CastMode", "Renewed"));
             StrafeMode = StrafeType.fromString(data.getString("Setting.StrafeMode"));
+            Shop.AmountReset = data.getBoolean("Setting.ShopAmountReset");
             PvPMode = data.getBoolean("Setting.PvPMode", false);
             PlayMode = data.getBoolean("Setting.PlayMode", true);
+            ActiveTeleportGate = data.getStringList("ActiveTeleportGate");
 
             for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
                 Classes.setLevel(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Level"));
@@ -378,21 +403,21 @@ public class PlayerData {
             }
 
             for (EquipmentSlot slot : EquipmentSlot.values()) {
-                ItemParameter param = stringToItem(data.getString("Inventory." + slot.toString(), "None")).itemParameter;
+                ItemParameter param = ItemParameterStack.fromString(data.getString("Inventory." + slot.toString(), "None")).itemParameter;
                 if (!param.isEmpty()) Equipment.Equip(slot, param);
             }
 
             List<String> itemList = data.getStringList("Inventory.ItemList");
             ItemInventory.clear();
             for (String itemData : itemList) {
-                ItemParameterStack stack = stringToItem(itemData);
+                ItemParameterStack stack = ItemParameterStack.fromString(itemData);
                 if (!stack.isEmpty()) ItemInventory.addItemParameter(stack.itemParameter, stack.Amount);
             }
 
             List<String> runeList = data.getStringList("Inventory.RuneList");
             RuneInventory.clear();
             for (String runeData : runeList) {
-                RuneParameter rune = stringToRune(runeData);
+                RuneParameter rune = RuneParameter.fromString(runeData);
                 if (!rune.isEmpty()) RuneInventory.addRuneParameter(rune);
             }
 
@@ -405,13 +430,12 @@ public class PlayerData {
 
             List<String> hotBarList = data.getStringList("Inventory.HotBar");
             int i = 0;
-            HotBarData[] HotBarData = new HotBarData[32];
-            for (String hotBarData : hotBarList) {
-                HotBarData hotBar = stringToHotBar(hotBarData);
-                HotBarData[i] = hotBar;
+            HotBarData[] hotBarData = new HotBarData[32];
+            for (String hotBar : hotBarList) {
+                hotBarData[i] = HotBarData.fromString(hotBar);
                 i++;
             }
-            HotBar.setHotBar(HotBarData);
+            HotBar.setHotBar(hotBarData);
 
             if (PlayMode) viewUpdate();
 
@@ -466,6 +490,26 @@ public class PlayerData {
         viewUpdate();
     }
 
+    public void changeHealth(double health) {
+        if (Status.Health+health > Status.MaxHealth) {
+            Status.Health = Status.MaxHealth;
+        } else if (Status.Health+health < 0) {
+            dead();
+        } else {
+            Status.Health += health;
+        }
+    }
+
+    public void changeMana(double mana) {
+        if (Status.Mana+mana > Status.MaxMana) {
+            Status.Mana = Status.MaxMana;
+        } else if (Status.Mana+mana < 0) {
+            Status.Mana = 0;
+        } else {
+            Status.Mana += mana;
+        }
+    }
+
     private boolean RightClickHold = false;
     private BukkitTask RightClickHoldTask;
 
@@ -481,16 +525,30 @@ public class PlayerData {
         return RightClickHold;
     }
 
+    public int deadTime = 0;
     public void dead() {
+        final Location LastDeadLocation = player.getLocation();
         Bukkit.getScheduler().runTask(plugin, () -> {
             player.setGameMode(GameMode.SPECTATOR);
-            player.sendTitle("§4§lYou Are Dead", "", 20, 60, 20);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                player.teleportAsync(player.getWorld().getSpawnLocation());
-                player.setGameMode(GameMode.SURVIVAL);
-                Status.Health = Status.MaxHealth;
-                Status.Mana = Status.MaxMana;
-            }, 100);
+            player.sendTitle("§4§lYou Are Dead", "§a§eスニークでリスポーン", 20, 1200, 20);
+            isDead = true;
+            deadTime = 1200;
+            BTTSet(new BukkitRunnable() {
+                @Override
+                public void run() {
+                    deadTime -= 10;
+                    if (deadTime <= 0) {
+                        this.cancel();
+                        player.teleportAsync(player.getWorld().getSpawnLocation());
+                        player.setGameMode(GameMode.SURVIVAL);
+                        Status.Health = Status.MaxHealth;
+                        Status.Mana = Status.MaxMana;
+                        player.resetTitle();
+                    } else {
+                        player.teleportAsync(LastDeadLocation);
+                    }
+                }
+            }.runTaskTimer(plugin, 0, 10), "PlayerDead:" + player.getName());
         });
     }
 }

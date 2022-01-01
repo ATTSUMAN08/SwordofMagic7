@@ -9,6 +9,7 @@ public enum StatusParameter {
     ManaRegen("マナ回復"),
     ATK("攻撃力"),
     DEF("防御力"),
+    HLP("治癒力"),
     ACC("命中"),
     EVA("回避"),
     CriticalRate("クリティカル発生"),
