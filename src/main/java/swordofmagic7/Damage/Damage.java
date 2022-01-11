@@ -11,6 +11,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.DamageLogType;
+import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.Pet.PetManager;
@@ -55,6 +57,10 @@ public final class Damage {
     }
 
     public static void makeDamage(LivingEntity attacker, List<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, int wait) {
+        makeDamage(attacker, victims, damageCause, damageSource, damageMultiply, false, count, wait);
+    }
+
+    public static void makeDamage(LivingEntity attacker, List<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, boolean invariably, int count, int wait) {
         BTTSet(new BukkitRunnable() {
             int i = 0;
 
@@ -69,6 +75,10 @@ public final class Damage {
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, false, count);
+    }
+
+    public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, boolean invariably, int count) {
         if (victim.isDead()) {
             return;
         }
@@ -91,6 +101,8 @@ public final class Damage {
         double Multiply = 1;
         double CriticalMultiply = 1.2;
         double Resistance = 1;
+        EffectManager attackerEffectManager;
+        EffectManager victimEffectManager;
 
         LivingEntity finalVictim = victim;
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -104,17 +116,20 @@ public final class Damage {
             CriticalRate = playerData.Status.CriticalRate;
             CriticalMultiply = playerData.Status.CriticalMultiply;
             Multiply = playerData.Status.DamageCauseMultiply.get(damageCause);
+            attackerEffectManager = playerData.EffectManager;
         } else if (MobManager.isEnemy(attacker)) {
             EnemyData enemyData = MobManager.EnemyTable(attacker.getUniqueId());
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
+            attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
             PetParameter petParameter = PetManager.PetParameter(attacker);
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
             petParameter.DecreaseStamina(1, 0.1);
+            attackerEffectManager = petParameter.effectManager;
         } else return;
 
         if (victim instanceof Player player) {
@@ -124,18 +139,40 @@ public final class Damage {
             EVA = playerData.Status.EVA;
             CriticalResist = playerData.Status.CriticalResist;
             Resistance = playerData.Status.DamageCauseResistance.get(damageCause);
+            victimEffectManager = playerData.EffectManager;
         } else if (MobManager.isEnemy(victim)) {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
+            victimEffectManager = enemyData.effectManager;
+            enemyData.HitCount++;
         } else if (PetManager.isPet(victim)) {
             PetParameter petParameter = PetManager.PetParameter(victim);
             DEF = petParameter.DEF;
             EVA = petParameter.EVA;
             CriticalResist = petParameter.CriticalResist;
             petParameter.DecreaseStamina(1, 0.7);
+            victimEffectManager = petParameter.effectManager;
         } else {
+            return;
+        }
+
+        if (victimEffectManager.hasEffect(EffectType.Invincible)) {
+            String log = "§b§l" + EffectType.Invincible.Display;
+            randomHologram(log, victim.getEyeLocation());
+            if (attacker instanceof Player player) {
+                DamageLogType DamageLog = playerData(player).DamageLog;
+                if (DamageLog.isDamageOnly()) {
+                    player.sendMessage("§a≫" + log);
+                }
+            }
+            if (victim instanceof Player player) {
+                DamageLogType DamageLog = playerData(player).DamageLog;
+                if (DamageLog.isDamageOnly()) {
+                    player.sendMessage("§c≪" + log);
+                }
+            }
             return;
         }
 
@@ -143,7 +180,9 @@ public final class Damage {
         baseDamage *= damageMultiply;
         baseDamage *= Multiply;
         baseDamage /= Resistance;
-        hitRate = (Math.pow(ACC, 2) / (ACC + EVA/2)) / ACC;
+        if (!invariably) {
+            hitRate = (Math.pow(ACC, 2) / (ACC + EVA / 2)) / ACC;
+        } else hitRate = 1;
         criRate = (Math.pow(CriticalRate, 2) / (CriticalRate + CriticalResist/2)) / CriticalRate;
         Attack = ATK;
         Defence = DEF;
@@ -193,7 +232,16 @@ public final class Damage {
             victimHealth = playerData.Status.Health;
         } else if (MobManager.isEnemy(victim)) {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
-            enemyData.Health -= damage;
+            boolean isStop = false;
+            for (double HPStop : enemyData.mobData.HPStop) {
+                Log("HPStop: " + HPStop + " > " + enemyData.Health / enemyData.MaxHealth);
+                if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
+                    enemyData.Health = enemyData.MaxHealth * HPStop;
+                    isStop = true;
+                    break;
+                }
+            }
+            if (!isStop) enemyData.Health -= damage;
             enemyData.addPriority(attacker, damage);
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);

@@ -6,7 +6,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Particle.ParticleData;
 
@@ -24,6 +23,7 @@ public class TeleportGateParameter {
     public String Subtitle;
     public Location Location;
     public boolean DefaultActive;
+    public MapData Map;
 
     public ItemStack view() {
         return new ItemStackData(Icon, decoText(Display)).view();

@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
 import swordofmagic7.Item.ItemExtend.ItemPetEgg;
+import swordofmagic7.Item.ItemExtend.ItemPetFood;
 import swordofmagic7.Item.ItemExtend.ItemPotion;
 import swordofmagic7.Status.StatusParameter;
 
@@ -30,6 +31,7 @@ public class ItemParameter implements Cloneable {
     public ItemEquipmentData itemEquipmentData = new ItemEquipmentData();
     public ItemPetEgg itemPetEgg = new ItemPetEgg();
     public ItemPotion itemPotion = new ItemPotion();
+    public ItemPetFood itemPetFood = new ItemPetFood();
 
     Material getIcon() {
         if (Icon == null) Icon = Material.BARRIER;
@@ -53,13 +55,25 @@ public class ItemParameter implements Cloneable {
         Lore.add(itemInformation);
         Lore.add(decoLore("カテゴリ") + Category.Display);
         Lore.add(decoLore("売値") + Sell);
-        if (Category == ItemCategory.Equipment) {
+        if (Category.isPotion()) {
+            Lore.add(decoText("§3§lポーション"));
+            Lore.add(decoLore("タイプ") + itemPotion.PotionType.Display);
+            int i = 1;
+            for (double d : itemPotion.Value) {
+                if (d != 0) {
+                    Lore.add(decoLore("効果値[" + i + "]") + d);
+                }
+                i++;
+            }
+            Lore.add(decoLore("再使用時間") + itemPotion.CoolTime + "秒");
+        }
+        if (Category.isEquipment()) {
             Lore.add(itemParameter);
             Lore.add(decoLore("装備部位") + itemEquipmentData.EquipmentSlot.Display);
             Lore.add(decoLore("装備種") + itemEquipmentData.EquipmentCategory.Display);
             for (StatusParameter param : StatusParameter.values()) {
                 if (isZero(Parameter.get(param))) {
-                    Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param) * (1+itemEquipmentData.Plus*0.02)) + " (" +String.format(format, this.itemEquipmentData.Parameter.get(param)) + ")");
+                    Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param)) + " (" +String.format(format, this.itemEquipmentData.Parameter.get(param)) + ")");
                 }
             }
             Lore.add(decoLore("強化値") + itemEquipmentData.Plus);
@@ -100,6 +114,9 @@ public class ItemParameter implements Cloneable {
     public ItemParameter clone() {
         try {
             ItemParameter clone = (ItemParameter) super.clone();
+            clone.itemEquipmentData = itemEquipmentData.clone();
+            clone.itemPotion = itemPotion.clone();
+            clone.itemPetEgg = itemPetEgg.clone();
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
             return clone;
         } catch (CloneNotSupportedException e) {

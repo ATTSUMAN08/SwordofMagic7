@@ -4,13 +4,15 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import swordofmagic7.Classes.ClassData;
@@ -18,19 +20,23 @@ import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.PlayerList;
+import swordofmagic7.Quest.QuestData;
+import swordofmagic7.Quest.QuestProcess;
+import swordofmagic7.Quest.QuestReqContentKey;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.System;
 
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.BroadCast;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.BTTSet;
 
@@ -52,6 +58,10 @@ public class EnemyData {
     public double CriticalResist;
     public double Exp;
 
+    public final EnemySkillManager skillManager = new EnemySkillManager(this);
+    public final EffectManager effectManager;
+    public int HitCount = 0;
+
     public void updateEntity() {
         Bukkit.getScheduler().runTask(plugin, () -> {
             entity = (LivingEntity) Bukkit.getEntity(uuid);
@@ -61,17 +71,12 @@ public class EnemyData {
     private final List<Player> Involved = new ArrayList<>();
     private final HashMap<LivingEntity, Double> Priority = new HashMap<>();
     Location SpawnLocation;
-    private final ParticleData particleCasting = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.RED, 1));
-    private final ParticleData particleActivate = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.PURPLE, 1));
-    private LivingEntity target;
-    private boolean SkillReady = true;
+    LivingEntity target;
     public boolean isDead = false;
-
-    public EnemyData() {
-    }
 
     public EnemyData(LivingEntity entity) {
         this.entity = entity;
+        effectManager = new EffectManager(entity);
     }
 
     void Involved(Player player) {
@@ -129,17 +134,10 @@ public class EnemyData {
                         Priority.remove(target);
                         target = null;
                     } else {
-                        if (SkillReady) {
-                            for (MobSkillData skill : mobData.SkillList) {
-                                if (SkillReady) mobSkillCast(skill);
-                                else break;
-                            }
-                        }
-
+                        skillManager.tickSkillTrigger();
                         final Location TargetLocation = target.getLocation();
                         final Location EntityLocation = entity.getLocation();
-                        if (Math.abs(TargetLocation.getX() - EntityLocation.getX()) <= mobData.Reach
-                                && Math.abs(TargetLocation.getZ() - EntityLocation.getZ()) <= mobData.Reach) {
+                        if (EntityLocation.distance(TargetLocation) <= mobData.Reach) {
                             Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
                         }
                     }
@@ -147,68 +145,13 @@ public class EnemyData {
 
                 if (SpawnLocation.distance(entity.getLocation()) > 64) entity.teleportAsync(SpawnLocation);
             }, 0, 20);
-            BTTSet(runAITask, "EnemyAI");
-            BTTSet(runPathfinderTask, "EnemyPathfinder");
-        }
-    }
-
-    void mobSkillCast(MobSkillData mobSkillData) {
-        if (random.nextDouble() < mobSkillData.Percent) {
-            switch (mobSkillData.Skill) {
-                case "PullUpper" -> PullUpper();
-            }
-        }
-    }
-
-    void CastSkill(boolean bool) {
-        if (bool) {
-            entity.setAI(false);
-            SkillReady = false;
-        } else {
-            entity.setAI(true);
-            SkillReady = true;
-        }
-    }
-
-    private final int period = 5;
-
-    void PullUpper() {
-        if (entity.getLocation().distance(target.getLocation()) <= 5) {
-            double radius = 8;
-            double angle = 80;
-            int CastTime = 20;
-
-            Location origin = entity.getLocation().clone();
-            CastSkill(true);
-
-            new BukkitRunnable() {
-                int i = 0;
-
-                @Override
-                public void run() {
-                    if (isDead) {
-                        this.cancel();
-                    } else if (i < CastTime) {
-                        ParticleManager.FanShapedParticle(particleCasting, origin, radius, angle, 3);
-                    } else {
-                        this.cancel();
-                        ParticleManager.FanShapedParticle(particleActivate, origin, radius, angle, 3);
-                        List<LivingEntity> Targets = PlayerList.getNearLivingEntity(entity.getLocation(), radius);
-                        List<LivingEntity> victims = ParticleManager.FanShapedCollider(origin, Targets, angle);
-                        Damage.makeDamage(entity, victims, DamageCause.ATK, "PullUpper", 2, 1, 2);
-                        Bukkit.getScheduler().runTaskLater(plugin, () -> CastSkill(false), 10);
-                    }
-                    i += period;
-                }
-            }.runTaskTimer(plugin, 0, period);
+            BTTSet(runAITask, "EnemyAI:" + mobData.Id);
+            BTTSet(runPathfinderTask, "EnemyPathfinder" + mobData.Id);
         }
     }
 
     public void addPriority(LivingEntity entity, double addPriority) {
-        if (!Priority.containsKey(entity)) {
-            Priority.put(entity, addPriority);
-        }
-        Priority.put(entity, Priority.get(entity) + addPriority);
+        Priority.put(entity, Priority.getOrDefault(entity, 0d) + addPriority);
     }
 
     public void delete() {
@@ -238,73 +181,90 @@ public class EnemyData {
         for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
             Involved(player);
         }
+        List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
+        DropItemTable.add(new DropItemData(getItemParameter("生命の雫"), 0.0001));
+        DropItemTable.add(new DropItemData(getItemParameter("強化石"), 0.03));
         for (Player player : Involved) {
-            PlayerData playerData = playerData(player);
-            Classes classes = playerData.Classes;
-            List<ClassData> classList = new ArrayList<>();
-            for (ClassData classData : classes.classTier) {
-                if (classData != null) {
-                    classList.add(classData);
-                } else break;
-            }
-            int expSplit = Math.round((float) exp/classList.size());
-            for (ClassData classData : classList) {
-                classes.addExp(classData, expSplit);
-            }
-            for (PetParameter pet : playerData.PetSummon) {
-                pet.addExp(exp);
-            }
-            List<String> Holo = new ArrayList<>();
-            Holo.add("§e§lEXP §a§l+" + exp);
-            List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
-            DropItemData LifeTear = new DropItemData(getItemParameter("生命の雫"));
-            LifeTear.Percent = 0.0001;
-            LifeTear.MinAmount = 1;
-            LifeTear.MaxAmount = 1;
-            DropItemTable.add(LifeTear);
-            for (DropItemData dropData : DropItemTable) {
-                if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                    if (random.nextDouble() <= dropData.Percent) {
-                        int amount;
-                        if (dropData.MaxAmount != dropData.MinAmount) {
-                            amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
-                        } else {
-                            amount = dropData.MinAmount;
-                        }
-                        playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
-                        Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                        if (playerData.DropLog.isItem()) {
-                            player.sendMessage("§b[+]§e" + dropData.itemParameter.Display + "§ax" + amount);
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                Classes classes = playerData.Classes;
+                List<ClassData> classList = new ArrayList<>();
+                for (ClassData classData : classes.classTier) {
+                    if (classData != null) {
+                        classList.add(classData);
+                    } else break;
+                }
+                int expSplit = Math.round((float) exp / classList.size());
+                for (ClassData classData : classList) {
+                    classes.addExp(classData, expSplit);
+                }
+                for (PetParameter pet : playerData.PetSummon) {
+                    pet.addExp(exp);
+                }
+                List<String> Holo = new ArrayList<>();
+                Holo.add("§e§lEXP §a§l+" + exp);
+                for (DropItemData dropData : DropItemTable) {
+                    if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                        if (random.nextDouble() <= dropData.Percent) {
+                            int amount;
+                            if (dropData.MaxAmount != dropData.MinAmount) {
+                                amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
+                            } else {
+                                amount = dropData.MinAmount;
+                            }
+                            playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
+                            Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
+                            if (playerData.DropLog.isItem()) {
+                                player.sendMessage("§b[+]§e" + dropData.itemParameter.Display + "§ax" + amount);
+                            }
                         }
                     }
                 }
-            }
-            for (DropRuneData dropData : mobData.DropRuneTable) {
-                if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                    if (random.nextDouble() <= dropData.Percent) {
-                        RuneParameter runeParameter = dropData.runeParameter.clone();
-                        runeParameter.Quality = random.nextDouble();
-                        runeParameter.Level = Level;
-                        playerData.RuneInventory.addRuneParameter(runeParameter);
-                        Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                        if (playerData.DropLog.isRune()) {
-                            player.sendMessage("§b[+]§e" + runeParameter.Display);
+                for (DropRuneData dropData : mobData.DropRuneTable) {
+                    if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                        if (random.nextDouble() <= dropData.Percent) {
+                            RuneParameter runeParameter = dropData.runeParameter.clone();
+                            runeParameter.Quality = random.nextDouble();
+                            runeParameter.Level = Level;
+                            playerData.RuneInventory.addRuneParameter(runeParameter);
+                            Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                            if (playerData.DropLog.isRune()) {
+                                player.sendMessage("§b[+]§e" + runeParameter.Display);
+                            }
                         }
                     }
                 }
-            }
-            Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                Hologram hologram = HologramsAPI.createHologram(plugin, loc);
-                VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                visibilityManager.setVisibleByDefault(false);
-                visibilityManager.showTo(player);
-                for (String holo : Holo) {
-                    hologram.appendTextLine(holo);
+                for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
+                    QuestData questData = data.getKey();
+                    if (questData.type.isEnemy()) {
+                        for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
+                            QuestReqContentKey key = reqContent.getKey();
+                            if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
+                                playerData.QuestManager.processQuest(questData, key, 1);
+                            }
+                        }
+                    }
                 }
-                Bukkit.getScheduler().runTaskLater(plugin, hologram::delete, 50);
-                playerData.viewUpdate();
-            });
+                if (classes.classTier[1] == getClassData("Tamer") && getPetList().containsKey(mobData.Id)) {
+                    if (random.nextDouble() <= 0.01) {
+                        PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Level+30, 0, random.nextDouble()+0.5);
+                        playerData.PetInventory.addPetParameter(pet);
+                        BroadCast(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
+                    }
+                }
+                Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Hologram hologram = HologramsAPI.createHologram(plugin, loc);
+                    VisibilityManager visibilityManager = hologram.getVisibilityManager();
+                    visibilityManager.setVisibleByDefault(false);
+                    visibilityManager.showTo(player);
+                    for (String holo : Holo) {
+                        hologram.appendTextLine(holo);
+                    }
+                    Bukkit.getScheduler().runTaskLater(plugin, hologram::delete, 50);
+                    playerData.viewUpdate();
+                });
+            }
         }
     }
 }

@@ -2,20 +2,17 @@ package swordofmagic7.Map;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import swordofmagic7.Dungeon.AusMine;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Sound.SoundList;
 
-import java.lang.reflect.Method;
-
-import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Data.DataBase.WarpGateList;
-import static swordofmagic7.Function.Log;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.BTTSet;
@@ -33,6 +30,7 @@ public class WarpGateParameter {
     public void usePlayer(Player player) {
         if (Trigger != null) {
             if (Trigger.equals("AusMineB1") && AusMine.AusMineB1()) return;
+            else if (Trigger.equals("AusMineB2") && AusMine.AusMineB2()) return;
         }
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).Location;

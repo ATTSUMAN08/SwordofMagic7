@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static swordofmagic7.Attribute.AttributeType.*;
+import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.System.BTTSet;
@@ -191,12 +192,15 @@ public class Status {
         SkillRigidTime = EquipStatus.get(StatusParameter.SkillRigidTime);
         SkillCooltime = EquipStatus.get(StatusParameter.SkillCooltime);
 
-        player.setPlayerListName("§b§l[" + playerData.Classes.topClass().Nick + "§b§l] §f§l" + playerData.Nick);
+        player.setPlayerListName(playerData.Classes.topClass().Color + "§l" + playerData.Classes.topClass().Display + " §f§l" + playerData.Nick);
 
         player.setWalkSpeed(0.24f);
     }
 
     public BukkitTask tickUpdateTask;
+    public Team team;
+    public double HealthPercent = 1;
+    public String HealthPercentColor = "§a§l";
     private final List<String> ScoreKey = new ArrayList<>();
     public void tickUpdate() {
         player.setHealthScaled(true);
@@ -208,8 +212,8 @@ public class Status {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective sidebarObject = board.registerNewObjective("Sidebar", "dummy", decoText("§bSword of Magic Ⅶ"));
         sidebarObject.setDisplaySlot(DisplaySlot.SIDEBAR);
-        Team team = board.registerNewTeam(player.getName());
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
+        team = board.registerNewTeam(player.getName());
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
         team.setCanSeeFriendlyInvisibles(true);
         if (tickUpdateTask != null) tickUpdateTask.cancel();
         tickUpdateTask = new BukkitRunnable() {
@@ -228,6 +232,10 @@ public class Status {
                     float ExpPercentBar = ExpPercent / 100;
                     if (ExpPercentBar < 0.01) ExpPercentBar = 0.01f;
                     if (ExpPercentBar > 0.99) ExpPercentBar = 0.99f;
+                    HealthPercent = Health/MaxHealth;
+                    if (HealthPercent < 0.2) HealthPercentColor = "§c§l";
+                    else if (HealthPercent < 0.5) HealthPercentColor = "§e§l";
+                    else HealthPercentColor = "§a§l";
                     player.setLevel(Level);
                     player.setExp(ExpPercentBar);
                     player.sendActionBar("§6§l《" + topClass.Color + "§l" + topClass.Display + " §e§lLv" + Level + "§6§l》" +
@@ -241,28 +249,39 @@ public class Status {
                     }
                     ScoreKey.clear();
                     ScoreKey.add(decoLore("メル") + playerData.Mel);
+                    if (playerData.Party != null) {
+                        ScoreKey.add(decoText("パーティメンバー"));
+                        for (Player member : playerData.Party.Members) {
+                            PlayerData memberData = playerData(member);
+                            ScoreKey.add(decoLore(memberData.getNick(true)) + memberData.Status.HealthPercentColor + String.format("%.0f", memberData.Status.HealthPercent*100) + "%");
+                        }
+                    }
                     if (TagGame.isPlayer(player)) {
                         ScoreKey.add(decoText("鬼ごっこ"));
                         ScoreKey.addAll(List.of(TagGame.info()));
                     }
-                    ScoreKey.add(decoText("スキルクールタイム"));
+                    List<String> SkillCoolTime = new ArrayList<>();
                     for (SkillData skillData : playerData.Classes.getActiveSkillList()) {
                         int cooltime = playerData.Skill.getSkillCoolTime(skillData);
                         if (cooltime > 0) {
-                            ScoreKey.add(decoLore(skillData.Display) + String.format("%.1f", cooltime / 20f) + "秒");
+                            SkillCoolTime.add(decoLore(skillData.Display) + String.format("%.1f", cooltime / 20f) + "秒");
                         }
+                    }
+                    if (SkillCoolTime.size() > 0) {
+                        ScoreKey.add(decoText("スキルクールタイム"));
+                        ScoreKey.addAll(SkillCoolTime);
                     }
                     int i = 15;
                     for (String scoreName : ScoreKey) {
                         Score sidebarScore = sidebarObject.getScore(scoreName);
                         sidebarScore.setScore(i);
                         i--;
-                        for (Player player : PlayerList.get()) {
-                            if (!team.hasEntry(player.getName())) {
-                                team.addEntry(player.getName());
-                            }
-                        }
                         if (i < 1) break;
+                    }
+                    for (Player player : PlayerList.get()) {
+                        if (!team.hasEntry(player.getName())) {
+                            team.addEntry(player.getName());
+                        }
                     }
                     player.setScoreboard(board);
 
@@ -270,8 +289,8 @@ public class Status {
                     Mana += ManaRegen / 20;
 
                     Bukkit.getScheduler().runTask(swordofmagic7.System.plugin, () -> {
-                        if (Health > MaxHealth) Health = MaxHealth;
-                        if (Mana > MaxMana) Mana = MaxMana;
+                        Health = Math.min(Math.max(Health, 0), MaxHealth);
+                        Mana = Math.min(Math.max(Mana, 0), MaxMana);
                         double ManaPercent = Mana / MaxMana;
                         player.setAbsorptionAmount(0);
                         player.setMaxHealth(MaxHealth);

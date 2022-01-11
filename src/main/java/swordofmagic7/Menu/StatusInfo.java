@@ -10,16 +10,17 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemStackData;
+import swordofmagic7.Life.LifeStatus;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Status.StatusParameter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
+import static swordofmagic7.Data.DataBase.getClassList;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Menu.Data.StatusInfoDisplay;
 import static swordofmagic7.System.BTTSet;
 import static swordofmagic7.System.plugin;
@@ -47,6 +48,7 @@ public class StatusInfo {
                 if (Viewer.getOpenInventory().getTopInventory().equals(inv)) {
                     statusMeta.setDisplayName(decoText(playerData.Nick));
                     List<String> statusLore = new ArrayList<>();
+                    statusLore.add(decoLore("現在位置") + playerData.Map.Display);
                     statusLore.add(decoLore("戦闘力") + String.format(format, playerData.Status.getCombatPower()));
                     statusLore.add(decoLore(StatusParameter.MaxHealth.Display) + String.format(format, status.Health) + "/" + String.format(format, status.MaxHealth) + " (" + String.format(format, status.BaseStatus(StatusParameter.MaxHealth)) + ")");
                     statusLore.add(StatusParameter.HealthRegen.DecoDisplay + String.format(format, status.HealthRegen) + " (" + String.format(format, status.BaseStatus(StatusParameter.HealthRegen)) + ")");
@@ -73,10 +75,35 @@ public class StatusInfo {
                     for (ClassData classData : getClassList().values()) {
                         int Level = playerData.Classes.getLevel(classData);
                         double Exp = (float) playerData.Classes.getExp(classData) / playerData.Classes.ReqExp(Level, classData.Tier);
-                        classLore.add("§7・" + classData.Color +classData.Display + "§e§lLv" + Level + " " + String.format("%.3f", Exp*100)+"%");
+                        classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + Level + " §a§l" + String.format("%.3f", Exp*100)+"%");
                     }
+                    List<String> lifeLore = new ArrayList<>();
+                    int CacheLevel = playerData.LifeStatus.MineLevel;
+                    lifeLore.add(decoLore("採掘レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("採掘経験値") + String.format("%.1f", (float) playerData.LifeStatus.MineExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
+                    CacheLevel = playerData.LifeStatus.LumberLevel;
+                    lifeLore.add(decoText("§3§l伐採ステータス"));
+                    lifeLore.add(decoLore("伐採レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("伐採経験値") + String.format("%.1f", (float) playerData.LifeStatus.LumberExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
+                    CacheLevel = playerData.LifeStatus.HarvestLevel;
+                    lifeLore.add(decoText("§3§l採取ステータス"));
+                    lifeLore.add(decoLore("採取レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("採取経験値") + String.format("%.1f", (float) playerData.LifeStatus.HarvestExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
+                    CacheLevel = playerData.LifeStatus.AnglerLevel;
+                    lifeLore.add(decoText("§3§l釣獲ステータス"));
+                    lifeLore.add(decoLore("釣獲レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("釣獲経験値") + String.format("%.1f", (float) playerData.LifeStatus.AnglerExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
+                    CacheLevel = playerData.LifeStatus.CookLevel;
+                    lifeLore.add(decoText("§3§l料理ステータス"));
+                    lifeLore.add(decoLore("料理レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("料理経験値") + String.format("%.1f", (float) playerData.LifeStatus.CookExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
+                    CacheLevel = playerData.LifeStatus.SmithLevel;
+                    lifeLore.add(decoText("§3§l鍛冶ステータス"));
+                    lifeLore.add(decoLore("鍛冶レベル") + CacheLevel + "/" + LifeStatus.MaxLifeLevel);
+                    lifeLore.add(decoLore("鍛冶経験値") + String.format("%.1f", (float) playerData.LifeStatus.SmithExp/LifeStatus.ReqExp(CacheLevel)*100) + "%");
                     inv.setItem(0, statusIcon);
                     inv.setItem(1, new ItemStackData(Material.END_CRYSTAL, decoText("§e§lクラス情報"), classLore).view());
+                    inv.setItem(2, new ItemStackData(Material.CRAFTING_TABLE, decoText("§3§l採掘ステータス"), lifeLore).view());
                 } else {
                     this.cancel();
                 }

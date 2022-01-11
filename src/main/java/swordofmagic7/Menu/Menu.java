@@ -1,7 +1,6 @@
 package swordofmagic7.Menu;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,35 +10,24 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
-import swordofmagic7.HotBar.HotBarCategory;
-import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.Item.ItemCategory;
-import swordofmagic7.Item.ItemExtend.ItemPetEgg;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Pet.PetData;
-import swordofmagic7.Pet.PetParameter;
-import swordofmagic7.Shop.ShopData;
-import swordofmagic7.Shop.ShopSlot;
-import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
-import swordofmagic7.Status.Status;
-import swordofmagic7.Status.StatusParameter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Function.equalInv;
 import static swordofmagic7.Menu.Data.*;
+import static swordofmagic7.Shop.PetShop.PetSellDisplay;
+import static swordofmagic7.Shop.PetShop.PetSyntheticDisplay;
+import static swordofmagic7.Shop.RuneShop.RuneEquipDisplay;
+import static swordofmagic7.Shop.RuneShop.RuneShopMenuDisplay;
+import static swordofmagic7.Shop.Shop.ShopSellDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.plugin;
 
@@ -50,6 +38,7 @@ public class Menu {
     public final StatusInfo StatusInfo;
     public final Setting Setting;
     public final Trigger Trigger;
+    public final Smith Smith;
 
     public Menu(Player player, PlayerData playerData) {
         this.player = player;
@@ -57,6 +46,7 @@ public class Menu {
         StatusInfo = new StatusInfo(player, playerData);
         Setting = new Setting(player, playerData);
         Trigger = new Trigger(player, playerData);
+        Smith = new Smith(player, playerData);
     }
 
     public void UserMenuView() {
@@ -91,7 +81,13 @@ public class Menu {
     public ViewInventoryType ViewInventoryCache;
 
     public boolean EquipAble() {
-        return !(player.getOpenInventory().getTitle().equals(RuneMenuDisplay));
+        InventoryView view = player.getOpenInventory();
+        return !(equalInv(view, RuneEquipDisplay)
+                || equalInv(view, UpgradeDisplay)
+                || equalInv(view, ShopSellDisplay)
+                || equalInv(view, PetSyntheticDisplay)
+                || equalInv(view, PetSellDisplay)
+                );
     }
 
     public void MenuClick(InventoryClickEvent event) {
@@ -133,15 +129,21 @@ public class Menu {
                     default -> {
                         if (index > -1) {
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
-                            if (!equalInv(view, RuneEquipMenuDisplay) && clickedItem.Category == ItemCategory.Equipment) {
-                                playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
-                                playSound(player, SoundList.Click);
-                            } else if (clickedItem.Category.isPetEgg()) {
-                                clickedItem.itemPetEgg.usePetEgg(player, clickedItem);
-                                playSound(player, SoundList.Click);
-                            } else if (clickedItem.Category.isPotion()) {
-                                clickedItem.itemPotion.usePotion(player, clickedItem);
-                                playSound(player, SoundList.Click);
+                            if (clickedItem != null) {
+                                if (EquipAble() && clickedItem.Category == ItemCategory.Equipment) {
+                                    playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
+                                    playSound(player, SoundList.Click);
+                                } else if (clickedItem.Category.isPetEgg()) {
+                                    clickedItem.itemPetEgg.usePetEgg(player, clickedItem);
+                                    playSound(player, SoundList.Click);
+                                } else if (clickedItem.Category.isPotion()) {
+                                    clickedItem.itemPotion.usePotion(player, clickedItem);
+                                } else if (clickedItem.Category.isTool()) {
+                                    playerData(player).Equipment.Equip(EquipmentSlot.MainHand, clickedItem);
+                                    playSound(player, SoundList.Click);
+                                } else if (clickedItem.Category.isPetFood()) {
+                                    clickedItem.itemPetFood.usePetFood(player, clickedItem);
+                                }
                             }
                         }
                     }
@@ -156,7 +158,7 @@ public class Menu {
                     case 17 -> playerData.PetInventory.upScrollTick();
                     case 35 -> playerData.PetInventory.downScrollTick(playerData.PetInventory.getList().size());
                     default -> {
-                        if (index > -1) {
+                        if (EquipAble() && index > -1) {
                             playerData.PetInventory.getPetParameter(index).spawn();
                         }
                     }
@@ -191,17 +193,18 @@ public class Menu {
 
         if (currentItem != null) {
             playerData.RuneShop.RuneMenuClick(view, ClickInventory, currentItem, index, Slot);
-            playerData.Upgrade.UpgradeClick(view, ClickInventory, currentItem, index, Slot);
+            playerData.PetShop.PetShopClick(view, ClickInventory, currentItem, index, Slot);
+            playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);
             playerData.Shop.ShopSellClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
                 playerData.Classes.ClassSelectClick(event.getView(), event.getSlot());
                 playerData.Attribute.AttributeMenuClick(event.getView(), event.getCurrentItem());
                 playerData.Skill.SkillMenuClick(view, Slot);
                 playerData.Shop.ShopClick(view, Slot);
-                playerData.PetManager.PetShopClick(view, currentItem);
                 playerData.MapManager.TeleportGateMenuClick(view, Slot);
                 Setting.SettingMenuClick(view, currentItem);
                 Trigger.TriggerMenuClick(view, currentItem, Slot);
+                Smith.SmithMenuClick(view, currentItem);
             } else if (ClickInventory == view.getBottomInventory()) {
 
             }
@@ -240,11 +243,13 @@ public class Menu {
     public void MenuClose(InventoryCloseEvent event) {
         InventoryView view = event.getView();
         player.setItemOnCursor(AirItem);
-        playerData.RuneShop.RuneMenuClose(event);
+        playerData.RuneShop.RuneMenuClose(view);
+        playerData.Upgrade.UpgradeClose(view);
         playerData.Shop.ShopClose();
+        playerData.PetShop.PetSyntheticClose(view);
         if (equalInv(view, TriggerMenuDisplay)) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (!equalInv(view, TriggerMenuDisplay)) {
+                if (!equalInv(player.getOpenInventory(), TriggerMenuDisplay)) {
                     playerData.HotBar.setSelectSlot(-1);
                     playerData.viewUpdate();
                 }

@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.A;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Inventory.ItemParameterStack;
@@ -16,9 +15,7 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.ShopFlame;
-import static swordofmagic7.Function.decoInv;
-import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Shop {
@@ -71,7 +68,6 @@ public class Shop {
         inv.setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
         player.openInventory(inv);
         ShopDataCache = Shop.clone();
-        playSound(player, SoundList.MenuOpen);
     }
 
     public void ShopSellOpen() {
@@ -88,15 +84,43 @@ public class Shop {
         if (ShopDataCache != null && equalInv(view, "§l" + ShopDataCache.Display)) {
             if (Slot < 45) {
                 if (ShopDataCache.Data.containsKey(Slot)) {
+                    boolean buyAble = true;
+                    List<String> reqList = new ArrayList<>();
                     ShopSlot data = ShopDataCache.Data.get(Slot);
                     int Mel = data.Mel * BuyAmount;
+                    String buyText = "購入";
                     if (playerData.Mel >= Mel) {
+                        reqList.add(decoLore("メル") + Mel + " §b✔");
+                    } else {
+                        buyAble = false;
+                        reqList.add(decoLore("メル") + Mel + " §c(" + playerData.Mel + ")");
+                    }
+                    if (data.itemRecipe != null) {
+                        buyText = "作成";
+                        for (ItemParameterStack stack : data.itemRecipe.ReqStack) {
+                            if (playerData.ItemInventory.hasItemParameter(stack.itemParameter, stack.Amount*BuyAmount)) {
+                                reqList.add(decoLore(stack.itemParameter.Id) + stack.Amount*BuyAmount + " §b✔");
+                            } else {
+                                buyAble = false;
+                                reqList.add(decoLore(stack.itemParameter.Id) + stack.Amount*BuyAmount + " §c(" + playerData.ItemInventory.getItemParameterStack(stack.itemParameter).Amount + ")");
+                            }
+                        }
+                    }
+                    if (buyAble) {
                         playerData.Mel -= Mel;
-                        playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), 1);
-                        player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + BuyAmount +"§e]§aを§b購入§aしました §c[-" + Mel + "メル]");
+                        if (data.itemRecipe != null) {
+                            for (ItemParameterStack stack : data.itemRecipe.ReqStack) {
+                                playerData.ItemInventory.removeItemParameter(stack.itemParameter, stack.Amount*BuyAmount);
+                            }
+                        }
+                        playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), BuyAmount);
+                        player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + BuyAmount +"§e]§aを§b" + buyText + "§aしました");
                         playSound(player, SoundList.LevelUp);
                     } else {
-                        player.sendMessage("§eメル§aが足りません §c不足[" + (Mel-playerData.Mel) + "メル]");
+                        player.sendMessage(decoText("必要物リスト"));
+                        for (String message : reqList) {
+                            player.sendMessage(message);
+                        }
                         playSound(player, SoundList.Nope);
                     }
                 }

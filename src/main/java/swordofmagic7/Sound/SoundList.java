@@ -19,6 +19,9 @@ public enum SoundList {
     DungeonTrigger(Sound.ENTITY_ENDER_DRAGON_GROWL, 1, SoundCategory.PLAYERS),
     Tick(Sound.BLOCK_LEVER_CLICK, 1, SoundCategory.PLAYERS),
     Heal(Sound.ENTITY_ENDER_EYE_DEATH, 1, SoundCategory.PLAYERS),
+    Accept(Sound.BLOCK_NOTE_BLOCK_HARP, 1, SoundCategory.PLAYERS),
+    Howl(Sound.ENTITY_HOGLIN_ANGRY, 0, SoundCategory.PLAYERS),
+    Explosion(Sound.ENTITY_GENERIC_EXPLODE, 1, SoundCategory.PLAYERS),
     ;
 
     Object data;

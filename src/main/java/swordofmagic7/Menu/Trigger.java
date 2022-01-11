@@ -10,7 +10,6 @@ import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.HotBar.HotBarCategory;
 import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
@@ -49,19 +48,21 @@ public class Trigger {
                     slot++;
                 }
             }
-            for (ItemParameterStack stack : playerData.ItemInventory.getList()) {
-                if (stack.itemParameter.Category.isPotion()) {
-                    inv.setItem(slot, stack.itemParameter.viewItem(1, playerData.ViewFormat()));
-                    TriggerMenuCache.put(slot, new HotBarData(stack.itemParameter));
-                    slot++;
-                }
+            tier++;
+        }
+        for (ItemParameterStack stack : playerData.ItemInventory.getList()) {
+            if (stack.itemParameter.Category.isPotion()) {
+                inv.setItem(slot, stack.itemParameter.viewItem(1, playerData.ViewFormat()));
+                TriggerMenuCache.put(slot, new HotBarData(stack.itemParameter));
+                slot++;
             }
-            for (PetParameter pet : playerData.PetInventory.getList()) {
+        }
+        for (PetParameter pet : playerData.PetInventory.getList()) {
+            if (pet.Summoned) {
                 inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
                 TriggerMenuCache.put(slot, new HotBarData(pet));
                 slot++;
             }
-            tier++;
         }
         inv.setItem(44, TriggerMenu_Reset);
         player.openInventory(inv);

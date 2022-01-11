@@ -50,6 +50,11 @@ commands:
     permission: debug.som7
     description: description
     usage: /<command>
+  DataBaseReload:
+    aliases: dbr
+    permission: debug.som7
+    description: description
+    usage: /<command>
   test:
     permission: debug.som7
     description: description
@@ -104,5 +109,33 @@ commands:
     description: description
     usage: /<command>
   taggame:
+    description: description
+    usage: /<command>
+  party:
+    aliases: pt
+    description: description
+    usage: /<command>
+  itemInventorySort:
+    aliases: iis
+    description: description
+    usage: /<command>
+  runeInventorySort:
+    aliases: ris
+    description: description
+    usage: /<command>
+  petInventorySort:
+    aliases: pis
+    description: description
+    usage: /<command>
+  itemInventorySortReverse:
+    aliases: iisr
+    description: description
+    usage: /<command>
+  runeInventorySortReverse:
+    aliases: risr
+    description: description
+    usage: /<command>
+  petInventorySortReverse:
+    aliases: pisr
     description: description
     usage: /<command>

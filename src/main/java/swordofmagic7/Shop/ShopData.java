@@ -1,10 +1,9 @@
 package swordofmagic7.Shop;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import swordofmagic7.Item.ItemStackData;
+import swordofmagic7.Inventory.ItemParameterStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +29,11 @@ public class ShopData implements Cloneable {
                 List<String> Lore = new ArrayList<>(meta.getLore());
                 Lore.add(decoText("§3§l販売情報"));
                 Lore.add(decoLore("メル") + data.Mel);
+                if (data.itemRecipe != null) {
+                    for (ItemParameterStack stack : data.itemRecipe.ReqStack) {
+                        Lore.add(decoLore(stack.itemParameter.Id) + stack.Amount + "個");
+                    }
+                }
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 inv.setItem(slot, item);

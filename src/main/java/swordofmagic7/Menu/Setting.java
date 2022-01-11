@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Menu.Data.*;
 
 public class Setting {

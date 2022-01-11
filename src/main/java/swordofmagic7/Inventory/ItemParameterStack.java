@@ -36,7 +36,7 @@ public class ItemParameterStack {
                         if (category == ItemCategory.Equipment) {
                                 data.append(",Plus:").append(itemParameter.itemEquipmentData.Plus).append(",Durable:").append(itemParameter.itemEquipmentData.Durable);
                                 for (RuneParameter runeParameter : itemParameter.itemEquipmentData.Rune) {
-                                        if (runeParameter.toString().equals("None"))
+                                        if (!runeParameter.toString().equals("None"))
                                                 data.append(",Rune:").append(runeParameter);
                                 }
                         }

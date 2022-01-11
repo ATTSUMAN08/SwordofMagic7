@@ -3,10 +3,16 @@ package swordofmagic7.Equipment;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Sound.SoundList;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Equipment {
     private final Player player;
@@ -20,6 +26,10 @@ public class Equipment {
 
     public boolean isEquip(EquipmentSlot slot) {
         return EquipSlot.containsKey(slot);
+    }
+
+    public boolean isWeaponEquip() {
+        return EquipSlot.containsKey(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).Category.isEquipment();
     }
 
     public ItemParameter getEquip(EquipmentSlot slot) {
@@ -41,9 +51,27 @@ public class Equipment {
         playerData.Status.StatusUpdate();
     }
 
-    public void Equip(EquipmentSlot slot, ItemParameter param) {
+    public boolean Equip(EquipmentSlot slot, ItemParameter param) {
         param = param.clone();
-        if (param.isEmpty()) return;
+        boolean req = false;
+        List<String> reqText = new ArrayList<>();
+        if (param.isEmpty()) {
+            req = true;
+            reqText.add("§eアイテムデータ§aが§c不正§aです");
+        }
+        for (ClassData classData : playerData.Classes.classTier) {
+            if (classData != null && playerData.Classes.getLevel(classData) < param.itemEquipmentData.ReqLevel) {
+                reqText.add(classData.Color + "[" + classData.Display + "]§aのレベルが足りません");
+                req = true;
+            }
+        }
+        if (req) {
+            for (String msg : reqText) {
+                player.sendMessage(msg);
+            }
+            playSound(player, SoundList.Nope);
+            return false;
+        }
 
         if (EquipSlot.containsKey(slot)) {
             playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
@@ -53,6 +81,7 @@ public class Equipment {
         playerData.ItemInventory.removeItemParameter(param, 1);
 
         player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
+        return true;
     }
 
     public void unEquip(EquipmentSlot slot) {

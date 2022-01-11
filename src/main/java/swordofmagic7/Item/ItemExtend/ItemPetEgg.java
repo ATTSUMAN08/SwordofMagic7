@@ -11,7 +11,7 @@ import java.util.Random;
 import static swordofmagic7.Data.DataBase.PetList;
 import static swordofmagic7.Data.PlayerData.playerData;
 
-public class ItemPetEgg {
+public class ItemPetEgg implements Cloneable  {
     public String PetId;
     public int PetMaxLevel;
     public int PetLevel;
@@ -24,5 +24,16 @@ public class ItemPetEgg {
         Random random = new Random();
         PetParameter pet = new PetParameter(player, playerData, petData, petEgg.PetLevel, petEgg.PetMaxLevel, 0, random.nextDouble()+0.5);
         playerData.PetInventory.addPetParameter(pet);
+    }
+
+    @Override
+    public ItemPetEgg clone() {
+        try {
+            ItemPetEgg clone = (ItemPetEgg) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

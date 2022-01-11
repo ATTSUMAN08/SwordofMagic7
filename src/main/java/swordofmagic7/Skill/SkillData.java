@@ -23,6 +23,7 @@ public class SkillData {
     public int CastTime = 0;
     public int RigidTime = 0;
     public int CoolTime = 0;
+    public int ReqLevel = 1;
     public List<EquipmentCategory> ReqMainHand = new ArrayList<>();
 
     public ItemStack view() {
@@ -43,7 +44,8 @@ public class SkillData {
             Lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
             Lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");
         }
-        Lore.add(decoLore("使用可能武器種") + SkillType.Display);
+        Lore.add(decoText("§3§l使用条件"));
+        Lore.add(decoLore("クラスレベル") + ReqLevel);
         for (EquipmentCategory category : ReqMainHand) {
             Lore.add("§7・§e§l" + category.Display);
         }

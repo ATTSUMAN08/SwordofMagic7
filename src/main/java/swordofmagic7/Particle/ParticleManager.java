@@ -3,20 +3,14 @@ package swordofmagic7.Particle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static swordofmagic7.Function.Log;
-import static swordofmagic7.System.plugin;
 
 public final class ParticleManager {
 

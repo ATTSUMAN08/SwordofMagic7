@@ -6,13 +6,9 @@ public class SkillParameter {
     public double Increase = 0;
     public String Prefix = "";
     public String Suffix = "";
-    public boolean isInt;
+    public String Format;
 
     public String valueView() {
-        if (isInt) {
-            return String.valueOf((int) Math.round(Value));
-        } else {
-            return String.valueOf(Value);
-        }
+        return String.format(Format, Value);
     }
 }

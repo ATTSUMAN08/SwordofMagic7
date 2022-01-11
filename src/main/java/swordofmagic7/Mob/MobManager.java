@@ -1,15 +1,10 @@
 package swordofmagic7.Mob;
 
 import me.libraryaddict.disguise.disguisetypes.Disguise;
-import net.minecraft.world.entity.EntityCreature;
-import net.minecraft.world.entity.EntityInsentient;
-import net.minecraft.world.entity.ai.goal.PathfinderGoalSelector;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -19,7 +14,7 @@ public final class MobManager {
 
     private static final HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
 
-    private static double StatusMultiply(int level) {
+    public static double StatusMultiply(int level) {
         return Math.pow(0.74+(level/3f), 1.4);
     }
 
@@ -28,7 +23,7 @@ public final class MobManager {
             return EnemyTable.get(uuid);
         }
         Log("§cNon-EnemyData: " + uuid, true);
-        return new EnemyData();
+        return null;
     }
 
     public static boolean isEnemy(Entity uuid) {

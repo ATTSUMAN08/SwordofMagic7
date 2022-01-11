@@ -10,6 +10,7 @@ public enum EquipmentCategory {
     Shield("盾", Material.SHIELD),
     Baton("指揮杖", Material.BLAZE_ROD),
     Armor("アーマー", Material.IRON_CHESTPLATE),
+    Trinket("武器装飾", Material.SOUL_LANTERN),
     ;
     public String Display;
     public Material material;
@@ -19,7 +20,7 @@ public enum EquipmentCategory {
         this.material = material;
     }
 
-    public EquipmentCategory getEquipmentCategory(String str) {
+    public static EquipmentCategory getEquipmentCategory(String str) {
         for (EquipmentCategory loop : EquipmentCategory.values()) {
             if (loop.toString().equalsIgnoreCase(str)) {
                 return loop;

@@ -9,16 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static swordofmagic7.Function.Log;
-
-public class ItemEquipmentData {
+public class ItemEquipmentData implements Cloneable {
     public EquipmentCategory EquipmentCategory;
     public EquipmentSlot EquipmentSlot;
     public int Durable = 0;
     public int MaxDurable = 0;
     public int ReqLevel = 0;
     public int Plus = 0;
-    public int UpgradeBase = 5;
+    public int UpgradeCost = 999;
     public HashMap<StatusParameter, Double> Parameter = new HashMap<>();
     public int RuneSlot = 0;
     public List<RuneParameter> Rune = new ArrayList<>();
@@ -26,7 +24,7 @@ public class ItemEquipmentData {
     public HashMap<StatusParameter, Double> Parameter() {
         HashMap<StatusParameter, Double> Parameter = new HashMap<>();
         for (StatusParameter statusParameter : StatusParameter.values()) {
-            double parameter = this.Parameter.get(statusParameter);
+            double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05);
             for (RuneParameter rune : Rune) {
                 parameter += rune.Parameter(statusParameter);
             }
@@ -49,5 +47,16 @@ public class ItemEquipmentData {
 
     public void removeRune(int i) {
         Rune.remove(i);
+    }
+
+    @Override
+    public ItemEquipmentData clone() {
+        try {
+            ItemEquipmentData clone = (ItemEquipmentData) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

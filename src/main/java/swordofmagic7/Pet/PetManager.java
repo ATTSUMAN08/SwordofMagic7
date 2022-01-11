@@ -1,37 +1,32 @@
 package swordofmagic7.Pet;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
-import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
-import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static swordofmagic7.Data.DataBase.getPetData;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.Data.PetShopDisplay;
+import static swordofmagic7.Function.Log;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetManager {
     public final static HashMap<UUID, PetParameter> PetSummonedList = new HashMap<>();
+    public final static String ReqPetSelect = "§e[ペット]§aを選択してください";
+    public final static String ReqCommandPetSelect = "§a指揮する§e[ペット]§aを選択してください";
+    public final static String ReqAttackTarget = "§c[攻撃対象]§aを選択してください";
 
     public static Predicate<Entity> PredicatePet(Player player) {
-        return entity -> entity != player && isPet((LivingEntity) entity) && PetParameter((LivingEntity) entity).player == player;
+        return entity -> entity != player && isPet(entity) && PetParameter(entity).player == player;
     }
 
     public static boolean isPet(Entity entity) {
@@ -55,18 +50,18 @@ public class PetManager {
         this.playerData = playerData;
     }
 
-    public void PetShop() {
-        Inventory inv = decoInv(PetShopDisplay, 1);
-        inv.setItem(0, new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l無料配布のペットです").view());
-        player.openInventory(inv);
+    public void PetSelect() {
+        Ray ray = RayTrace.rayLocationEntity(player.getEyeLocation(), 24, 1, PetManager::isPet);
+        if (ray.isHitEntity())
+        PetSelect(ray.HitEntity);
     }
-
     public void PetSelect(LivingEntity entity) {
         PlayerData playerData = playerData(player);
         if (PetManager.isPet(entity)) {
             PetParameter pet = PetManager.PetParameter(entity);
             if (pet.player == player) {
                 playerData.PetSelect = pet;
+                playerData.PetSelect.entity = entity;
                 player.sendMessage("§e[" + pet.petData.Display + "]§aを選択しました");
                 playSound(player, SoundList.Click);
             } else {
@@ -74,18 +69,16 @@ public class PetManager {
                 playSound(player, SoundList.Nope);
             }
         } else {
-            player.sendMessage("§e[ペット]§aを選択してください");
+            player.sendMessage(ReqPetSelect);
             playSound(player, SoundList.Nope);
         }
     }
 
     public boolean usingBaton() {
         PlayerData playerData = playerData(player);
-        if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
+        if (playerData.Equipment.isWeaponEquip()) {
             EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
-            if (category == EquipmentCategory.Baton) {
-                return true;
-            }
+            return category == EquipmentCategory.Baton;
         }
         return false;
     }
@@ -110,7 +103,7 @@ public class PetManager {
             player.sendMessage("§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました");
             playSound(player, SoundList.Click);
         } else {
-            player.sendMessage("§a指揮する§e[ペット]§aを選択してください");
+            player.sendMessage(ReqCommandPetSelect);
             playSound(player, SoundList.Nope);
         }
     }
@@ -145,25 +138,8 @@ public class PetManager {
                 }
             }
         } else {
-            player.sendMessage("§a指揮する§e[ペット]§aを選択してください");
+            player.sendMessage(ReqCommandPetSelect);
             playSound(player, SoundList.Nope);
-        }
-    }
-
-    public void PetShopClick(InventoryView view, ItemStack currentItem) {
-        if (equalInv(view, PetShopDisplay)) {
-            if (currentItem.getType() == Material.WOLF_SPAWN_EGG) {
-                if (playerData.PetInventory.getList().size() == 0) {
-                    PetData petData = getPetData("オースオオカミ");
-                    PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, 1);
-                    playerData.PetInventory.addPetParameter(petParameter);
-                    player.sendMessage("§e[" + petData.Display + "]§aを受け取りました");
-                    playSound(player, SoundList.LevelUp);
-                } else {
-                    player.sendMessage("§aすでに§eペット§aを所持しています");
-                    playSound(player, SoundList.Nope);
-                }
-            }
         }
     }
 }

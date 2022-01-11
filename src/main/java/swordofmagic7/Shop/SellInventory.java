@@ -5,22 +5,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Inventory.BasicInventory;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
-import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Data.DataBase.ShopFlame;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Shop.Shop.*;
-import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class SellInventory extends BasicInventory {
     private final List<ItemParameterStack> List = new ArrayList<>();

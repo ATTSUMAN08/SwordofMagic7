@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MobData {
+    public String Id;
     public String Display;
     public EntityType entityType;
     public MobDisguise disguise;
@@ -24,4 +25,5 @@ public class MobData {
     public List<MobSkillData> SkillList = new ArrayList<>();
     public List<DropItemData> DropItemTable = new ArrayList<>();
     public List<DropRuneData> DropRuneTable = new ArrayList<>();
+    public List<Double> HPStop = new ArrayList<>();
 }

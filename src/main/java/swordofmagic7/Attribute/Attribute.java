@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.AttributeMenuDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -72,11 +73,7 @@ public class Attribute {
         for (AttributeType attr : AttributeType.values()) {
             Parameter.put(attr, 0);
         }
-        int point = 0;
-        for (ClassData classData : DataBase.getClassList().values()) {
-            point += playerData.Classes.getLevel(classData) - 1;
-        }
-        AttributePoint = point;
+        AttributePoint = (playerData.Classes.getLevel(getClassData("Novice"))-1)*5;
     }
 
     public ItemStack attributeView(AttributeType type) {
@@ -87,10 +84,10 @@ public class Attribute {
         Lore.add(decoText("§3§l追加ステータス"));
         final String format = "%.1f";
         if (type == AttributeType.STR) {
-            Lore.add(decoLore("物理与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
+            Lore.add(decoLore("物理与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
             Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
         } else if (type == AttributeType.INT) {
-            Lore.add(decoLore("魔法与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.4) + "%");
+            Lore.add(decoLore("魔法与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.08) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
             Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
         } else if (type == AttributeType.DEX) {

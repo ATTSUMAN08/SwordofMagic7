@@ -1,6 +1,6 @@
 package swordofmagic7.Effect;
 
-import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -10,23 +10,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.plugin;
 
 public class EffectManager {
-    private final Player player;
-    private final PlayerData playerData;
-    private final Plugin plugin;
+    public final LivingEntity entity;
 
     HashMap<EffectType, EffectData> Effect = new HashMap<>();
 
-    public EffectManager(Player player, PlayerData playerData, Plugin plugin) {
-        this.player = player;
-        this.playerData = playerData;
-        this.plugin = plugin;
-
+    public EffectManager(LivingEntity entity) {
+        this.entity = entity;
         BTTSet(new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline()) this.cancel();
+                if ((entity instanceof Player player && !player.isOnline()) || (entity != null && entity.isDead())) this.cancel();
                 for (Map.Entry<EffectType, EffectData> effect : Effect.entrySet()) {
                     effect.getValue().time -= 5;
                     if (effect.getValue().time <= 0) {
@@ -34,7 +30,7 @@ public class EffectManager {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 5), "EffectManager:" + player.getName());
+        }.runTaskTimerAsynchronously(plugin, 0, 5), "EffectManager");
     }
 
     public boolean hasEffect(EffectType effect) {

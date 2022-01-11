@@ -5,9 +5,7 @@ import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -20,13 +18,10 @@ import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Mob.MobManager;
-import swordofmagic7.Particle.ParticleData;
-import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
@@ -34,7 +29,8 @@ import swordofmagic7.System;
 
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.BTTSet;
@@ -71,6 +67,7 @@ public class PetParameter implements Cloneable {
     public PetAIState AIState = PetAIState.Follow;
     public ItemParameter[] Equipment = new ItemParameter[3];
     public HashMap<StatusParameter, Double> EquipmentStatus = new HashMap<>();
+    public EffectManager effectManager = new EffectManager(entity);
 
     public boolean Summoned = false;
 
@@ -108,7 +105,7 @@ public class PetParameter implements Cloneable {
                 if (MaxLevel <= Level) Exp = 0;
             }
             if (levelUp)
-                BroadCast("§e" + playerData.Nick + "§aさんの§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました");
+                BroadCast(playerData.getNick() + "§aさんの§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました");
         }
     }
 
@@ -129,7 +126,7 @@ public class PetParameter implements Cloneable {
         return EquipmentStatus.get(param);
     }
 
-    void updateStatus() {
+    public void updateStatus() {
         for (StatusParameter param : StatusParameter.values()) {
             EquipmentStatus.put(param, 0d);
         }
@@ -170,7 +167,20 @@ public class PetParameter implements Cloneable {
         } else if (Summoned) {
             cage();
         }
+        updateStatus();
     }
+
+    public void changeStamina(int stamina) {
+        Stamina = Math.min(MaxStamina, Math.max(Stamina+stamina, 0));
+    }
+    public void changeHealth(int health) {
+        Health = Math.min(MaxHealth, Math.max(Health+health, 0));
+    }
+    public void changeMana(int mana) {
+        Mana = Math.min(MaxMana, Math.max(Mana+mana, 0));
+    }
+
+
     public void spawn(Location location) {
         target = null;
         if (Stamina / MaxStamina < 0.05) {

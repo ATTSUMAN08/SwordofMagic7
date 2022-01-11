@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
@@ -32,6 +31,7 @@ import static swordofmagic7.Damage.Damage.makeHeal;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
+import static swordofmagic7.Pet.PetManager.ReqPetSelect;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
@@ -59,7 +59,11 @@ public class SkillProcess {
     }
 
     public Predicate<Entity> PredicateA() {
-        return entity -> entity != player && entity instanceof Player && !isEnemy(entity);
+        return entity -> entity != player && entity instanceof Player player && isHealAble(player);
+    }
+
+    public Predicate<Entity> PredicateA2() {
+        return entity -> entity != player && entity instanceof Player player && isRevivalAble(player);
     }
 
     public boolean isEnemy(Entity enemy) {
@@ -74,11 +78,34 @@ public class SkillProcess {
         if (enemy instanceof Player target) {
             if (target.isOnline() && isAlive(target)) {
                 PlayerData targetData = playerData(target);
-                return playerData.PvPMode && targetData.PvPMode;
+                if (playerData.Party == targetData.Party) return false;
+                else return playerData.PvPMode && targetData.PvPMode;
             } else return false;
         } else if (MobManager.isEnemy(enemy)) {
             MobManager.EnemyTable(enemy.getUniqueId()).updateEntity();
             return true;
+        } else return false;
+    }
+
+    public boolean isHealAble(Player target) {
+        if (target == player) {
+            return false;
+        }
+        if (target.isOnline() && isAlive(target)) {
+            PlayerData targetData = playerData(target);
+            if (playerData.Party == targetData.Party) return true;
+            else return !(playerData.PvPMode && targetData.PvPMode);
+        } else return false;
+    }
+
+    public boolean isRevivalAble(Player target) {
+        if (target == player) {
+            return false;
+        }
+        if (target.isOnline() && !isAlive(target)) {
+            PlayerData targetData = playerData(target);
+            if (playerData.Party == targetData.Party) return true;
+            else return !(playerData.PvPMode && targetData.PvPMode);
         } else return false;
     }
 
@@ -129,7 +156,7 @@ public class SkillProcess {
     }
 
     public void normalAttackTargetSelect() {
-        if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
+        if (playerData.Equipment.isWeaponEquip()) {
             if (0 >= normalAttackCoolTime) {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 List<LivingEntity> victims = new ArrayList<>();
@@ -148,7 +175,7 @@ public class SkillProcess {
 
     public void normalAttack(List<LivingEntity> victims) {
         final String damageSource = "attack";
-        if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
+        if (playerData.Equipment.isWeaponEquip()) {
             if (0 >= normalAttackCoolTime) {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 switch (category) {
@@ -161,13 +188,13 @@ public class SkillProcess {
                         normalAttackCoolTime = 15;
                     }
                     case Rod -> {
-                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), player.getEyeLocation(), 15, 0, 10, true);
+                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), playerHandLocation(player), playerEyeLocation(player, 15), 0, 10);
                         Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
                         playSound(player, SoundList.RodAttack);
                         normalAttackCoolTime = 12;
                     }
                     case ActGun -> {
-                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT), player.getEyeLocation(), 15, 0, 10, true);
+                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), playerEyeLocation(player, 15), 0, 10);
                         Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
                         playSound(player, GunAttack);
                         normalAttackCoolTime = 10;
@@ -271,7 +298,7 @@ public class SkillProcess {
         }.runTaskTimer(plugin, 0, period);
     }
 
-    void DoubleTrigger(SkillData skillData) {
+    void TriggerShot(SkillData skillData, int count) {
         Skill.setCastReady(false);
         final Location loc = RayTrace.rayLocation(player.getEyeLocation(),32, 0.1, false, PredicateE()).HitPosition;
         loc.setPitch(90);
@@ -280,10 +307,10 @@ public class SkillProcess {
             public void run() {
                 if (SkillCastTime > skillData.CastTime) {
                     this.cancel();
-                    ParticleManager.LineParticle(new ParticleData(Particle.CRIT), player.getEyeLocation(), 20, 0, 10);
+                    ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), 20, 0, 10);
                     Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, PredicateE());
-                    if (ray.isHitEntity()) Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 2);
-                    playSound(player, GunAttack, 2, 2);
+                    if (ray.isHitEntity()) Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, count);
+                    playSound(player, GunAttack, count, 2);
                     SkillRigid(skillData);
                 }
                 SkillCastTime += period;
@@ -337,7 +364,7 @@ public class SkillProcess {
                     this.cancel();
                     ParticleManager.CircleParticle(particleActivate, origin, radius, 30);
                     List<LivingEntity> victims = (List<LivingEntity>) origin.getNearbyLivingEntities(radius, Predicate());
-                    Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1, 2);
+                    Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value/100, 1, 2);
                     SkillRigid(skillData);
                 }
                 SkillCastTime += period;
@@ -362,7 +389,125 @@ public class SkillProcess {
                     }
                     ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), target.getLocation(), 1, 2, 3, 3);
                     makeHeal(player, target, skillData.Parameter.get(0).Value/100);
-                    playSound(player, Heal);
+                    playSound(target.getLocation(), Heal);
+                    SkillRigid(skillData);
+                }
+                SkillCastTime += period;
+            }
+        }.runTaskTimer(plugin, 0, period);
+    }
+
+    void PetAttack(SkillData skillData) {
+        Skill.setCastReady(false);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (SkillCastTime > skillData.CastTime) {
+                    this.cancel();
+                    LivingEntity target = playerData.PetSelect.target;
+                    LivingEntity pet = playerData.PetSelect.entity;
+                    if (pet != null && target != null && pet.getLocation().distance(target.getLocation()) <= skillData.Parameter.get(1).Value) {
+                        ParticleManager.RandomVectorParticle(new ParticleData(Particle.CRIT), target.getLocation(), 30);
+                        Damage.makeDamage(pet, target, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
+                        playSound(target.getLocation(), SoundList.AttackWeak);
+                    }
+                    SkillRigid(skillData);
+                }
+                SkillCastTime += period;
+            }
+        }.runTaskTimer(plugin, 0, period);
+    }
+
+    void PetHeal(SkillData skillData) {
+        Skill.setCastReady(false);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (SkillCastTime > skillData.CastTime) {
+                    this.cancel();
+                    if (playerData.PetSelect != null && playerData.PetSelect.entity != null) {
+                        playerData.PetSelect.changeHealth((int) Math.round(playerData.Status.HLP*skillData.Parameter.get(0).Value/100));
+                        ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), playerData.PetSelect.entity.getLocation(), 1, 2, 3, 3);
+                        playSound(player, Heal);
+                    } else {
+                        player.sendMessage(ReqPetSelect);
+                        playSound(player, SoundList.Nope);
+                    }
+                    SkillRigid(skillData);
+                }
+                SkillCastTime += period;
+            }
+        }.runTaskTimer(plugin, 0, period);
+    }
+
+    void Resurrection(SkillData skillData, double length) {
+        Skill.setCastReady(false);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (SkillCastTime > skillData.CastTime) {
+                    this.cancel();
+                    Ray ray = rayLocationEntity(player.getEyeLocation(), length, 1, PredicateA2());
+                    if (ray.isHitEntity()) {
+                        Player target = (Player) ray.HitEntity;
+                        ParticleManager.LineParticle(new ParticleData(Particle.END_ROD), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
+                        ParticleManager.CylinderParticle(new ParticleData(Particle.END_ROD), target.getLocation(), 1, 2, 3, 3);
+                        playerData(target).revival();
+                        playSound(target.getLocation(), Heal);
+                    } else {
+                        player.sendMessage("§b[蘇生対象]§aを選択してください");
+                        playSound(player, SoundList.Nope);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> Skill.resetSkillCoolTime(skillData), 5);
+                    }
+                    SkillRigid(skillData);
+                }
+                SkillCastTime += period;
+            }
+        }.runTaskTimer(plugin, 0, period);
+    }
+
+    void FireBall(SkillData skillData) {
+        Skill.setCastReady(false);
+        final Location loc = RayTrace.rayLocation(player.getEyeLocation(),32, 0.1, false, PredicateE()).HitPosition;
+        ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f);
+        loc.setPitch(90);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (SkillCastTime > skillData.CastTime) {
+                    this.cancel();
+                    Ray ray = rayLocationEntity(player.getEyeLocation(), 10, 0.5, PredicateE());
+                    ParticleManager.LineParticle(particleData, playerHandLocation(player), ray.HitPosition, 0, 10);
+                    ParticleManager.RandomVectorParticle(particleData, ray.HitPosition, 100);
+                    List<LivingEntity> victims = (List<LivingEntity>) ray.HitPosition.getNearbyLivingEntities(skillData.Parameter.get(1).Value, Predicate());
+                    Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1, 2);
+                    playSound(player, GunAttack);
+                    SkillRigid(skillData);
+                }
+                SkillCastTime += period;
+            }
+        }.runTaskTimer(plugin, 0, period);
+    }
+
+    void Teleportation(SkillData skillData) {
+        Skill.setCastReady(false);
+        final Location loc = RayTrace.rayLocation(player.getEyeLocation(),32, 0.1, false, PredicateE()).HitPosition;
+        loc.setPitch(90);
+        final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+        final Location origin = RayTrace.rayLocationBlock(loc, 32, false).HitPosition;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (SkillCastTime < skillData.CastTime) {
+                    ParticleManager.CircleParticle(particleData, origin, 1, 10);
+                    ParticleManager.CircleParticle(particleData, origin, 1, 10);
+                } else {
+                    this.cancel();
+                    ParticleManager.CylinderParticle(particleData, origin, 1, 2, 30, 10);
+                    ParticleManager.CylinderParticle(particleData, origin, 1, 2, 30, 10);
+                    origin.setDirection(player.getLocation().getDirection());
+                    player.teleportAsync(origin);
+                    playSound(player, SoundList.Warp);
                     SkillRigid(skillData);
                 }
                 SkillCastTime += period;

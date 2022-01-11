@@ -2,12 +2,14 @@ package swordofmagic7;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import it.unimi.dsi.fastutil.Hash;
-import net.citizensnpcs.api.CitizensAPI;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -20,11 +22,11 @@ import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Renderer.MapCustom;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.*;
@@ -32,12 +34,12 @@ import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Data.PlayerData.playerDataList;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.getEnemyTable;
+import static swordofmagic7.Party.PartyManager.partyCommand;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class System extends JavaPlugin {
 
     public static Plugin plugin;
-    public static TagGame tagGame;
 
     private static HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
 
@@ -45,20 +47,22 @@ public final class System extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         EnemyTable = getEnemyTable();
-        tagGame = new TagGame();
 
         new Events(this);
-        new DataBase(this);
+        DataLoad();
 
         PlayerList.load();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            playerData(player).load();
-        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                playerData(player).load();
+            }
+        }, 5);
 
         for (WarpGateParameter warp : WarpGateList.values()) {
             warp.start();
         }
+
 
         World world = Bukkit.getWorld("world");
         world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
@@ -88,6 +92,7 @@ public final class System extends JavaPlugin {
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
             HashMap<UUID, PlayerData> list = playerDataList();
             if (list.containsKey(player.getUniqueId())) {
                 PlayerData playerData = list.get(player.getUniqueId());
@@ -105,7 +110,7 @@ public final class System extends JavaPlugin {
             count++;
         }
         for (Entity entity : Bukkit.getWorld("world").getEntities()) {
-            if (!(entity instanceof Player) && ignoreEntity(entity)) {
+            if (!(entity instanceof Player) && !ignoreEntity(entity)) {
                 entity.remove();
                 count++;
             }
@@ -119,7 +124,8 @@ public final class System extends JavaPlugin {
             PlayerData playerData = playerData(player);
             if (player.hasPermission("som7.debug")) {
                 if (cmd.getName().equalsIgnoreCase("test")) {
-
+                    MapCustom.getCustomMap(player, 0);
+                    return true;
                 } else if (cmd.getName().equalsIgnoreCase("gm")) {
                     if (args.length == 0) {
                         if (player.getGameMode().equals(GameMode.CREATIVE)) {
@@ -249,6 +255,11 @@ public final class System extends JavaPlugin {
                     for (Map.Entry<UUID, PlayerData> loopData : list.entrySet()) {
                         player.sendMessage(Bukkit.getOfflinePlayer(loopData.getKey()).getName() + ": " + loopData.getKey());
                     }
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("DataBaseReload")) {
+                    player.sendMessage("Reloaded DataBase");
+                    DataBase.DataLoad();
+                    return true;
                 }
             }
 
@@ -288,11 +299,13 @@ public final class System extends JavaPlugin {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("spawn")) {
                 MapList.get("Alden").enter(player);
+                player.setFlying(false);
+                player.setGravity(true);
                 player.teleportAsync(SpawnLocation);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("info")) {
                 Player target = player;
-                if (args.length == 1) {
+                if (args.length == 1 && Bukkit.getPlayer(args[0]) != null) {
                     target = Bukkit.getPlayer(args[0]);
                 }
                 playerData.Menu.StatusInfo.StatusInfoView(target);
@@ -329,6 +342,27 @@ public final class System extends JavaPlugin {
                     }
                     player.sendMessage("§e/tagGame [join/leave]");
                 }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("party")) {
+                partyCommand(player, playerData, args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("itemInventorySort")) {
+                playerData.ItemInventory.ItemInventorySort();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("runeInventorySort")) {
+                playerData.RuneInventory.RuneInventorySort();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("petInventorySort")) {
+                playerData.PetInventory.PetInventorySort();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("itemInventorySortReverse")) {
+                playerData.ItemInventory.ItemInventorySortReverse();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("runeInventorySortReverse")) {
+                playerData.RuneInventory.RuneInventorySortReverse();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("petInventorySortReverse")) {
+                playerData.PetInventory.PetInventorySortReverse();
                 return true;
             }
         }

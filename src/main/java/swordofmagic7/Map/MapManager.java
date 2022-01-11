@@ -89,6 +89,7 @@ public class MapManager {
             player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
             playSound(player, SoundList.LevelUp);
             lastTeleportGate = teleport.Id;
+            playerData.Map = teleport.Map;
         } else {
             player.sendMessage("§e[転移門]§aが§b[有効化]§aされていません");
             playSound(player, SoundList.Nope);

@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.UUID;

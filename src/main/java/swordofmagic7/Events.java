@@ -3,8 +3,6 @@ package swordofmagic7;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.event.NPCClickEvent;
-import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import org.bukkit.Bukkit;
@@ -16,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
@@ -32,7 +29,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.Npc.NpcMessage;
 import swordofmagic7.Pet.PetManager;
@@ -50,7 +46,6 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.BTTSet;
-import static swordofmagic7.System.tagGame;
 
 public class Events implements Listener {
 
@@ -75,6 +70,9 @@ public class Events implements Listener {
         List<PetParameter> PetSummon = new ArrayList<>(playerData.PetSummon);
         for (PetParameter pet : PetSummon) {
             pet.cage();
+        }
+        if (playerData.Party != null) {
+            playerData.Party.Quit(player);
         }
         playerData.save();
         PlayerList.load();
@@ -139,10 +137,12 @@ public class Events implements Listener {
     @EventHandler
     void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
         Block block = event.getClickedBlock();
+        Action action = event.getAction();
         if (player.getGameMode() != GameMode.CREATIVE) {
             if (block != null) {
-                if (block.getType() != Material.LECTERN) {
+                if (block.getType() != Material.LECTERN && !playerData.Map.GatheringData.containsKey(block.getType())) {
                     event.setCancelled(true);
                 }
             } else {
@@ -153,11 +153,8 @@ public class Events implements Listener {
                 event.setCancelled(true);
             }
         }
-
-        Action action = event.getAction();
-        PlayerData playerData = playerData(player);
         if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
-            if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && playerData.Equipment.isEquip(EquipmentSlot.MainHand)) {
+            if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && playerData.Equipment.isWeaponEquip()) {
                 if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
                     if (playerData.CastMode.isLegacy()) {
                         if (player.isSneaking()) {
@@ -187,6 +184,9 @@ public class Events implements Listener {
                         }
                     } else {
                         playerData.Skill.SkillProcess.normalAttackTargetSelect();
+                        if (playerData.PetManager.usingBaton()) {
+                            playerData.PetManager.PetSelect();
+                        }
                     }
                 }
             }
@@ -210,25 +210,29 @@ public class Events implements Listener {
 
     @EventHandler
     void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        event.setCancelled(true);
+        Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
         Entity entity = event.getRightClicked();
-        if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
+        if (player.getGameMode() != GameMode.CREATIVE && ignoreEntity(entity)) event.setCancelled(true);
+        if (playerData.PlayMode && event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
+            event.setCancelled(true);
             NPCRegistry npcRegistry = CitizensAPI.getNPCRegistry();
             if (npcRegistry.isNPC(entity)) {
-                Player player = event.getPlayer();
-                PlayerData playerData = playerData(player);
                 NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
                 String shop = unColored(entity.getCustomName());
                 if (ShopList.containsKey(shop)) {
                     playerData.Shop.ShopOpen(getShopData(shop));
+                    playSound(player, SoundList.MenuOpen);
                 } else if (shop.equalsIgnoreCase("ペットショップ")) {
-                    playerData.PetManager.PetShop();
+                    playerData.PetShop.PetShopOpen();
                 } else if (shop.equalsIgnoreCase("ルーン職人")) {
                     playerData.RuneShop.RuneMenuView();
                 } else if (shop.equalsIgnoreCase("転職神官")) {
                     playerData.Classes.ClassSelectView(0);
                 } else if (shop.equalsIgnoreCase("買取屋")) {
                     playerData.Shop.ShopSellOpen();
+                } else if (shop.equalsIgnoreCase("鍛冶場")) {
+                    playerData.Menu.Smith.SmithMenuView();
                 }
                 if (NpcList.containsKey(npc.getId())) {
                     NpcMessage.ShowMessage(player, npc);
@@ -294,7 +298,13 @@ public class Events implements Listener {
     @EventHandler
     void onDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL
+                || event.getCause() == EntityDamageEvent.DamageCause.LAVA
+                || event.getCause() == EntityDamageEvent.DamageCause.FIRE
+                || event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR
+                || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK
+        ) {
+            victim.setFireTicks(0);
             event.setCancelled(true);
             return;
         }
@@ -321,16 +331,13 @@ public class Events implements Listener {
                 skillProcess.normalAttack(victims);
             }
             if (event.getEntity() instanceof Player victim) {
-                if (tagGame.isPlayer(attacker) || tagGame.isPlayer(victim)) {
+                if (TagGame.isPlayer(attacker) || TagGame.isPlayer(victim)) {
                     if (!attacker.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-                        tagGame.tagChange(attacker, victim);
+                        TagGame.tagChange(attacker, victim);
                     }
                 }
-            } else if (event.getEntity() instanceof LivingEntity victim) {
-                PlayerData playerData = playerData(attacker);
-                if (playerData.PetManager.usingBaton()) {
-                    playerData.PetManager.PetSelect(victim);
-                }
+            } else if (PetManager.isPet(event.getEntity())) {
+
             }
             event.setCancelled(true);
         }
@@ -380,17 +387,28 @@ public class Events implements Listener {
             event.setCancelled(true);
         }
         String message = event.getMessage();
+        ItemStack itemView = null;
+        String itemText = null;
         if (message.contains("%item%")) {
-            ItemStack item = player.getInventory().getItemInMainHand();
-            if (item.getType() != Material.AIR && item.hasItemMeta()) {
-                ItemMeta meta = item.getItemMeta();
+            itemText = "%item%";
+            itemView = player.getInventory().getItemInMainHand();
+        } else if (message.contains("%armor%")) {
+            itemText = "%armor%";
+            itemView = player.getInventory().getChestplate();
+        } else if (message.contains("%offhand%")) {
+            itemText = "%offhand%";
+            itemView = player.getInventory().getItemInOffHand();
+        }
+        if (itemView != null) {
+            if (itemView.getType() != Material.AIR && itemView.hasItemMeta()) {
+                ItemMeta meta = itemView.getItemMeta();
                 if (meta != null && meta.hasDisplayName() && meta.hasLore()) {
                     String Display = unDecoText(meta.getDisplayName());
                     StringBuilder Lore = new StringBuilder(meta.getDisplayName());
                     for (String str : meta.getLore()) {
                         Lore.append("<nl>").append(str);
                     }
-                    event.setMessage(message.replace("%item%", "§e[" + Display + "]<tag>" + Lore + "<end>"));
+                    event.setMessage(message.replace(itemText, "§e[" + Display + "]<tag>" + Lore + "<end>"));
                 }
             }
         }
@@ -409,6 +427,21 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         if (!player.isOp() || playerData(player).PlayMode) {
             event.setCancelled(true);
+            PlayerData playerData = playerData(player);
+            playerData.Gathering.BlockBreak(playerData, event.getBlock());
+        }
+    }
+
+    @EventHandler
+    void onBlockDamage(BlockDamageEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
+        Block block = event.getBlock();
+        if (!playerData.Map.GatheringData.containsKey(block.getType())) {
+            event.setCancelled(true);
+        }
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            event.setInstaBreak(false);
         }
     }
 
@@ -429,11 +462,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         playerData.Strafe = 2;
-        if (playerData.StrafeMode.isDoubleJump() || player.getGameMode() == GameMode.CREATIVE) {
-            player.setAllowFlight(true);
-        } else {
-            player.setAllowFlight(false);
-        }
+        player.setAllowFlight(playerData.StrafeMode.isDoubleJump() || player.getGameMode() == GameMode.CREATIVE);
     }
 
     @EventHandler
@@ -445,7 +474,7 @@ public class Events implements Listener {
             playerData.MapManager.TeleportGateSelector();
         }
         CharaController.WallKick(player);
-        if (playerData.isDead) {
+        if (playerData.isDead && playerData.deadTime < 1100) {
             playerData.deadTime = 0;
         }
     }
@@ -489,11 +518,6 @@ public class Events implements Listener {
 
     @EventHandler
     void onBlockExplode(BlockExplodeEvent event) {
-        event.setCancelled(true);
-    }
-
-    @EventHandler
-    void onBlockDamage(BlockDamageEvent event) {
         event.setCancelled(true);
     }
 

@@ -2,7 +2,6 @@ package swordofmagic7.Item;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Status.StatusParameter;
 

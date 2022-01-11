@@ -5,7 +5,9 @@ public enum ItemCategory {
     Potion("ポーション"),
     Material("素材"),
     PetEgg("ペットエッグ"),
+    PetFood("ペットフード"),
     Equipment("装備"),
+    Tool("ツール"),
     ;
     String Display;
 
@@ -38,7 +40,15 @@ public enum ItemCategory {
         return this == PetEgg;
     }
 
+    public boolean isPetFood() {
+        return this == PetFood;
+    }
+
     public boolean isEquipment() {
         return this == Equipment;
+    }
+
+    public boolean isTool() {
+        return this == Tool;
     }
 }

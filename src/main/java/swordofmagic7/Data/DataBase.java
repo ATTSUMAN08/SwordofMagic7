@@ -3,35 +3,36 @@ package swordofmagic7.Data;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.watchers.SlimeWatcher;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.Plugin;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
-import swordofmagic7.HotBar.HotBarCategory;
-import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Item.RuneParameter;
+import swordofmagic7.Life.Angler.AnglerData;
+import swordofmagic7.Life.Harvest.HarvestData;
+import swordofmagic7.Life.Harvest.HarvestItemData;
+import swordofmagic7.Life.Lumber.LumberData;
+import swordofmagic7.Life.Lumber.LumberItemData;
+import swordofmagic7.Life.Mine.MineData;
+import swordofmagic7.Life.Mine.MineItemData;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.TeleportGateParameter;
 import swordofmagic7.Map.WarpGateParameter;
 import swordofmagic7.Mob.*;
 import swordofmagic7.Npc.NpcData;
 import swordofmagic7.Pet.PetData;
+import swordofmagic7.Shop.ItemRecipe;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Shop.ShopSlot;
 import swordofmagic7.Skill.SkillData;
@@ -39,7 +40,6 @@ import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Skill.SkillType;
 import swordofmagic7.Status.StatusParameter;
 
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +49,6 @@ import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.decoText;
 
 public final class DataBase {
-    Plugin plugin;
     public static final String DataBasePath = "M:\\Minecraft\\Server\\SwordofMagic7\\DataBase\\";
     public static final String format = "%.3f";
     public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 1200.5, 100, 0.5, 0, 0);
@@ -69,12 +68,17 @@ public final class DataBase {
     public static final HashMap<String, MobData> MobList = new HashMap<>();
     public static final HashMap<String, MobSpawnerData> MobSpawnerList = new HashMap<>();
     public static final HashMap<String, ShopData> ShopList = new HashMap<>();
+    public static final HashMap<String, ItemRecipe> ItemRecipeList = new HashMap<>();
     public static final HashMap<String, WarpGateParameter> WarpGateList = new HashMap<>();
     public static final HashMap<String, TeleportGateParameter> TeleportGateList = new HashMap<>();
     public static final HashMap<String, MapData> MapList = new HashMap<>();
     public static final HashMap<String, PetData> PetList = new HashMap<>();
     public static final HashMap<Integer, NpcData> NpcList = new HashMap<>();
     public static final HashMap<Integer, String> TeleportGateMenu = new HashMap<>();
+    public static final HashMap<String, MineData> MineDataList = new HashMap<>();
+    public static final HashMap<String, LumberData> LumberDataList = new HashMap<>();
+    public static final HashMap<String, HarvestData> HarvestDataList = new HashMap<>();
+    public static final HashMap<String, AnglerData> AnglerDataList = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(Player player) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
@@ -102,11 +106,6 @@ public final class DataBase {
         return item;
     }
 
-    public DataBase(Plugin plugin) {
-        this.plugin = plugin;
-        DataLoad();
-    }
-
     private static List<File> dumpFile(File file) {
         List<File> list = new ArrayList<>();
         File[] files = file.listFiles();
@@ -120,7 +119,7 @@ public final class DataBase {
         return list;
     }
 
-    static void DataLoad() {
+    public static void DataLoad() {
         File npcDirectories = new File(DataBasePath, "Npc");
         List<File> npcFiles = dumpFile(npcDirectories);
         for (File file : npcFiles) {
@@ -145,34 +144,35 @@ public final class DataBase {
             if (data.isSet("Color.R")) {
                 itemParameter.color = Color.fromRGB(data.getInt("Color.R"), data.getInt("Color.G"), data.getInt("Color.B"));
             }
-            if (itemParameter.Category == ItemCategory.PetEgg) {
+            if (itemParameter.Category.isPetEgg()) {
                 itemParameter.itemPetEgg.PetId = data.getString("PetId");
                 itemParameter.itemPetEgg.PetMaxLevel = data.getInt("PetMaxLevel");
                 itemParameter.itemPetEgg.PetLevel = data.getInt("PetLevel");
-            } else if (itemParameter.Category == ItemCategory.Potion) {
+            } else if (itemParameter.Category.isPotion()) {
                 itemParameter.itemPotion.PotionType = ItemPotionType.valueOf(data.getString("Potion.Type"));
                 itemParameter.itemPotion.CoolTime = data.getInt("Potion.CoolTime");
                 for (int i = 0; i < 4; i++) {
                     itemParameter.itemPotion.Value[i] = data.getDouble("Potion.Value." + i);
                 }
+            } else if (itemParameter.Category.isPetFood()) {
+                itemParameter.itemPetFood.Stamina = data.getInt("PetFood.Stamina");
             }
-            itemParameter.itemEquipmentData.EquipmentCategory = EquipmentCategory.Blade.getEquipmentCategory(data.getString("EquipmentCategory"));
             if (data.isSet("Material")) {
                 itemParameter.Icon = Material.getMaterial(data.getString("Material", "BARRIER"));
             } else if (itemParameter.Category == ItemCategory.Equipment) {
+                itemParameter.itemEquipmentData.EquipmentCategory = EquipmentCategory.getEquipmentCategory(data.getString("EquipmentCategory"));
                 itemParameter.Icon = itemParameter.itemEquipmentData.EquipmentCategory.material;
-            }
-            itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
-            for (StatusParameter param : StatusParameter.values()) {
-                if (data.isSet(param.toString())) {
-                    itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()));
-                }
-            }
-            if (data.isSet("ReqLevel")) itemParameter.itemEquipmentData.ReqLevel = data.getInt("ReqLevel");
-            if (data.isSet("RuneSlot")) itemParameter.itemEquipmentData.RuneSlot = data.getInt("RuneSlot");
-            if (data.isSet("Durable")) {
+                itemParameter.itemEquipmentData.ReqLevel = data.getInt("ReqLevel");
+                itemParameter.itemEquipmentData.RuneSlot = data.getInt("RuneSlot");
+                itemParameter.itemEquipmentData.UpgradeCost = data.getInt("UpgradeCost");
                 itemParameter.itemEquipmentData.Durable = data.getInt("Durable");
                 itemParameter.itemEquipmentData.MaxDurable = itemParameter.itemEquipmentData.Durable;
+                itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
+                for (StatusParameter param : StatusParameter.values()) {
+                    if (data.isSet(param.toString())) {
+                        itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()));
+                    }
+                }
             }
             ItemList.put(itemParameter.Id, itemParameter);
         }
@@ -237,11 +237,87 @@ public final class DataBase {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
             MapData mapData = new MapData();
+            mapData.Id = fileName;
             mapData.Display = data.getString("Display");
             mapData.Color = data.getString("Color");
             mapData.Level = data.getInt("Level");
             mapData.Safe = data.getBoolean("Safe");
+            if (data.isSet("Life.Mine")) {
+                for (String str : data.getStringList("Life.Mine")) {
+                    String[] split = str.split(",");
+                    mapData.GatheringData.put(Material.getMaterial(split[0]), split[1]);
+                }
+            }
+            if (data.isSet("Life.Lumber")) {
+                for (String str : data.getStringList("Life.Lumber")) {
+                    String[] split = str.split(",");
+                    mapData.GatheringData.put(Material.getMaterial(split[0]), split[1]);
+                }
+            }
+            if (data.isSet("Life.Harvest")) {
+                for (String str : data.getStringList("Life.Harvest")) {
+                    String[] split = str.split(",");
+                    mapData.GatheringData.put(Material.getMaterial(split[0]), split[1]);
+                }
+            }
             MapList.put(fileName, mapData);
+        }
+
+        File lifeMineDirectories = new File(DataBasePath, "Life/Mine");
+        File[] lifeMineFile = lifeMineDirectories.listFiles();
+        for (File file : lifeMineFile) {
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            String fileName = file.getName().replace(".yml", "");
+            int CoolTime = data.getInt("CoolTime");
+            int Exp = data.getInt("Exp");
+            int ReqLevel = data.getInt("ReqLevel");
+            MineData lifeData = new MineData(CoolTime, Exp, ReqLevel);
+            for (String str : data.getStringList("Item")) {
+                String[] split = str.split(":");
+                MineItemData itemData = new MineItemData();
+                itemData.itemParameter = getItemParameter(split[0]);
+                itemData.Percent = Double.parseDouble(split[1]);
+                lifeData.itemData.add(itemData);
+            }
+            MineDataList.put(fileName, lifeData);
+        }
+
+        File lifeLumberDirectories = new File(DataBasePath, "Life/Lumber");
+        File[] lifeLumberFile = lifeLumberDirectories.listFiles();
+        for (File file : lifeLumberFile) {
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            String fileName = file.getName().replace(".yml", "");
+            int CoolTime = data.getInt("CoolTime");
+            int Exp = data.getInt("Exp");
+            int ReqLevel = data.getInt("ReqLevel");
+            LumberData lifeData = new LumberData(CoolTime, Exp, ReqLevel);
+            for (String str : data.getStringList("Item")) {
+                String[] split = str.split(":");
+                LumberItemData itemData = new LumberItemData();
+                itemData.itemParameter = getItemParameter(split[0]);
+                itemData.Percent = Double.parseDouble(split[1]);
+                lifeData.itemData.add(itemData);
+            }
+            LumberDataList.put(fileName, lifeData);
+        }
+
+        File lifeHarvestDirectories = new File(DataBasePath, "Life/Harvest");
+        File[] lifeHarvestFile = lifeHarvestDirectories.listFiles();
+        for (File file : lifeHarvestFile) {
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            String fileName = file.getName().replace(".yml", "");
+            int CoolTime = data.getInt("CoolTime");
+            int Exp = data.getInt("Exp");
+            int ReqLevel = data.getInt("ReqLevel");
+            HarvestData lifeData = new HarvestData(CoolTime, Exp, ReqLevel);
+            for (String str : data.getStringList("Item")) {
+                String[] split = str.split(":");
+                HarvestItemData itemData = new HarvestItemData();
+                itemData.itemParameter = getItemParameter(split[0]);
+                itemData.Percent = Double.parseDouble(split[1]);
+                lifeData.itemData.add(itemData);
+            }
+            HarvestDataList.put(fileName, lifeData);
         }
 
         File warpDirectories = new File(DataBasePath, "WarpGateData/");
@@ -301,6 +377,7 @@ public final class DataBase {
                 teleport.Subtitle = data.getString("Subtitle");
                 teleport.Location = loc;
                 teleport.DefaultActive = data.getBoolean("DefaultActive");
+                teleport.Map = getMapData(data.getString("Map"));
                 TeleportGateList.put(fileName, teleport);
                 teleport.start();
             } else {
@@ -312,9 +389,9 @@ public final class DataBase {
             }
         }
 
-        File skillActiveDirectories = new File(DataBasePath, "SkillData/Active/");
-        File[] skillActiveFile = skillActiveDirectories.listFiles();
-        for (File file : skillActiveFile) {
+        File skillDirectories = new File(DataBasePath, "SkillData/");
+        List<File> skillFile = dumpFile(skillDirectories);
+        for (File file : skillFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             SkillData skillData = new SkillData();
@@ -326,7 +403,8 @@ public final class DataBase {
                 Lore.add("§a§l" + str);
             }
             skillData.Lore = Lore;
-            skillData.SkillType = SkillType.Active;
+            skillData.SkillType = SkillType.valueOf(data.getString("SkillType"));
+            skillData.ReqLevel = data.getInt("ReqLevel");
             int i = 0;
             while (data.isSet("Parameter-" + i + ".Display")) {
                 SkillParameter param = new SkillParameter();
@@ -335,49 +413,18 @@ public final class DataBase {
                 param.Increase = data.getDouble("Parameter-" + i + ".Increase");
                 param.Prefix = data.getString("Parameter-" + i + ".Prefix");
                 param.Suffix = data.getString("Parameter-" + i + ".Suffix");
-                param.isInt = data.getBoolean("Parameter-" + i + ".isInt");
+                param.Format = "%." + data.getInt("Parameter-" + i + ".Format") + "f";
                 skillData.Parameter.add(param);
                 i++;
             }
-            if (data.isSet("ReqMainHand")) {
+            if (skillData.SkillType.isActive()) {
                 for (String str : data.getStringList("ReqMainHand")) {
-                    skillData.ReqMainHand.add(EquipmentCategory.Blade.getEquipmentCategory(str));
+                    skillData.ReqMainHand.add(EquipmentCategory.getEquipmentCategory(str));
                 }
-            }
-            skillData.Mana = data.getInt("Mana");
-            skillData.CastTime = data.getInt("CastTime");
-            skillData.RigidTime = data.getInt("RigidTime");
-            skillData.CoolTime = data.getInt("CoolTime");
-            SkillDataList.put(skillData.Id, skillData);
-            SkillDataDisplayList.put(skillData.Display, skillData);
-        }
-
-        File skillPassiveDirectories = new File(DataBasePath, "SkillData/Passive/");
-        File[] skillPassiveFile = skillPassiveDirectories.listFiles();
-        for (File file : skillPassiveFile) {
-            String fileName = file.getName().replace(".yml", "");
-            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-            SkillData skillData = new SkillData();
-            skillData.Id = fileName;
-            skillData.Icon = Material.getMaterial(data.getString("Icon", "END_CRYSTAL"));
-            skillData.Display = data.getString("Display");
-            List<String> Lore = new ArrayList<>();
-            for (String str : data.getStringList("Lore")) {
-                Lore.add("§a§l" + str);
-            }
-            skillData.Lore = Lore;
-            skillData.SkillType = SkillType.Passive;
-            int i = 0;
-            while (data.isSet("Parameter-" + i + ".Display")) {
-                SkillParameter param = new SkillParameter();
-                param.Display = data.getString("Parameter-" + i + ".Display");
-                param.Value = data.getDouble("Parameter-" + i + ".Value");
-                param.Increase = data.getDouble("Parameter-" + i + ".Increase");
-                param.Prefix = data.getString("Parameter-" + i + ".Prefix");
-                param.Suffix = data.getString("Parameter-" + i + ".Suffix");
-                param.isInt = data.getBoolean("Parameter-" + i + ".isInt");
-                skillData.Parameter.add(param);
-                i++;
+                skillData.Mana = data.getInt("Mana");
+                skillData.CastTime = data.getInt("CastTime");
+                skillData.RigidTime = data.getInt("RigidTime");
+                skillData.CoolTime = data.getInt("CoolTime");
             }
             SkillDataList.put(skillData.Id, skillData);
             SkillDataDisplayList.put(skillData.Display, skillData);
@@ -405,6 +452,16 @@ public final class DataBase {
             classData.SkillList = Skills;
             ClassList.put(fileName, classData);
         }
+        for (File file : classFile) {
+            String fileName = file.getName().replace(".yml", "");
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            if (data.isSet("ReqClass")) {
+                for (String str : data.getStringList("ReqClass")) {
+                    String[] split = str.split(":");
+                    ClassList.get(fileName).ReqClass.put(getClassData(split[0]), Integer.valueOf(split[1]));
+                }
+            }
+        }
 
         File mobDirectories = new File(DataBasePath, "MobData/");
         List<File> mobFile = dumpFile(mobDirectories);
@@ -412,6 +469,7 @@ public final class DataBase {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             MobData mobData = new MobData();
+            mobData.Id = fileName;
             mobData.Display = data.getString("Display");
             String entityType = data.getString("Type").toUpperCase();
             if (EntityType.fromName(entityType) != null) {
@@ -441,16 +499,34 @@ public final class DataBase {
             if (data.isSet("Skill")) {
                 List<MobSkillData> SkillList = new ArrayList<>();
                 for (String str : data.getStringList("Skill")) {
-                    String[] split = str.split(",");
-                    MobSkillData mobSkillData = new MobSkillData();
-                    mobSkillData.Skill = split[0];
-                    mobSkillData.Percent = Double.parseDouble(split[1]);
-                    SkillList.add(mobSkillData);
+                    try {
+                        String[] split = str.split(",");
+                        MobSkillData mobSkillData = new MobSkillData();
+                        mobSkillData.Skill = split[0];
+                        for(String skillData : split) {
+                            if (skillData.contains("Percent:")) {
+                                mobSkillData.Percent = Double.parseDouble(skillData.replace("Percent:", ""));
+                            } else if (skillData.contains("CoolTime:")) {
+                                mobSkillData.CoolTime = Integer.parseInt(skillData.replace("CoolTime:", ""));
+                            } else if (skillData.contains("Health:")) {
+                                mobSkillData.Health = Double.parseDouble(skillData.replace("Health:", ""));
+                            } else if (skillData.contains("Available:")) {
+                                mobSkillData.Available = Integer.parseInt(skillData.replace("Available:", ""));
+                            }
+                        }
+                        SkillList.add(mobSkillData);
+                    } catch (Exception ignored) {
+                        Log("MobData Format Error -> " + fileName);
+                    }
+
                 }
                 mobData.SkillList = SkillList;
             }
             if (data.isSet("Hostile")) {
                 mobData.Hostile = data.getBoolean("Hostile");
+            }
+            if (data.isSet("HPStop")) {
+                mobData.HPStop = data.getDoubleList("HPStop");
             }
 
             List<DropItemData> DropItemTable = new ArrayList<>();
@@ -533,6 +609,26 @@ public final class DataBase {
             MobSpawnerList.put(fileName, mobSpawnerData);
         }
 
+        File recipeDirectories = new File(DataBasePath, "Recipe/");
+        File[] recipeFile = recipeDirectories.listFiles();
+        for (File file : recipeFile) {
+            String fileName = file.getName().replace(".yml", "");
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            ItemRecipe itemRecipe = new ItemRecipe();
+            for (String str : data.getStringList("ReqStack")) {
+                String[] split = str.split(",");
+                ItemParameter itemParameter = getItemParameter(split[0]);
+                ItemParameterStack stack = new ItemParameterStack(itemParameter);
+                for (String str2 : split) {
+                    if (str2.contains("Amount:")) {
+                        stack.Amount = Integer.parseInt(str2.replace("Amount:", ""));
+                    }
+                }
+                itemRecipe.ReqStack.add(stack);
+            }
+            ItemRecipeList.put(fileName, itemRecipe);
+        }
+
         File shopDirectories = new File(DataBasePath, "ShopData/");
         File[] shopFile = shopDirectories.listFiles();
         for (File file : shopFile) {
@@ -546,10 +642,12 @@ public final class DataBase {
                 String[] split = str.split(",");
                 shopSlot.itemParameter = getItemParameter(split[0]);
                 for (String str2 : split) {
-                    if (str2.contains("mel")) {
-                        shopSlot.Mel = Integer.parseInt(str2.replace("mel", ""));
-                    } else if (str2.contains("slot")) {
-                        slot = Integer.parseInt(str2.replace("slot", ""));
+                    if (str2.contains("Mel:")) {
+                        shopSlot.Mel = Integer.parseInt(str2.replace("Mel:", ""));
+                    } else if (str2.contains("Slot:")) {
+                        slot = Integer.parseInt(str2.replace("Slot:", ""));
+                    } else if (str2.contains("Recipe:")) {
+                        shopSlot.itemRecipe = getItemRecipe(str2.replace("Recipe:", ""));
                     }
                 }
                 shopData.Data.put(slot, shopSlot);
@@ -571,7 +669,7 @@ public final class DataBase {
         return ClassList;
     }
 
-    static HashMap<String, SkillData> getSkillList() {
+    public static HashMap<String, SkillData> getSkillList() {
         return SkillDataList;
     }
 
@@ -579,8 +677,12 @@ public final class DataBase {
         return MobList;
     }
 
-    static HashMap<String, PetData> getPetList() {
+    public static HashMap<String, PetData> getPetList() {
         return PetList;
+    }
+
+    public static HashMap<String, ItemRecipe> getItemRecipeList() {
+        return ItemRecipeList;
     }
 
     public static NpcData getNpcData(int id) {
@@ -636,6 +738,15 @@ public final class DataBase {
         } else {
             Log("§cNon-MobData: " + str, true);
             return new MobData();
+        }
+    }
+
+    public static ItemRecipe getItemRecipe(String str) {
+        if (ItemRecipeList.containsKey(str)) {
+            return ItemRecipeList.get(str);
+        } else {
+            Log("§cNon-ItemRecipe: " + str, true);
+            return new ItemRecipe();
         }
     }
 

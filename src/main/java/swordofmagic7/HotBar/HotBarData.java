@@ -2,12 +2,10 @@ package swordofmagic7.HotBar;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemExtend.ItemPotion;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillData;
@@ -59,11 +57,22 @@ public class HotBarData implements Cloneable {
                 amount = (int) Math.ceil(cooltime / 20f);
             }
             case Item -> {
-                ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(getItemParameter(Icon));
-                item = stack.itemParameter.viewItem(1, format).clone();
-                amount = stack.Amount;
+                ItemParameter itemParameter = getItemParameter(Icon);
+                item = getItemParameter(Icon).viewItem(1, format).clone();
+                if (playerData.ItemInventory.hasItemParameter(getItemParameter(Icon), 1)) {
+                    ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(itemParameter);
+                    amount = stack.Amount;
+                }
             }
-            case Pet -> item = playerData.PetInventory.getHashMap().get(UUID.fromString(Icon)).viewPet(format);
+            case Pet -> {
+                if (playerData.PetInventory.getHashMap().containsKey(UUID.fromString(Icon))) {
+                    item = playerData.PetInventory.getHashMap().get(UUID.fromString(Icon)).viewPet(format);
+                } else {
+                    category = HotBarCategory.None;
+                    Icon = null;
+                    item = FlameItem.clone();
+                }
+            }
             default -> item = FlameItem.clone();
         }
         if (glow) {

@@ -10,6 +10,7 @@ import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
@@ -18,8 +19,11 @@ import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
+    public final int MaxSlot = 300;
     private final java.util.List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
+    public ItemSortType Sort = ItemSortType.Name;
+    public boolean SortReverse = false;
 
     public ItemInventory(Player player, PlayerData playerData) {
         super(player, playerData);
@@ -33,10 +37,39 @@ public class ItemInventory extends BasicInventory {
         List.clear();
     }
 
+    public void ItemInventorySort() {
+        switch (Sort) {
+            case Name -> Sort = ItemSortType.Category;
+            case Category -> Sort = ItemSortType.Amount;
+            case Amount -> Sort = ItemSortType.Name;
+        }
+        player.sendMessage("§e[アイテムインベントリ]§aの§e[ソート方法]§aを§e[" + Sort.Display + "]§aにしました");
+        playSound(player, SoundList.Click);
+        playerData.viewUpdate();
+    }
+
+    public void ItemInventorySortReverse() {
+        SortReverse = !SortReverse;
+        String msg = "§e[アイテムインベントリ]§aの§e[ソート順]§aを";
+        if (SortReverse) msg += "§b[昇順]";
+        else msg += "§c[降順]";
+        msg += "§aにしました";
+        player.sendMessage(msg);
+        playSound(player, SoundList.Click);
+        playerData.viewUpdate();
+    }
+
+
     public void viewInventory() {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
         int slot = 9;
+        switch (Sort) {
+            case Name -> List.sort(new ItemSortName());
+            case Category -> List.sort(new ItemSortCategory());
+            case Amount -> List.sort(new ItemSortAmount());
+        }
+        if (SortReverse) Collections.reverse(List);
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {
                 ItemParameterStack stack = List.get(i);
@@ -64,7 +97,7 @@ public class ItemInventory extends BasicInventory {
                 return stack;
             }
         }
-        return null;
+        return new ItemParameterStack(param.clone());
     }
 
     public ItemParameterStack getItemParameterStack(int i) {
@@ -81,6 +114,10 @@ public class ItemInventory extends BasicInventory {
         return null;
     }
 
+    public boolean hasItemParameter(ItemParameterStack stack) {
+        return hasItemParameter(stack.itemParameter, stack.Amount);
+    }
+
     public boolean hasItemParameter(ItemParameter param, int amount) {
         for (ItemParameterStack stack : List) {
             if (ItemStackCheck(stack.itemParameter, param)) {
@@ -90,10 +127,14 @@ public class ItemInventory extends BasicInventory {
         return false;
     }
 
+    public void addItemParameter(ItemParameterStack stack) {
+        addItemParameter(stack.itemParameter, stack.Amount);
+    }
+
     public void addItemParameter(ItemParameter param, int addAmount) {
-        if (List.size() < 300) {
+        if (List.size() < MaxSlot) {
             ItemParameterStack stack = getItemParameterStack(param);
-            if (stack != null) {
+            if (stack.Amount > 0) {
                 stack.Amount += addAmount;
             } else {
                 ItemParameterStack newStack = new ItemParameterStack();
@@ -101,8 +142,8 @@ public class ItemInventory extends BasicInventory {
                 newStack.Amount = addAmount;
                 List.add(newStack);
             }
-            if (List.size() >= 295) {
-                player.sendMessage("§e[アイテムインベントリ]§aが§c残り" + (300 - List.size()) +"スロット§aです");
+            if (List.size() >= MaxSlot-5) {
+                player.sendMessage("§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです");
             }
         } else {
             player.sendMessage("§e[アイテムインベントリ]§aが§c満杯§aです");
@@ -112,7 +153,7 @@ public class ItemInventory extends BasicInventory {
 
     public void removeItemParameter(ItemParameter param, int removeAmount) {
         ItemParameterStack stack = getItemParameterStack(param);
-        if (stack != null) {
+        if (stack.Amount > 0) {
             stack.Amount -= removeAmount;
             if (stack.Amount <= 0) {
                 List.remove(stack);

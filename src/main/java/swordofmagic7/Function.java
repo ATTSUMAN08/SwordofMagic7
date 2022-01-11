@@ -3,14 +3,18 @@ package swordofmagic7;
 import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import swordofmagic7.Item.RuneParameter;
+import swordofmagic7.RayTrace.RayTrace;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public final class Function {
@@ -81,7 +85,7 @@ public final class Function {
     }
 
     public static boolean ignoreEntity(Entity entity) {
-        return (entity instanceof ItemFrame || entity instanceof ArmorStand || entity instanceof Minecart || CitizensAPI.getNPCRegistry().isNPC(entity));
+        return (entity instanceof ItemFrame || entity.getType() == EntityType.ARMOR_STAND || entity instanceof Minecart || CitizensAPI.getNPCRegistry().isNPC(entity));
     }
 
     public static String decoLore(String str) {
@@ -146,4 +150,16 @@ public final class Function {
     public static final Vector VectorUp = new Vector(0, 1, 0);
     public static final Vector VectorDown = new Vector(0, -1, 0);
 
+    public static Location playerHandLocation(Player player) {
+        Location location = player.getEyeLocation().clone();
+        location.setYaw(location.getYaw()+90);
+        location.setPitch(60);
+        location = location.add(location.getDirection());
+        location.setDirection(player.getLocation().getDirection());
+        return location;
+    }
+
+    public static Location playerEyeLocation(Player player, double length) {
+        return RayTrace.rayLocationBlock(player.getEyeLocation(), length, true).HitPosition;
+    }
 }
