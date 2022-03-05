@@ -44,7 +44,7 @@ public class HotBarData implements Cloneable {
         return category == HotBarCategory.None;
     }
 
-    public ItemStack view(PlayerData playerData, boolean glow) {
+    public ItemStack view(PlayerData playerData, int slot, boolean glow) {
         ItemStack item;
         int amount = 1;
         String format = playerData.ViewFormat();
@@ -57,12 +57,14 @@ public class HotBarData implements Cloneable {
                 amount = (int) Math.ceil(cooltime / 20f);
             }
             case Item -> {
-                ItemParameter itemParameter = getItemParameter(Icon);
-                item = getItemParameter(Icon).viewItem(1, format).clone();
-                if (playerData.ItemInventory.hasItemParameter(getItemParameter(Icon), 1)) {
+                ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(Icon);
+                if (itemParameter != null) {
                     ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(itemParameter);
                     amount = stack.Amount;
+                } else {
+                    itemParameter = getItemParameter(Icon);
                 }
+                item = itemParameter.viewItem(1, format).clone();
             }
             case Pet -> {
                 if (playerData.PetInventory.getHashMap().containsKey(UUID.fromString(Icon))) {
@@ -70,10 +72,10 @@ public class HotBarData implements Cloneable {
                 } else {
                     category = HotBarCategory.None;
                     Icon = null;
-                    item = FlameItem.clone();
+                    item = FlameItem(slot).clone();
                 }
             }
-            default -> item = FlameItem.clone();
+            default -> item = FlameItem(slot).clone();
         }
         if (glow) {
             item.addUnsafeEnchantment(Enchantment.DURABILITY, 0);

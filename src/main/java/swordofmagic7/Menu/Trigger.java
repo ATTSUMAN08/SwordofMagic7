@@ -10,12 +10,15 @@ import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.HotBar.HotBarCategory;
 import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Tutorial;
 
 import java.util.HashMap;
 
+import static swordofmagic7.Classes.Classes.MaxSlot;
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.decoInv;
 import static swordofmagic7.Function.equalInv;
@@ -39,28 +42,29 @@ public class Trigger {
         playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.HotBar, false);
         int slot = 0;
-        int tier = 0;
-        while (playerData.Classes.classTier[tier] != null) {
-            for (SkillData skill : playerData.Classes.classTier[tier].SkillList) {
-                if (skill.SkillType.isActive()) {
-                    inv.setItem(slot, skill.view());
-                    TriggerMenuCache.put(slot, new HotBarData(skill));
-                    slot++;
+        for (int i = 0; i < MaxSlot; i++) {
+            if (playerData.Classes.classSlot[i] != null) {
+                for (SkillData skill : playerData.Classes.classSlot[i].SkillList) {
+                    if (skill.SkillType.isActive()) {
+                        inv.setItem(slot, skill.view());
+                        TriggerMenuCache.put(slot, new HotBarData(skill));
+                        slot++;
+                    }
                 }
-            }
-            tier++;
-        }
-        for (ItemParameterStack stack : playerData.ItemInventory.getList()) {
-            if (stack.itemParameter.Category.isPotion()) {
-                inv.setItem(slot, stack.itemParameter.viewItem(1, playerData.ViewFormat()));
-                TriggerMenuCache.put(slot, new HotBarData(stack.itemParameter));
-                slot++;
             }
         }
         for (PetParameter pet : playerData.PetInventory.getList()) {
             if (pet.Summoned) {
                 inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
                 TriggerMenuCache.put(slot, new HotBarData(pet));
+                slot++;
+            }
+        }
+        for (ItemParameterStack stack : playerData.ItemInventory.getList()) {
+            ItemCategory itemCategory = stack.itemParameter.Category;
+            if (itemCategory.isPotion() || itemCategory.isEquipment() || itemCategory.isTool()) {
+                inv.setItem(slot, stack.itemParameter.viewItem(1, playerData.ViewFormat()));
+                TriggerMenuCache.put(slot, new HotBarData(stack.itemParameter));
                 slot++;
             }
         }
@@ -81,6 +85,7 @@ public class Trigger {
                             playSound(player, SoundList.Nope);
                         } else {
                             playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), TriggerMenuCache.get(Slot));
+                            Tutorial.tutorialTrigger(player, 3);
                         }
                     }
                     playerData.HotBar.unSelectSlot();

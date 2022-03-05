@@ -19,7 +19,6 @@ public class ClassData {
     public List<String> Lore;
     public String Display;
     public String Nick;
-    public int Tier;
     public List<SkillData> SkillList = new ArrayList<>();
     public HashMap<ClassData, Integer> ReqClass= new HashMap<>();
 

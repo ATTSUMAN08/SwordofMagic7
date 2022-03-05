@@ -3,8 +3,12 @@ package swordofmagic7.Damage;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityStatus;
+import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,12 +19,14 @@ import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.Mob.MobSkillData;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.Log;
@@ -40,38 +46,43 @@ public final class Damage {
         String M = " §f[M:" + String.format("%.0f", healMultiply*100) + "%]";
         String SPI = " §b[SPI:" + healerData.Attribute.getAttribute(AttributeType.SPI) + "]";
         String HLP = " §e[HPL:" + String.format("%.0f", healerData.Status.HLP) + "]";
+        String HP = " §c[HP:" + String.format("%.0f", victimData.Status.Health) + "/" + String.format("%.0f", victimData.Status.MaxHealth) + "]";
         if (healerData.DamageLog.isDamageOnly()) {
             String healText = Text;
             if (healerData.DamageLog.isDetail()) {
-                healText += M + SPI + HLP;
+                healText += M + SPI + HLP + HP;
             }
-            healer.sendMessage(healText + " -> " + victimData.Nick);
+            healer.sendMessage(healText + "§e -> " + victimData.Nick);
         }
-        if (healer != victim && victimData.DamageLog.isDetail()) {
+        if (healer != victim && victimData.DamageLog.isDamageOnly()) {
             String healText = Text;
             if (healerData.DamageLog.isDetail()) {
                 healText += M + SPI + HLP;
             }
-            victim.sendMessage(healText + " <- " + healerData.Nick);
+            victim.sendMessage(healText + "§e <- " + healerData.Nick);
         }
     }
 
-    public static void makeDamage(LivingEntity attacker, List<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, int wait) {
+    public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, int wait) {
         makeDamage(attacker, victims, damageCause, damageSource, damageMultiply, false, count, wait);
     }
 
-    public static void makeDamage(LivingEntity attacker, List<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, boolean invariably, int count, int wait) {
+    public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, boolean invariably, int count, int wait) {
         BTTSet(new BukkitRunnable() {
             int i = 0;
 
             @Override
             public void run() {
-                if (i < victims.size()) {
-                    makeDamage(attacker, victims.get(i), damageCause, damageSource, damageMultiply, count);
+                for (LivingEntity victim : victims) {
+                    makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, invariably, count);
+                    try {
+                        Thread.sleep(wait* 20L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                i++;
             }
-        }.runTaskTimerAsynchronously(plugin, 0, wait), "makeDamage");
+        }.runTaskAsynchronously(plugin), "makeDamage");
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
@@ -117,6 +128,8 @@ public final class Damage {
             CriticalMultiply = playerData.Status.CriticalMultiply;
             Multiply = playerData.Status.DamageCauseMultiply.get(damageCause);
             attackerEffectManager = playerData.EffectManager;
+            attackerEffectManager.removeEffect(EffectType.Covert);
+            if (player.getGameMode() != GameMode.SURVIVAL) return;
         } else if (MobManager.isEnemy(attacker)) {
             EnemyData enemyData = MobManager.EnemyTable(attacker.getUniqueId());
             ATK = enemyData.ATK;
@@ -140,6 +153,7 @@ public final class Damage {
             CriticalResist = playerData.Status.CriticalResist;
             Resistance = playerData.Status.DamageCauseResistance.get(damageCause);
             victimEffectManager = playerData.EffectManager;
+            if (player.getGameMode() != GameMode.SURVIVAL) return;
         } else if (MobManager.isEnemy(victim)) {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
             DEF = enemyData.DEF;
@@ -219,6 +233,10 @@ public final class Damage {
             PlayerData playerData = playerData(player);
             if (playerData.Status.Health - damage > 0) {
                 playerData.Status.Health -= damage;
+            } else if (playerData.EffectManager.hasEffect(EffectType.Revive)) {
+                playerData.Status.Health = playerData.Status.MaxHealth/2;
+                playerData.EffectManager.removeEffect(EffectType.Revive);
+                player.sendMessage("§e[" + EffectType.Revive.Display + "]§aが発動しました");
             } else {
                 victimDead = true;
                 playerData.dead();
@@ -234,9 +252,13 @@ public final class Damage {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
             boolean isStop = false;
             for (double HPStop : enemyData.mobData.HPStop) {
-                Log("HPStop: " + HPStop + " > " + enemyData.Health / enemyData.MaxHealth);
                 if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
                     enemyData.Health = enemyData.MaxHealth * HPStop;
+                    for (MobSkillData skillData : enemyData.mobData.SkillList) {
+                        if (skillData.Health == HPStop) {
+                            enemyData.skillManager.mobSkillCast(skillData);
+                        }
+                    }
                     isStop = true;
                     break;
                 }

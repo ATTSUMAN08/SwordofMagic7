@@ -11,7 +11,10 @@ import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.DamageCause;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Effect.EffectData;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Skill.Skill;
@@ -23,8 +26,10 @@ import swordofmagic7.TagGame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static swordofmagic7.Attribute.AttributeType.*;
+import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
@@ -63,6 +68,7 @@ public class Status {
     public HashMap<StatusParameter, Double> BaseStatus = new HashMap<>();
     public HashMap<AttributeType, Integer> Attribute = new HashMap<>();
     public HashMap<StatusParameter, Double> EquipStatus = new HashMap<>();
+    public HashMap<StatusParameter, Double> BaseMultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
     public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
     public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
@@ -80,6 +86,9 @@ public class Status {
         return EquipStatus.getOrDefault(param, 0d);
     }
 
+    double BaseMultiplyStatus(StatusParameter param) {
+        return BaseMultiplyStatus.getOrDefault(param, 0d);
+    }
 
     double MultiplyStatus(StatusParameter param) {
         return MultiplyStatus.getOrDefault(param, 0d);
@@ -102,9 +111,9 @@ public class Status {
     }
 
     double LevelMultiply() {
-        int level = 0;
-        for (ClassData classData : classes.classTier) {
-            level += classes.getLevel(classData)-1;
+        int level = playerData.Level;
+        for (ClassData classData : classes.classSlot) {
+            level += classes.getClassLevel(classData)-1;
         }
         return 1+level*0.05;
     }
@@ -117,6 +126,10 @@ public class Status {
         DamageCauseResistance.put(damageCause, DamageCauseResistance.get(damageCause)+add);
     }
 
+    void BaseMultiplyStatusAdd(StatusParameter statusParameter, double add) {
+        BaseMultiplyStatus.put(statusParameter, BaseMultiplyStatus.get(statusParameter)+add);
+    }
+
     void MultiplyStatusAdd(StatusParameter statusParameter, double add) {
         MultiplyStatus.put(statusParameter, MultiplyStatus.get(statusParameter)+add);
     }
@@ -124,6 +137,7 @@ public class Status {
     public void StatusUpdate() {
         for (StatusParameter param : StatusParameter.values()) {
             EquipStatus.put(param, 0d);
+            BaseMultiplyStatus.put(param, 1d);
             MultiplyStatus.put(param, 1d);
         }
         for (DamageCause cause : DamageCause.values()) {
@@ -140,7 +154,13 @@ public class Status {
         }
         for (SkillData skillData : playerData.Classes.getPassiveSkillList()) {
             for (SkillParameter param : skillData.Parameter) {
-                if (param.Display.equalsIgnoreCase("攻撃力")) {
+                if (param.Display.equalsIgnoreCase("基礎攻撃力")) {
+                    BaseMultiplyStatusAdd(StatusParameter.ATK, param.Value/100);
+                } else if (param.Display.equalsIgnoreCase("基礎防御力")) {
+                    BaseMultiplyStatusAdd(StatusParameter.DEF, param.Value / 100);
+                } else if (param.Display.equalsIgnoreCase("基礎治癒力")) {
+                    BaseMultiplyStatusAdd(StatusParameter.HLP, param.Value/100);
+                } else if (param.Display.equalsIgnoreCase("攻撃力")) {
                     MultiplyStatusAdd(StatusParameter.ATK, param.Value/100);
                 } else if (param.Display.equalsIgnoreCase("防御力")) {
                     MultiplyStatusAdd(StatusParameter.DEF, param.Value/100);
@@ -153,158 +173,70 @@ public class Status {
                 }
             }
         }
+        if (playerData.EffectManager.hasEffect(EffectType.PainBarrier)) {
+            double add = DataBase.getSkillData("PainBarrier").ParameterValue(1)/100;
+            MultiplyStatusAdd(StatusParameter.DEF, add);
+        }
+        if (playerData.EffectManager.hasEffect(EffectType.Aiming)) {
+            double add = DataBase.getSkillData("Aiming").ParameterValue(1)/100;
+            DamageCauseMultiplyAdd(DamageCause.ATK, add);
+            DamageCauseMultiplyAdd(DamageCause.MAT, add);
+        }
+        if (playerData.EffectManager.hasEffect(EffectType.HolyAttack)) {
+            double add = DataBase.getSkillData("HolyAttack").ParameterValue(2)/100;
+            DamageCauseMultiplyAdd(DamageCause.ATK, add);
+        }
+        if (playerData.EffectManager.hasEffect(EffectType.HolyDefense)) {
+            double add = DataBase.getSkillData("HolyDefense").ParameterValue(2)/100;
+            MultiplyStatusAdd(StatusParameter.DEF, add);
+        }
+
+        if (playerData.EffectManager.hasEffect(EffectType.Monstrance)) {
+            double rev = DataBase.getSkillData("Monstrance").ParameterValue(1)/100;
+            StatusParameter param = StatusParameter.EVA;
+            MultiplyStatusAdd(param, -(MultiplyStatus(param)*rev));
+        }
 
         CriticalMultiply = 1.2;
         CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
-        DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(AttributeType.STR) * 0.005);
-        DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(AttributeType.INT) * 0.004);
+        DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(STR) * 0.005);
+        DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(INT) * 0.004);
         DamageCauseResistanceAdd(DamageCause.ATK,Attribute(VIT) * 0.003);
-        DamageCauseResistanceAdd(DamageCause.MAT,Attribute(AttributeType.INT) * 0.001);
-        DamageCauseResistanceAdd(DamageCause.MAT,Attribute(AttributeType.SPI) * 0.001);
-        DamageCauseResistanceAdd(DamageCause.MAT,Attribute(VIT) * 0.001);
-
+        DamageCauseResistanceAdd(DamageCause.MAT,(Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
 
         double M = LevelMultiply();
-        BaseStatus.put(StatusParameter.MaxHealth, (M*100) * (1+Attribute(VIT)*0.008) * MultiplyStatus.get(StatusParameter.MaxHealth));
-        BaseStatus.put(StatusParameter.HealthRegen, (M*2) * (1+Attribute(VIT)*0.002) * MultiplyStatus.get(StatusParameter.HealthRegen));
-        BaseStatus.put(StatusParameter.MaxMana, (M*100) * (1+Attribute(SPI)*0.008) * MultiplyStatus.get(StatusParameter.MaxMana));
-        BaseStatus.put(StatusParameter.ManaRegen, (M*5) * (1+Attribute(SPI)*0.006) * MultiplyStatus.get(StatusParameter.ManaRegen));
-        BaseStatus.put(StatusParameter.ATK, (M*10) * (1+Attribute(STR)*0.005+Attribute.get(INT)*0.005) * MultiplyStatus.get(StatusParameter.ATK));
-        BaseStatus.put(StatusParameter.DEF, (M*5) * (1+Attribute(VIT)*0.005) * MultiplyStatus.get(StatusParameter.DEF));
-        BaseStatus.put(StatusParameter.HLP, (M*5) * (1+Attribute(SPI)*0.005) * MultiplyStatus.get(StatusParameter.HLP));
-        BaseStatus.put(StatusParameter.ACC, (M*10) * (1+Attribute(TEC)*0.008) * MultiplyStatus.get(StatusParameter.ACC));
-        BaseStatus.put(StatusParameter.EVA, (M*5) * (1+Attribute(DEX)*0.008) * MultiplyStatus.get(StatusParameter.EVA));
-        BaseStatus.put(StatusParameter.CriticalRate, (M*10) * (1+Attribute(TEC)*0.01) * MultiplyStatus.get(StatusParameter.CriticalRate));
-        BaseStatus.put(StatusParameter.CriticalResist, (M*3) * (1+Attribute(SPI)*0.02) * MultiplyStatus.get(StatusParameter.CriticalResist));
+        BaseStatus.put(StatusParameter.MaxHealth, (M*100) * (1+Attribute(VIT)*0.008));
+        BaseStatus.put(StatusParameter.HealthRegen, (M*2) * (1+Attribute(VIT)*0.002) * BaseMultiplyStatus(StatusParameter.HealthRegen));
+        BaseStatus.put(StatusParameter.MaxMana, (M*100) * (1+Attribute(SPI)*0.008) * BaseMultiplyStatus(StatusParameter.MaxMana));
+        BaseStatus.put(StatusParameter.ManaRegen, (M*5) * (1+Attribute(SPI)*0.006) * BaseMultiplyStatus(StatusParameter.ManaRegen));
+        BaseStatus.put(StatusParameter.ATK, (M*10) * (1+Attribute(STR)*0.005+Attribute(INT)*0.005) * BaseMultiplyStatus(StatusParameter.ATK));
+        BaseStatus.put(StatusParameter.DEF, (M*5) * (1+Attribute(VIT)*0.005) * BaseMultiplyStatus(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.HLP, (M*5) * (1+Attribute(SPI)*0.005) * BaseMultiplyStatus(StatusParameter.HLP));
+        BaseStatus.put(StatusParameter.ACC, (M*10) * (1+Attribute(TEC)*0.008) * BaseMultiplyStatus(StatusParameter.ACC));
+        BaseStatus.put(StatusParameter.EVA, (M*5) * (1+Attribute(DEX)*0.008) * BaseMultiplyStatus(StatusParameter.EVA));
+        BaseStatus.put(StatusParameter.CriticalRate, (M*10) * (1+Attribute(TEC)*0.01) * BaseMultiplyStatus(StatusParameter.CriticalRate));
+        BaseStatus.put(StatusParameter.CriticalResist, (M*3) * (1+Attribute(SPI)*0.02) * BaseMultiplyStatus(StatusParameter.CriticalResist));
 
-        MaxHealth = BaseStatus.get(StatusParameter.MaxHealth) + EquipStatus.get(StatusParameter.MaxHealth);
-        HealthRegen = BaseStatus.get(StatusParameter.HealthRegen) + EquipStatus.get(StatusParameter.HealthRegen);
-        MaxMana = BaseStatus.get(StatusParameter.MaxMana) + EquipStatus.get(StatusParameter.MaxMana);
-        ManaRegen = BaseStatus.get(StatusParameter.ManaRegen) + EquipStatus.get(StatusParameter.ManaRegen);
-        ATK = BaseStatus.get(StatusParameter.ATK) + EquipStatus.get(StatusParameter.ATK);
-        DEF = BaseStatus.get(StatusParameter.DEF) + EquipStatus.get(StatusParameter.DEF);
-        HLP = BaseStatus.get(StatusParameter.HLP) + EquipStatus.get(StatusParameter.HLP);
-        ACC = BaseStatus.get(StatusParameter.ACC) + EquipStatus.get(StatusParameter.ACC);
-        EVA = BaseStatus.get(StatusParameter.EVA) + EquipStatus.get(StatusParameter.EVA);
-        CriticalRate = BaseStatus.get(StatusParameter.CriticalRate) + EquipStatus.get(StatusParameter.CriticalRate);
-        CriticalResist = BaseStatus.get(StatusParameter.CriticalResist) + EquipStatus.get(StatusParameter.CriticalResist);
-        SkillCastTime = EquipStatus.get(StatusParameter.SkillCastTime);
-        SkillRigidTime = EquipStatus.get(StatusParameter.SkillRigidTime);
-        SkillCooltime = EquipStatus.get(StatusParameter.SkillCooltime);
+        MaxHealth = (BaseStatus(StatusParameter.MaxHealth) + EquipStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);
+        HealthRegen = (BaseStatus(StatusParameter.HealthRegen) + EquipStatus(StatusParameter.HealthRegen)) * MultiplyStatus(StatusParameter.HealthRegen);
+        MaxMana = (BaseStatus(StatusParameter.MaxMana) + EquipStatus(StatusParameter.MaxMana)) * MultiplyStatus(StatusParameter.MaxMana);
+        ManaRegen = (BaseStatus(StatusParameter.ManaRegen) + EquipStatus(StatusParameter.ManaRegen)) * MultiplyStatus(StatusParameter.ManaRegen);
+        ATK = (BaseStatus(StatusParameter.ATK) + EquipStatus(StatusParameter.ATK)) * MultiplyStatus(StatusParameter.ATK);
+        DEF = (BaseStatus(StatusParameter.DEF) + EquipStatus(StatusParameter.DEF)) * MultiplyStatus(StatusParameter.DEF);
+        HLP = (BaseStatus(StatusParameter.HLP) + EquipStatus(StatusParameter.HLP)) * MultiplyStatus(StatusParameter.HLP);
+        ACC = (BaseStatus(StatusParameter.ACC) + EquipStatus(StatusParameter.ACC)) * MultiplyStatus(StatusParameter.ACC);
+        EVA = (BaseStatus(StatusParameter.EVA) + EquipStatus(StatusParameter.EVA)) * MultiplyStatus(StatusParameter.EVA);
+        CriticalRate = (BaseStatus(StatusParameter.CriticalRate) + EquipStatus(StatusParameter.CriticalRate)) * MultiplyStatus(StatusParameter.CriticalResist);
+        CriticalResist = (BaseStatus(StatusParameter.CriticalResist) + EquipStatus(StatusParameter.CriticalResist)) * MultiplyStatus(StatusParameter.CriticalResist);
+        SkillCastTime = (EquipStatus(StatusParameter.SkillCastTime)) * MultiplyStatus(StatusParameter.SkillCastTime);
+        SkillRigidTime = (EquipStatus(StatusParameter.SkillRigidTime)) * MultiplyStatus(StatusParameter.SkillRigidTime);
+        SkillCooltime = (EquipStatus(StatusParameter.SkillCooltime)) * MultiplyStatus(StatusParameter.SkillCooltime);
 
-        player.setPlayerListName(playerData.Classes.topClass().Color + "§l" + playerData.Classes.topClass().Display + " §f§l" + playerData.Nick);
+        String color = "§f";
+        if (playerData.PvPMode) color = "§c";
+        player.setPlayerListName(playerData.Classes.lastClass().Color + "§l" + playerData.Classes.lastClass().Display + " " + color + "§l" + playerData.Nick);
 
         player.setWalkSpeed(0.24f);
-    }
-
-    public BukkitTask tickUpdateTask;
-    public Team team;
-    public double HealthPercent = 1;
-    public String HealthPercentColor = "§a§l";
-    private final List<String> ScoreKey = new ArrayList<>();
-    public void tickUpdate() {
-        player.setHealthScaled(true);
-        player.setGlowing(false);
-        if (playerData.PlayMode) {
-            player.setFlying(false);
-            player.setAllowFlight(false);
-        }
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective sidebarObject = board.registerNewObjective("Sidebar", "dummy", decoText("§bSword of Magic Ⅶ"));
-        sidebarObject.setDisplaySlot(DisplaySlot.SIDEBAR);
-        team = board.registerNewTeam(player.getName());
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-        team.setCanSeeFriendlyInvisibles(true);
-        if (tickUpdateTask != null) tickUpdateTask.cancel();
-        tickUpdateTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) this.cancel();
-                if (playerData.PlayMode) {
-                    Classes classes = playerData.Classes;
-                    ClassData topClass = classes.topClass();
-                    int Level = classes.getLevel(topClass);
-                    int Exp = classes.getExp(topClass);
-                    int Tier = topClass.Tier;
-                    int ReqExp = classes.ReqExp(Level, Tier);
-                    float ExpPercent = (float) Exp / ReqExp * 100;
-                    if (Float.isNaN(ExpPercent)) ExpPercent = 1f;
-                    float ExpPercentBar = ExpPercent / 100;
-                    if (ExpPercentBar < 0.01) ExpPercentBar = 0.01f;
-                    if (ExpPercentBar > 0.99) ExpPercentBar = 0.99f;
-                    HealthPercent = Health/MaxHealth;
-                    if (HealthPercent < 0.2) HealthPercentColor = "§c§l";
-                    else if (HealthPercent < 0.5) HealthPercentColor = "§e§l";
-                    else HealthPercentColor = "§a§l";
-                    player.setLevel(Level);
-                    player.setExp(ExpPercentBar);
-                    player.sendActionBar("§6§l《" + topClass.Color + "§l" + topClass.Display + " §e§lLv" + Level + "§6§l》" +
-                            "§c§l《Health: " + (int) Math.round(Health) + "/" + (int) Math.round(MaxHealth) + "》" +
-                            "§b§l《Mana: " + (int) Math.round(Mana) + "/" + (int) Math.round(MaxMana) + "》" +
-                            "§a§l《Exp: " + String.format("%.3f", ExpPercent) + "%》"
-                    );
-
-                    for (String scoreName : ScoreKey) {
-                        board.resetScores(scoreName);
-                    }
-                    ScoreKey.clear();
-                    ScoreKey.add(decoLore("メル") + playerData.Mel);
-                    if (playerData.Party != null) {
-                        ScoreKey.add(decoText("パーティメンバー"));
-                        for (Player member : playerData.Party.Members) {
-                            PlayerData memberData = playerData(member);
-                            ScoreKey.add(decoLore(memberData.getNick(true)) + memberData.Status.HealthPercentColor + String.format("%.0f", memberData.Status.HealthPercent*100) + "%");
-                        }
-                    }
-                    if (TagGame.isPlayer(player)) {
-                        ScoreKey.add(decoText("鬼ごっこ"));
-                        ScoreKey.addAll(List.of(TagGame.info()));
-                    }
-                    List<String> SkillCoolTime = new ArrayList<>();
-                    for (SkillData skillData : playerData.Classes.getActiveSkillList()) {
-                        int cooltime = playerData.Skill.getSkillCoolTime(skillData);
-                        if (cooltime > 0) {
-                            SkillCoolTime.add(decoLore(skillData.Display) + String.format("%.1f", cooltime / 20f) + "秒");
-                        }
-                    }
-                    if (SkillCoolTime.size() > 0) {
-                        ScoreKey.add(decoText("スキルクールタイム"));
-                        ScoreKey.addAll(SkillCoolTime);
-                    }
-                    int i = 15;
-                    for (String scoreName : ScoreKey) {
-                        Score sidebarScore = sidebarObject.getScore(scoreName);
-                        sidebarScore.setScore(i);
-                        i--;
-                        if (i < 1) break;
-                    }
-                    for (Player player : PlayerList.get()) {
-                        if (!team.hasEntry(player.getName())) {
-                            team.addEntry(player.getName());
-                        }
-                    }
-                    player.setScoreboard(board);
-
-                    Health += HealthRegen / 20;
-                    Mana += ManaRegen / 20;
-
-                    Bukkit.getScheduler().runTask(swordofmagic7.System.plugin, () -> {
-                        Health = Math.min(Math.max(Health, 0), MaxHealth);
-                        Mana = Math.min(Math.max(Mana, 0), MaxMana);
-                        double ManaPercent = Mana / MaxMana;
-                        player.setAbsorptionAmount(0);
-                        player.setMaxHealth(MaxHealth);
-                        player.setHealth(Health);
-                        player.setFoodLevel((int) Math.ceil(ManaPercent * 20));
-                        player.removePotionEffect(PotionEffectType.JUMP);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 19, 0, false, false));
-                    });
-
-                    playerData.HotBar.UpdateHotBar();
-                }
-            }
-        }.runTaskTimerAsynchronously(System.plugin, 0, 10);
-        BTTSet(tickUpdateTask, "StatusUpdate:" + player.getName());
     }
 }
 

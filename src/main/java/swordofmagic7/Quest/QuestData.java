@@ -14,5 +14,6 @@ public class QuestData {
     public HashMap<QuestReqContentKey, Integer> ReqContent = new HashMap<>();
 
     public int RewardExp;
+    public int RewardClassExp;
     public List<ItemParameterStack> RewardItemStack = new ArrayList<>();
 }

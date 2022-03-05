@@ -25,12 +25,16 @@ class ItemSortName implements Comparator<ItemParameterStack> {
 
 class ItemSortCategory implements Comparator<ItemParameterStack> {
     public int compare(ItemParameterStack item, ItemParameterStack item2) {
-        return item.itemParameter.Category.compareTo(item2.itemParameter.Category);
+        if (item.itemParameter.Category == item2.itemParameter.Category) {
+            return new ItemSortName().compare(item, item2);
+        } else return item.itemParameter.Category.compareTo(item2.itemParameter.Category);
     }
 }
 
 class ItemSortAmount implements Comparator<ItemParameterStack> {
     public int compare(ItemParameterStack item, ItemParameterStack item2) {
-        return item.Amount - item2.Amount;
+        if (item.Amount == item2.Amount) {
+            return new ItemSortName().compare(item, item2);
+        } else return item2.Amount - item.Amount;
     }
 }

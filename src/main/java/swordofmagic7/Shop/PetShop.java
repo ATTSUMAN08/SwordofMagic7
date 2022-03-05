@@ -19,9 +19,9 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetShop {
@@ -29,12 +29,13 @@ public class PetShop {
     private static final String PetShopDisplay = "§lペットショップ";
     public static final String PetSyntheticDisplay = "§lペット配合";
     public static final String PetSellDisplay = "§lペット売却";
-    private static final ItemStack PetShopFreeWolf = new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l無料配布のペットです").view();
+    private static final ItemStack PetShopFreeWolf = new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l100メルの配布ペットです").view();
     private static final ItemStack PetSynthetic = new ItemStackData(Material.HEART_OF_THE_SEA, decoText("ペット配合"), "§a§l同種のペットを配合して成長率を上げます\n§a§l成長率は合計の70%の値になります\n§a§l成長率の上限は200%です").view();
     private static final ItemStack PetSellItem = new ItemStackData(Material.GOLD_NUGGET, decoText("ペット売却"), "§a§lペットショップにペットを売ります").view();
 
     private final Player player;
     private final PlayerData playerData;
+
 
     public PetShop(Player player, PlayerData playerData) {
         this.player = player;
@@ -79,11 +80,17 @@ public class PetShop {
         if (equalInv(view, PetShopDisplay)) {
             if (equalItem(currentItem, PetShopFreeWolf)) {
                 if (!playerData.PetInventory.hasPetParameter("オースオオカミ")) {
-                    PetData petData = getPetData("オースオオカミ");
-                    PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, 1);
-                    playerData.PetInventory.addPetParameter(petParameter);
-                    player.sendMessage("§e[" + petData.Display + "]§aを受け取りました");
-                    playSound(player, SoundList.LevelUp);
+                    if (playerData.Mel >= 100) {
+                        playerData.Mel -= 100;
+                        PetData petData = getPetData("オースオオカミ");
+                        PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, 1);
+                        playerData.PetInventory.addPetParameter(petParameter);
+                        player.sendMessage("§e[" + petData.Display + "]§aを受け取りました");
+                        playSound(player, SoundList.LevelUp);
+                    } else {
+                        player.sendMessage(NonMel);
+                        playSound(player, SoundList.Nope);
+                    }
                 } else {
                     player.sendMessage("§aすでに§eペット§aを所持しています");
                     playSound(player, SoundList.Nope);
@@ -107,7 +114,7 @@ public class PetShop {
                             player.sendMessage("§e[" + pet.petData.Display + "§e]§aを§b買戻§aしました §c[-" + Mel + "メル]");
                             playSound(player, SoundList.LevelUp);
                         } else {
-                            player.sendMessage("§eメル§aが足りません §c不足[" + (Mel-playerData.Mel) + "メル]");
+                            player.sendMessage(NonMel + " §c不足[" + (Mel-playerData.Mel) + "メル]");
                             playSound(player, SoundList.Nope);
                         }
                     }
@@ -117,15 +124,18 @@ public class PetShop {
                 PetSell.add(pet);
                 playerData.PetInventory.removePetParameter(index);
                 playerData.Mel += Mel;
+                if (PetSell.size() > 45) {
+                    PetSell.remove(0);
+                }
                 player.sendMessage("§e[" + pet.petData.Display + "§e]§aを§c売却§aしました §e[+" + Mel + "メル]");
                 playSound(player, SoundList.LevelUp);
             }
-            player.getOpenInventory().getTopInventory().setContents(PetSellInv().getStorageContents());
+            view.getTopInventory().setContents(PetSellInv().getStorageContents());
         } else if (equalInv(view, PetSyntheticDisplay)) {
             String format = playerData.ViewFormat();
             Inventory inv = view.getTopInventory();
             if (ClickInventory == view.getTopInventory()) {
-                if (Slot < 2) {
+                if (Slot == AnvilUISlot[0] || Slot == AnvilUISlot[1]) {
                     for (int i = 0; i < 2; i++) {
                         if (PetSyntheticCache[i] != null) {
                             playerData.PetInventory.addPetParameter(PetSyntheticCache[i]);
@@ -133,7 +143,7 @@ public class PetShop {
                         }
                     }
                     playSound(player, SoundList.Click);
-                } else if (Slot == 2 && PetSyntheticCache[2] != null) {
+                } else if (Slot == AnvilUISlot[2] && PetSyntheticCache[2] != null) {
                     playerData.PetInventory.addPetParameter(PetSyntheticCache[2]);
                     PetSyntheticCache[2] = null;
                     for (int i = 0; i < 2; i++) {
@@ -166,9 +176,9 @@ public class PetShop {
             }
             for (int i = 0; i < 2; i++) {
                 if (PetSyntheticCache[i] != null) {
-                    inv.setItem(i, PetSyntheticCache[i].viewPet(format));
+                    inv.setItem(AnvilUISlot[i], PetSyntheticCache[i].viewPet(format));
                 } else {
-                    inv.setItem(i, AirItem);
+                    inv.setItem(AnvilUISlot[i], AirItem);
                 }
             }
             if (PetSyntheticCache[0] != null && PetSyntheticCache[1] != null) {
@@ -177,9 +187,9 @@ public class PetShop {
                 PetSyntheticCache[2].updateStatus();
                 PetSyntheticCache[2].GrowthRate = (PetSyntheticCache[0].GrowthRate+PetSyntheticCache[1].GrowthRate)*0.7;
                 if (PetSyntheticCache[2].GrowthRate > 2) PetSyntheticCache[2].GrowthRate = 2;
-                inv.setItem(2, PetSyntheticCache[2].viewPet(format));
+                inv.setItem(AnvilUISlot[2], PetSyntheticCache[2].viewPet(format));
             } else {
-                inv.setItem(2, AirItem);
+                inv.setItem(AnvilUISlot[2], AirItem);
                 PetSyntheticCache[2] = null;
             }
         }

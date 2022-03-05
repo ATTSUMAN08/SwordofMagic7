@@ -11,6 +11,7 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
@@ -20,7 +21,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
     public final int MaxSlot = 300;
-    private final java.util.List<ItemParameterStack> List = new ArrayList<>();
+    private final List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Name;
     public boolean SortReverse = false;
@@ -51,7 +52,7 @@ public class ItemInventory extends BasicInventory {
     public void ItemInventorySortReverse() {
         SortReverse = !SortReverse;
         String msg = "§e[アイテムインベントリ]§aの§e[ソート順]§aを";
-        if (SortReverse) msg += "§b[昇順]";
+        if (!SortReverse) msg += "§b[昇順]";
         else msg += "§c[降順]";
         msg += "§aにしました";
         player.sendMessage(msg);
@@ -59,16 +60,17 @@ public class ItemInventory extends BasicInventory {
         playerData.viewUpdate();
     }
 
-
     public void viewInventory() {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
         int slot = 9;
-        switch (Sort) {
-            case Name -> List.sort(new ItemSortName());
-            case Category -> List.sort(new ItemSortCategory());
-            case Amount -> List.sort(new ItemSortAmount());
+        Comparator<ItemParameterStack> comparator = null;
+        if (List.size() > 0) switch (Sort) {
+            case Name -> comparator = new ItemSortName();
+            case Category -> comparator = new ItemSortCategory();
+            case Amount -> comparator = new ItemSortAmount();
         }
+        if (comparator != null) List.sort(comparator);
         if (SortReverse) Collections.reverse(List);
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {
@@ -114,6 +116,16 @@ public class ItemInventory extends BasicInventory {
         return null;
     }
 
+    public ItemParameter getItemParameter(String name) {
+        for (ItemParameterStack stack : List) {
+            if (stack.itemParameter.Id.equals(name)) {
+                return stack.itemParameter;
+            }
+        }
+        return null;
+    }
+
+
     public boolean hasItemParameter(ItemParameterStack stack) {
         return hasItemParameter(stack.itemParameter, stack.Amount);
     }
@@ -153,6 +165,16 @@ public class ItemInventory extends BasicInventory {
 
     public void removeItemParameter(ItemParameter param, int removeAmount) {
         ItemParameterStack stack = getItemParameterStack(param);
+        if (stack.Amount > 0) {
+            stack.Amount -= removeAmount;
+            if (stack.Amount <= 0) {
+                List.remove(stack);
+            }
+        }
+    }
+
+    public void removeItemParameter(int index, int removeAmount) {
+        ItemParameterStack stack = getItemParameterStack(index);
         if (stack.Amount > 0) {
             stack.Amount -= removeAmount;
             if (stack.Amount <= 0) {

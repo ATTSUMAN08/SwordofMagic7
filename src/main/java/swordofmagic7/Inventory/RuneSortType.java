@@ -37,16 +37,16 @@ class RuneSortName implements Comparator<RuneParameter> {
 
 class RuneSortLevel implements Comparator<RuneParameter> {
     public int compare(RuneParameter rune1, RuneParameter rune2) {
-        return rune1.Level - rune2.Level;
+        if (rune1.Level == rune2.Level) {
+            return new RuneSortName().compare(rune1, rune2);
+        } else return rune2.Level - rune1.Level;
     }
 }
 
 class RuneSortQuality implements Comparator<RuneParameter> {
     public int compare(RuneParameter rune1, RuneParameter rune2) {
-        if (rune1.Quality < rune2.Quality) {
-            return 1;
-        } else if (rune1.Quality > rune2.Quality) {
-            return -1;
-        } else return 0;
+        if (rune1.Quality == rune2.Quality) {
+            return new RuneSortName().compare(rune1, rune2);
+        } else return Double.compare(rune2.Quality, rune1.Quality);
     }
 }

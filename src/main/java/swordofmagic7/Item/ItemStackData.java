@@ -23,17 +23,39 @@ public class ItemStackData {
         this.Display = Display;
     }
 
+    public ItemStackData(Material material, String Display, int customModelData) {
+        this.material = material;
+        this.Display = Display;
+        this.CustomModelData = customModelData;
+    }
+
     public ItemStackData(Material material, String Display, List<String> Lore) {
         this.material = material;
         this.Display = Display;
         this.Lore = Lore;
     }
 
+
     public ItemStackData(Material material, String Display, String Lore) {
         this.material = material;
         this.Display = Display;
         String[] LoreData = Lore.split("\n");
         this.Lore = List.of(LoreData);
+    }
+
+    public ItemStackData(Material material, String Display, List<String> Lore, int customModelData) {
+        this.material = material;
+        this.Display = Display;
+        this.Lore = Lore;
+        this.CustomModelData = customModelData;
+    }
+
+    public ItemStackData(Material material, String Display, String Lore, int customModelData) {
+        this.material = material;
+        this.Display = Display;
+        String[] LoreData = Lore.split("\n");
+        this.Lore = List.of(LoreData);
+        this.CustomModelData = customModelData;
     }
 
     public ItemStack view() {

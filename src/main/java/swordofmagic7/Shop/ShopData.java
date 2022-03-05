@@ -15,7 +15,7 @@ import static swordofmagic7.Shop.Shop.ItemFlame;
 
 public class ShopData implements Cloneable {
     public String Display;
-    public int MaxPage = 1;
+    public int Page = 1;
     public HashMap<Integer, ShopSlot> Data = new HashMap<>();
 
     public Inventory view(int page, String format) {
@@ -24,7 +24,7 @@ public class ShopData implements Cloneable {
         for (int i = (page-1)*45; i < page*45; i++) {
             if (Data.containsKey(i)) {
                 ShopSlot data = Data.get(i);
-                ItemStack item = data.itemParameter.viewItem(1, format);
+                ItemStack item = data.itemParameter.viewItem(data.Amount, format);
                 ItemMeta meta = item.getItemMeta();
                 List<String> Lore = new ArrayList<>(meta.getLore());
                 Lore.add(decoText("§3§l販売情報"));
@@ -34,6 +34,7 @@ public class ShopData implements Cloneable {
                         Lore.add(decoLore(stack.itemParameter.Id) + stack.Amount + "個");
                     }
                 }
+                Lore.add("§8" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 inv.setItem(slot, item);
@@ -48,8 +49,8 @@ public class ShopData implements Cloneable {
         inv.setItem(51,ItemFlame(10));
         inv.setItem(52,ItemFlame(100));
         inv.setItem(53, ShopFlame);
-        if (page > 1) inv.setItem(45, UpScrollItem);
-        if (page < MaxPage) inv.setItem(53, DownScrollItem);
+        if (page > 1) inv.setItem(45, PreviousPageItem);
+        if (page < Page) inv.setItem(53, NextPageItem);
         return inv;
     }
 

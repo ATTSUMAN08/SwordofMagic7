@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static swordofmagic7.Data.DataBase.ItemFlame;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Equipment {
@@ -46,49 +47,54 @@ public class Equipment {
         } else player.getInventory().setItem(40, new ItemStack(Material.AIR));
 
         if (isEquip(EquipmentSlot.Armor)) {
-            player.getInventory().setItem(38, EquipSlot.get(EquipmentSlot.Armor).viewItem(1, playerData.ViewFormat()));
-        } else player.getInventory().setItem(38, new ItemStack(Material.AIR));
+            player.getInventory().setItem(36, EquipSlot.get(EquipmentSlot.Armor).viewItem(1, playerData.ViewFormat()));
+        } else player.getInventory().setItem(36, ItemFlame);
+        player.getInventory().setItem(37, ItemFlame);
+        player.getInventory().setItem(38, ItemFlame);
         playerData.Status.StatusUpdate();
     }
 
     public boolean Equip(EquipmentSlot slot, ItemParameter param) {
-        param = param.clone();
-        boolean req = false;
-        List<String> reqText = new ArrayList<>();
-        if (param.isEmpty()) {
-            req = true;
-            reqText.add("§eアイテムデータ§aが§c不正§aです");
-        }
-        for (ClassData classData : playerData.Classes.classTier) {
-            if (classData != null && playerData.Classes.getLevel(classData) < param.itemEquipmentData.ReqLevel) {
-                reqText.add(classData.Color + "[" + classData.Display + "]§aのレベルが足りません");
+        if (playerData.Skill.isCastReady()) {
+            param = param.clone();
+            boolean req = false;
+            List<String> reqText = new ArrayList<>();
+            if (param.isEmpty()) {
+                req = true;
+                reqText.add("§eアイテムデータ§aが§c不正§aです");
+            }
+            if (playerData.Level < param.itemEquipmentData.ReqLevel) {
+                reqText.add("レベルが足りません");
                 req = true;
             }
-        }
-        if (req) {
-            for (String msg : reqText) {
-                player.sendMessage(msg);
+            if (req) {
+                for (String msg : reqText) {
+                    player.sendMessage(msg);
+                }
+                playSound(player, SoundList.Nope);
+                return false;
             }
-            playSound(player, SoundList.Nope);
-            return false;
+
+            if (EquipSlot.containsKey(slot)) {
+                playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
+            }
+
+            EquipSlot.put(slot, param.clone());
+            playerData.ItemInventory.removeItemParameter(param, 1);
+
+            player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
+            return true;
         }
-
-        if (EquipSlot.containsKey(slot)) {
-            playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
-        }
-
-        EquipSlot.put(slot, param.clone());
-        playerData.ItemInventory.removeItemParameter(param, 1);
-
-        player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
-        return true;
+        return false;
     }
 
     public void unEquip(EquipmentSlot slot) {
-        if (EquipSlot.containsKey(slot)) {
-            playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
-            player.sendMessage("§e[" + getEquip(slot).Display + "]§aを外しました");
-            EquipSlot.remove(slot);
+        if (playerData.Skill.isCastReady()) {
+            if (EquipSlot.containsKey(slot)) {
+                playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
+                player.sendMessage("§e[" + getEquip(slot).Display + "]§aを外しました");
+                EquipSlot.remove(slot);
+            }
         }
     }
 }

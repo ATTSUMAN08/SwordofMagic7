@@ -10,14 +10,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.RayTrace.RayTrace;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import static swordofmagic7.Data.DataBase.*;
 
 public final class Function {
+
+    static Random random = new Random();
 
     public static void Log(String str) {
         Log(str, false);
@@ -120,7 +121,25 @@ public final class Function {
     }
 
     public static Inventory decoAnvil(String name) {
-        return Bukkit.createInventory(null, InventoryType.ANVIL, name);
+        Inventory inv = Bukkit.createInventory(null, 9, name);
+        for (int i = 0; i < 9; i++) {
+            inv.setItem(i, NoneFlame);
+        }
+        for (int i : AnvilUISlot) {
+            inv.setItem(i, AirItem);
+        }
+        inv.setItem(8, AnvilUIFlame);
+        return inv;
+    }
+
+    public static Vector getRightDirection(Location location) {
+        Vector direction = location.getDirection().normalize();
+        return new Vector(-direction.getZ(), 0.0, direction.getX()).normalize();
+    }
+
+    public static Vector getLeftDirection(Location location) {
+        Vector direction = location.getDirection().normalize();
+        return new Vector(direction.getZ(), 0.0, -direction.getX()).normalize();
     }
 
     public static boolean inAir(Player player) {
@@ -161,5 +180,23 @@ public final class Function {
 
     public static Location playerEyeLocation(Player player, double length) {
         return RayTrace.rayLocationBlock(player.getEyeLocation(), length, true).HitPosition;
+    }
+
+    public static void CloseInventory(Player player) {
+        if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
+            player.closeInventory();
+        }
+    }
+
+    public static Object GetRandom(Set<?> list) {
+        if (list.size() > 0) {
+            int a = random.nextInt(list.size());
+            int i = 0;
+            for (Object obj : list) {
+                if (i == a) return obj;
+                i++;
+            }
+        }
+        return null;
     }
 }

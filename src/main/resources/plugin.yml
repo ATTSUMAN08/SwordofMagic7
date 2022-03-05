@@ -19,6 +19,26 @@ commands:
     permission: debug.som7
     description: description
     usage: /<command>
+  getExp:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  getLevel:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  getClassExp:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  getClassLevel:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  getEffect:
+    permission: debug.som7
+    description: description
+    usage: /<command>
   mobSpawn:
     aliases: ms
     permission: debug.som7
@@ -50,12 +70,15 @@ commands:
     permission: debug.som7
     description: description
     usage: /<command>
-  DataBaseReload:
-    aliases: dbr
+  SomReload:
     permission: debug.som7
     description: description
     usage: /<command>
   test:
+    permission: debug.som7
+    description: description
+    usage: /<command>
+  setItemEquipmentStatusMultiply:
     permission: debug.som7
     description: description
     usage: /<command>
@@ -137,5 +160,25 @@ commands:
     usage: /<command>
   petInventorySortReverse:
     aliases: pisr
+    description: description
+    usage: /<command>
+  tutorial:
+    description: description
+    usage: /<command>
+  trade:
+    description: description
+    usage: /<command>
+  textView:
+    description: description
+    usage: /<command>
+  uuid:
+    description: description
+    usage: /<command>
+  effectInfo:
+    aliases: efInfo
+    description: description
+    usage: /<command>
+  sideBarToDo:
+    aliases: sbtd
     description: description
     usage: /<command>

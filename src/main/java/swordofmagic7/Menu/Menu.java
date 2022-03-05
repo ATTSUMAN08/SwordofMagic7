@@ -16,6 +16,7 @@ import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Tutorial;
 
 import java.util.List;
 
@@ -98,28 +99,27 @@ public class Menu {
         final int Slot = event.getSlot();
         event.setCancelled(true);
 
-        if (Slot == 39) {
-            playerData.Menu.StatusInfo.StatusInfoView(player);
-            return;
-        }
         int index = -1;
-        if (currentItem != null && ClickInventory == view.getBottomInventory()) {
-            if (ignoreSlot(Slot) && currentItem.hasItemMeta() && playerData.ViewInventory != ViewInventoryType.HotBar) {
+        try {
+            if (currentItem != null && currentItem.hasItemMeta()) {
                 ItemMeta meta = currentItem.getItemMeta();
                 if (meta.hasLore()) {
                     List<String> Lore = meta.getLore();
                     index = Integer.parseInt(Lore.get(Lore.size() - 1).replace("§8", ""));
                 }
             }
+        } catch (Exception ignored) {}
+        if (currentItem != null && ClickInventory == view.getBottomInventory()) {
             switch (Slot) {
                 case 0,1,2,3,4,5,6,7 -> {
                     playerData.HotBar.setSelectSlot(slotToIndex(Slot));
                     Trigger.TriggerMenuView();
                     playSound(player, SoundList.Click);
                 }
-                case 8 -> playerData(player).Equipment.unEquip(EquipmentSlot.MainHand);
-                case 40 -> playerData(player).Equipment.unEquip(EquipmentSlot.OffHand);
-                case 38 -> playerData(player).Equipment.unEquip(EquipmentSlot.Armor);
+                case 8 -> playerData.Equipment.unEquip(EquipmentSlot.MainHand);
+                case 40 -> playerData.Equipment.unEquip(EquipmentSlot.OffHand);
+                case 36 -> playerData.Equipment.unEquip(EquipmentSlot.Armor);
+                case 39 -> playerData.Menu.StatusInfo.StatusInfoView(player);
             }
 
             if (playerData.ViewInventory.isItem()) {
@@ -197,10 +197,10 @@ public class Menu {
             playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);
             playerData.Shop.ShopSellClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
-                playerData.Classes.ClassSelectClick(event.getView(), event.getSlot());
-                playerData.Attribute.AttributeMenuClick(event.getView(), event.getCurrentItem());
+                playerData.Classes.ClassSelectClick(view, Slot);
+                playerData.Attribute.AttributeMenuClick(view, action, currentItem);
                 playerData.Skill.SkillMenuClick(view, Slot);
-                playerData.Shop.ShopClick(view, Slot);
+                playerData.Shop.ShopClick(view, currentItem, Slot, index);
                 playerData.MapManager.TeleportGateMenuClick(view, Slot);
                 Setting.SettingMenuClick(view, currentItem);
                 Trigger.TriggerMenuClick(view, currentItem, Slot);
@@ -215,12 +215,16 @@ public class Menu {
                 if (ClickInventory == view.getTopInventory()) {
                     if (equalItem(currentItem, UserMenu_ItemInventory)) {
                         playerData.setView(ViewInventoryType.ItemInventory);
+                        Tutorial.tutorialTrigger(player, 2);
                     } else if (equalItem(currentItem, UserMenu_RuneInventory)) {
                         playerData.setView(ViewInventoryType.RuneInventory);
+                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_PetInventory)) {
                         playerData.setView(ViewInventoryType.PetInventory);
+                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_HotBar)) {
                         playerData.setView(ViewInventoryType.HotBar);
+                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_SettingMenuIcon)) {
                         Setting.SettingMenuView();
                     } else if (equalItem(currentItem, UserMenu_SkillMenuIcon)) {

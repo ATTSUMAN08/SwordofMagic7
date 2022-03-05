@@ -25,9 +25,11 @@ public class RuneShop {
     private static final String RuneCrashDisplay = "§lルーン粉砕";
     public static final String RuneEquipDisplay = "§lルーン装着";
     private static final String RuneUpgradeDisplay = "§lルーン強化";
+    private static final String RunePolishDisplay = "§lルーン研磨";
     private static final ItemStack RuneShopMenu_RuneCrash = new ItemStackData(Material.GUNPOWDER, decoText("ルーン粉砕"), "§a§lルーンを砕いて粉に変えます").view();
     private static final ItemStack RuneShopMenu_RuneEquip = new ItemStackData(Material.CHAINMAIL_CHESTPLATE, decoText("ルーン装着"), "§a§l武具にルーンを装着できます").view();
     private static final ItemStack RuneShopMenu_RuneUpgrade = new ItemStackData(Material.ANVIL, decoText("ルーン強化"), "§a§l同名・同レベルのルーンを合成して\n§a§lルーンのレベルを上げます\n§a§l品質は合計の55%の値になります").view();
+    private static final ItemStack RuneShopMenu_RunePolish = new ItemStackData(Material.GRINDSTONE, decoText("ルーン研磨"), "§a§lルーンの粉末を使用して\n§a§lルーンの品質を上げます\n§a§l品質は最大の70%まで上がります").view();
     private final Player player;
     private final PlayerData playerData;
 
@@ -59,6 +61,7 @@ public class RuneShop {
         inv.setItem(0, RuneShopMenu_RuneCrash);
         inv.setItem(1, RuneShopMenu_RuneEquip);
         inv.setItem(2, RuneShopMenu_RuneUpgrade);
+        inv.setItem(3, RuneShopMenu_RunePolish);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
     }
@@ -86,7 +89,7 @@ public class RuneShop {
         playerData.setView(ViewInventoryType.ItemInventory, false);
         for (int slot = 0; slot < 45; slot++) {
             if (slot != 20 && !RuneSlotIndex().contains(slot)) {
-                inv.setItem(slot, new ItemStack(Material.BROWN_STAINED_GLASS_PANE));
+                inv.setItem(slot, RuneEquipFlame);
             }
         }
         player.openInventory(inv);
@@ -99,10 +102,18 @@ public class RuneShop {
         player.openInventory(inv);
     }
 
+    public void RunePolishView() {
+        Inventory inv = decoAnvil(RunePolishDisplay);
+        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
+        playerData.setView(ViewInventoryType.RuneInventory, false);
+        player.openInventory(inv);
+    }
+
     private ItemParameter RuneCache;
     private final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     private final ItemParameter RunePowder = getItemParameter("ルーンの粉");
     public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ItemStack currentItem, int index, int Slot) {
+        String format = playerData.ViewFormat();
         if (equalInv(view, RuneShopMenuDisplay)) {
             if (equalItem(currentItem, RuneShopMenu_RuneCrash)) {
                 RuneCrashView();
@@ -110,6 +121,8 @@ public class RuneShop {
                 RuneEquipView();
             } else if (equalItem(currentItem, RuneShopMenu_RuneUpgrade)) {
                 RuneUpgradeView();
+            } else if (equalItem(currentItem, RuneShopMenu_RunePolish)) {
+                RunePolishView();
             }
             playSound(player, SoundList.Click);
         } else if (equalInv(view, RuneCrashDisplay) && playerData.ViewInventory.isRune()) {
@@ -136,9 +149,8 @@ public class RuneShop {
                 player.sendMessage("§e[ルーン]§aを§c粉砕§aしました");
                 playSound(player, SoundList.LevelUp);
             }
-            player.getOpenInventory().getTopInventory().setContents(RuneCrashInv().getStorageContents());
+            view.getTopInventory().setContents(RuneCrashInv().getStorageContents());
         } else if (equalInv(view, RuneEquipDisplay)) {
-            String format = playerData.ViewFormat();
             if (ClickInventory == player.getInventory() && ignoreSlot(Slot)) {
                 if (index > -1) {
                     if (playerData.ViewInventory.isItem()) {
@@ -207,11 +219,10 @@ public class RuneShop {
                     view.getTopInventory().setItem(slot, AirItem);
                 }
             }
-        } else if (equalInv(view, RuneUpgradeDisplay)) {
-            String format = playerData.ViewFormat();
+        } else if (equalInv(view, RuneUpgradeDisplay) && playerData.ViewInventory.isRune()) {
             Inventory inv = view.getTopInventory();
-            if (ClickInventory == view.getTopInventory()) {
-                if (Slot < 2) {
+            if (ClickInventory == inv) {
+                if (Slot == AnvilUISlot[0] || Slot == AnvilUISlot[1]) {
                     for (int i = 0; i < 2; i++) {
                         if (RuneUpgradeCache[i] != null) {
                             playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[i]);
@@ -219,7 +230,7 @@ public class RuneShop {
                         }
                     }
                     playSound(player, SoundList.Click);
-                } else if (Slot == 2 && RuneUpgradeCache[2] != null) {
+                } else if (Slot == AnvilUISlot[2] && RuneUpgradeCache[2] != null) {
                     playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
                     RuneUpgradeCache[2] = null;
                     for (int i = 0; i < 2; i++) {
@@ -247,18 +258,61 @@ public class RuneShop {
             }
             for (int i = 0; i < 2; i++) {
                 if (RuneUpgradeCache[i] != null) {
-                    inv.setItem(i, RuneUpgradeCache[i].viewRune(format));
+                    inv.setItem(AnvilUISlot[i], RuneUpgradeCache[i].viewRune(format));
                 } else {
-                    inv.setItem(i, AirItem);
+                    inv.setItem(AnvilUISlot[i], AirItem);
                 }
             }
             if (RuneUpgradeCache[0] != null && RuneUpgradeCache[1] != null) {
                 RuneUpgradeCache[2] = getRuneParameter(RuneUpgradeCache[0].Id);
                 RuneUpgradeCache[2].Level = RuneUpgradeCache[0].Level+1;
-                RuneUpgradeCache[2].Quality = (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55;
-                inv.setItem(2, RuneUpgradeCache[2].viewRune(format));
+                RuneUpgradeCache[2].Quality = Math.min(2, (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55);
+                inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));
             } else {
-                inv.setItem(2, AirItem);
+                inv.setItem(AnvilUISlot[2], AirItem);
+                RuneUpgradeCache[2] = null;
+            }
+        } else if (equalInv(view, RunePolishDisplay) && playerData.ViewInventory.isRune()) {
+            Inventory inv = view.getTopInventory();
+            if (ClickInventory == inv) {
+                if (Slot == AnvilUISlot[2]) {
+                    if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
+                        playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
+                        playerData.ItemInventory.removeItemParameter(RunePowder, 1);
+                        RuneUpgradeCache[0] = null;
+                        player.sendMessage("§e[ルーン]§aを§b研磨§aしました");
+                        playSound(player, SoundList.LevelUp);
+                    } else {
+                        player.sendMessage("§e[" + RunePowder.Display + "]§aが足りません");
+                        playSound(player, SoundList.Nope);
+                    }
+                } else if (RuneUpgradeCache[0] != null) {
+                    playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
+                    RuneUpgradeCache[0] = null;
+                    playSound(player, SoundList.Click);
+                }
+            } else if (index > -1) {
+                if (RuneUpgradeCache[0] != null) playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
+                RuneUpgradeCache[0] = playerData.RuneInventory.getRuneParameter(index).clone();
+                if (RuneUpgradeCache[0].Quality < 0.7) {
+                    playerData.RuneInventory.removeRuneParameter(index);
+                    playSound(player, SoundList.Click);
+                } else {
+                    RuneUpgradeCache[0] = null;
+                    player.sendMessage("§e[品質]§aが§e[70%以上]§aです");
+                    playSound(player, SoundList.Nope);
+                }
+            }
+            if (RuneUpgradeCache[0] != null) {
+                RuneUpgradeCache[2] = RuneUpgradeCache[0].clone();
+                RuneUpgradeCache[2].Quality = Math.min(0.7, RuneUpgradeCache[2].Quality*1.2);
+                inv.setItem(AnvilUISlot[0], RuneUpgradeCache[0].viewRune(format));
+                inv.setItem(AnvilUISlot[1], RunePowder.viewItem(1, format));
+                inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));
+            } else {
+                inv.setItem(AnvilUISlot[0], AirItem);
+                inv.setItem(AnvilUISlot[1], AirItem);
+                inv.setItem(AnvilUISlot[2], AirItem);
                 RuneUpgradeCache[2] = null;
             }
         }
@@ -271,7 +325,7 @@ public class RuneShop {
                 playerData.ItemInventory.addItemParameter(RuneCache, 1);
                 RuneCache = null;
             }
-        } else if (equalInv(view, RuneUpgradeDisplay)) {
+        } else if (equalInv(view, RuneUpgradeDisplay) || equalInv(view, RunePolishDisplay)) {
             for (int i = 0; i < 2; i++) {
                 if (RuneUpgradeCache[i] != null) {
                     playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[i]);

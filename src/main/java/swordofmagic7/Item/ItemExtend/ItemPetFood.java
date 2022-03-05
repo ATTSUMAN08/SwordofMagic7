@@ -8,7 +8,7 @@ import swordofmagic7.Sound.SoundList;
 import static swordofmagic7.Pet.PetManager.ReqPetSelect;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class ItemPetFood {
+public class ItemPetFood implements Cloneable{
     public int Stamina;
 
     public void usePetFood(Player player, ItemParameter CurrentItem) {
@@ -25,6 +25,17 @@ public class ItemPetFood {
         } else {
             player.sendMessage(ReqPetSelect);
             playSound(player, SoundList.Nope);
+        }
+    }
+
+    @Override
+    public ItemPetFood clone() {
+        try {
+            ItemPetFood clone = (ItemPetFood) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
     }
 }

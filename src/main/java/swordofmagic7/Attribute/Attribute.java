@@ -2,6 +2,7 @@ package swordofmagic7.Attribute;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -73,7 +74,7 @@ public class Attribute {
         for (AttributeType attr : AttributeType.values()) {
             Parameter.put(attr, 0);
         }
-        AttributePoint = (playerData.Classes.getLevel(getClassData("Novice"))-1)*5;
+        AttributePoint = (playerData.Level-1)*5;
     }
 
     public ItemStack attributeView(AttributeType type) {
@@ -84,10 +85,10 @@ public class Attribute {
         Lore.add(decoText("§3§l追加ステータス"));
         final String format = "%.1f";
         if (type == AttributeType.STR) {
-            Lore.add(decoLore("物理与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
+            Lore.add(decoLore("物理与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
             Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
         } else if (type == AttributeType.INT) {
-            Lore.add(decoLore("魔法与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.08) + "%");
+            Lore.add(decoLore("魔法与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.4) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
             Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
         } else if (type == AttributeType.DEX) {
@@ -137,12 +138,14 @@ public class Attribute {
         AttributeMenuCache.setItem(8, point);
     }
 
-    public void AttributeMenuClick(InventoryView view, ItemStack currentItem) {
+    public void AttributeMenuClick(InventoryView view, InventoryAction action, ItemStack currentItem) {
         if (equalInv(view, AttributeMenuDisplay)) {
+            int x = 1;
+            if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) x = 10;
             Attribute attr = playerData.Attribute;
             for (AttributeType attrType : AttributeType.values()) {
                 if (currentItem.getType() == attrType.Icon) {
-                    attr.addAttribute(attrType, 1);
+                    attr.addAttribute(attrType, x);
                 }
             }
             if (currentItem.getType() == Material.EXPERIENCE_BOTTLE) {

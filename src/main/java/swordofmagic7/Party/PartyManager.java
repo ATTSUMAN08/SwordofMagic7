@@ -13,6 +13,10 @@ import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PartyManager {
+    public static void save() {
+
+    }
+
     public static HashMap<String, PartyData> PartyList = new HashMap<>();
     public static HashMap<Player, PartyData> PartyInvites = new HashMap<>();
 
@@ -87,21 +91,20 @@ public class PartyManager {
                     }
                     return;
                 } else if (playerData.Party.Leader == player) {
-                    if (Bukkit.getPlayer(args[0]) != null) {
-                        player.performCommand("party invite " + args[0]);
-                        return;
-                    } else if (args[0].equalsIgnoreCase("invite") && args.length == 2) {
-                        Player invite = Bukkit.getPlayer(args[1]);
-                        if (invite != null) {
-                            if (!playerData.Party.Members.contains(invite)) {
-                                playerData.Party.Invite(invite);
+                    if (args[0].equalsIgnoreCase("invite") && args.length <= 2) {
+                        for (int i = 1; i < args.length; i++) {
+                            Player invite = Bukkit.getPlayer(args[i]);
+                            if (invite != null) {
+                                if (!playerData.Party.Members.contains(invite)) {
+                                    playerData.Party.Invite(invite);
+                                } else {
+                                    player.sendMessage("§aすでに§e[" + playerData.Party.Display + "]§aに参加しています");
+                                    playSound(player, SoundList.Nope);
+                                }
                             } else {
-                                player.sendMessage("§aすでに§e[" + playerData.Party.Display + "]§aに参加しています");
+                                player.sendMessage("§a存在しない§eプレイヤー§aです");
                                 playSound(player, SoundList.Nope);
                             }
-                        } else {
-                            player.sendMessage("§a存在しない§eプレイヤー§aです");
-                            playSound(player, SoundList.Nope);
                         }
                         return;
                     } else if (args[0].equalsIgnoreCase("promote") && args.length == 2) {
@@ -134,6 +137,15 @@ public class PartyManager {
                         if (party.Public) party.Message("§e[" + party.Display + "]§aを§b公開§aしました");
                         else party.Message("§e[" + party.Display + "]§aを§c非公開§aにしました");
                         return;
+                    } else {
+                        boolean check = false;
+                        for (String str : args) {
+                            if (Bukkit.getPlayer(str) != null) {
+                                player.performCommand("party invite " + str);
+                                check = true;
+                            }
+                        }
+                        if (check) return;
                     }
                 }
             }
@@ -149,6 +161,7 @@ public class PartyManager {
             player.sendMessage(decoLore("/party leave") + "パーティから脱退します");
             player.sendMessage(decoLore("/party info") + "パーティの情報を表示します");
             if (playerData.Party.Leader == player) {
+                player.sendMessage(decoLore("/party <Player> [<Player>] etc...") + "複数のプレイヤーをパーティに招待します");
                 player.sendMessage(decoLore("/party invite <Player>") + "プレイヤーをパーティに招待します");
                 player.sendMessage(decoLore("/party promote <Player>") + "リーダー権を譲渡します");
                 player.sendMessage(decoLore("/party kick <Player>") + "プレイヤーをパーティから追放します");

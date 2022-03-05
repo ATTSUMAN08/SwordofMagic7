@@ -53,6 +53,7 @@ public class ItemEquipmentData implements Cloneable {
     public ItemEquipmentData clone() {
         try {
             ItemEquipmentData clone = (ItemEquipmentData) super.clone();
+            clone.Rune = new ArrayList<>(Rune);
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
             return clone;
         } catch (CloneNotSupportedException e) {

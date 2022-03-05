@@ -19,14 +19,22 @@ public class Setting {
         this.playerData = playerData;
     }
     public void SettingMenuView() {
-        Inventory inv = decoInv(SettingMenuDisplay, 1);
-        inv.setItem(0, SettingMenu_DamageLogIcon);
-        inv.setItem(1, SettingMenu_ExpLogIcon);
-        inv.setItem(2, SettingMenu_DropLogIcon);
-        inv.setItem(3, SettingMenu_StrafeModeIcon);
-        inv.setItem(4, SettingMenu_CastModeIcon);
-        inv.setItem(5, SettingMenu_ShopAmountResetIcon);
-        inv.setItem(6, SettingMenu_PvPModeIcon);
+        Inventory inv = decoInv(SettingMenuDisplay, 2);
+        inv.setItem(0, SettingMenu_ItemInventorySort);
+        inv.setItem(9, SettingMenu_ItemInventorySortReverse);
+        inv.setItem(1, SettingMenu_RuneInventorySort);
+        inv.setItem(10, SettingMenu_RuneInventorySortReverse);
+        inv.setItem(2, SettingMenu_PetInventorySort);
+        inv.setItem(11, SettingMenu_PetInventorySortReverse);
+
+        inv.setItem(4, SettingMenu_DamageLogIcon);
+        inv.setItem(5, SettingMenu_ExpLogIcon);
+        inv.setItem(6, SettingMenu_DropLogIcon);
+        inv.setItem(7, SettingMenu_StrafeModeIcon);
+        inv.setItem(8, SettingMenu_CastModeIcon);
+        inv.setItem(13, SettingMenu_ShopAmountResetIcon);
+        inv.setItem(14, SettingMenu_PvPModeIcon);
+        inv.setItem(15, SettingMenu_ViewFormat);
         player.openInventory(inv);
     }
 
@@ -46,6 +54,20 @@ public class Setting {
                 playerData.Shop.AmountReset();
             } else if (equalItem(currentItem, SettingMenu_PvPModeIcon)) {
                 playerData.PvPMode();
+            } else if (equalItem(currentItem, SettingMenu_ViewFormat)) {
+                playerData.changeViewFormat();
+            } else if (equalItem(currentItem, SettingMenu_ItemInventorySort)) {
+                playerData.ItemInventory.ItemInventorySort();
+            } else if (equalItem(currentItem, SettingMenu_ItemInventorySortReverse)) {
+                playerData.ItemInventory.ItemInventorySortReverse();
+            } else if (equalItem(currentItem, SettingMenu_RuneInventorySort)) {
+                playerData.RuneInventory.RuneInventorySort();
+            } else if (equalItem(currentItem, SettingMenu_RuneInventorySortReverse)) {
+                playerData.RuneInventory.RuneInventorySortReverse();
+            } else if (equalItem(currentItem, SettingMenu_PetInventorySort)) {
+                playerData.PetInventory.PetInventorySort();
+            } else if (equalItem(currentItem, SettingMenu_PetInventorySortReverse)) {
+                playerData.PetInventory.PetInventorySortReverse();
             }
         }
     }

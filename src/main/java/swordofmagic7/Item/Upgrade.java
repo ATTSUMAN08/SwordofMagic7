@@ -13,16 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.UpgradeDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Upgrade {
 
-    private Player player;
-    private PlayerData playerData;
+    private final Player player;
+    private final PlayerData playerData;
     private final Random random = new Random();
 
     public Upgrade(Player player, PlayerData playerData) {
@@ -46,7 +45,7 @@ public class Upgrade {
     public void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
         if (equalInv(view, UpgradeDisplay)) {
             if (view.getTopInventory() == ClickInventory) {
-                if (Slot == 2) {
+                if (Slot == AnvilUISlot[2]) {
                     if (UpgradeCache[0] != null) {
                         int cost = UpgradeCost(UpgradeCache[0]);
                         if (playerData.ItemInventory.hasItemParameter(UpgradeStone, cost)) {
@@ -65,7 +64,7 @@ public class Upgrade {
                             playSound(player, SoundList.Nope);
                         }
                     }
-                } else if (Slot == 0 && UpgradeCache[0] != null) {
+                } else if (Slot == AnvilUISlot[0] && UpgradeCache[0] != null) {
                     playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                     UpgradeCache[0] = null;
                     playSound(player, SoundList.Click);
@@ -89,20 +88,20 @@ public class Upgrade {
             String format = playerData.ViewFormat();
             Inventory inv = player.getOpenInventory().getTopInventory();
             if (UpgradeCache[0] != null) {
-                inv.setItem(0, UpgradeCache[0].viewItem(1, format));
+                inv.setItem(AnvilUISlot[0], UpgradeCache[0].viewItem(1, format));
                 List<String> Lore = new ArrayList<>();
                 int cost = UpgradeCost(UpgradeCache[0]);
                 Lore.add(decoLore("必要強化石") + cost + "個");
                 Lore.add(decoLore("消費強化石") + cost/2 + "～" + cost + "個");
                 ItemStack viewCost = new ItemStackData(Material.AMETHYST_SHARD, decoText("強化コスト"), Lore).view();
-                inv.setItem(1, viewCost);
+                inv.setItem(AnvilUISlot[1], viewCost);
                 UpgradeCache[1] = UpgradeCache[0].clone();
                 UpgradeCache[1].itemEquipmentData.Plus++;
-                inv.setItem(2, UpgradeCache[1].viewItem(1, format));
+                inv.setItem(AnvilUISlot[2], UpgradeCache[1].viewItem(1, format));
             } else {
-                inv.setItem(0, AirItem);
-                inv.setItem(1, AirItem);
-                inv.setItem(2, AirItem);
+                inv.setItem(AnvilUISlot[0], AirItem);
+                inv.setItem(AnvilUISlot[1], AirItem);
+                inv.setItem(AnvilUISlot[2], AirItem);
                 UpgradeCache[1] = null;
             }
         }

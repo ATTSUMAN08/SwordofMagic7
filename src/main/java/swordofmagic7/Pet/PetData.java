@@ -14,7 +14,6 @@ public class PetData {
     public String Display;
     public List<String> Lore;
     public Material Icon;
-    public int Tier;
     public double MaxStamina;
     public double MaxHealth;
     public double HealthRegen;

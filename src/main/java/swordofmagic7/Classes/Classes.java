@@ -9,24 +9,26 @@ import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemStackData;
+import swordofmagic7.Life.LifeStatus;
+import swordofmagic7.Life.LifeType;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
-    public static final int MaxTier = 1;
+    public static final int MaxSlot = 4;
+    public static final int MaxLevel = 15;
+    public static final int[] SlotReqLevel = {1, 10, 30, 50};
     private final Player player;
     private final PlayerData playerData;
     private final HashMap<ClassData, Integer> ClassLevel = new HashMap<>();
     private final HashMap<ClassData, Integer> ClassExp = new HashMap<>();
-    public ClassData[] classTier = new ClassData[4];
+    public ClassData[] classSlot = new ClassData[MaxSlot];
     public Classes(Player player, PlayerData playerData) {
         this.player = player;
         this.playerData = playerData;
@@ -34,77 +36,88 @@ public class Classes {
             ClassLevel.put(classData, 1);
             ClassExp.put(classData, 0);
         }
-        classTier[0] = DataBase.getClassData("Novice");
+        classSlot[0] = getClassData("Novice");
     }
 
-    public int ReqExp(int Level, int Tier) {
+    public static int ReqExp(int Level) {
         double reqExp = 100f;
-        reqExp *= Math.pow(Level, 1.2);
-        reqExp *= Math.pow(Tier+1, 1.2);
-        for (int i = 0; i < Math.floor((Level-10)/10f); i++) {
-            reqExp *= 2.5;
-        }
+        reqExp *= Math.pow(Level, 1.5);
+        if (Level >= 30) reqExp *= 3;
+        if (Level >= 50) reqExp *= 3;
         return (int) Math.round(reqExp);
     }
 
-    public void setLevel(ClassData classData, int level) {
+    public ClassData lastClass() {
+        ClassData lastClass = getClassData("Novice");
+        for (ClassData classData : classSlot) {
+            if (classData != null){
+                lastClass = classData;
+            }
+        }
+        return lastClass;
+    }
+
+    public void setClassLevel(ClassData classData, int level) {
         ClassLevel.put(classData, level);
     }
 
-    public void addLevel(ClassData classData, int addLevel) {
-        ClassLevel.put(classData, getLevel(classData) + addLevel);
-        if (classData.Id.equals("Novice")) {
-            playerData.Attribute.addPoint(addLevel*5);
+    public void addClassLevel(ClassData classData, int addLevel) {
+        ClassLevel.put(classData, getClassLevel(classData) + addLevel);
+        if (getClassLevel(classData) >= MaxLevel) {
+            setClassExp(classData, 0);
         }
     }
 
-    public int getLevel(ClassData classData) {
+    public int getClassLevel(ClassData classData) {
         if (ClassLevel.getOrDefault(classData, 0) <= 0) {
             ClassLevel.put(classData, 1);
         }
         return ClassLevel.get(classData);
     }
 
-    public void setExp(ClassData classData, int exp) {
+    public void setClassExp(ClassData classData, int exp) {
         ClassExp.put(classData, exp);
     }
 
-    public void addExp(ClassData classData, int addExp) {
-        ClassExp.put(classData, getExp(classData) + addExp);
-        if (ReqExp(getLevel(classData), classData.Tier) <= getExp(classData)) {
+    public void addClassExp(ClassData classData, int addExp) {
+        if (getClassLevel(classData) >= MaxLevel) {
+            ClassExp.put(classData, 0);
+            addExp = 0;
+        } else {
+            ClassExp.put(classData, getClassExp(classData) + addExp);
+        }
+        int Level = getClassLevel(classData);
+        if (ReqExp(Level) <= getClassExp(classData)) {
             int addLevel = 0;
-            while (ReqExp(getLevel(classData), classData.Tier) <= getExp(classData)) {
-                removeExp(classData, ReqExp(getLevel(classData), classData.Tier));
+            while (ReqExp(Level+addLevel) <= getClassExp(classData)) {
+                removeExp(classData, ReqExp(Level+addLevel));
                 addLevel++;
             }
-            addLevel(classData, addLevel);
-            BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getLevel(classData) + "§aになりました");
+            addClassLevel(classData, addLevel);
+            BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました");
             playSound(player, SoundList.LevelUp);
         }
         if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp);
     }
 
     public void removeExp(ClassData classData, int addExp) {
-        ClassExp.put(classData, getExp(classData) - addExp);
+        ClassExp.put(classData, getClassExp(classData) - addExp);
     }
 
-    public int getExp(ClassData classData) {
+    public int getClassExp(ClassData classData) {
         if (!ClassExp.containsKey(classData)) {
             ClassExp.put(classData, 0);
         }
         return ClassExp.get(classData);
     }
 
-    public ClassData topClass() {
-        for (int i = classTier.length-1; i > 0; i--) {
-            if (classTier[i] != null) return classTier[i];
-        }
-        return DataBase.getClassData("Novice");
+    public String viewExpPercent(ClassData classData) {
+        return String.format("%.3f", (float) getClassExp(classData)/ ReqExp(getClassLevel(classData))*100) + "%";
     }
 
-    public List<SkillData> getPassiveSkillList() {
-        List<SkillData> list = new ArrayList<>();
-        for (ClassData classData : classTier) {
+    public Set<SkillData> getPassiveSkillList() {
+        Set<SkillData> list = new HashSet<>();
+        for (ClassData classData : classSlot) {
             if (classData != null) {
                 for (SkillData skillData : classData.SkillList) {
                     if (skillData.SkillType.isPassive()) {
@@ -116,9 +129,9 @@ public class Classes {
         return list;
     }
 
-    public List<SkillData> getActiveSkillList() {
-        List<SkillData> list = new ArrayList<>();
-        for (ClassData classData : classTier) {
+    public Set<SkillData> getActiveSkillList() {
+        Set<SkillData> list = new HashSet<>();
+        for (ClassData classData : classSlot) {
             if (classData != null) {
                 for (SkillData skillData : classData.SkillList) {
                     if (!skillData.SkillType.isActive()) {
@@ -130,11 +143,11 @@ public class Classes {
         return list;
     }
 
-    public void ClassChange(ClassData classData) {
+    public void ClassChange(ClassData classData, int slot) {
         boolean changeAble = true;
         List<String> reqText = new ArrayList<>();
         for (Map.Entry<ClassData, Integer> classes : classData.ReqClass.entrySet()) {
-            if (playerData.Classes.getLevel(classes.getKey()) < classes.getValue()) {
+            if (playerData.Classes.getClassLevel(classes.getKey()) < classes.getValue()) {
                 changeAble = false;
                 reqText.add("§7・§e§l" + classes.getKey().Display + " Lv" + classes.getValue() + " §c✖");
             } else {
@@ -142,8 +155,8 @@ public class Classes {
             }
         }
         if (changeAble) {
-            classTier[classData.Tier] = classData;
-            player.sendMessage("§e[クラスT" + classData.Tier + "]§aを" + classData.Color + "[" + classData.Display + "]§aに§b転職§aしました");
+            classSlot[slot] = classData;
+            player.sendMessage("§e[クラススロット" + (slot+1) + "]§aを" + classData.Color + "[" + classData.Display + "]§aに§b転職§aしました");
             playSound(player, SoundList.LevelUp);
         } else {
             player.sendMessage(decoText("§c転職条件"));
@@ -154,46 +167,63 @@ public class Classes {
         }
     }
 
-    private final ClassData[] ClassSelectCache = new ClassData[9];
-    private int SelectTier = 0;
-    public void ClassSelectView(int tier) {
-        Inventory inv = decoInv("クラスカウンター", 1);
-        SelectTier = tier;
-        switch (tier) {
-            case 0 -> {
-                ItemStack tier1 = new ItemStackData(Material.END_CRYSTAL, decoText("クラス一覧 [T1]")).view();
-                inv.setItem(0, tier1);
-                playSound(player, SoundList.MenuOpen);
+    private final ClassData[] ClassSelectCache = new ClassData[54];
+    private int SelectSlot = -1;
+    public void ClassSelectView(boolean isSlotMenu) {
+        int size = 6;
+        if (isSlotMenu) size = 1;
+        Inventory inv = decoInv("クラスカウンター", size);
+        if (isSlotMenu) {
+            SelectSlot = -1;
+            for (int i = 0; i < SlotReqLevel.length; i++) {
+                inv.setItem(i, new ItemStackData(Material.END_CRYSTAL, decoLore("クラススロット[" + (i+1) + "]"), decoLore("必要レベル") + SlotReqLevel[i]).view());
             }
-            case 1 -> {
-                int i = 0;
-                for (ClassData classData : DataBase.getClassList().values()) {
-                    if (classData.Tier == 1) {
-                        ClassSelectCache[i] = classData;
-                        inv.setItem(i, classData.view());
-                        i++;
-                    }
-                }
-                playSound(player, SoundList.Click);
+        } else {
+            HashMap<Integer, String> ClassTable = new HashMap<>();
+            ClassTable.put(0, "Novice");
+            ClassTable.put(9, "Swordman");
+            ClassTable.put(18, "Mage");
+            ClassTable.put(27, "Gunner");
+            ClassTable.put(36, "Cleric");
+            ClassTable.put(37, "Priest");
+            ClassTable.put(45, "Tamer");
+            for (Map.Entry<Integer, String> data : ClassTable.entrySet()) {
+                ClassData classData = getClassData(data.getValue());
+                ClassSelectCache[data.getKey()] = classData;
+                inv.setItem(data.getKey(), classData.view());
             }
         }
+        playSound(player, SoundList.Click);
         player.openInventory(inv);
     }
 
     public void ClassSelectClick(InventoryView view, int slot) {
         if (equalInv(view, "クラスカウンター")) {
-            if (SelectTier > 0 && ClassSelectCache[slot] != null) {
+            if (SelectSlot == -1 && slot < classSlot.length) {
+                if (SlotReqLevel[slot] <= playerData.Level) {
+                    SelectSlot = slot;
+                    ClassSelectView(false);
+                } else {
+                    player.sendMessage("§aレベルが足りません");
+                    playSound(player, SoundList.Nope);
+                }
+            } else if (ClassSelectCache[slot] != null) {
+                for (ClassData classData : classSlot) {
+                    if (classData == ClassSelectCache[slot]) {
+                        player.sendMessage("§aすでに" + classData.Color + classData.Display + "]§aは使用されています");
+                        playSound(player, SoundList.Nope);
+                        return;
+                    }
+                }
                 if (!(playerData.Equipment.isEquip(EquipmentSlot.MainHand)
-                || playerData.Equipment.isEquip(EquipmentSlot.OffHand)
-                || playerData.Equipment.isEquip(EquipmentSlot.Armor))) {
+                        || playerData.Equipment.isEquip(EquipmentSlot.OffHand)
+                        || playerData.Equipment.isEquip(EquipmentSlot.Armor))) {
                     ClassData classData = ClassSelectCache[slot];
-                    ClassChange(classData);
+                    ClassChange(classData, SelectSlot);
                 } else {
                     player.sendMessage("§e[装備]§aを外してください");
                     playSound(player, SoundList.Nope);
                 }
-            } else if (0 <= slot && slot < MaxTier){
-                ClassSelectView(slot+1);
             }
         }
     }

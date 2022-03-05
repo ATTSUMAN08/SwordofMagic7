@@ -12,7 +12,7 @@ import java.util.List;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
 
-public class SkillData {
+public class SkillData implements Cloneable {
     public String Id;
     public Material Icon;
     public String Display;
@@ -55,5 +55,32 @@ public class SkillData {
         }
         item.setItemMeta(meta);
         return item;
+    }
+
+    public SkillParameter Parameter(int i) {
+        if (Parameter.size() > i) {
+            return Parameter.get(i);
+        } else {
+            return new SkillParameter();
+        }
+    }
+
+    public double ParameterValue(int i) {
+        if (Parameter.size() > i) {
+            return Parameter.get(i).Value;
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public SkillData clone() {
+        try {
+            SkillData clone = (SkillData) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

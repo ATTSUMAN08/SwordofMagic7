@@ -2,11 +2,13 @@ package swordofmagic7.Data;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
+import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,6 +22,7 @@ import swordofmagic7.Data.Type.DropLogType;
 import swordofmagic7.Data.Type.StrafeType;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectOwnerType;
 import swordofmagic7.Equipment.Equipment;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.HotBar.HotBar;
@@ -32,6 +35,7 @@ import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Item.Upgrade;
 import swordofmagic7.Life.Gathering;
 import swordofmagic7.Life.LifeStatus;
+import swordofmagic7.Life.LifeType;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.MapManager;
 import swordofmagic7.Menu.Menu;
@@ -47,11 +51,15 @@ import swordofmagic7.Skill.Skill;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.System;
+import swordofmagic7.Tutorial;
+import swordofmagic7.ViewBar.SideBarToDo.SideBarToDo;
+import swordofmagic7.ViewBar.ViewBar;
 
 import java.io.File;
 import java.util.*;
 
-import static swordofmagic7.Classes.Classes.MaxTier;
+import static swordofmagic7.Classes.Classes.MaxSlot;
+import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -98,8 +106,13 @@ public class PlayerData {
     public MapManager MapManager;
     public Gathering Gathering;
     public QuestManager QuestManager;
+    public ViewBar ViewBar;
+    public SideBarToDo SideBarToDo;
 
     public String Nick;
+
+    public int Level = 1;
+    public int Exp = 0;
 
     public DamageLogType DamageLog = DamageLogType.None;
     public boolean ExpLog = false;
@@ -107,7 +120,7 @@ public class PlayerData {
     public boolean PvPMode = false;
     public boolean PlayMode = true;
     public StrafeType StrafeMode = StrafeType.DoubleJump;
-    public CastType CastMode = CastType.Renewed;
+    public CastType CastMode = CastType.Hold;
     public int Mel = 10000;
     public int ViewFormat = 0;
     public int Strafe = 2;
@@ -137,7 +150,7 @@ public class PlayerData {
         Status = new Status(player, this, Classes, Skill);
         Menu = new Menu(player, this);
         Attribute = new Attribute(player, this);
-        EffectManager = new EffectManager(player);
+        EffectManager = new EffectManager(player, EffectOwnerType.Player);
         Upgrade = new Upgrade(player, this);
         Shop = new Shop(player, this);
         RuneShop = new RuneShop(player, this);
@@ -147,21 +160,64 @@ public class PlayerData {
         MapManager = new MapManager(player, this);
         Gathering = new Gathering(player, this);
         QuestManager = new QuestManager(player, this);
+        ViewBar = new ViewBar(player, this, Status);
+        SideBarToDo = new SideBarToDo(this);
 
         Nick = player.getName();
 
         able = true;
         PetInventory.start();
+
+        InitializeHologram();
+    }
+
+    public Hologram hologram;
+    public TextLine textLine;
+    public void InitializeHologram() {
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (hologram != null) hologram.delete();
+            hologram = HologramsAPI.createHologram(plugin, playerHoloLocation());
+            textLine = hologram.appendTextLine("§a§l■■■■■■■■■■");
+            VisibilityManager visibilityManager = hologram.getVisibilityManager();
+            visibilityManager.hideTo(player);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!hologram.isDeleted()) {
+                        hologram.teleport(playerHoloLocation());
+                    } else {
+                        this.cancel();
+                        if (player.isOnline()) InitializeHologram();
+                    }
+                }
+            }.runTaskTimer(plugin, 0, 1);
+        });
+    }
+
+    public void RefreshHologram() {
+        int x = (int) Math.floor(Status.Health/Status.MaxHealth*10);
+        textLine.setText("§a§l" + "■".repeat(Math.max(0, x)) + "§7§l" + "■".repeat(Math.max(0, 10 - x)));
+    }
+
+    public Location playerHoloLocation() {
+        Location loc = player.getEyeLocation().clone();
+        loc.setY(loc.getY()+0.5);
+        return loc;
     }
 
     public String getNick() {
         return getNick(false);
     }
 
-    public String getNick(boolean bool) {
+    public String getNick(boolean bold) {
         String prefix = "§e";
-        if (bool) prefix += "§l";
+        if (bold) prefix += "§l";
         return prefix + Nick;
+    }
+
+    public void changeViewFormat() {
+        if (ViewFormat < 3) setViewFormat(ViewFormat+1);
+        else setViewFormat(0);
     }
 
     public void DamageLog() {
@@ -274,12 +330,57 @@ public class PlayerData {
     }
 
     public void remove() {
-        Status.tickUpdateTask.cancel();
+        ViewBar.tickUpdateTask.cancel();
         PetInventory.task.cancel();
         playerData.remove(player.getUniqueId());
     }
 
+    public void saveCloseInventory() {
+        CloseInventory(player);
+        Bukkit.getScheduler().runTaskLater(plugin, this::save, 1);
+    }
+
+    public void addPlayerLevel(int addLevel) {
+        Level += addLevel;
+        if (Level > MaxLevel) {
+            Level = MaxLevel;
+            Exp = 0;
+        } else {
+            BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました");
+            Attribute.addPoint(addLevel * 5);
+            if (Level == MaxLevel) Exp = 0;
+            playSound(player, SoundList.LevelUp);
+        }
+    }
+
+    public static final int MaxLevel = 50;
+
+    public void addPlayerExp(int addExp) {
+        if (Level >= MaxLevel) {
+            Exp = 0;
+            addExp = 0;
+        } else {
+            Exp += addExp;
+        }
+        if (ReqExp(Level) <= Exp) {
+            int addLevel = 0;
+            while (ReqExp(Level) <= Exp) {
+                Exp -= ReqExp(Level);
+                addLevel++;
+            }
+            addPlayerLevel(addLevel);
+        }
+        if (ExpLog) player.sendMessage("§e経験値§7: §a+" + addExp);
+    }
+
     public void save() {
+        if (Tutorial.TutorialProcess.containsKey(player)) {
+            player.sendMessage(Tutorial.TutorialNonSave);
+            return;
+        }
+        if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
+            player.closeInventory();
+        }
         File playerFile = new File(DataBasePath, "PlayerData/" + player.getUniqueId() + ".yml");
         if (!playerFile.exists()) {
             try {
@@ -290,20 +391,31 @@ public class PlayerData {
         }
         FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
 
-        boolean rollback = false;
-        for (java.util.Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
-            if (Classes.getLevel(classData.getValue()) == data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
-                if (Classes.getExp(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Exp", 0)) {
-                    rollback = true;
+        Set<String> rollback = new HashSet<>();
+        for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
+            if (Classes.getClassLevel(classData.getValue()) < swordofmagic7.Classes.Classes.MaxLevel) {
+                if (Classes.getClassLevel(classData.getValue()) == data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
+                    if (Classes.getClassExp(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Exp", 0)) {
+                        rollback.add("クラス経験値[" + classData.getKey() + "]");
+                    }
+                } else if (Classes.getClassLevel(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
+                    rollback.add("クラスレベル[" + classData.getKey() + "]");
                 }
-            } else if (Classes.getLevel(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
-                rollback = true;
+            }
+        }
+        if (Level < MaxLevel) {
+            if (Level == data.getInt("Level")) {
+                if (Exp < data.getInt("Exp")) {
+                    rollback.add("プレイヤー経験値");
+                }
+            } else if (Level < data.getInt("Level")) {
+                rollback.add("プレイヤーレベル");
             }
         }
 
-        if (rollback) {
+        if (rollback.size() > 0) {
             player.sendMessage("§eロールバック§aを検知したため§bセーブ§aを中断しました");
-            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId());
+            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId() + ", " + rollback);
             return;
         }
 
@@ -327,6 +439,7 @@ public class PlayerData {
         data.set("Setting.ShopAmountReset", Shop.AmountReset);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.PlayMode", PlayMode);
+        data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -337,27 +450,24 @@ public class PlayerData {
 
         data.set("ActiveTeleportGate", ActiveTeleportGate);
 
-        data.set("Life.MineLevel", LifeStatus.MineLevel);
-        data.set("Life.MineExp", LifeStatus.MineExp);
-        data.set("Life.LumberLevel", LifeStatus.LumberLevel);
-        data.set("Life.LumberExp", LifeStatus.LumberExp);
-        data.set("Life.HarvestLevel", LifeStatus.HarvestLevel);
-        data.set("Life.HarvestExp", LifeStatus.HarvestExp);
-        data.set("Life.CookLevel", LifeStatus.CookLevel);
-        data.set("Life.CookExp", LifeStatus.CookExp);
-        data.set("Life.SmithLevel", LifeStatus.SmithLevel);
-        data.set("Life.SmithExp", LifeStatus.SmithExp);
-
-        for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
-            data.set("ClassData." + classData.getKey() + ".Level", Classes.getLevel(classData.getValue()));
-            data.set("ClassData." + classData.getKey() + ".Exp", Classes.getExp(classData.getValue()));
+        for (LifeType type : LifeType.values()) {
+            data.set("Life." + type + "Level", LifeStatus.getLevel(type));
+            data.set("Life." + type + "Exp", LifeStatus.getExp(type));
         }
 
-        for (int i = 0; i <= MaxTier; i++) {
-            if (Classes.classTier[i] != null) {
-                data.set("Class.Tier" + i, Classes.classTier[i].Id);
+        data.set("Level", Level);
+        data.set("Exp", Exp);
+
+        for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
+            data.set("ClassData." + classData.getKey() + ".Level", Classes.getClassLevel(classData.getValue()));
+            data.set("ClassData." + classData.getKey() + ".Exp", Classes.getClassExp(classData.getValue()));
+        }
+
+        for (int i = 0; i <= MaxSlot-1; i++) {
+            if (Classes.classSlot[i] != null) {
+                data.set("Class.Slot" + i, Classes.classSlot[i].Id);
             } else {
-                data.set("Class.Tier" + i, "None");
+                data.set("Class.Slot" + i, "None");
             }
         }
 
@@ -431,6 +541,7 @@ public class PlayerData {
             Shop.AmountReset = data.getBoolean("Setting.ShopAmountReset");
             PvPMode = data.getBoolean("Setting.PvPMode", false);
             PlayMode = data.getBoolean("Setting.PlayMode", true);
+            ViewFormat = data.getInt("Setting.ViewFormat",0);
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));
@@ -441,26 +552,23 @@ public class PlayerData {
 
             ActiveTeleportGate = data.getStringList("ActiveTeleportGate");
 
-            LifeStatus.MineLevel = data.getInt("Life.MineLevel", 1);
-            LifeStatus.MineExp = data.getInt("Life.MineExp", 0);
-            LifeStatus.LumberLevel = data.getInt("Life.LumberLevel", 1);
-            LifeStatus.LumberExp = data.getInt("Life.LumberExp", 0);
-            LifeStatus.HarvestLevel = data.getInt("Life.HarvestLevel", 1);
-            LifeStatus.HarvestExp = data.getInt("Life.HarvestExp", 0);
-            LifeStatus.CookLevel = data.getInt("Life.CookLevel", 1);
-            LifeStatus.CookExp = data.getInt("Life.CookExp", 0);
-            LifeStatus.SmithLevel = data.getInt("Life.SmithLevel", 1);
-            LifeStatus.SmithExp = data.getInt("Life.SmithExp", 0);
-
-            for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
-                Classes.setLevel(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Level"));
-                Classes.setExp(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Exp"));
+            for (LifeType type : LifeType.values()) {
+                LifeStatus.setLevel(type, data.getInt("Life." + type + "Level", 1));
+                LifeStatus.setExp(type, data.getInt("Life." + type + "Exp", 0));
             }
 
-            for (int i = 0; i <= MaxTier; i++) {
-                String id = data.getString("Class.Tier" + i, "None");
+            Level = data.getInt("Level", 1);
+            Exp = data.getInt("Exp", 1);
+
+            for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
+                Classes.setClassLevel(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Level"));
+                Classes.setClassExp(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Exp"));
+            }
+
+            for (int i = 0; i <= MaxSlot-1; i++) {
+                String id = data.getString("Class.Slot" + i, "None");
                 if (!id.equalsIgnoreCase("None"))
-                    Classes.classTier[i] = getClassData(id);
+                    Classes.classSlot[i] = getClassData(id);
             }
 
             Attribute.setPoint(data.getInt("Attribute.Point"));
@@ -506,19 +614,19 @@ public class PlayerData {
             if (PlayMode) viewUpdate();
 
             Status.StatusUpdate();
-            Status.tickUpdate();
+            ViewBar.tickUpdate();
         } else {
             Status.StatusUpdate();
-            Status.tickUpdate();
-            player.teleportAsync(SpawnLocation);
+            ViewBar.tickUpdate();
+            Tutorial.tutorialTrigger(player, 0);
             Status.Health = Status.MaxHealth;
             Status.Mana = Status.MaxMana;
         }
     }
 
     public static String booleanToTextOrder(boolean bool) {
-        if (bool) return "§c§l降順";
-        else return "§b§l昇順";
+        if (bool) return "降順";
+        else return "昇順";
     }
 
     ItemStack UserMenuIcon() {
@@ -538,6 +646,7 @@ public class PlayerData {
             Lore.add(decoLore("§e§lペットケージ容量") + PetInventory.getList().size() + "/" + PetInventory.MaxSlot);
             Lore.add(decoLore("§e§lソート方法/順") + PetInventory.Sort.Display + "/" + booleanToTextOrder(PetInventory.SortReverse));
         }
+        Lore.add("§c§l※BE勢は選択した後インベントリを閉じるとメニューが開きます");
         return new ItemStackData(Material.BOOK, decoText("§e§lユーザーメニュー"), Lore).view();
     }
 
@@ -593,13 +702,21 @@ public class PlayerData {
     public void setRightClickHold() {
         RightClickHold = true;
         if (RightClickHoldTask != null) RightClickHoldTask.cancel();
+        if (CastMode.isRenewed() || CastMode.isHold()) {
+            HotBar.viewBottom();
+        }
         RightClickHoldTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (isRightClickHold()) {
+                setRightClickHold();
+            } else if (CastMode.isRenewed() || CastMode.isHold()) {
+                HotBar.UpdateHotBar();
+            }
             RightClickHold = false;
         }, 6);
     }
 
     public boolean isRightClickHold() {
-        return RightClickHold;
+        return RightClickHold || player.isBlocking();
     }
 
     public void revival() {

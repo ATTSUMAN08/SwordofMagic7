@@ -32,6 +32,7 @@ public class ItemParameter implements Cloneable {
     public ItemPetEgg itemPetEgg = new ItemPetEgg();
     public ItemPotion itemPotion = new ItemPotion();
     public ItemPetFood itemPetFood = new ItemPetFood();
+    public java.io.File File;
 
     Material getIcon() {
         if (Icon == null) Icon = Material.BARRIER;
@@ -96,8 +97,8 @@ public class ItemParameter implements Cloneable {
         }
         item.setItemMeta(meta);
 
-        if (amount > 127) {
-            amount = 127;
+        if (amount > 99) {
+            amount = 99;
         }
 
         item.setAmount(amount);
@@ -114,9 +115,10 @@ public class ItemParameter implements Cloneable {
     public ItemParameter clone() {
         try {
             ItemParameter clone = (ItemParameter) super.clone();
-            clone.itemEquipmentData = itemEquipmentData.clone();
-            clone.itemPotion = itemPotion.clone();
-            clone.itemPetEgg = itemPetEgg.clone();
+            clone.itemEquipmentData = this.itemEquipmentData.clone();
+            clone.itemPotion = this.itemPotion.clone();
+            clone.itemPetEgg = this.itemPetEgg.clone();
+            clone.itemPetFood = this.itemPetFood.clone();
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
             return clone;
         } catch (CloneNotSupportedException e) {

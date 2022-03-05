@@ -15,7 +15,10 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static swordofmagic7.Data.DataBase.NextPageItem;
+import static swordofmagic7.Data.DataBase.PreviousPageItem;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Shop {
@@ -60,11 +63,13 @@ public class Shop {
     }
 
     private ShopData ShopDataCache;
+    private int currentPage = 1;
     public void ShopOpen(ShopData Shop) {
         playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.ItemInventory, false);
         if (AmountReset) BuyAmount = 1;
-        Inventory inv = Shop.view(1, playerData.ViewFormat());
+        currentPage = 1;
+        Inventory inv = Shop.view(currentPage, playerData.ViewFormat());
         inv.setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
         player.openInventory(inv);
         ShopDataCache = Shop.clone();
@@ -80,13 +85,13 @@ public class Shop {
     }
 
     private int BuyAmount = 1;
-    public void ShopClick(InventoryView view, int Slot) {
-        if (ShopDataCache != null && equalInv(view, "§l" + ShopDataCache.Display)) {
+    public void ShopClick(InventoryView view, ItemStack currentItem, int Slot, int index) {
+        if (ShopDataCache != null && equalInv(view, "§l" + ShopDataCache.Display) && playerData.ViewInventory.isItem()) {
             if (Slot < 45) {
-                if (ShopDataCache.Data.containsKey(Slot)) {
+                if (ShopDataCache.Data.containsKey(index)) {
                     boolean buyAble = true;
                     List<String> reqList = new ArrayList<>();
-                    ShopSlot data = ShopDataCache.Data.get(Slot);
+                    ShopSlot data = ShopDataCache.Data.get(index);
                     int Mel = data.Mel * BuyAmount;
                     String buyText = "購入";
                     if (playerData.Mel >= Mel) {
@@ -113,8 +118,8 @@ public class Shop {
                                 playerData.ItemInventory.removeItemParameter(stack.itemParameter, stack.Amount*BuyAmount);
                             }
                         }
-                        playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), BuyAmount);
-                        player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + BuyAmount +"§e]§aを§b" + buyText + "§aしました");
+                        playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), data.Amount*BuyAmount);
+                        player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + data.Amount*BuyAmount +"§e]§aを§b" + buyText + "§aしました");
                         playSound(player, SoundList.LevelUp);
                     } else {
                         player.sendMessage(decoText("必要物リスト"));
@@ -125,18 +130,28 @@ public class Shop {
                     }
                 }
             } else {
-                switch (Slot) {
-                    case 46 -> BuyAmount-=100;
-                    case 47 -> BuyAmount-=10;
-                    case 48 -> BuyAmount--;
-                    case 50 -> BuyAmount++;
-                    case 51 -> BuyAmount+=10;
-                    case 52 -> BuyAmount+=100;
+                if (equalItem(currentItem, NextPageItem)) {
+                    currentPage++;
+                    view.getTopInventory().setContents(ShopDataCache.view(currentPage, playerData.ViewFormat()).getStorageContents());
+                    playSound(player, SoundList.Click);
+                } else if (equalItem(currentItem, PreviousPageItem)) {
+                    currentPage--;
+                    view.getTopInventory().setContents(ShopDataCache.view(currentPage, playerData.ViewFormat()).getStorageContents());
+                    playSound(player, SoundList.Click);
+                } else {
+                    switch (Slot) {
+                        case 46 -> BuyAmount -= 100;
+                        case 47 -> BuyAmount -= 10;
+                        case 48 -> BuyAmount--;
+                        case 50 -> BuyAmount++;
+                        case 51 -> BuyAmount += 10;
+                        case 52 -> BuyAmount += 100;
+                    }
+                    if (BuyAmount < 1) BuyAmount = 1;
+                    if (BuyAmount > 10000) BuyAmount = 10000;
+                    playSound(player, SoundList.Click);
                 }
-                if (BuyAmount < 1) BuyAmount = 1;
-                if (BuyAmount > 10000) BuyAmount = 10000;
-                player.getOpenInventory().getTopInventory().setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
-                playSound(player, SoundList.Click);
+                view.getTopInventory().setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
             }
         }
     }
@@ -157,7 +172,7 @@ public class Shop {
                             player.sendMessage("§e[" + stack.itemParameter.Display + "§ax" + Amount +"§e]§aを§b買戻§aしました §c[-" + Mel + "メル]");
                             playSound(player, SoundList.LevelUp);
                         } else {
-                            player.sendMessage("§eメル§aが足りません §c不足[" + (Mel-playerData.Mel) + "メル]");
+                            player.sendMessage(NonMel +  " §c不足[" + (Mel-playerData.Mel) + "メル]");
                             playSound(player, SoundList.Nope);
                         }
                     }
@@ -185,7 +200,7 @@ public class Shop {
                 player.sendMessage("§e[" + item.Display + "§ax" + Amount +"§e]§aを§c売却§aしました §e[+" + Mel + "メル]");
                 playSound(player, SoundList.LevelUp);
             }
-            player.getOpenInventory().getTopInventory().setContents(SellInventory.viewInventory(SellAmount).getStorageContents());
+            view.getTopInventory().setContents(SellInventory.viewInventory(SellAmount).getStorageContents());
         }
     }
 

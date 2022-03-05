@@ -62,14 +62,14 @@ public class Gathering {
             Material material = null;
             if (playerTool == Material.IRON_PICKAXE && MineDataList.containsKey(key)) {
                 MineData data = MineDataList.get(key);
-                if (data.ReqLevel <= lifeStatus.MineLevel) {
+                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Mine)) {
                     CoolTime = data.CoolTime;
                     if (block.getType().toString().contains(Material.DEEPSLATE.toString())) {
                         material = Material.DEEPSLATE;
                     } else {
                         material = Material.COBBLESTONE;
                     }
-                    lifeStatus.addMineExp(data.Exp);
+                    lifeStatus.addLifeExp(LifeType.Mine, data.Exp);
                     for (MineItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, 1);
@@ -81,10 +81,10 @@ public class Gathering {
                 }
             } else if (playerTool == Material.IRON_AXE && LumberDataList.containsKey(key)) {
                 LumberData data = LumberDataList.get(key);
-                if (data.ReqLevel <= lifeStatus.LumberLevel) {
+                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Lumber)) {
                     CoolTime = data.CoolTime;
                     material = Material.STRIPPED_OAK_WOOD;
-                    lifeStatus.addLumberExp(data.Exp);
+                    lifeStatus.addLifeExp(LifeType.Lumber, data.Exp);
                     for (LumberItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, 1);
@@ -96,10 +96,10 @@ public class Gathering {
                 }
             } else if (playerTool == Material.SHEARS && HarvestDataList.containsKey(key)) {
                 HarvestData data = HarvestDataList.get(key);
-                if (data.ReqLevel <= lifeStatus.HarvestLevel) {
+                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Harvest)) {
                     CoolTime = data.CoolTime;
                     material = Material.VOID_AIR;
-                    lifeStatus.addHarvestExp(data.Exp);
+                    lifeStatus.addLifeExp(LifeType.Harvest, data.Exp);
                     for (HarvestItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, 1);

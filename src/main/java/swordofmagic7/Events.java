@@ -29,6 +29,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.Npc.NpcMessage;
 import swordofmagic7.Pet.PetManager;
@@ -36,9 +38,7 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -74,7 +74,8 @@ public class Events implements Listener {
         if (playerData.Party != null) {
             playerData.Party.Quit(player);
         }
-        playerData.save();
+        playerData.hologram.delete();
+        playerData.saveCloseInventory();
         PlayerList.load();
         if (TagGame.isPlayer(player)) {
             TagGame.leave(player);
@@ -228,7 +229,7 @@ public class Events implements Listener {
                 } else if (shop.equalsIgnoreCase("ルーン職人")) {
                     playerData.RuneShop.RuneMenuView();
                 } else if (shop.equalsIgnoreCase("転職神官")) {
-                    playerData.Classes.ClassSelectView(0);
+                    playerData.Classes.ClassSelectView(true);
                 } else if (shop.equalsIgnoreCase("買取屋")) {
                     playerData.Shop.ShopSellOpen();
                 } else if (shop.equalsIgnoreCase("鍛冶場")) {
@@ -303,6 +304,7 @@ public class Events implements Listener {
                 || event.getCause() == EntityDamageEvent.DamageCause.FIRE
                 || event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR
                 || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK
+                || event.getCause() == EntityDamageEvent.DamageCause.DROWNING
         ) {
             victim.setFireTicks(0);
             event.setCancelled(true);
@@ -323,17 +325,20 @@ public class Events implements Listener {
 
     @EventHandler
     void onDamageEntity(EntityDamageByEntityEvent event) {
+        Entity victim = event.getEntity();
         if (event.getDamager() instanceof Player attacker && attacker.getGameMode() != GameMode.CREATIVE) {
-            SkillProcess skillProcess = playerData(attacker).Skill.SkillProcess;
-            if (skillProcess.isEnemy(event.getEntity())) {
-                List<LivingEntity> victims = new ArrayList<>();
-                victims.add((LivingEntity) event.getEntity());
+            PlayerData attackerData = playerData(attacker);
+            SkillProcess skillProcess = attackerData.Skill.SkillProcess;
+            if (skillProcess.isEnemy(victim)) {
+                Set<LivingEntity> victims = new HashSet<>();
+                victims.add((LivingEntity) victim);
                 skillProcess.normalAttack(victims);
-            }
-            if (event.getEntity() instanceof Player victim) {
-                if (TagGame.isPlayer(attacker) || TagGame.isPlayer(victim)) {
+            } else if (PetManager.isPet(victim)) {
+                attackerData.PetManager.PetSelect((LivingEntity) victim);
+            } else if (event.getEntity() instanceof Player player) {
+                if (TagGame.isPlayer(attacker) || TagGame.isPlayer(player)) {
                     if (!attacker.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-                        TagGame.tagChange(attacker, victim);
+                        TagGame.tagChange(attacker, player);
                     }
                 }
             } else if (PetManager.isPet(event.getEntity())) {
@@ -383,34 +388,9 @@ public class Events implements Listener {
     @EventHandler
     void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        PlayerData playerData = playerData(player);
         if (event.getMessage().contains("${")) {
             event.setCancelled(true);
-        }
-        String message = event.getMessage();
-        ItemStack itemView = null;
-        String itemText = null;
-        if (message.contains("%item%")) {
-            itemText = "%item%";
-            itemView = player.getInventory().getItemInMainHand();
-        } else if (message.contains("%armor%")) {
-            itemText = "%armor%";
-            itemView = player.getInventory().getChestplate();
-        } else if (message.contains("%offhand%")) {
-            itemText = "%offhand%";
-            itemView = player.getInventory().getItemInOffHand();
-        }
-        if (itemView != null) {
-            if (itemView.getType() != Material.AIR && itemView.hasItemMeta()) {
-                ItemMeta meta = itemView.getItemMeta();
-                if (meta != null && meta.hasDisplayName() && meta.hasLore()) {
-                    String Display = unDecoText(meta.getDisplayName());
-                    StringBuilder Lore = new StringBuilder(meta.getDisplayName());
-                    for (String str : meta.getLore()) {
-                        Lore.append("<nl>").append(str);
-                    }
-                    event.setMessage(message.replace(itemText, "§e[" + Display + "]<tag>" + Lore + "<end>"));
-                }
-            }
         }
     }
 
@@ -477,6 +457,11 @@ public class Events implements Listener {
         if (playerData.isDead && playerData.deadTime < 1100) {
             playerData.deadTime = 0;
         }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (playerData.CastMode.isRenewed() || playerData.CastMode.isHold()) {
+                playerData.HotBar.UpdateHotBar();
+            }
+        }, 1);
     }
 
     @EventHandler
@@ -494,11 +479,14 @@ public class Events implements Listener {
     void onFlightToggle(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode() != GameMode.CREATIVE) {
+            PlayerData playerData = playerData(player);
             event.setCancelled(true);
             player.setFlying(false);
-            player.setAllowFlight(false);
-            if (!player.isFlying() && playerData(player).StrafeMode.isDoubleJump()) {
+            if (!player.isFlying() && playerData.StrafeMode.isDoubleJump()) {
                 CharaController.Strafe(player);
+            }
+            if (playerData.Strafe == 0) {
+                player.setAllowFlight(false);
             }
         }
     }

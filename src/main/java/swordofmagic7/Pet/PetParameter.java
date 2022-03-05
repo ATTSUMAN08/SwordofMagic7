@@ -14,11 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectOwnerType;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.MobManager;
@@ -67,7 +71,8 @@ public class PetParameter implements Cloneable {
     public PetAIState AIState = PetAIState.Follow;
     public ItemParameter[] Equipment = new ItemParameter[3];
     public HashMap<StatusParameter, Double> EquipmentStatus = new HashMap<>();
-    public EffectManager effectManager = new EffectManager(entity);
+    public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
+    public EffectManager effectManager = new EffectManager(entity, EffectOwnerType.Pet);
 
     public boolean Summoned = false;
 
@@ -75,6 +80,7 @@ public class PetParameter implements Cloneable {
     private final Random random = new Random();
 
     PetParameter() {
+        effectManager.petParameter = this;
     }
 
     ;
@@ -91,6 +97,7 @@ public class PetParameter implements Cloneable {
         Stamina = MaxStamina;
         Health = MaxHealth;
         Mana = MaxMana;
+        effectManager.petParameter = this;
     }
 
     public void addExp(int add) {
@@ -110,7 +117,7 @@ public class PetParameter implements Cloneable {
     }
 
     int ReqExp() {
-        double reqExp = playerData.Classes.ReqExp(Level, petData.Tier);
+        double reqExp = playerData.Classes.ReqExp(Level);
         reqExp *= GrowthRate;
         return (int) Math.round(reqExp);
     }
@@ -126,9 +133,23 @@ public class PetParameter implements Cloneable {
         return EquipmentStatus.get(param);
     }
 
+    double MultiplyStatus(StatusParameter param) {
+        if (!MultiplyStatus.containsKey(param)) {
+            MultiplyStatus.put(param, 0d);
+        }
+        return MultiplyStatus.get(param);
+    }
+
+    void MultiplyStatusAdd(StatusParameter param, double add) {
+        if (MultiplyStatus.containsKey(param)) {
+            MultiplyStatus.put(param, MultiplyStatus.getOrDefault(param, 0d) + add);
+        }
+    }
+
     public void updateStatus() {
         for (StatusParameter param : StatusParameter.values()) {
             EquipmentStatus.put(param, 0d);
+            MultiplyStatus.put(param, 1d);
         }
         for (ItemParameter equipment : Equipment) {
             if (equipment != null) {
@@ -142,18 +163,22 @@ public class PetParameter implements Cloneable {
         if (playerData.Classes.getPassiveSkillList().contains(basicTamer)) {
             Multiply *= 1+basicTamer.Parameter.get(1).Value/100;
         }
+        if (effectManager.hasEffect(EffectType.PetBoost)) {
+            MultiplyStatusAdd(StatusParameter.ATK, 0.1d);
+            MultiplyStatusAdd(StatusParameter.DEF, 0.1d);
+        }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
-        MaxHealth = petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth);
-        HealthRegen = petData.HealthRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.HealthRegen);
-        MaxMana = petData.MaxMana * Multiply + EquipmentStatus(StatusParameter.MaxMana);
-        ManaRegen = petData.ManaRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.ManaRegen);
-        ATK = petData.ATK * Multiply + EquipmentStatus(StatusParameter.ATK);
-        DEF = petData.DEF * Multiply + EquipmentStatus(StatusParameter.DEF);
-        HLP = petData.HLP * Multiply + EquipmentStatus(StatusParameter.HLP);
-        ACC = petData.ACC * Multiply + EquipmentStatus(StatusParameter.ACC);
-        EVA = petData.EVA * Multiply + EquipmentStatus(StatusParameter.EVA);
-        CriticalRate = petData.CriticalRate * Multiply + EquipmentStatus(StatusParameter.CriticalRate);
-        CriticalResist = petData.CriticalResist * Multiply + EquipmentStatus(StatusParameter.CriticalResist);
+        MaxHealth = (petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);
+        HealthRegen = (petData.HealthRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.HealthRegen)) * MultiplyStatus(StatusParameter.HealthRegen);
+        MaxMana = (petData.MaxMana * Multiply + EquipmentStatus(StatusParameter.MaxMana)) * MultiplyStatus(StatusParameter.MaxMana);
+        ManaRegen = (petData.ManaRegen * (Multiply / 10 + 1) + EquipmentStatus(StatusParameter.ManaRegen)) * MultiplyStatus(StatusParameter.ManaRegen);
+        ATK = (petData.ATK * Multiply + EquipmentStatus(StatusParameter.ATK)) * MultiplyStatus(StatusParameter.ATK);
+        DEF = (petData.DEF * Multiply + EquipmentStatus(StatusParameter.DEF)) * MultiplyStatus(StatusParameter.DEF);
+        HLP = (petData.HLP * Multiply + EquipmentStatus(StatusParameter.HLP)) * MultiplyStatus(StatusParameter.HLP);
+        ACC = (petData.ACC * Multiply + EquipmentStatus(StatusParameter.ACC)) * MultiplyStatus(StatusParameter.ACC);
+        EVA = (petData.EVA * Multiply + EquipmentStatus(StatusParameter.EVA)) * MultiplyStatus(StatusParameter.EVA);
+        CriticalRate = (petData.CriticalRate * Multiply + EquipmentStatus(StatusParameter.CriticalRate)) * MultiplyStatus(StatusParameter.CriticalRate);
+        CriticalResist = (petData.CriticalResist * Multiply + EquipmentStatus(StatusParameter.CriticalResist)) * MultiplyStatus(StatusParameter.CriticalResist);
 
         if (entity != null) {
             String DisplayName = "§e§l《" + petData.Display + "Lv" + Level + "》";
@@ -183,6 +208,17 @@ public class PetParameter implements Cloneable {
 
     public void spawn(Location location) {
         target = null;
+        List<String> cancel = new ArrayList<>();
+        if (playerData.Level < MaxLevel - 30) {
+            cancel.add("レベルが足りないため召喚出来ません");
+        }
+        if (cancel.size() > 0) {
+            for (String str : cancel) {
+                player.sendMessage(str);
+            }
+            playSound(player, SoundList.Nope);
+            return;
+        }
         if (Stamina / MaxStamina < 0.05) {
             player.sendMessage("§e[スタミナ]§aが§e[5%]§a未満のため召喚できません");
             playSound(player, SoundList.Nope);
@@ -206,6 +242,8 @@ public class PetParameter implements Cloneable {
         Summoned = true;
         playerData.PetSummon.add(this);
         PetManager.PetSummonedList.put(entity.getUniqueId(), this);
+        effectManager.entity = entity;
+        effectManager.petParameter = this;
         player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました");
         playSound(player, SoundList.Click);
         runAI();
@@ -241,6 +279,12 @@ public class PetParameter implements Cloneable {
         Lore.add(decoLore(StatusParameter.EVA.Display) + String.format(format, EVA));
         Lore.add(decoLore(StatusParameter.CriticalRate.Display) + String.format(format, CriticalRate));
         Lore.add(decoLore(StatusParameter.CriticalResist.Display) + String.format(format, CriticalResist));
+        if (effectManager.Effect.size() > 0) {
+            Lore.add(decoText("バフ・デバフ"));
+            for (Map.Entry<EffectType, EffectData> effect : effectManager.Effect.entrySet()) {
+                Lore.add(decoLore(effect.getKey().Display) + String.format(playerData.ViewFormat(), effect.getValue().time/20f) + "秒");
+            }
+        }
         for (ItemFlag flag : ItemFlag.values()) {
             meta.addItemFlags(flag);
         }
@@ -340,7 +384,7 @@ public class PetParameter implements Cloneable {
     public void dead() {
         stopAI();
         Bukkit.getScheduler().runTask(System.plugin, () -> {
-            entity.remove();
+            if (entity != null) entity.remove();
             entity = null;
         });
         Summoned = false;

@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import swordofmagic7.RayTrace.RayTrace;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public final class ParticleManager {
 
@@ -28,8 +26,8 @@ public final class ParticleManager {
         return Math.floor(angle * 360 / (2 * Math.PI));
     }
 
-    public static List<LivingEntity> FanShapedCollider(Location location, List<LivingEntity> targetList, double angle) {
-        List<LivingEntity> Return = new ArrayList<>();
+    public static Set<LivingEntity> FanShapedCollider(Location location, Set<LivingEntity> targetList, double angle) {
+        Set<LivingEntity> Return = new HashSet<>();
         for (LivingEntity target : targetList) {
             Location location2 = target.getLocation();
             angle /= 2;
@@ -48,13 +46,13 @@ public final class ParticleManager {
         return Return;
     }
 
-    public static List<LivingEntity> RectangleCollider(Location location, List<LivingEntity> targetList, double length, double width) {
+    public static Set<LivingEntity> RectangleCollider(Location location, Set<LivingEntity> targetList, double length, double width) {
         final double posX0 = -width/2;
         final double posY0 = length;
         final double posX1 = width/2;
         final double posY1 = 0;
         double angle = angle(location.getDirection());
-        List<LivingEntity> Return = new ArrayList<>();
+        Set<LivingEntity> Return = new HashSet<>();
         for (LivingEntity target : targetList) {
             double distance = location.distance(target.getLocation());
             double posAngle = angle(location.toVector(), target.getLocation().toVector()) - angle;

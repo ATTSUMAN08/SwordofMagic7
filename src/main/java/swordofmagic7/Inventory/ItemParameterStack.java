@@ -1,6 +1,7 @@
 package swordofmagic7.Inventory;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemParameter;
@@ -75,4 +76,9 @@ public class ItemParameterStack {
                 }
                 return parameterStack;
         }
+
+        public ItemStack viewItem(String format) {
+                return itemParameter.viewItem(Amount, format);
+        }
+
 }

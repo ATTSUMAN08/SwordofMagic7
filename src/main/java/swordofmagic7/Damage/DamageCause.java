@@ -1,5 +1,7 @@
 package swordofmagic7.Damage;
 
+import swordofmagic7.Status.StatusParameter;
+
 public enum DamageCause {
     ATK,
     MAT,

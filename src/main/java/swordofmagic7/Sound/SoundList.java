@@ -22,6 +22,8 @@ public enum SoundList {
     Accept(Sound.BLOCK_NOTE_BLOCK_HARP, 1, SoundCategory.PLAYERS),
     Howl(Sound.ENTITY_HOGLIN_ANGRY, 0, SoundCategory.PLAYERS),
     Explosion(Sound.ENTITY_GENERIC_EXPLODE, 1, SoundCategory.PLAYERS),
+    Failed(Sound.ENTITY_IRON_GOLEM_DEATH, 1, SoundCategory.PLAYERS),
+    DeBuff(Sound.AMBIENT_UNDERWATER_EXIT, 1, SoundCategory.PLAYERS),
     ;
 
     Object data;

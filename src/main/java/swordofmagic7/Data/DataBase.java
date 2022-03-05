@@ -15,6 +15,7 @@ import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
+import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
@@ -22,6 +23,7 @@ import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
 import swordofmagic7.Life.Harvest.HarvestData;
 import swordofmagic7.Life.Harvest.HarvestItemData;
+import swordofmagic7.Life.LifeType;
 import swordofmagic7.Life.Lumber.LumberData;
 import swordofmagic7.Life.Lumber.LumberItemData;
 import swordofmagic7.Life.Mine.MineData;
@@ -41,6 +43,7 @@ import swordofmagic7.Skill.SkillType;
 import swordofmagic7.Status.StatusParameter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,16 +56,27 @@ public final class DataBase {
     public static final String format = "%.3f";
     public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 1200.5, 100, 0.5, 0, 0);
     public static final ItemStack AirItem = new ItemStack(Material.AIR);
-    public static final ItemStack FlameItem = new ItemStackData(Material.GRAY_STAINED_GLASS_PANE, "§7§l空スロット").view();
-    public static final ItemStack ShopFlame = new ItemStackData(Material.BROWN_STAINED_GLASS_PANE, " ").view();
-    public static final ItemStack UpScrollItem = UpScrollItem();
-    public static final ItemStack DownScrollItem = DownScrollItem();
+    public static ItemStack FlameItem(int i) {
+        return new ItemStackData(Material.IRON_BARS, "§7§l空スロット[" + i + "]", 1).view();
+    }
+    public static final int[] AnvilUISlot = new int[3];
+    public static final ItemStack ItemFlame = new ItemStackData(Material.IRON_BARS, " ", 1).view();
+    public static final ItemStack ShopFlame = new ItemStackData(Material.IRON_BARS, " ", 2).view();
+    public static final ItemStack RuneEquipFlame = new ItemStackData(Material.IRON_BARS, " ", 2).view();
+    public static final ItemStack AnvilUIFlame = new ItemStackData(Material.IRON_BARS, " ", 3).view();
+    public static final ItemStack NoneFlame = new ItemStackData(Material.IRON_BARS, " ", 4).view();
+    public static final ItemStack TradeFlame = new ItemStackData(Material.IRON_BARS, " ").view();
+    public static final ItemStack UpScrollItem = new ItemStackData(Material.ITEM_FRAME, "§e§l上にスクロール").view();
+    public static final ItemStack DownScrollItem = new ItemStackData(Material.ITEM_FRAME, "§e§l下にスクロール").view();
+    public static final ItemStack NextPageItem = new ItemStackData(Material.ITEM_FRAME, "§e§l次のページ").view();
+    public static final ItemStack PreviousPageItem = new ItemStackData(Material.ITEM_FRAME, "§e§l前のページ").view();
     public static final String itemInformation = decoText("§3§lアイテム情報");
     public static final String itemParameter = decoText("§3§lパラメーター");
     public static final String itemRune = decoText("§3§lルーン");
     public static final HashMap<String, ItemParameter> ItemList = new HashMap<>();
     public static final HashMap<String, RuneParameter> RuneList = new HashMap<>();
     public static final HashMap<String, ClassData> ClassList = new HashMap<>();
+    public static final HashMap<String, ClassData> ClassListDisplay = new HashMap<>();
     public static final HashMap<String, SkillData> SkillDataList = new HashMap<>();
     public static final HashMap<String, SkillData> SkillDataDisplayList = new HashMap<>();
     public static final HashMap<String, MobData> MobList = new HashMap<>();
@@ -81,14 +95,24 @@ public final class DataBase {
     public static final HashMap<String, AnglerData> AnglerDataList = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(Player player) {
+        return ItemStackPlayerHead(player, null, null);
+    }
+
+    public static ItemStack ItemStackPlayerHead(Player player, String Display) {
+        return ItemStackPlayerHead(player, Display, null);
+    }
+
+    public static ItemStack ItemStackPlayerHead(Player player, String Display, List<String> Lore) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwningPlayer(player);
+        if (Display != null) meta.setDisplayName(Display);
+        if (Lore != null) meta.setLore(Lore);
         item.setItemMeta(meta);
         return item;
     }
 
-    static ItemStack UpScrollItem() {
+    private static ItemStack UpScrollItem() {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner("MHF_ArrowUp");
@@ -97,7 +121,7 @@ public final class DataBase {
         return item;
     }
 
-    static ItemStack DownScrollItem() {
+    private static ItemStack DownScrollItem() {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner("MHF_ArrowDown");
@@ -106,7 +130,7 @@ public final class DataBase {
         return item;
     }
 
-    private static List<File> dumpFile(File file) {
+    public static List<File> dumpFile(File file) {
         List<File> list = new ArrayList<>();
         File[] files = file.listFiles();
         for (File tmpFile : files) {
@@ -120,6 +144,10 @@ public final class DataBase {
     }
 
     public static void DataLoad() {
+        LifeType.Initialize();
+        AnvilUISlot[0] = 1;
+        AnvilUISlot[1] = 4;
+        AnvilUISlot[2] = 7;
         File npcDirectories = new File(DataBasePath, "Npc");
         List<File> npcFiles = dumpFile(npcDirectories);
         for (File file : npcFiles) {
@@ -136,6 +164,7 @@ public final class DataBase {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             ItemParameter itemParameter = new ItemParameter();
+            itemParameter.File = file;
             itemParameter.Id = fileName;
             itemParameter.Display = data.getString("Display");
             itemParameter.Lore = data.getStringList("Lore");
@@ -168,17 +197,57 @@ public final class DataBase {
                 itemParameter.itemEquipmentData.Durable = data.getInt("Durable");
                 itemParameter.itemEquipmentData.MaxDurable = itemParameter.itemEquipmentData.Durable;
                 itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
+                double statusMultiply = data.getDouble("StatusMultiply", 1);
                 for (StatusParameter param : StatusParameter.values()) {
                     if (data.isSet(param.toString())) {
-                        itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()));
+                        itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()) * statusMultiply);
                     }
                 }
             }
             ItemList.put(itemParameter.Id, itemParameter);
         }
+        //ノービス均一化
+        if (false) for (File file : itemFiles) {
+            String fileName = file.getName().replace(".yml", "");
+            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+            ItemParameter itemParameter = getItemParameter(fileName);
+            if (itemParameter.Category.isEquipment()) {
+                ItemEquipmentData itemEquipmentData = itemParameter.itemEquipmentData;
+                ItemParameter baseItem = null;
+                EquipmentCategory category = itemEquipmentData.EquipmentCategory;
+
+                if (category == EquipmentCategory.Blade
+                    || category == EquipmentCategory.Rod
+                    || category == EquipmentCategory.ActGun) {
+                    baseItem = getItemParameter("ノービスブレード");
+                } else if (category == EquipmentCategory.Mace) {
+                    baseItem = getItemParameter("ノービスメイス");
+                } else if (category == EquipmentCategory.Armor) {
+                    baseItem = getItemParameter("ノービスアーマー");
+                } else if (category == EquipmentCategory.Shield) {
+                    baseItem = getItemParameter("ノービスシールド");
+                }
+                if (baseItem != null) {
+                    for (StatusParameter param : StatusParameter.values()) {
+                        double value = Math.round(baseItem.itemEquipmentData.Parameter.get(param));
+                        if (value > 0) {
+                            data.set(param.toString(), (int) Math.round(baseItem.itemEquipmentData.Parameter.get(param)));
+                        } else {
+                            data.set(param.toString(), null);
+                        }
+                    }
+                }
+                data.set("StatusMultiply", 1);
+                try {
+                    data.save(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         File runeDirectories = new File(DataBasePath, "RuneData/");
-        File[] runeFile = runeDirectories.listFiles();
+        List<File> runeFile = dumpFile(runeDirectories);
         for (File file : runeFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -232,7 +301,7 @@ public final class DataBase {
         }
 
         File mapDirectories = new File(DataBasePath, "MapData/");
-        File[] mapFile = mapDirectories.listFiles();
+        List<File> mapFile = dumpFile(mapDirectories);
         for (File file : mapFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -264,7 +333,7 @@ public final class DataBase {
         }
 
         File lifeMineDirectories = new File(DataBasePath, "Life/Mine");
-        File[] lifeMineFile = lifeMineDirectories.listFiles();
+        List<File> lifeMineFile = dumpFile(lifeMineDirectories);
         for (File file : lifeMineFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -283,7 +352,7 @@ public final class DataBase {
         }
 
         File lifeLumberDirectories = new File(DataBasePath, "Life/Lumber");
-        File[] lifeLumberFile = lifeLumberDirectories.listFiles();
+        List<File> lifeLumberFile = dumpFile(lifeLumberDirectories);
         for (File file : lifeLumberFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -302,7 +371,7 @@ public final class DataBase {
         }
 
         File lifeHarvestDirectories = new File(DataBasePath, "Life/Harvest");
-        File[] lifeHarvestFile = lifeHarvestDirectories.listFiles();
+        List<File> lifeHarvestFile = dumpFile(lifeHarvestDirectories);
         for (File file : lifeHarvestFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -321,7 +390,7 @@ public final class DataBase {
         }
 
         File warpDirectories = new File(DataBasePath, "WarpGateData/");
-        File[] warpFile = warpDirectories.listFiles();
+        List<File> warpFile = dumpFile(warpDirectories);
         for (File file : warpFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -357,7 +426,7 @@ public final class DataBase {
         }
 
         File teleportDirectories = new File(DataBasePath, "TeleportGateData/");
-        File[] teleportFile = teleportDirectories.listFiles();
+        List<File> teleportFile = dumpFile(teleportDirectories);
         for (File file : teleportFile) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             String fileName = file.getName().replace(".yml", "");
@@ -442,7 +511,6 @@ public final class DataBase {
             classData.Display = data.getString("Display");
             classData.Lore = data.getStringList("Lore");
             classData.Nick = data.getString("Nick");
-            classData.Tier = data.getInt("Tier");
             List<SkillData> Skills = new ArrayList<>();
             for (String str : data.getStringList("SkillList")) {
                 if (SkillDataList.containsKey(str)) {
@@ -451,6 +519,7 @@ public final class DataBase {
             }
             classData.SkillList = Skills;
             ClassList.put(fileName, classData);
+            ClassListDisplay.put(classData.Display, classData);
         }
         for (File file : classFile) {
             String fileName = file.getName().replace(".yml", "");
@@ -512,6 +581,8 @@ public final class DataBase {
                                 mobSkillData.Health = Double.parseDouble(skillData.replace("Health:", ""));
                             } else if (skillData.contains("Available:")) {
                                 mobSkillData.Available = Integer.parseInt(skillData.replace("Available:", ""));
+                            } else if (skillData.contains("Interrupt:")) {
+                                mobSkillData.Interrupt = Boolean.parseBoolean((skillData.replace("Interrupt:", "")));
                             }
                         }
                         SkillList.add(mobSkillData);
@@ -610,7 +681,7 @@ public final class DataBase {
         }
 
         File recipeDirectories = new File(DataBasePath, "Recipe/");
-        File[] recipeFile = recipeDirectories.listFiles();
+        List<File> recipeFile = dumpFile(recipeDirectories);
         for (File file : recipeFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -630,12 +701,13 @@ public final class DataBase {
         }
 
         File shopDirectories = new File(DataBasePath, "ShopData/");
-        File[] shopFile = shopDirectories.listFiles();
+        List<File> shopFile = dumpFile(shopDirectories);
         for (File file : shopFile) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             ShopData shopData = new ShopData();
             shopData.Display = fileName;
+            shopData.Page = data.getInt("Page", 1);
             int slot = 0;
             for (String str : data.getStringList("Data")) {
                 ShopSlot shopSlot = new ShopSlot();
@@ -644,6 +716,8 @@ public final class DataBase {
                 for (String str2 : split) {
                     if (str2.contains("Mel:")) {
                         shopSlot.Mel = Integer.parseInt(str2.replace("Mel:", ""));
+                    } else if (str2.contains("Amount:")) {
+                        shopSlot.Amount = Integer.parseInt(str2.replace("Amount:", ""));
                     } else if (str2.contains("Slot:")) {
                         slot = Integer.parseInt(str2.replace("Slot:", ""));
                     } else if (str2.contains("Recipe:")) {
@@ -715,9 +789,11 @@ public final class DataBase {
     public static ClassData getClassData(String str) {
         if (ClassList.containsKey(str)) {
             return ClassList.get(str);
+        } else if (ClassListDisplay.containsKey(str)) {
+            return ClassListDisplay.get(str);
         } else {
             Log("§cNon-ClassData: " + str, true);
-            return new ClassData();
+            return null;
         }
     }
 

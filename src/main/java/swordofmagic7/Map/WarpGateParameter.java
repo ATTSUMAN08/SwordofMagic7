@@ -31,6 +31,8 @@ public class WarpGateParameter {
         if (Trigger != null) {
             if (Trigger.equals("AusMineB1") && AusMine.AusMineB1()) return;
             else if (Trigger.equals("AusMineB2") && AusMine.AusMineB2()) return;
+            else if (Trigger.equals("AusMineB3") && AusMine.AusMineB3()) return;
+            else if (Trigger.equals("AusMineB4") && AusMine.AusMineB4()) return;
         }
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).Location;

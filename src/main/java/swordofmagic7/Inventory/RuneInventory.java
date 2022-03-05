@@ -71,7 +71,7 @@ public class RuneInventory extends BasicInventory {
     public void RuneInventorySortReverse() {
         SortReverse = !SortReverse;
         String msg = "§e[ルーンインベントリ]§aの§e[ソート順]§aを";
-        if (SortReverse) msg += "§b[昇順]";
+        if (!SortReverse) msg += "§b[昇順]";
         else msg += "§c[降順]";
         msg += "§aにしました";
         player.sendMessage(msg);
@@ -83,7 +83,7 @@ public class RuneInventory extends BasicInventory {
         playerData.ViewInventory = ViewInventoryType.RuneInventory;
         int index = ScrollTick*8;
         int slot = 9;
-        switch (Sort) {
+        if (List.size() > 0) switch (Sort) {
             case Name -> List.sort(new RuneSortName());
             case Level -> List.sort(new RuneSortLevel());
             case Quality -> List.sort(new RuneSortQuality());

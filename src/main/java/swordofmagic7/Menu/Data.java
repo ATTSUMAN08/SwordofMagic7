@@ -36,6 +36,13 @@ public record Data() {
     static final ItemStack SettingMenu_CastModeIcon = new ItemStackData(Material.END_CRYSTAL, decoText("キャストモード"), "§a§lスキルの発動方法を切り替えます").view();
     static final ItemStack SettingMenu_PvPModeIcon = new ItemStackData(Material.IRON_SWORD, decoText("PvPモード"), "§a§lPvPモードを切り替えます").view();
     static final ItemStack SettingMenu_ShopAmountResetIcon = new ItemStackData(Material.GOLD_NUGGET, decoText("ショップ購入数初期化"), "§a§l[ショップ/買取屋]を開くたびに[購入数/売却数]を\n§a§lリセットするか切り替えます").view();
+    static final ItemStack SettingMenu_ViewFormat = new ItemStackData(Material.COMMAND_BLOCK, decoText("表示桁数"), "§a§lステータスなどの数値の表示桁数を変更します").view();
+    static final ItemStack SettingMenu_ItemInventorySort = new ItemStackData(Material.CHEST, decoText("アイテムインベントリ [ソート方法]"), "§a§lアイテムインベントリのソート方法を変更します").view();
+    static final ItemStack SettingMenu_RuneInventorySort = new ItemStackData(Material.ENDER_CHEST, decoText("ルーンインベントリ [ソート方法]"), "§a§lルーンインベントリのソート方法を変更します").view();
+    static final ItemStack SettingMenu_PetInventorySort = new ItemStackData(Material.NOTE_BLOCK, decoText("ペットケージ [ソート方法]"), "§a§lペットケージのソート方法を変更します").view();
+    static final ItemStack SettingMenu_ItemInventorySortReverse = new ItemStackData(Material.CHEST, decoText("アイテムインベントリ [ソート順]"), "§a§lアイテムインベントリのソート順を変更します").view();
+    static final ItemStack SettingMenu_RuneInventorySortReverse = new ItemStackData(Material.ENDER_CHEST, decoText("ルーンインベントリ [ソート順]"), "§a§lルーンインベントリのソート順を変更します").view();
+    static final ItemStack SettingMenu_PetInventorySortReverse = new ItemStackData(Material.NOTE_BLOCK, decoText("ペットケージ [ソート順]"), "§a§lペットケージのソート順を変更します").view();
 
     public static final String UpgradeDisplay = "§l装備強化";
 
@@ -43,4 +50,6 @@ public record Data() {
     static final ItemStack SmithMenu_SmeltingIcon = new ItemStackData(Material.FURNACE, decoText("製錬炉"), "§a§l製錬炉メニューを開きます").view();
     static final ItemStack SmithMenu_CreateEquipmentIcon = new ItemStackData(Material.CRAFTING_TABLE, decoText("装備制作"), "§a§l装備制作メニューを開きます").view();
     static final ItemStack SmithMenu_UpgradeEquipmentIcon = new ItemStackData(Material.ANVIL, decoText("装備強化"), "§a§l装備強化メニューを開きます\n§a§l強化石を消費して装備の強化値を上げます\n§a§l強化石は必要量の50%~100%個消費されます").view();
+
+    public static String NonMel = "§eメル§aが足りません";
 }

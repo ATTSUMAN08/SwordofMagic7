@@ -3,8 +3,10 @@ package swordofmagic7.HotBar;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
+import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Tutorial;
 
 import java.util.UUID;
 
@@ -28,37 +30,51 @@ public class HotBar {
     }
 
     public void use(int index) {
-        switch (HotBarData[index].category) {
-            case Skill -> {
-                if (playerData.Skill.isCastReady()) {
-                    playerData.Skill.CastSkill(getSkillData(HotBarData[index].Icon));
+        if (playerData.Skill.isCastReady()) {
+            switch (HotBarData[index].category) {
+                case Skill -> {
+                    if (playerData.Skill.isCastReady()) {
+                        playerData.Skill.CastSkill(getSkillData(HotBarData[index].Icon));
+                    }
                 }
-            }
-            case Pet -> {
-                if (playerData.PetInventory.getHashMap().containsKey(UUID.fromString(HotBarData[index].Icon))) {
-                    playerData.PetInventory.getHashMap().get(UUID.fromString(HotBarData[index].Icon)).spawn();
-                } else {
-                    player.sendMessage("§e[ペットケージ]§aに居ません");
-                    playSound(player, SoundList.Nope);
+                case Pet -> {
+                    if (playerData.PetInventory.getHashMap().containsKey(UUID.fromString(HotBarData[index].Icon))) {
+                        playerData.PetInventory.getHashMap().get(UUID.fromString(HotBarData[index].Icon)).spawn();
+                    } else {
+                        player.sendMessage("§e[ペットケージ]§aに居ません");
+                        playSound(player, SoundList.Nope);
+                    }
                 }
-            }
-            case Item -> {
-                ItemParameter item = getItemParameter(HotBarData[index].Icon);
-                if (playerData.ItemInventory.hasItemParameter(item, 1)) {
-                    item.itemPotion.usePotion(player, item);
-                } else {
-                    player.sendMessage("§e[アイテム]§aがありません");
-                    playSound(player, SoundList.Nope);
+                case Item -> {
+                    ItemParameter item = playerData.ItemInventory.getItemParameter(HotBarData[index].Icon);
+                    if (item != null) {
+                        if (item.Category.isPotion()) {
+                            item.itemPotion.usePotion(player, item);
+                        } else if (item.Category.isEquipment()) {
+                            playerData.Equipment.Equip(item.itemEquipmentData.EquipmentSlot, item);
+                            playerData.viewUpdate();
+                        } else if (item.Category.isTool()) {
+                            playerData.Equipment.Equip(EquipmentSlot.MainHand, item);
+                            playerData.viewUpdate();
+                        }
+                    } else {
+                        player.sendMessage("§e[アイテム]§aがありません");
+                        playSound(player, SoundList.Nope);
+                    }
                 }
+                default -> player.sendMessage("§e[ホットバー" + (index + 1) + "]§aは§eセット§aされていません");
             }
-            default -> player.sendMessage("§e[ホットバー" + (index+1) + "]§aは§eセット§aされていません");
+            UpdateHotBar();
+        } else {
+            player.sendMessage("§e[硬直]§a中は使用できません");
         }
-        UpdateHotBar();
     }
 
     public void UpdateHotBar() {
-        if (playerData.ViewInventory.isHotBar()) viewTop();
-        viewBottom();
+        if (playerData.PlayMode) {
+            if (playerData.ViewInventory.isHotBar()) viewTop();
+            viewBottom();
+        }
     }
 
     public void setHotBar(HotBarData[] HotBarData) {
@@ -105,9 +121,17 @@ public class HotBar {
     }
 
     public void viewBottom() {
+        int offset = 0;
+        if (playerData.CastMode.isRenewed()) {
+            if (player.isSneaking()) offset += 8;
+            if (playerData.isRightClickHold()) offset += 16;
+        } else if (playerData.CastMode.isHold()) {
+            if (player.isSneaking()) offset += 8;
+        }
         for (int i = 0; i < 8; i++) {
-            if (HotBarData[i] == null) HotBarData[i] = new HotBarData();
-            player.getInventory().setItem(i, HotBarData[i].view(playerData, SelectSlot == i));
+            int slot = i + offset;
+            if (HotBarData[slot] == null) HotBarData[slot] = new HotBarData();
+            player.getInventory().setItem(i, HotBarData[slot].view(playerData, slot+1, SelectSlot == slot));
         }
     }
 
@@ -115,7 +139,7 @@ public class HotBar {
         playerData.ViewInventory = ViewInventoryType.HotBar;
         int slot = 9;
         for (int i = 8; i < 32; i++) {
-            player.getInventory().setItem(slot, HotBarData[i].view(playerData, SelectSlot == i));
+            player.getInventory().setItem(slot, HotBarData[i].view(playerData, i+1, SelectSlot == i));
             slot++;
             if (slot == 17 || slot == 26 || slot == 35) slot++;
         }

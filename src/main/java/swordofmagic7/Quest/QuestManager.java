@@ -87,14 +87,16 @@ public class QuestManager {
 
     public void clearQuest(QuestData questData) {
         player.sendMessage(decoText("クエスト報酬[" + questData.Display + "]"));
-        player.sendMessage("§7・§e経験値 §a+" + questData.RewardExp);
+        player.sendMessage("§7・§eプレイヤー経験値 §a+" + questData.RewardExp);
+        player.sendMessage("§7・§eクラス経験値 §a+" + questData.RewardClassExp);
         for (ItemParameterStack stack : questData.RewardItemStack) {
             playerData.ItemInventory.addItemParameter(stack);
             player.sendMessage("§7・" + stack.itemParameter.Display + "§ax" + stack.Amount);
         }
-        for (ClassData classData : playerData.Classes.classTier) {
+        playerData.addPlayerExp(questData.RewardExp);
+        for (ClassData classData : playerData.Classes.classSlot) {
             if (classData != null) {
-                playerData.Classes.addExp(classData, questData.RewardExp);
+                playerData.Classes.addClassExp(classData, questData.RewardClassExp);
             }
         }
     }
