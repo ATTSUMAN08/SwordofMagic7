@@ -2,11 +2,12 @@ package swordofmagic7.Party;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Function;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Party.PartyManager.PartyInvites;
 import static swordofmagic7.Party.PartyManager.PartyList;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
 
 public class PartyData {
     public static final int MaxPlayer = 5;
@@ -35,8 +35,7 @@ public class PartyData {
         Members.add(player);
         this.Display = Display;
         setLore(Lore);
-        player.sendMessage("§e[" + Display + "]§aを作成しました");
-        playSound(player, SoundList.Click);
+        Function.sendMessage(player, "§e[" + Display + "]§aを作成しました", SoundList.Click);
     }
 
     public void setLore(String lore) {
@@ -54,12 +53,10 @@ public class PartyData {
                 playerData.Party = this;
                 PartyInvites.remove(player);
             } else {
-                player.sendMessage(MaxPlayerError);
-                playSound(player, SoundList.Nope);
+                Function.sendMessage(player, MaxPlayerError, SoundList.Nope);
             }
         } else {
-            player.sendMessage("§e[" + playerData.Party.Display + "]§aに参加しています");
-            playSound(player, SoundList.Nope);
+            Function.sendMessage(player, "§e[" + playerData.Party.Display + "]§aに参加しています", SoundList.Nope);
         }
     }
 
@@ -71,7 +68,7 @@ public class PartyData {
             playerData.Party = null;
             if (Members.size() == 0) {
                 PartyList.remove(Display);
-                player.sendMessage("§e[" + Display + "]§aを§c解散§aしました");
+                Function.sendMessage(player, "§e[" + Display + "]§aを§c解散§aしました", SoundList.Tick);
             } else if (Leader == player) {
                 Promote(Members.get(0));
             }
@@ -90,27 +87,24 @@ public class PartyData {
                 player.spigot().sendMessage(inviteMessage);
                 playSound(player, SoundList.Tick);
                 PartyInvites.put(player, this);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                MultiThread.TaskRunSynchronizedLater(() -> {
                     if (PartyInvites.containsKey(player)) {
                         Message(playerData.getNick() + "§aさんへの§e招待§aが§cタイムアウト§aしました");
-                        player.sendMessage("§e[" + Display + "]§aからの§e招待§aが§cタイムアウト§aしました");
+                        Function.sendMessage(player, "§e[" + Display + "]§aからの§e招待§aが§cタイムアウト§aしました", SoundList.Tick);
                         PartyInvites.remove(player);
                     }
                 }, 600);
             } else {
-                Leader.sendMessage(MaxPlayerError);
-                playSound(Leader, SoundList.Nope);
+                Function.sendMessage(Leader, MaxPlayerError, SoundList.Nope);
             }
         } else {
-            Leader.sendMessage(playerData.getNick() + "§aは§e[" + PartyInvites.get(player).Display + "]§aからの§e招待§aに返答中です");
-            playSound(Leader, SoundList.Nope);
+            Function.sendMessage(Leader, playerData.getNick() + "§aは§e[" + PartyInvites.get(player).Display + "]§aからの§e招待§aに返答中です", SoundList.Nope);
         }
     }
 
     public void Message(String msg) {
         for (Player player : Members) {
-            player.sendMessage(msg);
-            playSound(player, SoundList.Tick);
+            Function.sendMessage(player, msg, SoundList.Tick);
         }
     }
 

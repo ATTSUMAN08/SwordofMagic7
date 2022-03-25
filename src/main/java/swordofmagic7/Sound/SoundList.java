@@ -24,6 +24,9 @@ public enum SoundList {
     Explosion(Sound.ENTITY_GENERIC_EXPLODE, 1, SoundCategory.PLAYERS),
     Failed(Sound.ENTITY_IRON_GOLEM_DEATH, 1, SoundCategory.PLAYERS),
     DeBuff(Sound.AMBIENT_UNDERWATER_EXIT, 1, SoundCategory.PLAYERS),
+    Fire(Sound.ENTITY_BLAZE_SHOOT, 1, SoundCategory.PLAYERS),
+    Rock(Sound.ENTITY_IRON_GOLEM_HURT, 1.5f, SoundCategory.PLAYERS),
+    Eat(Sound.ENTITY_HORSE_EAT, 1, SoundCategory.PLAYERS),
     ;
 
     Object data;

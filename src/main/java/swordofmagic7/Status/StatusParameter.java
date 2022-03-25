@@ -14,9 +14,9 @@ public enum StatusParameter {
     EVA("回避"),
     CriticalRate("クリティカル発生"),
     CriticalResist("クリティカル耐性"),
-    SkillCooltime("スキル再使用時間"),
-    SkillCastTime("スキル詠唱時間"),
-    SkillRigidTime("スキル硬直時間"),
+    SkillCooltime("スキル再使用短縮"),
+    SkillCastTime("スキル詠唱短縮"),
+    SkillRigidTime("スキル硬直短縮"),
     ;
 
     public String Display;

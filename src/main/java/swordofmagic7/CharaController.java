@@ -1,10 +1,10 @@
 package swordofmagic7;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.MultiThread.MultiThread;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.inAir;
@@ -22,8 +22,11 @@ public class CharaController {
             player.setVelocity(loc.getDirection().normalize().multiply(-0.7).setY(0.6));
             playerData.WallKicked = true;
             playerData.Strafe = 2;
-            playerData.WallKickedTask = Bukkit.getScheduler().runTaskLaterAsynchronously(System.plugin, () -> playerData.WallKicked = false, 12);
             player.setAllowFlight(true);
+            MultiThread.TaskRun(() -> {
+                MultiThread.sleepTick(12);
+                playerData.WallKicked = false;
+            }, "WallKick: " + player.getName());
         }
     }
 

@@ -5,11 +5,18 @@ import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 public class ParticleData implements Cloneable {
-    Particle particle = Particle.REDSTONE;
-    Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
-    ParticleType particleType = ParticleType.General;
-    float speed = 0;
-    Vector vector = new Vector();
+
+    public static float IgnoreValue = -999;
+    public static Vector RandomVector = new Vector(-999, -999, -999);
+
+    public Particle particle = Particle.REDSTONE;
+    public Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
+    public ParticleType particleType = ParticleType.General;
+    public float speed = 0;
+    public float speedRandom = IgnoreValue;
+    public boolean randomOffset = false;
+    public float randomOffsetMultiply = 1;
+    public Vector vector = new Vector();
 
     ParticleData() {
     }
@@ -26,6 +33,19 @@ public class ParticleData implements Cloneable {
     public ParticleData(Particle particle, float speed) {
         this.particle = particle;
         this.speed = speed;
+    }
+
+    public ParticleData(Particle particle, float speed, boolean randomOffset) {
+        this.particle = particle;
+        this.speed = speed;
+        this.randomOffset = randomOffset;
+    }
+
+    public ParticleData(Particle particle, float speed, boolean randomOffset, float randomOffsetMultiply) {
+        this.particle = particle;
+        this.speed = speed;
+        this.randomOffset = randomOffset;
+        this.randomOffsetMultiply = randomOffsetMultiply;
     }
 
     public ParticleData(Particle particle, float speed, Vector vector) {

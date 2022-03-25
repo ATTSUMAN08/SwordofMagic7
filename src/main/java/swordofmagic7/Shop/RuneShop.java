@@ -73,7 +73,6 @@ public class RuneShop {
 
     public Inventory RuneCrashInv() {
         Inventory inv = decoInv(RuneCrashDisplay, 5);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.RuneInventory, false);
         int slot = 0;
         for (RuneParameter rune : RuneCrashed) {
@@ -85,11 +84,10 @@ public class RuneShop {
 
     public void RuneEquipView() {
         Inventory inv = decoInv(RuneEquipDisplay, 5);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.ItemInventory, false);
         for (int slot = 0; slot < 45; slot++) {
             if (slot != 20 && !RuneSlotIndex().contains(slot)) {
-                inv.setItem(slot, RuneEquipFlame);
+                inv.setItem(slot, BrownItemFlame);
             }
         }
         player.openInventory(inv);
@@ -97,14 +95,12 @@ public class RuneShop {
 
     public void RuneUpgradeView() {
         Inventory inv = decoAnvil(RuneUpgradeDisplay);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.RuneInventory, false);
         player.openInventory(inv);
     }
 
     public void RunePolishView() {
         Inventory inv = decoAnvil(RunePolishDisplay);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.RuneInventory, false);
         player.openInventory(inv);
     }

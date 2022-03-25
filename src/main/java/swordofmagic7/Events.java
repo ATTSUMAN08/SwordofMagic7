@@ -5,9 +5,9 @@ import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -22,30 +22,35 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Dungeon.Dungeon;
+import swordofmagic7.Life.FishingCommand;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Npc.NpcMessage;
+import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.random;
+import static swordofmagic7.System.spawnPlayer;
 
 public class Events implements Listener {
 
@@ -74,7 +79,7 @@ public class Events implements Listener {
         if (playerData.Party != null) {
             playerData.Party.Quit(player);
         }
-        playerData.hologram.delete();
+        if (playerData.hologram != null) playerData.hologram.delete();
         playerData.saveCloseInventory();
         PlayerList.load();
         if (TagGame.isPlayer(player)) {
@@ -106,7 +111,7 @@ public class Events implements Listener {
 
     @EventHandler
     void onInventoryClose(InventoryCloseEvent event) {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        MultiThread.TaskRunSynchronizedLater(() -> {
             Player player = (Player) event.getPlayer();
             if (player.isOnline()) {
                 PlayerData playerData = playerData(player);
@@ -143,58 +148,63 @@ public class Events implements Listener {
         Action action = event.getAction();
         if (player.getGameMode() != GameMode.CREATIVE) {
             if (block != null) {
-                if (block.getType() != Material.LECTERN && !playerData.Map.GatheringData.containsKey(block.getType())) {
+                if (block.getType() != Material.LECTERN && !playerData.Map.isGathering(block.getType())) {
                     event.setCancelled(true);
                 }
             } else {
                 event.setCancelled(true);
             }
         } else if (event.getAction() == Action.PHYSICAL) {
-            if(block != null && block.getType() == Material.FARMLAND) {
+            if (block != null && block.getType() == Material.FARMLAND) {
                 event.setCancelled(true);
             }
         }
+        if (Function.isHoldFishingRod(player) && action.isRightClick()) {
+            playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
+            event.setCancelled(false);
+        }
         if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
-            if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && playerData.Equipment.isWeaponEquip()) {
-                if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
-                    if (playerData.CastMode.isLegacy()) {
+            if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
+                switch (action) {
+                    case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
+                        if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
+                            if (player.isSneaking()) {
+                                playerData.HotBar.use(4);
+                            } else {
+                                playerData.HotBar.use(0);
+                            }
+                        } else if (playerData.CastMode.isRenewed()) {
+                            playerData.setRightClickHold();
+                        } else if (playerData.CastMode.isHold()) {
+                            int slot = player.getInventory().getHeldItemSlot();
+                            if (slot < 8) {
+                                if (player.isSneaking()) slot += 8;
+                                playerData.HotBar.use(slot);
+                            }
+                        }
+                        if (playerData.PetManager.usingBaton()) {
+                            playerData.PetManager.PetAITarget();
+                        }
+                    }
+                    case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
                         if (player.isSneaking()) {
-                            playerData.HotBar.use(4);
+                            if (playerData.CastMode.isLegacy()) {
+                                playerData.HotBar.use(3);
+                            }
+                            if (playerData.PetManager.usingBaton()) {
+                                playerData.PetManager.PetAISelect();
+                            }
                         } else {
-                            playerData.HotBar.use(0);
-                        }
-                    } else if (playerData.CastMode.isRenewed()) {
-                        playerData.setRightClickHold();
-                    } else if (playerData.CastMode.isHold()) {
-                        int slot = player.getInventory().getHeldItemSlot();
-                        if (slot < 9) {
-                            if (player.isSneaking()) slot += 8;
-                            playerData.HotBar.use(slot);
-                        }
-                    }
-                    if (playerData.PetManager.usingBaton()) {
-                        playerData.PetManager.PetAITarget();
-                    }
-                } else if ((action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
-                    if (player.isSneaking()) {
-                        if (playerData.CastMode.isLegacy()) {
-                            playerData.HotBar.use(3);
-                        }
-                        if (playerData.PetManager.usingBaton()) {
-                            playerData.PetManager.PetAISelect();
-                        }
-                    } else {
-                        playerData.Skill.SkillProcess.normalAttackTargetSelect();
-                        if (playerData.PetManager.usingBaton()) {
-                            playerData.PetManager.PetSelect();
-                        }
-                    }
+                            playerData.Skill.SkillProcess.normalAttackTargetSelect();
+                            if (playerData.PetManager.usingBaton()) {
+                                playerData.PetManager.PetSelect();
+                            }
+                        }}
                 }
             }
 
             if (block != null && block.getState() instanceof Sign sign) {
                 if (sign.getLine(0).equals("訓練用ダミー")) {
-                    Random random = new Random();
                     mobSpawn(getMobData("訓練用ダミー"), 1, sign.getLocation().add(random.nextDouble(), 0, random.nextDouble()));
                 }
             }
@@ -219,7 +229,7 @@ public class Events implements Listener {
             event.setCancelled(true);
             NPCRegistry npcRegistry = CitizensAPI.getNPCRegistry();
             if (npcRegistry.isNPC(entity)) {
-                NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
+                NPC npc = npcRegistry.getNPC(entity);
                 String shop = unColored(entity.getCustomName());
                 if (ShopList.containsKey(shop)) {
                     playerData.Shop.ShopOpen(getShopData(shop));
@@ -234,9 +244,24 @@ public class Events implements Listener {
                     playerData.Shop.ShopSellOpen();
                 } else if (shop.equalsIgnoreCase("鍛冶場")) {
                     playerData.Menu.Smith.SmithMenuView();
+                } else if (shop.equalsIgnoreCase("料理場")) {
+                    playerData.Menu.Cook.CookMenuView();
+                } else if (shop.equalsIgnoreCase("回復神官")) {
+                    playerData.Status.Health = playerData.Status.MaxHealth;
+                    playerData.Status.Mana = playerData.Status.MaxMana;
+                    ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getLocation(), 1, 2, 3, 3);
+                    playSound(player, SoundList.Heal);
+                } else if (shop.equalsIgnoreCase("マーケット")) {
+                    playerData.Menu.Market.MarketMenuView();
+                } else if (shop.equalsIgnoreCase("チュートリアル最低限編")) {
+                    Tutorial.tutorialTrigger(player, 0);
+                } else {
+                    Dungeon.Trigger(shop);
                 }
                 if (NpcList.containsKey(npc.getId())) {
-                    NpcMessage.ShowMessage(player, npc);
+                    MultiThread.TaskRun(() -> {
+                        NpcMessage.ShowMessage(player, npc);
+                    }, "ShowMessage: " + player.getName());
                 }
             }
         }
@@ -255,18 +280,15 @@ public class Events implements Listener {
                 } else if (Under1 == Material.GOLD_BLOCK || Under2 == Material.GOLD_BLOCK) {
                     event.setCancelled(true);
                     player.setGravity(false);
-                    BTTSet(new BukkitRunnable() {
+                    MultiThread.TaskRun(() -> {
                         double y = 1;
-                        @Override
-                        public void run() {
+                        while (y > -1 && !player.isSneaking()) {
                             y -= 0.08;
                             player.setVelocity(player.getLocation().getDirection().multiply(2).setY(y));
-                            if (y < -1 || player.isSneaking()) {
-                                this.cancel();
-                                player.setGravity(true);
-                            }
+                            MultiThread.sleepTick(1);
                         }
-                    }.runTaskTimerAsynchronously(plugin, 0, 1), "PressurePlate:" + player.getName());
+                        player.setGravity(true);
+                    }, "PressurePlate:" + player.getName());
                     playSound(player, SoundList.Shoot);
 
                 } else if (Under1 == Material.EMERALD_BLOCK || Under2 == Material.EMERALD_BLOCK) {
@@ -285,12 +307,24 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
+            if (Function.isHoldFishingRod(player)) {
+                switch (event.getNewSlot()) {
+                    case 0 -> playerData.Gathering.inputFishingCommand(FishingCommand.Shift);
+                    case 1 -> playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
+                    case 2 -> playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
+                }
+                player.getInventory().setHeldItemSlot(8);
+                event.setCancelled(true);
+            }
             if (playerData.CastMode.isRenewed() && event.getNewSlot() < 8) {
                 int x = 0;
                 if (player.isSneaking()) x += 8;
                 if (playerData.isRightClickHold()) x += 16;
                 player.getInventory().setHeldItemSlot(8);
-                playerData.HotBar.use(event.getNewSlot() + x);
+                int slot = event.getNewSlot() + x;
+                if (!playerData.Gathering.FishingInProgress) {
+                    playerData.HotBar.use(slot);
+                }
             }
             if (!playerData.CastMode.isHold()) event.setCancelled(true);
         }
@@ -299,16 +333,23 @@ public class Events implements Listener {
     @EventHandler
     void onDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL
-                || event.getCause() == EntityDamageEvent.DamageCause.LAVA
-                || event.getCause() == EntityDamageEvent.DamageCause.FIRE
-                || event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR
-                || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK
-                || event.getCause() == EntityDamageEvent.DamageCause.DROWNING
-        ) {
-            victim.setFireTicks(0);
-            event.setCancelled(true);
-            return;
+        switch (event.getCause()) {
+            case FALL, HOT_FLOOR, FIRE_TICK -> {
+                victim.setFireTicks(0);
+                event.setCancelled(true);
+                return;
+            }
+            case LAVA, DROWNING -> {
+                if (victim instanceof Player player) {
+                    PlayerData playerData = playerData(player);
+                    playerData.changeHealth(-playerData.Status.MaxHealth/10);
+                }
+            }
+            case VOID -> {
+                if (victim instanceof Player player) {
+                    spawnPlayer(player);
+                }
+            }
         }
         if (victim instanceof Player) {
             event.setDamage(0.01);
@@ -374,6 +415,9 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
+            if (isHoldFishingRod(player)) {
+                playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
+            }
             if (playerData.CastMode.isLegacy()) {
                 if (player.isSneaking()) {
                     playerData.HotBar.use(6);
@@ -397,7 +441,7 @@ public class Events implements Listener {
     @EventHandler
     void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (!player.isOp() || playerData(player).PlayMode) {
+        if (!player.hasPermission("som7.builder") || playerData(player).PlayMode) {
             event.setCancelled(true);
         }
     }
@@ -405,10 +449,11 @@ public class Events implements Listener {
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        if (!player.isOp() || playerData(player).PlayMode) {
+        Block block = event.getBlock();
+        if (!player.hasPermission("som7.builder") || playerData(player).PlayMode) {
             event.setCancelled(true);
             PlayerData playerData = playerData(player);
-            playerData.Gathering.BlockBreak(playerData, event.getBlock());
+            playerData.Gathering.BlockBreak(playerData, block);
         }
     }
 
@@ -417,7 +462,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         Block block = event.getBlock();
-        if (!playerData.Map.GatheringData.containsKey(block.getType())) {
+        if (!playerData.Map.isGathering(block.getType())) {
             event.setCancelled(true);
         }
         if (player.getGameMode() != GameMode.CREATIVE) {
@@ -452,12 +497,13 @@ public class Events implements Listener {
         if (!player.isSneaking()) {
             playerData.MapManager.WarpGateSelector();
             playerData.MapManager.TeleportGateSelector();
+            if (Function.isHoldFishingRod(player)) playerData.Gathering.inputFishingCommand(FishingCommand.Shift);
         }
         CharaController.WallKick(player);
         if (playerData.isDead && playerData.deadTime < 1100) {
             playerData.deadTime = 0;
         }
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        MultiThread.TaskRunSynchronizedLater(() -> {
             if (playerData.CastMode.isRenewed() || playerData.CastMode.isHold()) {
                 playerData.HotBar.UpdateHotBar();
             }
@@ -493,7 +539,7 @@ public class Events implements Listener {
 
     @EventHandler
     void onChunkLoad(ChunkLoadEvent event) {
-        Bukkit.getScheduler().runTaskLater(System.plugin, () -> {
+        MultiThread.TaskRunSynchronizedLater(() -> {
             for (Entity entity : event.getChunk().getEntities()) {
                 if (isEnemy(entity)) {
                     EnemyTable(entity.getUniqueId()).updateEntity();
@@ -505,9 +551,23 @@ public class Events implements Listener {
     }
 
     @EventHandler
+    void onEntitiesUnload(EntitiesUnloadEvent event) {
+        for (Entity entity : event.getEntities()) {
+            if (MobManager.isEnemy(entity)) {
+                EnemyTable(entity.getUniqueId()).delete();
+            } else if (entity.getName().contains("§c§l《")) {
+                entity.remove();
+            }
+        }
+    }
+
+    @EventHandler
     void onBlockExplode(BlockExplodeEvent event) {
         event.setCancelled(true);
     }
 
-
+    @EventHandler
+    void onFishing(PlayerFishEvent event) {
+        playerData(event.getPlayer()).Gathering.Fishing(event);
+    }
 }

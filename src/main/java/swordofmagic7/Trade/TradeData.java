@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemStackData;
@@ -16,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
+import static swordofmagic7.Data.DataBase.TradeFlame;
 import static swordofmagic7.Function.decoInv;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Sound.CustomSound.playSound;

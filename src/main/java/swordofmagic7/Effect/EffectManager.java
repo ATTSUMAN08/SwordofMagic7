@@ -1,79 +1,124 @@
 package swordofmagic7.Effect;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.Log;
-import static swordofmagic7.System.BTTSet;
 import static swordofmagic7.System.plugin;
 
 public class EffectManager {
     public LivingEntity entity;
     public final EffectOwnerType ownerType;
+    public PlayerData playerData;
     public PetParameter petParameter;
     public EnemyData enemyData;
 
     public HashMap<EffectType, EffectData> Effect = new HashMap<>();
 
-    public EffectManager(LivingEntity entity, EffectOwnerType ownerType) {
+    public EffectManager(LivingEntity entity, EffectOwnerType ownerType, Object ownerData) {
         this.entity = entity;
         this.ownerType = ownerType;
-        BTTSet(new BukkitRunnable() {
-            @Override
-            public void run() {
-                if ((entity instanceof Player player && !player.isOnline()) || (entity != null && entity.isDead())) {
-                    this.cancel();
-                    Effect.clear();
-                    return;
-                }
-                if (Effect.size() > 0){
-                    HashMap<EffectType, EffectData> clone = new HashMap<>(Effect);
-                    for (Map.Entry<EffectType, EffectData> effect : clone.entrySet()) {
+        switch (ownerType) {
+            case Player -> playerData = (PlayerData) ownerData;
+            case Pet -> petParameter = (PetParameter) ownerData;
+            case Enemy -> enemyData = (EnemyData) ownerData;
+        }
+        String ThreadTag;
+        if (entity != null) ThreadTag = entity.getName();
+        else ThreadTag = "Null";
+        MultiThread.TaskRun(() -> {
+            while (plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline()) || (ownerType.isEnemy() && enemyData.isAlive()) || ownerType.isPet())) {
+                if (Effect.size() > 0) {
+                    for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
                         effect.getValue().time -= 2;
-                        if (effect.getKey() == EffectType.Stun) {
-                            if (entity != null) {
-                                entity.setVelocity(Function.VectorDown);
-                                Bukkit.getScheduler().runTask(plugin, () -> {
-                                    entity.removePotionEffect(PotionEffectType.SLOW);
-                                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3, 127, false, false));
-                                });
+                        EffectType effectType = effect.getKey();
+                        if (entity != null) {
+                            if (effectType.isCrowdControl()) {
+                                if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                                    entity.setVelocity(Function.VectorDown);
+                                    potionSlow(entity, 127);
+                                }
+                            } else if (effectType.isSlow()) {
+                                potionSlow(entity, 1);
                             }
                         }
-                        if (effect.getValue().time <= 0) {
-                            Effect.remove(effect.getKey());
+                        if (ownerType == EffectOwnerType.Player) {
+                            if (effectType == EffectType.Indulgendia && Math.floorMod(effect.getValue().time, 10) == 0) {
+                                playerData.changeHealth(effect.getValue().doubleData[0]);
+                            }
+                        }
+                        if (effect.getValue().time <= 0 || effect.getValue().stack < 1) {
+                            Effect.remove(effectType);
                         }
                     }
                 }
+                MultiThread.sleepTick(2);
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 2), "EffectManager");
+        }, "EffectManager: " + ThreadTag);
+    }
+
+    public void potionSlow(LivingEntity entity, int tier) {
+        MultiThread.TaskRunSynchronized(() -> {
+            entity.removePotionEffect(PotionEffectType.SLOW);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3, tier, false, false));
+        }, "PotionSlow");
     }
 
     public boolean hasEffect(EffectType effect) {
         return Effect.containsKey(effect);
     }
 
-    public void addEffect(EffectType effectType, int time) {
-        if (effectType == EffectType.Stun && hasEffect(EffectType.PainBarrier)) {
-            if (entity instanceof Player) entity.sendMessage("§e[" + EffectType.PainBarrier.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました");
-            return;
+    public boolean addEffect(EffectType effectType, int time) {
+        return addEffect(effectType, time, null, 1);
+    }
+
+    public boolean addEffect(EffectType effectType, int time, double doubleData) {
+        return addEffect(effectType, time, new double[]{doubleData}, 1);
+    }
+
+    public boolean addEffect(EffectType effectType, int time, double[] doubleData, int stack) {
+        if (hasEffect(EffectType.Stop)) {
+            if (entity instanceof Player player) Function.sendMessage(player, "§e[" + EffectType.Stop.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            return false;
         }
-        Effect.put(effectType, new EffectData(time));
+        if (effectType == EffectType.Stun && hasEffect(EffectType.PainBarrier)) {
+            if (entity instanceof Player player) Function.sendMessage(player, "§e[" + EffectType.PainBarrier.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            return false;
+        }
+        if (!effectType.Buff && effectType.effectRank.isNormal() && hasEffect(EffectType.Indulgence)) {
+            Effect.get(EffectType.Indulgence).stack--;
+            if (Effect.get(EffectType.Indulgence).stack < 1) Effect.remove(EffectType.Indulgence);
+            if (entity instanceof Player player) Function.sendMessage(player, "§e[" + EffectType.Indulgence.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            return false;
+        }
+        EffectData effectData;
+        if (Effect.containsKey(effectType)) {
+            effectData = Effect.get(effectType);
+            effectData.time = time;
+            if (effectData.stack+stack >= effectType.MaxStack) {
+                effectData.stack = effectType.MaxStack;
+            } else effectData.stack += stack;
+        } else {
+            effectData = new EffectData(effectType, time);
+            effectData.stack = stack;
+        }
+        effectData.doubleData = doubleData;
+        Effect.put(effectType, effectData);
         statusUpdate();
+        return true;
     }
 
     public void removeEffect(EffectType effectType) {
@@ -81,10 +126,25 @@ public class EffectManager {
         statusUpdate();
     }
 
+    public void removeEffect(EffectType effectType, Player player) {
+        Effect.remove(effectType);
+        switch (ownerType) {
+            case Player -> {
+                if (entity instanceof Player target) {
+                    player.sendMessage(playerData(target).getNick() + "§aの" + effectType.color() + "[" + effectType.Display + "]§aを§b解除§aしました");
+                    target.sendMessage(playerData.getNick() + "§aが" + effectType.color() + "[" + effectType.Display + "]§aを§b解除§aしました");
+                }
+            }
+            case Pet -> player.sendMessage("§e" + petParameter.petData.Display + "§aの" + effectType.color() + "[" + effectType.Display + "]§aを§b解除§aしました");
+            case Enemy -> player.sendMessage("§e" + enemyData.mobData.Display + "§aの" + effectType.color() + "[" + effectType.Display + "]§aを§b解除§aしました");
+        }
+
+    }
+
     public void statusUpdate() {
         switch (ownerType) {
             case Pet -> petParameter.updateStatus();
-            case Player -> playerData((Player) entity).Status.StatusUpdate();
+            case Player -> playerData.Status.StatusUpdate();
             case Enemy -> enemyData.statusUpdate();
         }
     }
@@ -103,17 +163,17 @@ public class EffectManager {
     }
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player) {
+        addEffect(entity, effectType, time, 1, player);
+    }
+
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player) {
         EffectManager manager = getEffectManager(entity);
         if (manager != null) {
-            manager.addEffect(effectType, time);
-            String color;
-            if (effectType.Buff) {
-                color = "§e";
+            if (manager.addEffect(effectType, time, null, stack)) {
+                if (player != null) addEffectMessage(player, entity, effectType);
             } else {
-                color = "§c";
+                if (player != null) player.sendMessage(effectType.color() + "[" + effectType.Display + "]§aが無効化されました");
             }
-            player.sendMessage(color + manager.getOwnerName() + "§aに" + color + "[" + effectType.Display + "]§aを付与しました");
-            if (entity instanceof Player target && player != target) target.sendMessage(color + playerData(player).getNick() + "§aから" + color + "[" + effectType.Display + "]§aを付与されました");
         }
     }
 
@@ -132,6 +192,14 @@ public class EffectManager {
         return false;
     }
 
+    public boolean isSkillsNotAvailable() {
+        return hasEffect(EffectType.Silence) || hasEffect(EffectType.Freeze);
+    }
+
+    public boolean isInvincible() {
+        return hasEffect(EffectType.Invincible) || hasEffect(EffectType.Stop);
+    }
+
     public String getOwnerName() {
         return getOwnerName(entity);
     }
@@ -147,5 +215,14 @@ public class EffectManager {
             return PetManager.PetParameter(entity).petData.Display;
         }
         return null;
+    }
+
+    public static void addEffectMessage(Player player, LivingEntity entity, EffectType effectType) {
+        addEffectMessage(player, entity, effectType.Display, effectType.color());
+    }
+
+    public static void addEffectMessage(Player player, LivingEntity entity, String Display, String color) {
+        player.sendMessage(color + EffectManager.getOwnerName(entity) + "§aに" + color + "[" + Display + "]§aを付与しました");
+        if (entity instanceof Player target && player != entity) target.sendMessage(color + playerData(player).getNick() + "§aから" + color + "[" + Display + "]§aを付与されました");
     }
 }

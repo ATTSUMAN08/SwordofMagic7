@@ -1,7 +1,5 @@
 package swordofmagic7.Renderer;
 
-import swordofmagic7.Renderer.CustomMapType.*;
-
 public class CustomMapData {
     public CustomMapType type = CustomMapType.Image;
     public String path;

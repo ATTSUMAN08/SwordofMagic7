@@ -1,7 +1,5 @@
 package swordofmagic7.Trade;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -9,7 +7,6 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
-import swordofmagic7.Party.PartyData;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 

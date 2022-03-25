@@ -3,10 +3,10 @@ package swordofmagic7.Equipment;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Tutorial;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,6 +83,7 @@ public class Equipment {
             playerData.ItemInventory.removeItemParameter(param, 1);
 
             player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
+            Tutorial.tutorialTrigger(player, 2);
             return true;
         }
         return false;

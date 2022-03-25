@@ -11,8 +11,8 @@ import static swordofmagic7.Menu.Data.*;
 
 public class Setting {
 
-    private Player player;
-    private PlayerData playerData;
+    private final Player player;
+    private final PlayerData playerData;
 
     Setting(Player player, PlayerData playerData) {
         this.player = player;
@@ -32,9 +32,12 @@ public class Setting {
         inv.setItem(6, SettingMenu_DropLogIcon);
         inv.setItem(7, SettingMenu_StrafeModeIcon);
         inv.setItem(8, SettingMenu_CastModeIcon);
-        inv.setItem(13, SettingMenu_ShopAmountResetIcon);
-        inv.setItem(14, SettingMenu_PvPModeIcon);
-        inv.setItem(15, SettingMenu_ViewFormat);
+        inv.setItem(12, SettingMenu_ShopAmountResetIcon);
+        inv.setItem(13, SettingMenu_PvPModeIcon);
+        inv.setItem(14, SettingMenu_ViewFormat);
+        inv.setItem(15, SettingMenu_HoloSelfViewIcon);
+        inv.setItem(16, SettingMenu_FishingDisplayNumIcon);
+        inv.setItem(17, SettingMenu_FishingUseCombo);
         player.openInventory(inv);
     }
 
@@ -56,6 +59,12 @@ public class Setting {
                 playerData.PvPMode();
             } else if (equalItem(currentItem, SettingMenu_ViewFormat)) {
                 playerData.changeViewFormat();
+            } else if (equalItem(currentItem, SettingMenu_FishingDisplayNumIcon)) {
+                playerData.FishingDisplayNum();
+            } else if (equalItem(currentItem, SettingMenu_FishingUseCombo)) {
+                playerData.FishingUseCombo();
+            } else if (equalItem(currentItem, SettingMenu_HoloSelfViewIcon)) {
+                playerData.HoloSelfView();
             } else if (equalItem(currentItem, SettingMenu_ItemInventorySort)) {
                 playerData.ItemInventory.ItemInventorySort();
             } else if (equalItem(currentItem, SettingMenu_ItemInventorySortReverse)) {

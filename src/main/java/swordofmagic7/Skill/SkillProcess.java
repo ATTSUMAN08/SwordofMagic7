@@ -1,32 +1,28 @@
 package swordofmagic7.Skill;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Function;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -34,7 +30,6 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
-import static swordofmagic7.System.plugin;
 
 public class SkillProcess {
     public final Player player;
@@ -51,15 +46,11 @@ public class SkillProcess {
         return entity -> entity != player && isEnemy(entity);
     }
 
-    public Predicate<Entity> PredicateE() {
-        return entity -> entity != player && isEnemy(entity);
-    }
-
-    public Predicate<Entity> PredicateA() {
+    public Predicate<LivingEntity> PredicateA() {
         return entity -> entity != player && entity instanceof Player target && isAllies(target);
     }
 
-    public Predicate<Entity> PredicateA2() {
+    public Predicate<LivingEntity> PredicateA2() {
         return entity -> entity != player && entity instanceof Player target && isRevivalAble(target);
     }
 
@@ -73,7 +64,7 @@ public class SkillProcess {
             return false;
         }
         if (enemy instanceof Player target) {
-            if (target.isOnline() && isAlive(target)) {
+            if (isAlive(target)) {
                 PlayerData targetData = playerData(target);
                 if (playerData.Party == null) {
                     return playerData.PvPMode && targetData.PvPMode;
@@ -92,11 +83,13 @@ public class SkillProcess {
         if (target == player) {
             return false;
         }
-        if (target.isOnline() && isAlive(target)) {
+        if (isAlive(target)) {
             PlayerData targetData = playerData(target);
-            if (playerData.Party == targetData.Party) return true;
-            else return !(playerData.PvPMode && targetData.PvPMode);
-        } else return false;
+            if (playerData.Party == null) {
+                return !(playerData.PvPMode && targetData.PvPMode);
+            } else return playerData.Party == targetData.Party;
+        }
+        return false;
     }
 
     public boolean isRevivalAble(Player target) {
@@ -105,30 +98,26 @@ public class SkillProcess {
         }
         if (target.isOnline() && !isAlive(target)) {
             PlayerData targetData = playerData(target);
-            if (playerData.Party == targetData.Party) return true;
-            else return !(playerData.PvPMode && targetData.PvPMode);
-        } else return false;
+            if (playerData.Party == null) {
+                return !(playerData.PvPMode && targetData.PvPMode);
+            } else return playerData.Party == targetData.Party;
+        }
+        return false;
     }
 
     public static Set<LivingEntity> FanShapedCollider(Location location, double radius, double angle, Predicate<LivingEntity> Predicate, boolean single) {
-        Set<LivingEntity> Targets = new HashSet<>(location.getNearbyLivingEntities(radius, Predicate));
+        Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(location, radius, Predicate));
         if (Targets.size() == 0) return Targets;
-        if (single) {
-            Targets.add(Nearest(location, Targets).get(0));
-        } else {
-            Targets = ParticleManager.FanShapedCollider(location, Targets, angle);
-        }
+        Targets = ParticleManager.FanShapedCollider(location, Targets, angle);
+        if (single && Targets.size() > 0) Targets = Collections.singleton(Nearest(location, Targets).get(0));
         return Targets;
     }
 
     public static Set<LivingEntity> RectangleCollider(Location location, double length, double width, Predicate<LivingEntity> Predicate, boolean single) {
-        Set<LivingEntity> Targets = new HashSet<>(location.getNearbyLivingEntities(length, Predicate));
+        Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(location, length, Predicate));
         if (Targets.size() == 0) return Targets;
-        if (single) {
-            Targets.add(Nearest(location, Targets).get(0));
-        } else {
-            Targets = ParticleManager.RectangleCollider(location, Targets, length, width);
-        }
+        Targets = ParticleManager.RectangleCollider(location, Targets, length, width);
+        if (single && Targets.size() > 0) Targets = Collections.singleton(Nearest(location, Targets).get(0));
         return Targets;
     }
 
@@ -154,13 +143,16 @@ public class SkillProcess {
 
     public static final ParticleData particleCasting = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.YELLOW, 1));
     public static final ParticleData particleActivate = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.ORANGE, 1));
-    public static final int period = 1;
-    private int normalAttackCoolTime = 0;
+    public int normalAttackCoolTime = 0;
     public int SkillCastTime = 0;
 
     public void SkillRigid(SkillData skillData) {
-        playerData.EffectManager.addEffect(EffectType.Rigidity, skillData.RigidTime);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> skill.setCastReady(true), skillData.RigidTime);
+        MultiThread.TaskRun(() -> {
+            playerData.EffectManager.addEffect(EffectType.Rigidity, skillData.RigidTime);
+            MultiThread.sleepTick(skillData.RigidTime);
+            skill.setCastReady(true);
+            skill.SkillCastProgress = 0f;
+        }, "SkillRigid: ");
     }
 
     public void normalAttackTargetSelect() {
@@ -172,8 +164,10 @@ public class SkillProcess {
                     case Blade -> victims = RectangleCollider(player.getLocation(), 4, 0.75, Predicate(), true);
                     case Mace -> victims = RectangleCollider(player.getLocation(), 6, 1.25, Predicate(), true);
                     case Rod, ActGun -> {
-                        Ray ray = rayLocationEntity(player.getEyeLocation(), 15, 0.5, PredicateE());
-                        if (ray.isHitEntity()) victims.add(ray.HitEntity);
+                        Ray ray = rayLocationEntity(player.getEyeLocation(), 15, 0.5, Predicate());
+                        if (ray.isHitEntity()) {
+                            victims.add(ray.HitEntity);
+                        }
                     }
                 }
                 normalAttack(victims);
@@ -218,13 +212,6 @@ public class SkillProcess {
                         playSound(player, SoundList.Nope);
                     }
                 }
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        normalAttackCoolTime--;
-                        if (normalAttackCoolTime <= 0) this.cancel();
-                    }
-                }.runTaskTimerAsynchronously(plugin, 0, 1);
             }
         } else {
             player.sendMessage("§e[武器]§aが§e装備§aされていません");
@@ -233,10 +220,15 @@ public class SkillProcess {
     }
 
     public void BuffApply(SkillData skillData, EffectType effectType, ParticleData particleData, int time) {
-        skill.setCastReady(false);
-        playerData.EffectManager.addEffect(effectType, time);
-        ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-        playSound(player, SoundList.Heal);
-        SkillRigid(skillData);
+        MultiThread.TaskRun(() -> {
+            skill.setCastReady(false);
+
+            MultiThread.sleepTick(skillData.CastTime);
+
+            playerData.EffectManager.addEffect(effectType, time);
+            ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
+            playSound(player, SoundList.Heal);
+            SkillRigid(skillData);
+        }, "BuffApply");
     }
 }

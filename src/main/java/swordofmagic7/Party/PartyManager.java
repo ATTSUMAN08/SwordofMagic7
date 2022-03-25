@@ -3,6 +3,7 @@ package swordofmagic7.Party;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Function;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
@@ -67,6 +68,15 @@ public class PartyManager {
                     }
                 }
                 if (none) player.sendMessage("§7・§c公開中のパーティなし");
+                return;
+            } else if (args[0].equalsIgnoreCase("chat") && args.length == 2) {
+                if (playerData.Party != null) {
+                    for (Player member : playerData.Party.Members) {
+                        Function.sendMessage(member, args[1], SoundList.Tick);
+                    }
+                } else {
+                    Function.sendMessage(player, "§eパーティ§aに参加していません", SoundList.Tick);
+                }
                 return;
             }
             if (PartyInvites.containsKey(player)) {

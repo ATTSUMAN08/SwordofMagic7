@@ -6,9 +6,13 @@ public class SkillParameter {
     public double Increase = 0;
     public String Prefix = "";
     public String Suffix = "";
-    public String Format;
+    public int Format = 0;
 
     public String valueView() {
-        return String.format(Format, Value);
+        if (Format > -1) {
+            return Prefix + String.format("%." + Format + "f", Value) + Suffix;
+        } else {
+            return Prefix + Suffix;
+        }
     }
 }

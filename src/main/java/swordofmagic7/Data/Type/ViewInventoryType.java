@@ -4,7 +4,7 @@ public enum ViewInventoryType {
     ItemInventory("アイテムインベントリ"),
     RuneInventory("ルーンインベントリ"),
     PetInventory("ペットケージ"),
-    HotBar("ホットバー"),
+    HotBar("スキルスロット"),
     ;
 
     public String Display;

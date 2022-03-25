@@ -4,28 +4,43 @@ import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Mob.EnemyData;
+import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Pet.PetManager;
+import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.RayTrace.RayTrace;
+import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.random;
 
 public final class Function {
-
-    static Random random = new Random();
 
     public static void Log(String str) {
         Log(str, false);
     }
     public static void Log(String str, boolean stackTrace) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.isOp()) player.sendMessage(str);
+            if (player.hasPermission("som7.log")) player.sendMessage(str);
         }
         if (stackTrace) {
             try {
@@ -93,6 +108,10 @@ public final class Function {
         return "§7・" + colored(str, "§e§l") + "§7: §a§l";
     }
 
+    public static String decoBossBar(String str) {
+        return colored(str, "§e§l") + "§7: §a§l";
+    }
+
     public static List<String> removeChar() {
         List<String> list = new ArrayList<>();
         list.add("=");
@@ -111,8 +130,13 @@ public final class Function {
     }
 
     public static void BroadCast(String str) {
+        BroadCast(str, null);
+    }
+
+    public static void BroadCast(String str, SoundList sound) {
         for (Player player : PlayerList.get()) {
             player.sendMessage(str);
+            if (sound != null) playSound(player, sound);
         }
     }
 
@@ -147,7 +171,7 @@ public final class Function {
     }
 
     public static boolean isAlive(Player player) {
-        return player.getGameMode() == GameMode.SURVIVAL;
+        return player.isOnline() && player.getGameMode() == GameMode.SURVIVAL;
     }
 
     public static boolean equalInv(InventoryView view, String name) {
@@ -184,7 +208,7 @@ public final class Function {
 
     public static void CloseInventory(Player player) {
         if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
-            player.closeInventory();
+            MultiThread.TaskRunSynchronized(player::closeInventory, "CloseInventory: " + player.getName());
         }
     }
 
@@ -198,5 +222,68 @@ public final class Function {
             }
         }
         return null;
+    }
+
+    public static void Push(LivingEntity entity, Vector vector) {
+        EffectManager manager = EffectManager.getEffectManager(entity);
+        if (!manager.hasEffect(EffectType.PainBarrier)) {
+            entity.setVelocity(vector);
+        }
+    }
+
+    public static Set<LivingEntity> NearLivingEntity(Location location, double radius, Predicate<LivingEntity> predicate) {
+        Set<LivingEntity> entities = new HashSet<>();
+        for (Player player : PlayerList.PlayerList) {
+            if (location.distance(player.getLocation()) < radius && predicate.test(player)) {
+                entities.add(player);
+            }
+        }
+        try {
+            for (EnemyData enemyData : MobManager.getEnemyList()) {
+                if (enemyData.entity != null && location.distance(enemyData.entity.getLocation()) < radius && predicate.test(enemyData.entity)) {
+                    entities.add(enemyData.entity);
+                }
+            }
+        } catch (Exception ignored) {}
+        for (PetParameter petParameter : PetManager.PetSummonedList.values()) {
+            if (petParameter.entity != null && location.distance(petParameter.entity.getLocation()) < radius && predicate.test(petParameter.entity)) {
+                entities.add(petParameter.entity);
+            }
+        }
+        return entities;
+    }
+
+    public static List<LivingEntity> NearLivingEntityAtList(Location location, double radius, Predicate<LivingEntity> predicate) {
+        return new ArrayList<>(NearLivingEntity(location, radius, predicate));
+    }
+
+    public static boolean isHoldFishingRod(Player player) {
+        return playerData(player).Equipment.getEquip(EquipmentSlot.MainHand).Icon == Material.FISHING_ROD;
+    }
+
+    public static String decoDoubleToString(double i, String format) {
+        String text = String.format(format, i);
+        if (i >= 0) return text;
+        else return "-" + text;
+    }
+
+    public static void sendMessage(Player player, String message) {
+        player.sendMessage(message);
+    }
+
+    public static void sendMessage(Player player, List<String> message) {
+        for (String str : message) {
+            player.sendMessage(str);
+        }
+    }
+
+    public static void sendMessage(Player player, String message, SoundList sound) {
+        sendMessage(player, message);
+        playSound(player, sound);
+    }
+
+    public static void sendMessage(Player player, List<String> message, SoundList sound) {
+        sendMessage(player, message);
+        playSound(player, sound);
     }
 }

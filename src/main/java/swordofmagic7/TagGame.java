@@ -1,11 +1,11 @@
 package swordofmagic7;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.MultiThread.MultiThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.plugin;
 
 public class TagGame {
     public static final String Prefix = "§c[鬼ごっこ]§r ";
@@ -23,17 +23,20 @@ public class TagGame {
     public static HashMap<Player, Boolean> Stun = new HashMap<>();
 
     TagGame() {
-        BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(System.plugin, () -> {
-            if (Tag != null) tagTime++;
-            if (tagTime >= 120) {
-                for (Player temp : Players) {
-                    temp.sendMessage(Prefix + Tag.getDisplayName() + "§aさんが§c脱落§aしました");
+        MultiThread.TaskRun(() -> {
+            while (plugin.isEnabled()) {
+                if (Tag != null) tagTime++;
+                if (tagTime >= 120) {
+                    for (Player temp : Players) {
+                        temp.sendMessage(Prefix + Tag.getDisplayName() + "§aさんが§c脱落§aしました");
+                    }
+                    Players.remove(Tag);
+                    Tag = null;
+                    tagCheck();
                 }
-                Players.remove(Tag);
-                Tag = null;
-                tagCheck();
+                MultiThread.sleepTick(20);
             }
-        }, 0, 20), "TagGame");
+        }, "TagGame");
     }
 
     public static void join(Player player) {

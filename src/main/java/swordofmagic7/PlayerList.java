@@ -7,9 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import swordofmagic7.Pet.PetParameter;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -32,12 +30,16 @@ public final class PlayerList {
 
     public static Set<Player> getNear(Location loc, double radius) {
         Set<Player> List = new HashSet<>();
-        for (Player player : PlayerList) {
-            if (player.isOnline()) {
-                if (player.getLocation().distance(loc) <= radius) List.add(player);
+        try {
+            for (Player player : PlayerList) {
+                if (player.isOnline()) {
+                    if (player.getLocation().distance(loc) <= radius) List.add(player);
+                }
             }
+            return List;
+        } catch (Exception e) {
+            return List;
         }
-        return List;
     }
 
     public static Set<Player> getNearNonDead(Location loc, double radius) {
@@ -53,7 +55,7 @@ public final class PlayerList {
     public static Set<LivingEntity> getNearLivingEntity(Location loc, double radius) {
         Set<LivingEntity> List = new HashSet<>();
         for (Player player : PlayerList) {
-            if (player.isOnline() && player.getGameMode() == GameMode.SURVIVAL) {
+            if (Function.isAlive(player)) {
                 if (player.getLocation().distance(loc) <= radius) List.add(player);
                 for (PetParameter pet : playerData(player).PetSummon) {
                     if (pet.entity.getLocation().distance(loc) <= radius) List.add(pet.entity);

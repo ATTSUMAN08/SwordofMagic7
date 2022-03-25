@@ -65,7 +65,6 @@ public class Shop {
     private ShopData ShopDataCache;
     private int currentPage = 1;
     public void ShopOpen(ShopData Shop) {
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.ItemInventory, false);
         if (AmountReset) BuyAmount = 1;
         currentPage = 1;
@@ -76,7 +75,6 @@ public class Shop {
     }
 
     public void ShopSellOpen() {
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.ItemInventory, false);
         if (AmountReset) SellAmount = 1;
         Inventory inv = SellInventory.viewInventory(SellAmount);

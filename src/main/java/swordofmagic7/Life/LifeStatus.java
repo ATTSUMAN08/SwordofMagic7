@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import static swordofmagic7.Function.BroadCast;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.random;
 
 public class LifeStatus {
     public final static int MaxLifeLevel = 30;
@@ -23,10 +24,34 @@ public class LifeStatus {
     HashMap<LifeType, Integer> Level = new HashMap<>();
     HashMap<LifeType, Integer> Exp = new HashMap<>();
 
+    public static int[] ReqLifeExp;
     public static int LifeReqExp(int Level) {
-        double reqExp = 100;
-        reqExp *= Math.pow(Level, 1.2);
-        return (int) Math.round(reqExp);
+        if (ReqLifeExp == null) {
+            ReqLifeExp = new int[MaxLifeLevel+1];
+            for (int level = 0; level < ReqLifeExp.length; level++) {
+                double reqExp = 100f;
+                reqExp *= Math.pow(level, 1.8);
+                reqExp *= Math.ceil(level/5f);
+                if (level >= 15) reqExp *= 3;
+                ReqLifeExp[level] = (int) Math.round(reqExp);
+            }
+        }
+        if (Level < 0) return 100;
+        if (Level > MaxLifeLevel) return Integer.MAX_VALUE;
+        return ReqLifeExp[Level];
+    }
+
+    public int getMultiplyAmount(LifeType type) {
+        double base = (getLevel(type)-1)*0.05;
+        int amount = 1;
+        while (base >= 1) {
+            amount++;
+            base--;
+        }
+        if (random.nextDouble() < base) {
+            amount++;
+        }
+        return amount;
     }
 
     public int getLevel(LifeType type) {
@@ -47,6 +72,7 @@ public class LifeStatus {
 
     public void addLifeExp(LifeType type, int exp) {
         int level = getLevel(type);
+        playerData.addPlayerExp(exp);
         if (level < MaxLifeLevel) {
             Exp.put(type, getExp(type)+exp);
             int addLevel = 0;

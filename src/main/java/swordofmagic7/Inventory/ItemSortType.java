@@ -1,7 +1,5 @@
 package swordofmagic7.Inventory;
 
-import swordofmagic7.Item.RuneParameter;
-
 import java.util.Comparator;
 
 public enum ItemSortType {

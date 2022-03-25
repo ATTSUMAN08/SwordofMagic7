@@ -23,7 +23,7 @@ public class ItemInventory extends BasicInventory {
     public final int MaxSlot = 300;
     private final List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
-    public ItemSortType Sort = ItemSortType.Name;
+    public ItemSortType Sort = ItemSortType.Category;
     public boolean SortReverse = false;
 
     public ItemInventory(Player player, PlayerData playerData) {
@@ -64,12 +64,15 @@ public class ItemInventory extends BasicInventory {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
         int slot = 9;
+        List.removeIf(stack -> stack.Amount <= 0);
         Comparator<ItemParameterStack> comparator = null;
-        if (List.size() > 0) switch (Sort) {
-            case Name -> comparator = new ItemSortName();
-            case Category -> comparator = new ItemSortCategory();
-            case Amount -> comparator = new ItemSortAmount();
-        }
+        try {
+            if (List.size() > 0) switch (Sort) {
+                case Name -> comparator = new ItemSortName();
+                case Category -> comparator = new ItemSortCategory();
+                case Amount -> comparator = new ItemSortAmount();
+            }
+        } catch (Exception ignored) {}
         if (comparator != null) List.sort(comparator);
         if (SortReverse) Collections.reverse(List);
         for (int i = index; i < index+24; i++) {
@@ -112,8 +115,7 @@ public class ItemInventory extends BasicInventory {
     public ItemParameter getItemParameter(int i) {
         if (i < List.size()) {
             return List.get(i).itemParameter.clone();
-        }
-        return null;
+        } else return null;
     }
 
     public ItemParameter getItemParameter(String name) {
@@ -163,44 +165,44 @@ public class ItemInventory extends BasicInventory {
         }
     }
 
+    public void removeItemParameter(ItemParameterStack stack) {
+        removeItemParameter(stack.itemParameter, stack.Amount);
+    }
+
     public void removeItemParameter(ItemParameter param, int removeAmount) {
         ItemParameterStack stack = getItemParameterStack(param);
-        if (stack.Amount > 0) {
-            stack.Amount -= removeAmount;
-            if (stack.Amount <= 0) {
-                List.remove(stack);
-            }
+        stack.Amount -= removeAmount;
+        if (stack.Amount <= 0) {
+            List.remove(stack);
         }
     }
 
     public void removeItemParameter(int index, int removeAmount) {
         ItemParameterStack stack = getItemParameterStack(index);
-        if (stack.Amount > 0) {
-            stack.Amount -= removeAmount;
-            if (stack.Amount <= 0) {
-                List.remove(stack);
-            }
+        stack.Amount -= removeAmount;
+        if (stack.Amount <= 0) {
+            List.remove(stack);
         }
     }
 
     boolean ItemStackCheck(ItemParameter param1, ItemParameter param2) {
-        if (param1.Display.equals(param2.Display) &&
-                param1.itemEquipmentData.Durable == param2.itemEquipmentData.Durable &&
-                param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
-                param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
-            if (0 < param1.itemEquipmentData.getRuneSize()) {
-                for (int i = 0; i < param1.itemEquipmentData.getRuneSize(); i++) {
-                    final RuneParameter rune1 = param1.itemEquipmentData.getRune(i);
-                    final RuneParameter rune2 = param2.itemEquipmentData.getRune(i);
-                    if (rune1.Display.equals(rune2.Display) &&
-                            rune1.Level == rune2.Level &&
-                            rune1.Quality == rune2.Quality) {
-                        return true;
+        if (param1.Id.equals(param2.Id)) {
+            if (param1.Category.isEquipment()) {
+                if (param1.itemEquipmentData.Durable == param2.itemEquipmentData.Durable &&
+                    param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
+                    param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
+                    if (0 < param1.itemEquipmentData.getRuneSize()) {
+                        for (int i = 0; i < param1.itemEquipmentData.getRuneSize(); i++) {
+                            final RuneParameter rune1 = param1.itemEquipmentData.getRune(i);
+                            final RuneParameter rune2 = param2.itemEquipmentData.getRune(i);
+                            if (!rune1.toString().equals(rune2.toString())) {
+                                return false;
+                            }
+                        }
                     }
-                }
-            } else {
-                return true;
-            }
+                    return true;
+                } else return false;
+            } else return true;
         }
         return false;
     }

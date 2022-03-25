@@ -17,6 +17,8 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static swordofmagic7.Classes.Classes.MaxSlot;
 import static swordofmagic7.Data.DataBase.getSkillData;
@@ -38,8 +40,7 @@ public class Trigger {
 
     private final HashMap<Integer, HotBarData> TriggerMenuCache = new HashMap<>();
     public void TriggerMenuView() {
-        Inventory inv = decoInv(TriggerMenuDisplay, 5);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
+        Inventory inv = decoInv(TriggerMenuDisplay, 6);
         playerData.setView(ViewInventoryType.HotBar, false);
         int slot = 0;
         for (int i = 0; i < MaxSlot; i++) {
@@ -53,22 +54,25 @@ public class Trigger {
                 }
             }
         }
+        slot = (int) Math.ceil(slot/9f)*9;
+        Set<String> itemSet = new HashSet<>();
         for (PetParameter pet : playerData.PetInventory.getList()) {
-            if (pet.Summoned) {
-                inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
-                TriggerMenuCache.put(slot, new HotBarData(pet));
-                slot++;
-            }
+            if (slot > 52) break;
+            inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
+            TriggerMenuCache.put(slot, new HotBarData(pet));
+            slot++;
         }
         for (ItemParameterStack stack : playerData.ItemInventory.getList()) {
+            if (slot > 52) break;
             ItemCategory itemCategory = stack.itemParameter.Category;
-            if (itemCategory.isPotion() || itemCategory.isEquipment() || itemCategory.isTool()) {
+            if (!itemSet.contains(stack.itemParameter.Display) && itemCategory.isTriggerAble()) {
+                itemSet.add(stack.itemParameter.Display);
                 inv.setItem(slot, stack.itemParameter.viewItem(1, playerData.ViewFormat()));
                 TriggerMenuCache.put(slot, new HotBarData(stack.itemParameter));
                 slot++;
             }
         }
-        inv.setItem(44, TriggerMenu_Reset);
+        inv.setItem(53, TriggerMenu_Reset);
         player.openInventory(inv);
     }
 

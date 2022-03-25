@@ -1,7 +1,6 @@
 package swordofmagic7.Data;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import org.bukkit.*;
@@ -10,7 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import swordofmagic7.Attribute.Attribute;
@@ -27,6 +25,7 @@ import swordofmagic7.Equipment.Equipment;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.HotBar.HotBar;
 import swordofmagic7.HotBar.HotBarData;
+import swordofmagic7.InstantBuff.InstantBuff;
 import swordofmagic7.Inventory.*;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
@@ -39,7 +38,9 @@ import swordofmagic7.Life.LifeType;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.MapManager;
 import swordofmagic7.Menu.Menu;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Party.PartyData;
+import swordofmagic7.Pet.PetEvolution;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Quest.QuestManager;
@@ -50,7 +51,7 @@ import swordofmagic7.Skill.CastType;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
-import swordofmagic7.System;
+import swordofmagic7.Title.TitleManager;
 import swordofmagic7.Tutorial;
 import swordofmagic7.ViewBar.SideBarToDo.SideBarToDo;
 import swordofmagic7.ViewBar.ViewBar;
@@ -63,10 +64,11 @@ import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.createHologram;
+import static swordofmagic7.System.plugin;
+import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
-
     private static final HashMap<UUID, PlayerData> playerData = new HashMap<>();
     public static PlayerData playerData(Player player) {
         if (player.isOnline()) {
@@ -83,13 +85,11 @@ public class PlayerData {
     }
 
 
-    private final Plugin plugin = System.plugin;
     public final Player player;
-    private boolean able = false;
     public swordofmagic7.Inventory.ItemInventory ItemInventory;
     public HotBar HotBar;
-    public RuneInventory RuneInventory;
-    public PetInventory PetInventory;
+    public swordofmagic7.Inventory.RuneInventory RuneInventory;
+    public swordofmagic7.Inventory.PetInventory PetInventory;
     public Equipment Equipment;
     public Status Status;
     public Classes Classes;
@@ -103,11 +103,14 @@ public class PlayerData {
     public LifeStatus LifeStatus;
     public PetManager PetManager;
     public PetShop PetShop;
+    public PetEvolution PetEvolution;
     public MapManager MapManager;
     public Gathering Gathering;
     public QuestManager QuestManager;
     public ViewBar ViewBar;
     public SideBarToDo SideBarToDo;
+    public Statistics statistics;
+    public TitleManager titleManager;
 
     public String Nick;
 
@@ -130,10 +133,15 @@ public class PlayerData {
     public List<PetParameter> PetSummon = new ArrayList<>();
     public List<String> ActiveTeleportGate = new ArrayList<>();
     public HashMap<ItemPotionType, Integer> PotionCoolTime = new HashMap<>();
+    public int useCookCoolTime = 0;
     public PetParameter PetSelect;
     public boolean isDead = false;
     public boolean RevivalReady = false;
+    public boolean FishingDisplayNum = false;
+    public boolean HoloSelfView = false;
     public PartyData Party;
+    public InstantBuff instantBuff;
+    public boolean isLoaded = false;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -150,58 +158,87 @@ public class PlayerData {
         Status = new Status(player, this, Classes, Skill);
         Menu = new Menu(player, this);
         Attribute = new Attribute(player, this);
-        EffectManager = new EffectManager(player, EffectOwnerType.Player);
+        EffectManager = new EffectManager(player, EffectOwnerType.Player, this);
         Upgrade = new Upgrade(player, this);
         Shop = new Shop(player, this);
         RuneShop = new RuneShop(player, this);
         LifeStatus = new LifeStatus(player, this);
         PetManager = new PetManager(player, this);
         PetShop = new PetShop(player, this);
+        PetEvolution = new PetEvolution(player, this);
         MapManager = new MapManager(player, this);
         Gathering = new Gathering(player, this);
         QuestManager = new QuestManager(player, this);
         ViewBar = new ViewBar(player, this, Status);
         SideBarToDo = new SideBarToDo(this);
+        titleManager = new TitleManager(this);
+        statistics = new Statistics(player, this);
+        instantBuff = new InstantBuff(this);
 
         Nick = player.getName();
 
-        able = true;
         PetInventory.start();
 
         InitializeHologram();
     }
 
     public Hologram hologram;
-    public TextLine textLine;
+    public VisibilityManager visibilityManager;
+    public TextLine[] hologramLine = new TextLine[3];
+    public String holoTitle;
+    public int HoloWait = 0;
+    public int HoloAnim = 0;
     public void InitializeHologram() {
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            if (hologram != null) hologram.delete();
-            hologram = HologramsAPI.createHologram(plugin, playerHoloLocation());
-            textLine = hologram.appendTextLine("§a§l■■■■■■■■■■");
-            VisibilityManager visibilityManager = hologram.getVisibilityManager();
-            visibilityManager.hideTo(player);
+        MultiThread.TaskRunSynchronized(() -> {
+            if (hologram != null && !hologram.isDeleted()) hologram.delete();
+            hologram = createHologram(player.getName(), playerHoloLocation());
+            visibilityManager = hologram.getVisibilityManager();
+            if (!HoloSelfView) visibilityManager.hideTo(player);
+            hologramLine[2] = hologram.appendTextLine(DefaultTitle.Display[0]);
+            hologramLine[0] = hologram.appendTextLine("NameTag");
+            hologramLine[1] = hologram.appendTextLine("HealthBar");
+            MultiThread.TaskRun(() -> {
+                while (plugin.isEnabled() && player.isOnline()) {
+                    if (titleManager.Title.flame > 1) {
+                        if (titleManager.Title.flame - 1 > HoloAnim) {
+                            HoloWait++;
+                            if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
+                                HoloWait = 0;
+                                HoloAnim++;
+                            }
+                        } else {
+                            HoloWait++;
+                            if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
+                                HoloWait = 0;
+                                HoloAnim = 0;
+                            }
+                        }
+                        holoTitle = titleManager.Title.Display[HoloAnim];
+                    } else {
+                        holoTitle = titleManager.Title.Display[0];
+                    }
+                    MultiThread.sleepTick(1);
+                }
+            }, "PlayerHolo: " + player.getName());
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!hologram.isDeleted()) {
+                    if (player.isOnline()) {
+                        hologramLine[2].setText(holoTitle);
                         hologram.teleport(playerHoloLocation());
                     } else {
+                        if (!hologram.isDeleted()) hologram.delete();
+                        hologram = null;
                         this.cancel();
-                        if (player.isOnline()) InitializeHologram();
                     }
                 }
             }.runTaskTimer(plugin, 0, 1);
-        });
-    }
-
-    public void RefreshHologram() {
-        int x = (int) Math.floor(Status.Health/Status.MaxHealth*10);
-        textLine.setText("§a§l" + "■".repeat(Math.max(0, x)) + "§7§l" + "■".repeat(Math.max(0, 10 - x)));
+        }, "HologramInitialize: " + player.getName());
     }
 
     public Location playerHoloLocation() {
         Location loc = player.getEyeLocation().clone();
-        loc.setY(loc.getY()+0.5);
+        loc.setY(loc.getY()+1.1);
         return loc;
     }
 
@@ -318,6 +355,57 @@ public class PlayerData {
         playSound(player, SoundList.Click);
     }
 
+    public void FishingDisplayNum() {
+        FishingDisplayNum(!FishingDisplayNum);
+    }
+
+    void FishingDisplayNum(boolean bool) {
+        FishingDisplayNum = bool;
+        String msg = "§e[釣獲コンボ表記]§aを";
+        if (bool) msg += "§b[数字]";
+        else msg += "§c[アルファベット]";
+        msg += "§aにしました";
+        player.sendMessage(msg);
+        playSound(player, SoundList.Click);
+    }
+
+    public void FishingUseCombo() {
+        FishingUseCombo(!Gathering.FishingUseCombo);
+    }
+
+    void FishingUseCombo(boolean bool) {
+        if (Gathering.FishingInProgress) {
+            player.sendMessage("§e釣獲中§aは切り替えできません");
+            playSound(player, SoundList.Nope);
+            return;
+        }
+        Gathering.FishingUseCombo = bool;
+        String msg = "§e[釣獲モード]§aを";
+        if (bool) msg += "§b[エンドレス]";
+        else msg += "§c[タイムアタック]";
+        msg += "§aにしました";
+        player.sendMessage(msg);
+        playSound(player, SoundList.Click);
+    }
+
+    public void HoloSelfView() {
+        HoloSelfView(!HoloSelfView, true);
+    }
+
+    void HoloSelfView(boolean bool, boolean message) {
+        HoloSelfView = bool;
+        if (bool) visibilityManager.showTo(player);
+        else visibilityManager.hideTo(player);
+        if (message) {
+            String msg = "§e[自視点ステータスバー]§aを";
+            if (bool) msg += "§b[表示]";
+            else msg += "§c[非表示]";
+            msg += "§aにしました";
+            player.sendMessage(msg);
+            playSound(player, SoundList.Click);
+        }
+    }
+
     public String ViewFormat() {
         return "%." + ViewFormat + "f";
     }
@@ -329,9 +417,11 @@ public class PlayerData {
         viewUpdate();
     }
 
+    public String viewExpPercent() {
+        return String.format("%.3f", (float)Exp/ ReqExp(Level) * 100);
+    }
+
     public void remove() {
-        ViewBar.tickUpdateTask.cancel();
-        PetInventory.task.cancel();
         playerData.remove(player.getUniqueId());
     }
 
@@ -429,6 +519,7 @@ public class PlayerData {
         data.set("Health", Status.Health);
         data.set("Mana", Status.Mana);
         data.set("Map", Map.Id);
+        data.set("Nick", Nick);
 
         data.set("Setting.DamageLog", DamageLog.toString());
         data.set("Setting.ExpLog", ExpLog);
@@ -438,6 +529,12 @@ public class PlayerData {
         data.set("Setting.StrafeMode", StrafeMode.toString());
         data.set("Setting.ShopAmountReset", Shop.AmountReset);
         data.set("Setting.ViewFormat", ViewFormat);
+        data.set("Setting.FishingDisplayNum", FishingDisplayNum);
+        data.set("Setting.FishingUseCombo", Gathering.FishingUseCombo);
+        if (HoloSelfView) data.set("Setting.HoloSelfView", "VISIBLE");
+        else data.set("Setting.HoloSelfView", "HIDDEN");
+        data.set("Others.FishingCombo", Gathering.FishingComboBoost);
+        data.set("Others.FishingSetCombo", Gathering.FishingSetCombo);
         data.set("Setting.PlayMode", PlayMode);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
@@ -447,6 +544,9 @@ public class PlayerData {
         data.set("Setting.Inventory.ItemInventorySortReverse", ItemInventory.SortReverse);
         data.set("Setting.Inventory.RuneInventorySortReverse", RuneInventory.SortReverse);
         data.set("Setting.Inventory.PetInventorySortReverse", PetInventory.SortReverse);
+
+        data.set("Title.List", new ArrayList<>(titleManager.TitleList));
+        data.set("Title.Select", titleManager.Title.Id);
 
         data.set("ActiveTeleportGate", ActiveTeleportGate);
 
@@ -507,6 +607,8 @@ public class PlayerData {
         }
         data.set("Inventory.HotBar", hotBarList);
 
+        statistics.save(data);
+
         try {
             data.save(playerFile);
             player.sendMessage("§eプレイヤデータ§aの§bセーブ§aが完了しました");
@@ -519,19 +621,12 @@ public class PlayerData {
         File playerFile = new File(DataBasePath, "PlayerData/" + player.getUniqueId() + ".yml");
         if (playerFile.exists()) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
-            World world = player.getWorld();
-            double x = data.getDouble("Location.x", SpawnLocation.getX());
-            double y = data.getDouble("Location.y", SpawnLocation.getY());
-            double z = data.getDouble("Location.z", SpawnLocation.getZ());
-            float yaw = (float) data.getDouble("Location.yaw", SpawnLocation.getYaw());
-            float pitch = (float) data.getDouble("Location.pitch", SpawnLocation.getPitch());
-            Location loc = new Location(world, x, y, z, yaw, pitch);
-            player.teleportAsync(loc);
 
             Mel = data.getInt("Mel", 10000);
-            Status.Health = data.getDouble("Health", 20);
-            Status.Mana = data.getDouble("Mana", 100);
+            Status.Health = data.getDouble("Health", -1);
+            Status.Mana = data.getDouble("Mana", -1);
             Map = getMapData(data.getString("Map", "Alden"));
+            Nick = data.getString("Nick", player.getName());
 
             DamageLog = DamageLogType.fromString(data.getString("Setting.DamageLog"));
             ExpLog = data.getBoolean("Setting.ExpLog", false);
@@ -540,6 +635,11 @@ public class PlayerData {
             StrafeMode = StrafeType.fromString(data.getString("Setting.StrafeMode"));
             Shop.AmountReset = data.getBoolean("Setting.ShopAmountReset");
             PvPMode = data.getBoolean("Setting.PvPMode", false);
+            FishingDisplayNum = data.getBoolean("Setting.FishingDisplayNum", false);
+            HoloSelfView = data.getString("Setting.HoloSelfView", "HIDDEN").equals("VISIBLE");
+            Gathering.FishingComboBoost = data.getInt("Others.FishingCombo", 0);
+            Gathering.FishingSetCombo = data.getInt("Others.FishingSetCombo", 0);
+            Gathering.FishingUseCombo = data.getBoolean("Setting.FishingUseCombo", true);
             PlayMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
@@ -549,6 +649,9 @@ public class PlayerData {
             ItemInventory.SortReverse = data.getBoolean("Setting.Inventory.ItemInventorySortReverse",false);
             RuneInventory.SortReverse = data.getBoolean("Setting.Inventory.RuneInventorySortReverse",false);
             PetInventory.SortReverse = data.getBoolean("Setting.Inventory.PetInventorySortReverse",false);
+
+            titleManager.TitleList = new HashSet<>(data.getStringList("Title.List"));
+            titleManager.Title = TitleDataList.getOrDefault(data.getString("Title.Select"), DefaultTitle);
 
             ActiveTeleportGate = data.getStringList("ActiveTeleportGate");
 
@@ -611,17 +714,41 @@ public class PlayerData {
             }
             HotBar.setHotBar(hotBarData);
 
-            if (PlayMode) viewUpdate();
+            if (PlayMode) {
+                viewUpdate();
+                World world = player.getWorld();
+                double x = data.getDouble("Location.x", SpawnLocation.getX());
+                double y = data.getDouble("Location.y", SpawnLocation.getY());
+                double z = data.getDouble("Location.z", SpawnLocation.getZ());
+                float yaw = (float) data.getDouble("Location.yaw", SpawnLocation.getYaw());
+                float pitch = (float) data.getDouble("Location.pitch", SpawnLocation.getPitch());
+                Location loc = new Location(world, x, y, z, yaw, pitch);
+                player.teleportAsync(loc);
+                player.setGameMode(GameMode.SURVIVAL);
+            } else {
+                player.setGameMode(GameMode.CREATIVE);
+            }
 
-            Status.StatusUpdate();
-            ViewBar.tickUpdate();
+            statistics.load(data);
         } else {
-            Status.StatusUpdate();
-            ViewBar.tickUpdate();
-            Tutorial.tutorialTrigger(player, 0);
-            Status.Health = Status.MaxHealth;
-            Status.Mana = Status.MaxMana;
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                Status.Health = Status.MaxHealth;
+                Status.Mana = Status.MaxMana;
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスブレード"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスメイス"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスロッド"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアクトガン"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスシールド"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
+                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
+                Tutorial.tutorialTrigger(player, 0);
+            }, 10, "TutorialTrigger: " + player.getName());
         }
+        Status.StatusUpdate();
+        ViewBar.tickUpdate();
+        MultiThread.TaskRunSynchronizedLater(() -> {
+            isLoaded = true;
+        }, 5);
     }
 
     public static String booleanToTextOrder(boolean bool) {
@@ -674,6 +801,7 @@ public class PlayerData {
         this.ViewInventory = ViewInventory;
         if (log) player.sendMessage("§eインベントリ表示§aを§e[" + ViewInventory.Display + "]§aに切り替えました");
         viewUpdate();
+        Tutorial.tutorialTrigger(player, 1);
     }
 
     public void changeHealth(double health) {
@@ -686,6 +814,11 @@ public class PlayerData {
         }
     }
 
+    public void setHealth(double health) {
+        Status.Health = health;
+        changeHealth(0);
+    }
+
     public void changeMana(double mana) {
         if (Status.Mana+mana > Status.MaxMana) {
             Status.Mana = Status.MaxMana;
@@ -696,27 +829,34 @@ public class PlayerData {
         }
     }
 
+    public void setMana(double mana) {
+        Status.Mana = mana;
+        changeMana(0);
+    }
+
     private boolean RightClickHold = false;
     private BukkitTask RightClickHoldTask;
 
     public void setRightClickHold() {
         RightClickHold = true;
+        if (CastMode.isRenewed()) HotBar.UpdateHotBar();
+        setRightClickHoldTask();
+    }
+
+    void setRightClickHoldTask() {
         if (RightClickHoldTask != null) RightClickHoldTask.cancel();
-        if (CastMode.isRenewed() || CastMode.isHold()) {
-            HotBar.viewBottom();
-        }
         RightClickHoldTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (isRightClickHold()) {
-                setRightClickHold();
-            } else if (CastMode.isRenewed() || CastMode.isHold()) {
-                HotBar.UpdateHotBar();
+            if (player.isHandRaised() || player.isBlocking()) {
+                setRightClickHoldTask();
+            } else {
+                RightClickHold = false;
+                if (CastMode.isRenewed()) HotBar.UpdateHotBar();
             }
-            RightClickHold = false;
-        }, 6);
+        }, 5);
     }
 
     public boolean isRightClickHold() {
-        return RightClickHold || player.isBlocking();
+        return RightClickHold || player.isHandRaised() || player.isBlocking();
     }
 
     public void revival() {
@@ -728,17 +868,17 @@ public class PlayerData {
     public int deadTime = 0;
     public void dead() {
         final Location LastDeadLocation = player.getLocation();
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        MultiThread.TaskRunSynchronized(() -> {
             player.setGameMode(GameMode.SPECTATOR);
             player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
             isDead = true;
             deadTime = 1200;
-            Hologram hologram = HologramsAPI.createHologram(plugin, player.getEyeLocation());
+            Hologram hologram = createHologram("DeadHologram:" + player.getName(), player.getEyeLocation());
             hologram.appendTextLine(Nick);
             ItemStack head = ItemStackPlayerHead(player);
             head.setAmount(1);
             hologram.appendItemLine(head);
-            BTTSet(new BukkitRunnable() {
+            new BukkitRunnable() {
                 @Override
                 public void run() {
                     deadTime -= 10;
@@ -766,7 +906,7 @@ public class PlayerData {
                         if (deadTime < 1100) player.sendTitle("§4§lYou Are Dead", "§e§lスニークでリスポーン", 0, 20, 0);
                     }
                 }
-            }.runTaskTimer(plugin, 0, 10), "PlayerDead:" + player.getName());
-        });
+            }.runTaskTimer(plugin, 0, 10);
+        }, "PlayerDead: " + player.getName());
     }
 }

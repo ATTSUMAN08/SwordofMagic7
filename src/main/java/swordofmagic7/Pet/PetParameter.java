@@ -2,8 +2,6 @@ package swordofmagic7.Pet;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
@@ -12,9 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
@@ -23,13 +19,14 @@ import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectOwnerType;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
-import swordofmagic7.System;
 
 import java.util.*;
 
@@ -37,7 +34,8 @@ import static swordofmagic7.Data.DataBase.getPetData;
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.plugin;
+import static swordofmagic7.System.random;
 
 public class PetParameter implements Cloneable {
     public Player player;
@@ -72,16 +70,13 @@ public class PetParameter implements Cloneable {
     public ItemParameter[] Equipment = new ItemParameter[3];
     public HashMap<StatusParameter, Double> EquipmentStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
-    public EffectManager effectManager = new EffectManager(entity, EffectOwnerType.Pet);
+    public EffectManager effectManager = new EffectManager(entity, EffectOwnerType.Pet, this);
 
     public boolean Summoned = false;
 
     public LivingEntity target;
-    private final Random random = new Random();
 
-    PetParameter() {
-        effectManager.petParameter = this;
-    }
+    PetParameter() {}
 
     ;
 
@@ -97,11 +92,10 @@ public class PetParameter implements Cloneable {
         Stamina = MaxStamina;
         Health = MaxHealth;
         Mana = MaxMana;
-        effectManager.petParameter = this;
     }
 
     public void addExp(int add) {
-        if (MaxLevel > Level) {
+        if (MaxLevel > Level && PlayerData.MaxLevel > Level) {
             Exp += add;
             boolean levelUp = false;
             while (ReqExp() <= Exp) {
@@ -164,8 +158,8 @@ public class PetParameter implements Cloneable {
             Multiply *= 1+basicTamer.Parameter.get(1).Value/100;
         }
         if (effectManager.hasEffect(EffectType.PetBoost)) {
-            MultiplyStatusAdd(StatusParameter.ATK, 0.1d);
-            MultiplyStatusAdd(StatusParameter.DEF, 0.1d);
+            MultiplyStatusAdd(StatusParameter.ATK, 0.2d);
+            MultiplyStatusAdd(StatusParameter.DEF, 0.2d);
         }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
         MaxHealth = (petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);
@@ -243,13 +237,13 @@ public class PetParameter implements Cloneable {
         playerData.PetSummon.add(this);
         PetManager.PetSummonedList.put(entity.getUniqueId(), this);
         effectManager.entity = entity;
-        effectManager.petParameter = this;
         player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました");
         playSound(player, SoundList.Click);
         runAI();
     }
 
     public ItemStack viewPet(String format) {
+        if (petData.Icon == null) Log(petData.Id + " -> Icon Error");
         ItemStack item = new ItemStack(petData.Icon);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(decoText(petData.Display));
@@ -265,7 +259,7 @@ public class PetParameter implements Cloneable {
             Lore.add(decoLore("状態") + "ケージ内 [" + AIState.Display + "]");
         }
         Lore.add(decoLore("成長率") + String.format(format, GrowthRate * 100) + "%");
-        Lore.add(decoLore("レベル") + Level + "/" + MaxLevel);
+        Lore.add(decoLore("レベル") + Level + "/" + Math.min(PlayerData.MaxLevel, MaxLevel));
         Lore.add(decoLore("経験値") + Exp + "/" + ReqExp());
         Lore.add(decoText("ペットステータス"));
         Lore.add(decoLore("スタミナ") + String.format(format, Stamina) + "/" + String.format(format, MaxStamina));
@@ -294,12 +288,14 @@ public class PetParameter implements Cloneable {
     }
 
 
-    private BukkitTask runAITask;
-    private BukkitTask runPathfinderTask;
+    private boolean runAITask;
 
     void stopAI() {
-        if (runAITask != null) runAITask.cancel();
-        if (runPathfinderTask != null) runPathfinderTask.cancel();
+        runAITask = false;
+    }
+
+    public boolean isRunnableAI() {
+        return runAITask && entity != null && plugin.isEnabled();
     }
 
     public Location LastLocation;
@@ -307,55 +303,55 @@ public class PetParameter implements Cloneable {
         stopAI();
         LastLocation = entity.getLocation();
         if (entity instanceof Mob mob) {
-            runPathfinderTask = Bukkit.getScheduler().runTaskTimer(System.plugin, () -> {
-                Vector vector;
-                Location location;
-                double range;
-                if (target != null && AIState.isAttack()) {
-                    location = target.getLocation();
-                    range = 2;
-                } else {
-                    location = player.getEyeLocation();
-                    range = 4;
-                }
-                vector = location.toVector().subtract(entity.getLocation().toVector());
-                mob.lookAt(location);
-                Pathfinder pathfinder = mob.getPathfinder();
-                pathfinder.moveTo(location, 1.5d);
-                if (LastLocation.distance(entity.getLocation()) < 0.5 && location.distance(entity.getLocation()) > range) {
-                    entity.setVelocity(vector.normalize().multiply(0.5).setY(0.5));
-                }
-                LastLocation = entity.getLocation();
-            }, 0, 10);
-            runAITask = Bukkit.getScheduler().runTaskTimer(System.plugin, () -> {
-                if (entity.getLocation().distance(player.getLocation()) > 32) {
-                    entity.teleportAsync(player.getLocation());
-                }
+            Pathfinder pathfinder = mob.getPathfinder();
+            MultiThread.TaskRun(() ->{
+                runAITask = true;
+                while (isRunnableAI()) {
+                    Vector vector;
+                    Location location;
+                    double range;
+                    if (target != null && AIState.isAttack()) {
+                        location = target.getLocation();
+                        range = 2;
+                    } else {
+                        location = player.getEyeLocation();
+                        range = 4;
+                    }
+                    vector = location.toVector().subtract(entity.getLocation().toVector());
+                    MultiThread.TaskRunSynchronized(() -> {
+                        pathfinder.moveTo(location, 1.5d);
+                        if (LastLocation.distance(entity.getLocation()) < 0.5 && location.distance(entity.getLocation()) > range) {
+                            entity.setVelocity(vector.normalize().multiply(0.5).setY(0.5));
+                        }
+                        LastLocation = entity.getLocation();
+                        mob.lookAt(location);
+                        pathfinder.moveTo(location, 1.5d);
+                    });
 
-                if (target == null && AIState.isAttack()) {
-                    double radius = 24;
-                    List<LivingEntity> targets = (List<LivingEntity>) player.getLocation().getNearbyLivingEntities(radius, radius / 2, playerData.Skill.SkillProcess.Predicate());
-                    double distance = radius;
-                    for (LivingEntity entity : targets) {
-                        if (playerData.Skill.SkillProcess.isEnemy(entity) && entity.getLocation().distance(player.getLocation()) < distance) {
-                            distance = entity.getLocation().distance(player.getLocation());
-                            target = entity;
+                    if (target == null && AIState.isAttack()) {
+                        double radius = 24;
+                        List<LivingEntity> targets = Function.NearLivingEntityAtList(player.getLocation(), radius, playerData.Skill.SkillProcess.Predicate());
+                        double distance = radius;
+                        for (LivingEntity entity : targets) {
+                            if (playerData.Skill.SkillProcess.isEnemy(entity) && entity.getLocation().distance(player.getLocation()) < distance) {
+                                distance = entity.getLocation().distance(player.getLocation());
+                                target = entity;
+                            }
                         }
                     }
-                }
-                if (target != null) {
-                    if ((target.getLocation().distance(entity.getLocation()) > 32)
-                    || (MobManager.isEnemy(target) && MobManager.EnemyTable(target.getUniqueId()).isDead)
-                    || (target instanceof Player player && player.getGameMode() != GameMode.SURVIVAL)
-                    || target.isDead()) {
-                        target = null;
-                    } else if (target.getLocation().distance(entity.getLocation()) < 2) {
-                        Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
+                    if (target != null) {
+                        if ((target.getLocation().distance(entity.getLocation()) > 32)
+                                || (MobManager.isEnemy(target) && MobManager.EnemyTable(target.getUniqueId()).isDead())
+                                || (target instanceof Player player && !Function.isAlive(player))
+                                || target.isDead()) {
+                            target = null;
+                        } else if (target.getLocation().distance(entity.getLocation()) < 2) {
+                            Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
+                        }
                     }
+                    MultiThread.sleepTick(10);
                 }
-            }, 0, 20);
-            BTTSet(runPathfinderTask, "PetPathfinder");
-            BTTSet(runAITask, "PetAI");
+            }, "EnemyAI: " + uuid);
         }
     }
 
@@ -370,7 +366,7 @@ public class PetParameter implements Cloneable {
 
     public void cage() {
         stopAI();
-        Bukkit.getScheduler().runTask(System.plugin, () -> {
+        MultiThread.TaskRunSynchronized(() -> {
             entity.remove();
             entity = null;
         });
@@ -378,12 +374,12 @@ public class PetParameter implements Cloneable {
         player.sendMessage("§e[" + petData.Display + "]§aを§eケージ§aに戻しました");
         playerData.PetSummon.remove(this);
         PetManager.PetSummonedList.remove(entity.getUniqueId());
-        playSound(entity.getLocation(), SoundList.Click);
+        playSound(player, SoundList.Click);
     }
 
     public void dead() {
         stopAI();
-        Bukkit.getScheduler().runTask(System.plugin, () -> {
+        MultiThread.TaskRunSynchronized(() -> {
             if (entity != null) entity.remove();
             entity = null;
         });
@@ -392,7 +388,7 @@ public class PetParameter implements Cloneable {
         player.sendMessage("§e[" + petData.Display + "]§aが§eケージ§aに戻りました");
         playerData.PetSummon.remove(this);
         PetManager.PetSummonedList.remove(entity.getUniqueId());
-        playSound(entity.getLocation(), SoundList.Death);
+        playSound(player, SoundList.Death);
     }
 
     public PetParameter(Player player, PlayerData playerData, String data) {

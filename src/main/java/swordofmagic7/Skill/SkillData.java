@@ -24,7 +24,9 @@ public class SkillData implements Cloneable {
     public int RigidTime = 0;
     public int CoolTime = 0;
     public int ReqLevel = 1;
+    public int Stack = 1;
     public List<EquipmentCategory> ReqMainHand = new ArrayList<>();
+    public List<EquipmentCategory> ReqOffHand = new ArrayList<>();
 
     public ItemStack view() {
         if (Icon == null) Icon = Material.END_CRYSTAL;
@@ -34,7 +36,7 @@ public class SkillData implements Cloneable {
         List<String> Lore = new ArrayList<>(this.Lore);
         Lore.add(decoText("§3§lスキルステータス"));
         for (SkillParameter param : Parameter) {
-            Lore.add(decoLore(param.Display) + param.Prefix + param.valueView() + param.Suffix);
+            Lore.add(decoLore(param.Display) + param.valueView());
         }
         Lore.add(decoText("§3§lスキル情報"));
         Lore.add(decoLore("スキルタイプ") + SkillType.Display);
@@ -47,6 +49,9 @@ public class SkillData implements Cloneable {
         Lore.add(decoText("§3§l使用条件"));
         Lore.add(decoLore("クラスレベル") + ReqLevel);
         for (EquipmentCategory category : ReqMainHand) {
+            Lore.add("§7・§e§l" + category.Display);
+        }
+        for (EquipmentCategory category : ReqOffHand) {
             Lore.add("§7・§e§l" + category.Display);
         }
         meta.setLore(Lore);
@@ -71,6 +76,10 @@ public class SkillData implements Cloneable {
         } else {
             return -1;
         }
+    }
+
+    public int ParameterValueInt(int i) {
+        return Math.toIntExact(Math.round(ParameterValue(i)));
     }
 
     @Override

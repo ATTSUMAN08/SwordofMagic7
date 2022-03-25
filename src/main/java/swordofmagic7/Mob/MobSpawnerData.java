@@ -1,14 +1,16 @@
 package swordofmagic7.Mob;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.scheduler.BukkitRunnable;
-import swordofmagic7.System;
+import swordofmagic7.PlayerList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static swordofmagic7.Function.VectorDown;
+import static swordofmagic7.System.plugin;
+import static swordofmagic7.System.random;
 
 public class MobSpawnerData {
     public MobData mobData;
@@ -18,18 +20,18 @@ public class MobSpawnerData {
     public int Radius = 5;
     public int RadiusY = 5;
     public int PerSpawn = 1;
+    public File file;
 
+    private boolean Started = false;
     private final List<EnemyData> SpawnedList = new ArrayList<>();
 
     public void start() {
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
+        if (!Started) {
+            Started = true;
+            Bukkit.getScheduler().runTaskTimer(plugin, () -> {
                 int perSpawn = PerSpawn;
-                List<EnemyData> dataList = new ArrayList<>(SpawnedList);
-                for (EnemyData data : dataList) {
-                    if (data.entity.isDead() || data.isDead) {
+                for (EnemyData data : new ArrayList<>(SpawnedList)) {
+                    if (data.entity == null || data.entity.isDead() || data.isDead()) {
                         data.delete();
                         SpawnedList.remove(data);
                     } else if (data.entity.getLocation().distance(location) > Radius + 24) {
@@ -39,15 +41,12 @@ public class MobSpawnerData {
                 if (SpawnedList.size() + perSpawn > MaxMob) {
                     perSpawn = MaxMob - SpawnedList.size();
                 }
-                if (perSpawn > 0 && location.getNearbyPlayers(Radius + 48, RadiusY + 8).size() > 0) {
-
+                if (perSpawn > 0 && PlayerList.getNear(location, Radius + 48).size() > 0) {
                     for (int i = 0; i < perSpawn; i++) spawn();
                 }
-            }
-        }.runTaskTimer(System.plugin, 0, 20);
+            }, 0, 20);
+        }
     }
-
-    private final Random random = new Random();
 
     public void spawn() {
         for (int i = 0; i < 4; i++) {
@@ -59,9 +58,8 @@ public class MobSpawnerData {
             for (int i2 = 0; i2 < RadiusY * 2; i2++) {
                 boolean spawnAble = !loc.getBlock().getType().isSolid() && loc.clone().add(VectorDown).getBlock().getType().isSolid();
                 if (spawnAble) {
-                    EnemyData enemyData = MobManager.mobSpawn(mobData, Level, loc);
-                    SpawnedList.add(enemyData);
-                    return;
+                    SpawnedList.add(MobManager.mobSpawn(mobData, Level, loc));
+                    break;
                 }
                 loc.add(VectorDown);
             }

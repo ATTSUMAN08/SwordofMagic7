@@ -1,5 +1,8 @@
 package swordofmagic7;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import org.bukkit.*;
@@ -9,34 +12,33 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Data.DataBase;
+import swordofmagic7.Data.DataLoader;
+import swordofmagic7.Data.Editor;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
+import swordofmagic7.Life.LifeStatus;
 import swordofmagic7.Map.WarpGateParameter;
+import swordofmagic7.Market.Market;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetParameter;
-import swordofmagic7.Renderer.MapCustom;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -49,6 +51,14 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 public final class System extends JavaPlugin {
 
     public static Plugin plugin;
+    public static final Random random = new Random();
+    public static final Set<Hologram> HologramSet = new HashSet<>();
+
+    public static Hologram createHologram(String key, Location location) {
+        Hologram hologram = HologramsAPI.createHologram(plugin, location);
+        HologramSet.add(hologram);
+        return hologram;
+    }
 
     private static HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
 
@@ -56,12 +66,20 @@ public final class System extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         EnemyTable = getEnemyTable();
+        //MultiThread.SynchronizedLoopCaster();
+
         Tutorial.onLoad();
 
         new Events(this);
         DataLoad();
+        Dungeon.Initialize();
 
         PlayerList.load();
+
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        if (protocolManager != null) {
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.BLOCK_CHANGE));
+        }
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -72,7 +90,6 @@ public final class System extends JavaPlugin {
         for (WarpGateParameter warp : WarpGateList.values()) {
             warp.start();
         }
-
 
         World world = Bukkit.getWorld("world");
         world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
@@ -85,28 +102,37 @@ public final class System extends JavaPlugin {
         world.setGameRule(GameRule.MOB_GRIEFING, false);
         world.setGameRule(GameRule.DO_MOB_LOOT, false);
 
-        BTTSet(Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
-            for (PlayerData playerData : PlayerData.playerDataList().values()) {
-                playerData.saveCloseInventory();
+            for (PlayerData playerData : new HashSet<>(PlayerData.playerDataList().values())) {
+                if (playerData.player.isOnline()) {
+                    playerData.saveCloseInventory();
+                } else {
+                    playerData.remove();
+                }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
+            for (Hologram hologram : new HashSet<>(HologramSet)) {
+                if (hologram.isDeleted()) HologramSet.remove(hologram);
+            }
         }, 200, 6000), "AutoSave");
     }
 
     @Override
     public void onDisable() {
 
-        for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
-            hologram.delete();
+        MultiThread.closeMultiThreads();
+
+        for (Hologram hologram : HologramSet) {
+            if (!hologram.isDeleted()) hologram.delete();
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
+            player.sendMessage("§cシステムをリロードします");
             HashMap<UUID, PlayerData> list = playerDataList();
             if (list.containsKey(player.getUniqueId())) {
                 PlayerData playerData = list.get(player.getUniqueId());
-                playerData.PetInventory.task.cancel();
                 playerData.save();
                 for (PetParameter pet : playerData.PetSummon) {
                     pet.entity.remove();
@@ -116,7 +142,7 @@ public final class System extends JavaPlugin {
 
         int count = 0;
         for (EnemyData enemyData : EnemyTable.values()) {
-            enemyData.entity.remove();
+            if (enemyData.entity != null) enemyData.entity.remove();
             count++;
         }
         for (Entity entity : Bukkit.getWorld("world").getEntities()) {
@@ -139,51 +165,11 @@ public final class System extends JavaPlugin {
         }
         if (sender instanceof Player player) {
             PlayerData playerData = playerData(player);
-            if (player.hasPermission("som7.debug")) {
+            if (player.hasPermission("som7.developer")) {
                 if (cmd.getName().equalsIgnoreCase("test")) {
-                    if (args.length == 1) {
-                        if (args[0].equalsIgnoreCase("a")) {
-                            Bukkit.getScheduler().runTask(plugin, () -> {
-                                for (int i = 0; i < 500; i++) {
-                                    player.sendTitle("Time" + i, "", 0, 1, 0);
-                                    try {
-                                        Thread.sleep(10);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                        } else if (args[0].equalsIgnoreCase("b")) {
-                            new BukkitRunnable() {
-                                int i = 0;
-                                @Override
-                                public void run() {
-                                    if (i > 100) this.cancel();
-                                    player.sendTitle("Time" + i, "", 0, 1, 0);
-                                    i++;
-                                }
-                            }.runTaskTimerAsynchronously(plugin, 0, 1);
-                        }
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("gm")) {
-                    if (args.length == 0) {
-                        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-                            player.setGameMode(GameMode.SURVIVAL);
-                        } else {
-                            player.setGameMode(GameMode.CREATIVE);
-                        }
-                    } else {
-                        if (args[0].equalsIgnoreCase("0")) {
-                            player.setGameMode(GameMode.SURVIVAL);
-                        } else if (args[0].equalsIgnoreCase("1")) {
-                            player.setGameMode(GameMode.CREATIVE);
-                        } else if (args[0].equalsIgnoreCase("2")) {
-                            player.setGameMode(GameMode.ADVENTURE);
-                        } else if (args[0].equalsIgnoreCase("3")) {
-                            player.setGameMode(GameMode.SPECTATOR);
-                        }
-                    }
+                    MultiThread.TaskRun(() -> {
+
+                    }, "RayTest");
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("get")) {
                     if (args.length >= 1) {
@@ -249,25 +235,6 @@ public final class System extends JavaPlugin {
                     } else {
                         player.sendMessage("§c無効なプレイヤーです");
                     }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("playMode")) {
-                    playerData.PlayMode = !playerData.PlayMode;
-                    if (playerData.PlayMode) {
-                        player.setGameMode(GameMode.SURVIVAL);
-                        player.closeInventory();
-                    } else {
-                        player.setGameMode(GameMode.CREATIVE);
-                        player.getInventory().clear();
-                    }
-                    player.sendMessage("§ePlayMode: " + playerData.PlayMode);
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("flySpeed")) {
-                    if (args.length == 1) {
-                        player.setFlySpeed(Float.parseFloat(args[0]));
-                    } else {
-                        player.setFlySpeed(0.2f);
-                    }
-                    player.sendMessage("FlySpeed: " + player.getFlySpeed());
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("bukkitTasks")) {
                     player.sendMessage("TaggedTasks: ");
@@ -366,6 +333,75 @@ public final class System extends JavaPlugin {
                             player.sendMessage("/setItemEquipmentStatusMultiply <Series> <StatusMultiply>");
                         }
                     }
+                } else if (cmd.getName().equalsIgnoreCase("itemDataEdit")) {
+                    Editor.itemDataEditCommand(player, args);
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataEdit")) {
+                    Editor.mobSpawnerDataEditCommand(player, args);
+                    return true;
+                }
+            }
+
+            if (player.hasPermission("som7.data.reload")) {
+                if (cmd.getName().equalsIgnoreCase("dataReload")) {
+                    for (Player loopPlayer : Bukkit.getOnlinePlayers()) {
+                        playerData(loopPlayer).save();
+                    }
+                    DataLoader.AllLoad();
+                    for (Player loopPlayer : Bukkit.getOnlinePlayers()) {
+                        playerData(loopPlayer).load();
+                    }
+                    return true;
+                }
+            }
+
+            if (player.hasPermission("som7.builder")) {
+                if (cmd.getName().equalsIgnoreCase("gm")) {
+                    if (args.length == 0) {
+                        if (player.getGameMode().equals(GameMode.CREATIVE)) {
+                            player.setGameMode(GameMode.SURVIVAL);
+                        } else {
+                            player.setGameMode(GameMode.CREATIVE);
+                        }
+                    } else {
+                        if (args[0].equalsIgnoreCase("0")) {
+                            player.setGameMode(GameMode.SURVIVAL);
+                        } else if (args[0].equalsIgnoreCase("1")) {
+                            player.setGameMode(GameMode.CREATIVE);
+                        } else if (args[0].equalsIgnoreCase("2")) {
+                            player.setGameMode(GameMode.ADVENTURE);
+                        } else if (args[0].equalsIgnoreCase("3")) {
+                            player.setGameMode(GameMode.SPECTATOR);
+                        }
+                    }
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("playMode")) {
+                    playerData.PlayMode = !playerData.PlayMode;
+                    if (playerData.PlayMode) {
+                        player.setGameMode(GameMode.SURVIVAL);
+                        player.closeInventory();
+                    } else {
+                        player.setGameMode(GameMode.CREATIVE);
+                        player.getInventory().clear();
+                    }
+                    player.sendMessage("§ePlayMode: " + playerData.PlayMode);
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("flySpeed")) {
+                    if (args.length == 1) {
+                        player.setFlySpeed(Float.parseFloat(args[0]));
+                    } else {
+                        player.setFlySpeed(0.2f);
+                    }
+                    player.sendMessage("FlySpeed: " + player.getFlySpeed());
+                    return true;
+                }
+            }
+
+            if (player.hasPermission("som7.title.editor")) {
+                if (cmd.getName().equalsIgnoreCase("titleReload")) {
+                    DataLoader.TitleDataLoad();
+                    Log("§aDataLoader -> TitleLoad");
+                    return true;
                 }
             }
 
@@ -396,17 +432,20 @@ public final class System extends JavaPlugin {
             } else if (cmd.getName().equalsIgnoreCase("strafeMode")) {
                 playerData.StrafeMode();
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("fishingDisplayNum")) {
+                playerData.FishingDisplayNum();
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("castMode")) {
                 playerData.CastMode();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("viewFormat")) {
                 playerData.changeViewFormat();
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("holoSelfView")) {
+                playerData.HoloSelfView();
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("spawn")) {
-                MapList.get("Alden").enter(player);
-                player.setFlying(false);
-                player.setGravity(true);
-                player.teleportAsync(SpawnLocation);
+                spawnPlayer(player);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("info")) {
                 Player target = player;
@@ -431,6 +470,53 @@ public final class System extends JavaPlugin {
                     }
                 } else {
                     player.sendMessage("§e/reqExp <Level>");
+                }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("reqExpAll")) {
+                if (args.length == 1) {
+                    try {
+                        int level = Integer.parseInt(args[0]);
+                        if (level > PlayerData.MaxLevel) level = PlayerData.MaxLevel;
+                        int reqExp = 0;
+                        for (int i = 1; i < level; i++) {
+                            reqExp += Classes.ReqExp(level);
+                        }
+                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
+                    } catch (Exception ignored) {
+                        player.sendMessage("§e/reqExpAll <Level>");
+                    }
+                } else {
+                    player.sendMessage("§e/reqExpAll <Level>");
+                }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("reqLifeExp")) {
+                if (args.length == 1) {
+                    try {
+                        int level = Integer.parseInt(args[0]);
+                        int reqExp = LifeStatus.LifeReqExp(level);
+                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
+                    } catch (Exception ignored) {
+                        player.sendMessage("§e/reqLifeExp <Level>");
+                    }
+                } else {
+                    player.sendMessage("§e/reqLifeExp <Level>");
+                }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("reqLifeExpAll")) {
+                if (args.length == 1) {
+                    try {
+                        int level = Integer.parseInt(args[0]);
+                        if (level > LifeStatus.MaxLifeLevel) level = LifeStatus.MaxLifeLevel;
+                        int reqExp = 0;
+                        for (int i = 1; i < level; i++) {
+                            reqExp += LifeStatus.LifeReqExp(level);
+                        }
+                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
+                    } catch (Exception ignored) {
+                        player.sendMessage("§e/reqLifeExpAll <Level>");
+                    }
+                } else {
+                    player.sendMessage("§e/reqLifeExpAll <Level>");
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("tagGame")) {
@@ -469,13 +555,16 @@ public final class System extends JavaPlugin {
                 playerData.PetInventory.PetInventorySortReverse();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("tutorial")) {
-                Tutorial.tutorialTrigger(player, 0);
+                Tutorial.tutorialHub(player);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("trade")) {
                 TradeManager.tradeCommand(player, playerData, args);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("textView")) {
                 TextViewManager.TextView(player, args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("checkTitle")) {
+                playerData.statistics.checkTitle();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("uuid")) {
                 Player target;
@@ -500,9 +589,54 @@ public final class System extends JavaPlugin {
             } else if (cmd.getName().equalsIgnoreCase("sideBarToDo")) {
                 playerData.SideBarToDo.SideBarToDoCommand(args);
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("setTitle")) {
+                if (args.length == 1) {
+                    if (TitleDataList.containsKey(args[0])) {
+                        playerData.titleManager.setTitle(TitleDataList.get(args[0]));
+                    } else {
+                        player.sendMessage("§a存在しない称号です");
+                        playSound(player, SoundList.Nope);
+                    }
+                } else {
+                    playerData.titleManager.Title = TitleDataList.get("称号無し");
+                    player.sendMessage("§a称号を外しました");
+                    playSound(player, SoundList.Tick);
+                }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("auction")) {
+                Auction.auctionCommand(playerData, args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("market")) {
+                Market.marketCommand(playerData, args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("setFishingCombo")) {
+                if (!playerData.Gathering.FishingUseCombo) {
+                    try {
+                        int combo = Integer.parseInt(args[0]);
+                        if (playerData.Gathering.FishingComboBoost > combo && combo > 0) {
+                            playerData.Gathering.FishingSetCombo = combo;
+                            player.sendMessage("§eComboを" + combo + "に設定しました");
+                        } else {
+                            player.sendMessage("§eCombo: 1 ~ " + (playerData.Gathering.FishingComboBoost - 1));
+                        }
+                    } catch (Exception ignored) {
+                        player.sendMessage("§e/setFishingCombo <combo>");
+                    }
+                } else {
+                    player.sendMessage("§a現在の§e[釣獲モード]§aでは利用できません");
+                }
+                playSound(player, SoundList.Tick);
+                return true;
             }
         }
         return false;
+    }
+
+    public static void spawnPlayer(Player player) {
+        MapList.get("Alden").enter(player);
+        player.setFlying(false);
+        player.setGravity(true);
+        player.teleportAsync(SpawnLocation);
     }
 
     public static HashMap<BukkitTask, String> BukkitTaskTag = new HashMap<>();

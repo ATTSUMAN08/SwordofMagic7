@@ -1,10 +1,10 @@
 package swordofmagic7.Mob;
 
-import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,6 +28,10 @@ public final class MobManager {
 
     public static HashMap<UUID, EnemyData> getEnemyTable() {
         return EnemyTable;
+    }
+
+    public static Collection<EnemyData> getEnemyList() {
+        return EnemyTable.values();
     }
 
     public static EnemyData mobSpawn(MobData baseData, int level, Location location) {

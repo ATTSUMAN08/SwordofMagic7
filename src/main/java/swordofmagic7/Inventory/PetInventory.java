@@ -1,27 +1,24 @@
 package swordofmagic7.Inventory;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitTask;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
-import swordofmagic7.System;
 
 import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.BTTSet;
+import static swordofmagic7.System.plugin;
 
 public class PetInventory extends BasicInventory {
     public final int MaxSlot = 300;
     private final List<PetParameter> List = new ArrayList<>();
     private final HashMap<UUID, PetParameter> HashMap = new HashMap<>();
-    public BukkitTask task;
     public PetInventory(Player player, PlayerData playerData) {
         super(player, playerData);
     }
@@ -29,26 +26,25 @@ public class PetInventory extends BasicInventory {
     public boolean SortReverse = false;
 
     public void start() {
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(System.plugin, () -> {
-            if (List.size() > 0) {
-                if (!player.isOnline() || !System.plugin.isEnabled()) {
-                    task.cancel();
-                }
-                for (PetParameter pet : List) {
-                    if (!pet.Summoned) {
-                        pet.changeStamina(1);
+        MultiThread.TaskRun(() -> {
+            while (player.isOnline() && plugin.isEnabled()) {
+                if (List.size() > 0) {
+                    for (PetParameter pet : List) {
+                        if (!pet.Summoned) {
+                            pet.changeStamina(1);
+                        }
+                        pet.Health += pet.HealthRegen / 5;
+                        pet.Mana += pet.ManaRegen / 5;
+                        if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth;
+                        if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana;
                     }
-                    pet.Health += pet.HealthRegen / 5;
-                    pet.Mana += pet.ManaRegen / 5;
-                    if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth;
-                    if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana;
+                    if (playerData.ViewInventory.isPet()) {
+                        viewPet();
+                    }
                 }
-                if (playerData.ViewInventory.isPet()) {
-                    viewPet();
-                }
+                MultiThread.sleepTick(20);
             }
-        }, 0, 20);
-        BTTSet(task, "PetInventory");
+        }, "PetInventory: " + player.getName());
     }
 
     public List<PetParameter> getList() {

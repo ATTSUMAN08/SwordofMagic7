@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TagGame;
 
@@ -84,12 +85,14 @@ public class MapManager {
     }
 
     public void TeleportGateUse(TeleportGateParameter teleport) {
-        if (teleport.DefaultActive || playerData.ActiveTeleportGate.contains(teleport.Id)) {
-            player.teleportAsync(teleport.Location);
-            player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
-            playSound(player, SoundList.LevelUp);
-            lastTeleportGate = teleport.Id;
-            playerData.Map = teleport.Map;
+        if (teleport.DefaultActive || playerData.ActiveTeleportGate.contains(teleport.Id) || player.hasPermission("som7.builder")) {
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                player.teleportAsync(teleport.Location);
+                player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
+                playSound(player, SoundList.LevelUp);
+                lastTeleportGate = teleport.Id;
+                playerData.Map = teleport.Map;
+            }, 1);
         } else {
             player.sendMessage("§e[転移門]§aが§b[有効化]§aされていません");
             playSound(player, SoundList.Nope);

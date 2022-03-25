@@ -7,9 +7,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import swordofmagic7.Classes.ClassData;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Function;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Sound.SoundList;
 
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.AttributeMenuDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -66,6 +64,15 @@ public class Attribute {
         }
     }
 
+    public void revAttribute(AttributeType type, int rev) {
+        if (Parameter.get(type) >= rev) {
+            AttributePoint += rev;
+            Parameter.put(type, Parameter.get(type) - rev);
+        } else {
+            player.sendMessage("§eポイント§aが足りません");
+        }
+    }
+
     public void setAttribute(AttributeType type, int attr) {
         Parameter.put(type, attr);
     }
@@ -99,7 +106,7 @@ public class Attribute {
             Lore.add(decoLore("クリティカル発生") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
         } else if (type == AttributeType.SPI) {
             Lore.add(decoLore("最大マナ") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
-            Lore.add(decoLore("マナ自動回復") + "+" + String.format(format, Parameter.get(type) * 0.6) + "%");
+            Lore.add(decoLore("マナ自動回復") + "+" + String.format(format, Parameter.get(type) * 0.05) + "%");
             Lore.add(decoLore("治癒力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
             Lore.add(decoLore("クリティカル耐性") + "+" + String.format(format, Parameter.get(type) * 0.2) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
@@ -140,16 +147,24 @@ public class Attribute {
 
     public void AttributeMenuClick(InventoryView view, InventoryAction action, ItemStack currentItem) {
         if (equalInv(view, AttributeMenuDisplay)) {
-            int x = 1;
-            if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) x = 10;
             Attribute attr = playerData.Attribute;
             for (AttributeType attrType : AttributeType.values()) {
                 if (currentItem.getType() == attrType.Icon) {
-                    attr.addAttribute(attrType, x);
+                    switch (action) {
+                        case MOVE_TO_OTHER_INVENTORY -> attr.addAttribute(attrType, 10);
+                        case PICKUP_ALL -> attr.addAttribute(attrType, 1);
+                        case PICKUP_HALF -> {
+                            if (playerData.Map.Safe) {
+                                attr.revAttribute(attrType, 1);
+                            } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
+                        }
+                    }
                 }
             }
             if (currentItem.getType() == Material.EXPERIENCE_BOTTLE) {
-                attr.resetAttribute();
+                if (playerData.Map.Safe) {
+                    attr.resetAttribute();
+                } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
             }
             AttributeMenuLoad();
             playSound(player, SoundList.Click);

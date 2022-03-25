@@ -1,16 +1,15 @@
 package swordofmagic7.HotBar;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
-import swordofmagic7.Tutorial;
 
 import java.util.UUID;
 
-import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
@@ -50,6 +49,8 @@ public class HotBar {
                     if (item != null) {
                         if (item.Category.isPotion()) {
                             item.itemPotion.usePotion(player, item);
+                        } else if (item.Category.isCook()) {
+                            item.itemCook.useCook(player, item);
                         } else if (item.Category.isEquipment()) {
                             playerData.Equipment.Equip(item.itemEquipmentData.EquipmentSlot, item);
                             playerData.viewUpdate();
@@ -121,27 +122,45 @@ public class HotBar {
     }
 
     public void viewBottom() {
-        int offset = 0;
-        if (playerData.CastMode.isRenewed()) {
-            if (player.isSneaking()) offset += 8;
-            if (playerData.isRightClickHold()) offset += 16;
-        } else if (playerData.CastMode.isHold()) {
-            if (player.isSneaking()) offset += 8;
-        }
-        for (int i = 0; i < 8; i++) {
-            int slot = i + offset;
-            if (HotBarData[slot] == null) HotBarData[slot] = new HotBarData();
-            player.getInventory().setItem(i, HotBarData[slot].view(playerData, slot+1, SelectSlot == slot));
+        if (playerData.PlayMode && player.getGameMode() == GameMode.SURVIVAL) {
+            int offset = 0;
+            if (playerData.CastMode.isRenewed()) {
+                if (player.isSneaking()) offset += 8;
+                if (playerData.isRightClickHold()) offset += 16;
+            } else if (playerData.CastMode.isHold()) {
+                if (player.isSneaking()) offset += 8;
+            }
+            for (int i = 0; i < 8; i++) {
+                int slot = i + offset;
+                if (HotBarData[slot] == null) HotBarData[slot] = new HotBarData();
+                player.getInventory().setItem(i, HotBarData[slot].view(playerData, slot + 1, SelectSlot == slot));
+            }
         }
     }
 
     public void viewTop() {
-        playerData.ViewInventory = ViewInventoryType.HotBar;
-        int slot = 9;
-        for (int i = 8; i < 32; i++) {
-            player.getInventory().setItem(slot, HotBarData[i].view(playerData, i+1, SelectSlot == i));
-            slot++;
-            if (slot == 17 || slot == 26 || slot == 35) slot++;
+        if (playerData.PlayMode) {
+            playerData.ViewInventory = ViewInventoryType.HotBar;
+            int slot = 9;
+            for (int i = 8; i < 32; i++) {
+                player.getInventory().setItem(slot, HotBarData[i].view(playerData, i + 1, SelectSlot == i));
+                slot++;
+                if (slot == 17 || slot == 26 || slot == 35) slot++;
+            }
         }
+    }
+
+    public void ScrollUp() {
+        HotBarData[] HotBarDataOld = HotBarData.clone();
+        System.arraycopy(HotBarDataOld, 8, HotBarData, 0, 24);
+        System.arraycopy(HotBarDataOld, 0, HotBarData, 24, 8);
+        playSound(player, SoundList.Tick);
+    }
+
+    public void ScrollDown() {
+        HotBarData[] HotBarDataOld = HotBarData.clone();
+        System.arraycopy(HotBarDataOld, 0, HotBarData, 8, 24);
+        System.arraycopy(HotBarDataOld, 24, HotBarData, 0, 8);
+        playSound(player, SoundList.Tick);
     }
 }

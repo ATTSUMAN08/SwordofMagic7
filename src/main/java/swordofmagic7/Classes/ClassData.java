@@ -19,6 +19,7 @@ public class ClassData {
     public List<String> Lore;
     public String Display;
     public String Nick;
+    public boolean ProductionClass = false;
     public List<SkillData> SkillList = new ArrayList<>();
     public HashMap<ClassData, Integer> ReqClass= new HashMap<>();
 
@@ -35,6 +36,21 @@ public class ClassData {
         for (Map.Entry<ClassData, Integer> classes : ReqClass.entrySet()) {
             lore.add("§7・§e§l" + classes.getKey().Display + " Lv" + classes.getValue());
         }
-        return new ItemStackData(Icon, decoText(Display), lore).view();
+        return new ItemStackData(Icon, decoText(Color + Display), lore).view();
+    }
+
+    public String getDisplay() {
+        return getDisplay(true);
+    }
+
+    public String getDisplay(boolean bold) {
+        return getDisplay(bold, false);
+    }
+
+    public String getDisplay(boolean bold, boolean brackets) {
+        String _return = Display;
+        if (brackets) _return = "[" + _return + "]";
+        if (bold) _return = "§l" + _return;
+        return Color + _return;
     }
 }

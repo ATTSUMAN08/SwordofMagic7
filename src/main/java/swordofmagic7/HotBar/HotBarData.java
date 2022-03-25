@@ -4,15 +4,20 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillData;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 
 public class HotBarData implements Cloneable {
     public HotBarCategory category = HotBarCategory.None;
@@ -52,19 +57,40 @@ public class HotBarData implements Cloneable {
             case Skill -> {
                 SkillData skillData = getSkillData(Icon);
                 item = skillData.view().clone();
-                int cooltime = playerData.Skill.getSkillCoolTime(skillData);
-                if (cooltime > 0) item.setType(Material.NETHER_STAR);
-                amount = (int) Math.ceil(cooltime / 20f);
+                if (playerData.Skill.SkillStack(skillData) > 0) {
+                    amount = playerData.Skill.SkillStack(skillData);
+                } else {
+                    item.setType(Material.NETHER_STAR);
+                    amount = (int) Math.ceil(playerData.Skill.getSkillCoolTime(skillData) / 20f);
+                }
             }
             case Item -> {
                 ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(Icon);
+                List<String> addLore = new ArrayList<>();
                 if (itemParameter != null) {
                     ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(itemParameter);
                     amount = stack.Amount;
+                    if (itemParameter.Category.isPotion() || itemParameter.Category.isCook()) {
+                        addLore.add(decoText("§3§lアイテムスタック"));
+                        addLore.add(decoLore("個数") + stack.Amount);
+                    }
                 } else {
                     itemParameter = getItemParameter(Icon);
                 }
                 item = itemParameter.viewItem(1, format).clone();
+                ItemMeta meta = item.getItemMeta();
+                if (addLore.size() > 0) {
+                    List<String> Lore = new ArrayList<>(meta.getLore());
+                    Lore.addAll(addLore);
+                    meta.setLore(Lore);
+                    item.setItemMeta(meta);
+                }
+                if (itemParameter.Category.isPotion()) {
+                    if (playerData.PotionCoolTime.containsKey(itemParameter.itemPotion.PotionType)) {
+                        item.setType(Material.GLASS_BOTTLE);
+                        amount = playerData.PotionCoolTime.get(itemParameter.itemPotion.PotionType);
+                    }
+                }
             }
             case Pet -> {
                 if (playerData.PetInventory.getHashMap().containsKey(UUID.fromString(Icon))) {
@@ -75,13 +101,16 @@ public class HotBarData implements Cloneable {
                     item = FlameItem(slot).clone();
                 }
             }
-            default -> item = FlameItem(slot).clone();
+            default -> {
+                item = FlameItem(slot).clone();
+                amount = slot;
+            }
         }
         if (glow) {
             item.addUnsafeEnchantment(Enchantment.DURABILITY, 0);
             item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        item.setAmount(Math.max(Math.min(127, amount), 1));
+        item.setAmount(Math.max(Math.min(99, amount), 1));
         return item;
     }
 

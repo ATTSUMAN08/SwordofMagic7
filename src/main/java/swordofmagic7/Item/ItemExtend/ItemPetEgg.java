@@ -6,10 +6,9 @@ import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Pet.PetData;
 import swordofmagic7.Pet.PetParameter;
 
-import java.util.Random;
-
 import static swordofmagic7.Data.DataBase.PetList;
 import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.System.random;
 
 public class ItemPetEgg implements Cloneable  {
     public String PetId;
@@ -21,7 +20,6 @@ public class ItemPetEgg implements Cloneable  {
         playerData.ItemInventory.removeItemParameter(clickedItem, 1);
         PetData petData = PetList.get(clickedItem.itemPetEgg.PetId);
         ItemPetEgg petEgg = clickedItem.itemPetEgg;
-        Random random = new Random();
         PetParameter pet = new PetParameter(player, playerData, petData, petEgg.PetLevel, petEgg.PetMaxLevel, 0, random.nextDouble()+0.5);
         playerData.PetInventory.addPetParameter(pet);
     }

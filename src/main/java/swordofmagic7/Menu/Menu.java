@@ -1,6 +1,5 @@
 package swordofmagic7.Menu;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -13,24 +12,28 @@ import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
-import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Life.Cook.Cook;
+import swordofmagic7.Life.Smith.Smelt;
+import swordofmagic7.Life.Smith.SmithEquipment;
+import swordofmagic7.Market.Market;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Data.DataBase.ItemFlame;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.Life.Smith.SmithEquipment.SmeltEquipmentMaterializationDisplay;
 import static swordofmagic7.Menu.Data.*;
-import static swordofmagic7.Shop.PetShop.PetSellDisplay;
-import static swordofmagic7.Shop.PetShop.PetSyntheticDisplay;
+import static swordofmagic7.Shop.PetShop.*;
 import static swordofmagic7.Shop.RuneShop.RuneEquipDisplay;
-import static swordofmagic7.Shop.RuneShop.RuneShopMenuDisplay;
 import static swordofmagic7.Shop.Shop.ShopSellDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.System.spawnPlayer;
 
 public class Menu {
 
@@ -40,6 +43,11 @@ public class Menu {
     public final Setting Setting;
     public final Trigger Trigger;
     public final Smith Smith;
+    public final TitleMenu TitleMenu;
+    public final Cook Cook;
+    public final Smelt Smelt;
+    public final Market Market;
+    public final SmithEquipment SmithEquipment;
 
     public Menu(Player player, PlayerData playerData) {
         this.player = player;
@@ -48,19 +56,31 @@ public class Menu {
         Setting = new Setting(player, playerData);
         Trigger = new Trigger(player, playerData);
         Smith = new Smith(player, playerData);
+        TitleMenu = new TitleMenu(playerData);
+        Cook = new Cook(playerData);
+        Smelt = new Smelt(playerData);
+        Market = new Market(playerData);
+        SmithEquipment = new SmithEquipment(playerData);
     }
 
     public void UserMenuView() {
-        Inventory inv = decoInv(UserMenuDisplay, 1);
+        Inventory inv = decoInv(UserMenuDisplay, 3);
         inv.setItem(0, UserMenu_ItemInventory);
         inv.setItem(1, UserMenu_RuneInventory);
         inv.setItem(2, UserMenu_PetInventory);
         inv.setItem(3, UserMenu_HotBar);
-        inv.setItem(4, UserMenu_AttributeMenuIcon);
-        inv.setItem(5, UserMenu_SkillMenuIcon);
-        inv.setItem(6, UserMenu_TriggerMenuIcon);
-        inv.setItem(7, UserMenu_StatusInfoIcon);
-        inv.setItem(8, UserMenu_SettingMenuIcon);
+        inv.setItem(8, UserMenu_SpawnIcon);
+
+        inv.setItem(18, UserMenu_AttributeMenuIcon);
+        inv.setItem(19, UserMenu_SkillMenuIcon);
+        inv.setItem(20, UserMenu_TriggerMenuIcon);
+        inv.setItem(21, UserMenu_StatusInfoIcon);
+        inv.setItem(22, UserMenu_TitleMenuIcon);
+        inv.setItem(23, UserMenu_SettingMenuIcon);
+
+        for (int i = 9; i < 18; i++) {
+            inv.setItem(i, ItemFlame);
+        }
         player.openInventory(inv);
     }
 
@@ -88,6 +108,8 @@ public class Menu {
                 || equalInv(view, ShopSellDisplay)
                 || equalInv(view, PetSyntheticDisplay)
                 || equalInv(view, PetSellDisplay)
+                || equalInv(view, PetEvolutionDisplay)
+                || equalInv(view, SmeltEquipmentMaterializationDisplay)
                 );
     }
 
@@ -130,18 +152,20 @@ public class Menu {
                         if (index > -1) {
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
-                                if (EquipAble() && clickedItem.Category == ItemCategory.Equipment) {
+                                if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
                                     playSound(player, SoundList.Click);
-                                } else if (clickedItem.Category.isPetEgg()) {
+                                } else if (EquipAble() && clickedItem.Category.isPetEgg()) {
                                     clickedItem.itemPetEgg.usePetEgg(player, clickedItem);
                                     playSound(player, SoundList.Click);
-                                } else if (clickedItem.Category.isPotion()) {
+                                } else if (EquipAble() && clickedItem.Category.isPotion()) {
                                     clickedItem.itemPotion.usePotion(player, clickedItem);
-                                } else if (clickedItem.Category.isTool()) {
+                                } else if (EquipAble() && clickedItem.Category.isCook()) {
+                                    clickedItem.itemCook.useCook(player, clickedItem);
+                                } else if (EquipAble() && clickedItem.Category.isTool()) {
                                     playerData(player).Equipment.Equip(EquipmentSlot.MainHand, clickedItem);
                                     playSound(player, SoundList.Click);
-                                } else if (clickedItem.Category.isPetFood()) {
+                                } else if (EquipAble() && clickedItem.Category.isPetFood()) {
                                     clickedItem.itemPetFood.usePetFood(player, clickedItem);
                                 }
                             }
@@ -166,7 +190,9 @@ public class Menu {
             } else if (playerData.ViewInventory.isHotBar()) {
                 if (8 < Slot && Slot < 36)
                 switch (Slot) {
-                    case 17, 26, 35 -> {}
+                    case 26 -> {}
+                    case 17 -> playerData.HotBar.ScrollUp();
+                    case 35 -> playerData.HotBar.ScrollDown();
                     default -> {
                         playerData.HotBar.setSelectSlot(slotToIndex(Slot));
                         Trigger.TriggerMenuView();
@@ -194,8 +220,10 @@ public class Menu {
         if (currentItem != null) {
             playerData.RuneShop.RuneMenuClick(view, ClickInventory, currentItem, index, Slot);
             playerData.PetShop.PetShopClick(view, ClickInventory, currentItem, index, Slot);
+            playerData.PetEvolution.PetEvolutionClick(view, ClickInventory, index, Slot);
             playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);
             playerData.Shop.ShopSellClick(view, ClickInventory, index, Slot);
+            SmithEquipment.SmeltMenuClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
                 playerData.Classes.ClassSelectClick(view, Slot);
                 playerData.Attribute.AttributeMenuClick(view, action, currentItem);
@@ -205,6 +233,11 @@ public class Menu {
                 Setting.SettingMenuClick(view, currentItem);
                 Trigger.TriggerMenuClick(view, currentItem, Slot);
                 Smith.SmithMenuClick(view, currentItem);
+                TitleMenu.TitleMenuClick(view, currentItem, Slot);
+                Cook.CookMenuClick(view, currentItem, Slot);
+                Smelt.SmeltMenuClick(view, currentItem, Slot);
+                Market.MarketMenuClick(view, currentItem, Slot);
+                playerData.Skill.getAlchemist().AlchemyClick(view, currentItem, Slot);
             } else if (ClickInventory == view.getBottomInventory()) {
 
             }
@@ -215,16 +248,12 @@ public class Menu {
                 if (ClickInventory == view.getTopInventory()) {
                     if (equalItem(currentItem, UserMenu_ItemInventory)) {
                         playerData.setView(ViewInventoryType.ItemInventory);
-                        Tutorial.tutorialTrigger(player, 2);
                     } else if (equalItem(currentItem, UserMenu_RuneInventory)) {
                         playerData.setView(ViewInventoryType.RuneInventory);
-                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_PetInventory)) {
                         playerData.setView(ViewInventoryType.PetInventory);
-                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_HotBar)) {
                         playerData.setView(ViewInventoryType.HotBar);
-                        Tutorial.tutorialTrigger(player, 1);
                     } else if (equalItem(currentItem, UserMenu_SettingMenuIcon)) {
                         Setting.SettingMenuView();
                     } else if (equalItem(currentItem, UserMenu_SkillMenuIcon)) {
@@ -237,6 +266,13 @@ public class Menu {
                         playerData.Attribute.AttributeMenuView();
                     } else if (equalItem(currentItem, UserMenu_StatusInfoIcon)) {
                         StatusInfo.StatusInfoView(player);
+                    } else if (equalItem(currentItem, UserMenu_TitleMenuIcon)) {
+                        TitleMenu.TitleMenuView();
+                    } else if (equalItem(currentItem, UserMenu_SpawnIcon)) {
+                        if (Tutorial.TutorialProcess.containsKey(player)) {
+                            player.sendMessage("§eチュートリアル中§aは使用できません");
+                            playSound(player, SoundList.Nope);
+                        } else spawnPlayer(player);
                     }
                     playSound(player, SoundList.Click);
                 }
@@ -251,15 +287,18 @@ public class Menu {
         playerData.Upgrade.UpgradeClose(view);
         playerData.Shop.ShopClose();
         playerData.PetShop.PetSyntheticClose(view);
+        playerData.PetEvolution.PetEvolutionClose(view);
+        SmithEquipment.SmeltMenuClose(view);
         if (equalInv(view, TriggerMenuDisplay)) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            MultiThread.TaskRunSynchronizedLater(() -> {
                 if (!equalInv(player.getOpenInventory(), TriggerMenuDisplay)) {
                     playerData.HotBar.setSelectSlot(-1);
                     playerData.viewUpdate();
                 }
             }, 1);
         }
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+        MultiThread.TaskRun(() -> {
+            MultiThread.sleepTick(1);
             if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
                 playSound(player, SoundList.MenuClose);
                 if (EquipAble()) {
@@ -269,7 +308,7 @@ public class Menu {
                     }
                 }
             }
-        }, 1);
+        }, "MenuClose: " + player.getName());
         if (!playerData.CastMode.isHold()) {
             player.getInventory().setHeldItemSlot(8);
         }

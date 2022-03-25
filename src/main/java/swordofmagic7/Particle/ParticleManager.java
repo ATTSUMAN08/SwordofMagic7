@@ -1,18 +1,19 @@
 package swordofmagic7.Particle;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.RayTrace;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import static swordofmagic7.System.random;
 
 public final class ParticleManager {
-
-    private static final Random random = new Random();
 
     public static double angle(Vector vector) {
         return angle(new Vector(), vector);
@@ -95,13 +96,23 @@ public final class ParticleManager {
     }
 
     public static void spawnParticle(ParticleData particleData, Location location) {
+        float speed;
+        Vector vector;
+        Vector offset;
+        if (particleData.speedRandom == ParticleData.IgnoreValue) speed = particleData.speed;
+        else speed = random.nextFloat(particleData.speed, particleData.speedRandom);
+        if (particleData.vector != ParticleData.RandomVector) vector = particleData.vector;
+        else vector = new Vector(random.nextFloat()*2-1, random.nextFloat()*2-1, random.nextFloat()*2-1);
+        if (!particleData.randomOffset) offset = new Vector(0, 0.15, 0);
+        else offset = new Vector(random.nextFloat()*particleData.randomOffsetMultiply, random.nextFloat()*particleData.randomOffsetMultiply, random.nextFloat()*particleData.randomOffsetMultiply);
+        Set<Player> Players = PlayerList.getNear(location, 96);
         if (particleData.particle != Particle.REDSTONE) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.spawnParticle(particleData.particle, location.clone().add(0, 0.1, 0), 0, particleData.vector.getX(), particleData.vector.getY(), particleData.vector.getZ(), particleData.speed);
+            for (Player player : Players) {
+                player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);
             }
         } else {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.spawnParticle(particleData.particle, location.clone().add(0, 0.1, 0), 0, particleData.vector.getX(), particleData.vector.getY(), particleData.vector.getZ(), particleData.speed, particleData.dustOptions);
+            for (Player player : Players) {
+                player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
             }
         }
     }

@@ -1,13 +1,10 @@
 package swordofmagic7.Skill;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.units.qual.N;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Data.DataBase;
@@ -15,7 +12,11 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Skill.SkillClass.Alchemist.Alchemist;
+import swordofmagic7.Skill.SkillClass.BulletMarker.FreezeBullet;
+import swordofmagic7.Skill.SkillClass.BulletMarker.RestInPeace;
 import swordofmagic7.Skill.SkillClass.*;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
@@ -23,13 +24,13 @@ import swordofmagic7.Tutorial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.SkillMenuDisplay;
 import static swordofmagic7.Pet.PetManager.ReqAttackTarget;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
 
 public class Skill {
     private final Plugin plugin;
@@ -37,17 +38,31 @@ public class Skill {
     public final PlayerData playerData;
     private boolean CastReady = true;
     public SkillProcess SkillProcess;
-    private final HashMap<String, Integer> SkillCoolTime = new HashMap<>();
+    public float SkillCastProgress = 0f;
+    public final HashMap<String, Integer> SkillCoolTime = new HashMap<>();
     private final HashMap<String, Integer> SkillLevel = new HashMap<>();
+    private final HashMap<String, Integer> SkillStack = new HashMap<>();
     int SkillPoint = 0;
+    public static final int millis = 50;
 
-    Novice novice;
-    Swordman swordman;
-    Mage mage;
-    Gunner gunner;
-    Cleric cleric;
-    Tamer tamer;
-    Priest priest;
+    private final Novice novice;
+    private final Swordman swordman;
+    private final Mage mage;
+    private final Gunner gunner;
+    private final Cleric cleric;
+    private final Tamer tamer;
+    private final Priest priest;
+    private final Peltast peltast;
+    private final Elementalist elementalist;
+    private final Doppelsoeldner doppelsoeldner;
+    private final Pardoner pardoner;
+    private final Chronomancer chronomancer;
+    private final Alchemist alchemist;
+    private final Sheriff sheriff;
+
+    public Alchemist getAlchemist() {
+        return alchemist;
+    }
 
     public Skill(Player player, PlayerData playerData, Plugin plugin) {
         this.player = player;
@@ -62,6 +77,30 @@ public class Skill {
         cleric = new Cleric(SkillProcess);
         tamer = new Tamer(SkillProcess);
         priest = new Priest(SkillProcess);
+        peltast = new Peltast(SkillProcess);
+        elementalist = new Elementalist(SkillProcess);
+        doppelsoeldner = new Doppelsoeldner(SkillProcess);
+        pardoner = new Pardoner(SkillProcess);
+        chronomancer = new Chronomancer(SkillProcess);
+        alchemist = new Alchemist(SkillProcess);
+        sheriff = new Sheriff(SkillProcess);
+
+        MultiThread.TaskRun(() -> {
+            while (player.isOnline() && plugin.isEnabled()) {
+                for (Map.Entry<String, Integer> data : new HashMap<>(SkillCoolTime).entrySet()) {
+                    String key = data.getKey();
+                    int cooltime = data.getValue()-1;
+                    if (cooltime > 0) {
+                        SkillCoolTime.put(key, cooltime);
+                    } else {
+                        SkillCoolTime.remove(key);
+                        SkillStack.put(key, getSkillData(key).Stack);
+                    }
+                }
+                if (SkillProcess.normalAttackCoolTime > 0) SkillProcess.normalAttackCoolTime--;
+                MultiThread.sleepTick(1);
+            }
+        }, "SkillCoolTimeTask: " + player.getName());
     }
 
     public void setCastReady(boolean bool) {
@@ -74,128 +113,178 @@ public class Skill {
     }
 
     public void CastSkill(SkillData skillDataBase) {
-        if (CastReady && isAlive(player) && !player.isInsideVehicle()) {
-            SkillData skillData = skillDataBase.clone();
-            if (CategoryCheck(EquipmentSlot.MainHand, skillData.ReqMainHand)) {
-                if (hasSkill(skillData.Id)) {
-                    if (getSkillCoolTime(skillData) == 0) {
-                        if (playerData.Status.Mana >= skillData.Mana) {
-                            if (!playerData.EffectManager.hasEffect(EffectType.Silence)) {
-                                Tutorial.tutorialTrigger(player, 4);
-                                if (playerData.Skill.hasSkill("MagicEfficiently")) {
-                                    SkillData MagicEfficiently = getSkillData("MagicEfficiently");
-                                    skillData.Mana = (int) Math.floor(skillData.Mana * (1-MagicEfficiently.ParameterValue(0)/100));
-                                    skillData.CastTime = (int) Math.floor(skillData.CastTime * (1-MagicEfficiently.ParameterValue(1)/100));
-                                }
-                                if (skillData.SkillType.isPetSkill()) {
-                                    if (playerData.PetSelect == null) {
-                                        player.sendMessage("§a指揮する§e[ペット]§aを選択してください");
-                                        playSound(player, SoundList.Nope);
-                                        return;
-                                    } else if (skillData.SkillType.isPetAttack() && playerData.PetSelect.target == null) {
-                                        player.sendMessage(ReqAttackTarget);
-                                        playSound(player, SoundList.Nope);
-                                        return;
+        MultiThread.TaskRun(() -> {
+            if (!SkillStack.containsKey(skillDataBase.Id)) {
+                SkillStack.put(skillDataBase.Id, skillDataBase.Stack);
+            }
+            if (CastReady && isAlive(player) && !player.isInsideVehicle()) {
+                SkillData skillData = skillDataBase.clone();
+                if (CategoryCheck(skillData)) {
+                    if (hasSkill(skillData.Id)) {
+                        if (SkillStack(skillData) > 0) {
+                            if (playerData.Status.Mana >= skillData.Mana) {
+                                if (!playerData.EffectManager.isSkillsNotAvailable()) {
+                                    Tutorial.tutorialTrigger(player, 4);
+                                    if (hasSkill("MagicEfficiently")) {
+                                        SkillData MagicEfficiently = getSkillData("MagicEfficiently");
+                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100));
                                     }
-                                }
-                                if (skillData.CastTime > 0) {
-                                    new BukkitRunnable() {
-                                        float p = 0;
-
-                                        @Override
-                                        public void run() {
-                                            p = (float) SkillProcess.SkillCastTime / skillData.CastTime;
-                                            if (p >= 1) {
-                                                this.cancel();
-                                                p = 1;
-                                            }
-                                            player.sendTitle(" ", "§e" + String.format("%.0f", p * 100) + "%", 0, 10, 0);
+                                    skillData.CastTime = (int) Math.floor(skillData.CastTime * (1 / playerData.Status.SkillCastTime));
+                                    skillData.RigidTime = (int) Math.floor(skillData.RigidTime * (1 / playerData.Status.SkillRigidTime));
+                                    skillData.CoolTime = (int) Math.floor(skillData.CoolTime * (1 / playerData.Status.SkillCooltime));
+                                    if (skillData.SkillType.isPetSkill()) {
+                                        if (playerData.PetSelect == null) {
+                                            player.sendMessage("§a指揮する§e[ペット]§aを選択してください");
+                                            playSound(player, SoundList.Nope);
+                                            return;
+                                        } else if (skillData.SkillType.isPetAttack() && playerData.PetSelect.target == null) {
+                                            player.sendMessage(ReqAttackTarget);
+                                            playSound(player, SoundList.Nope);
+                                            return;
                                         }
-                                    }.runTaskTimerAsynchronously(plugin, 0, 1);
+                                    }
+                                    switch (skillData.Id) {
+                                        //ノービス
+                                        case "Slash" -> novice.Slash(skillData, 5, 70);
+                                        case "Vertical" -> novice.Vertical(skillData, 10, 2.5);
+                                        case "Smite" -> novice.Smite(skillData, 4);
+                                        case "Rain" -> novice.Rain(skillData, 5);
+                                        case "DoubleTrigger" -> novice.TriggerShot(skillData, 2);
+                                        case "FireBall" -> novice.FireBall(skillData);
+                                        //ソードマン
+                                        case "Bash" -> novice.Slash(skillData, 6, 90);
+                                        case "Thrust" -> novice.Vertical(skillData, 10, 3);
+                                        case "PainBarrier" -> swordman.PainBarrier(skillData);
+                                        case "Feint" -> swordman.Feint(skillData);
+                                        //ガンナー
+                                        case "TripleTrigger" -> novice.TriggerShot(skillData, 3);
+                                        case "ChargeShot" -> novice.TriggerShot(skillData, 1);
+                                        case "Aiming" -> gunner.Aiming(skillData);
+                                        case "Rolling" -> gunner.Rolling(skillData);
+                                        //メイジ
+                                        case "Infall" -> mage.Infall(skillData, 10);
+                                        case "Teleportation" -> mage.Teleportation(skillData);
+                                        case "MagicMissile" -> mage.MagicMissile(skillData);
+                                        //クレシック
+                                        case "Heal" -> cleric.Heal(skillData, 20);
+                                        case "Cure" -> cleric.Cure(skillData, 20);
+                                        case "Fade" -> cleric.Fade(skillData);
+                                        case "Resurrection" -> cleric.Resurrection(skillData, 20);
+                                        //テイマー
+                                        case "PetAttack" -> tamer.PetAttack(skillData);
+                                        case "PetHeal" -> tamer.PetHeal(skillData);
+                                        case "PetBoost" -> tamer.PetBoost(skillData);
+                                        //プリースト
+                                        case "MassHeal" -> priest.MassHeal(skillData);
+                                        case "Monstrance" -> priest.Monstrance(skillData);
+                                        case "HolyDefense" -> priest.HolyBuff(skillData, new ParticleData(Particle.FIREWORKS_SPARK), EffectType.HolyDefense);
+                                        case "HolyAttack" -> priest.HolyBuff(skillData, new ParticleData(Particle.REDSTONE), EffectType.HolyAttack);
+                                        case "Revive" -> priest.HolyBuff(skillData, new ParticleData(Particle.VILLAGER_HAPPY), EffectType.Revive);
+                                        //ペルタスト
+                                        case "RimBlow" -> novice.Slash(skillData, 4, 160);
+                                        case "ShieldBash" -> peltast.ShieldBash(skillData, 12, 5);
+                                        case "SwashBaring" -> peltast.SwashBaring(skillData);
+                                        case "HighGuard" -> peltast.HighGuard(skillData);
+                                        //エレメンタリスト
+                                        case "ElementalBurst" -> elementalist.ElementalBurst(skillData);
+                                        case "Heil" -> elementalist.Heil(skillData);
+                                        case "FireClaw" -> elementalist.FireClaw(skillData);
+                                        case "Electrocute" -> elementalist.Electrocute(skillData);
+                                        case "StormDust" -> elementalist.StormDust(skillData);
+                                        //バレットマーカー
+                                        case "TracerBullet" -> SkillProcess.BuffApply(skillData, EffectType.TracerBullet, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
+                                        case "DoubleGunStance" -> SkillProcess.BuffApply(skillData, EffectType.DoubleGunStance, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
+                                        case "FreezeBullet" -> new FreezeBullet(skillData, SkillProcess);
+                                        case "RestInPeace" -> new RestInPeace(skillData, SkillProcess);
+                                        //ドッペルゾルドナー
+                                        case "DeedsOfValor" -> doppelsoeldner.DeedsOfValor(skillData);
+                                        case "Cyclone" -> doppelsoeldner.Cyclone(skillData);
+                                        case "Zornhau" -> doppelsoeldner.ComboSkill(skillData, 6, 90, 1, null, EffectType.Zornhau);
+                                        case "Zucken" -> doppelsoeldner.ComboSkill(skillData, 7, 120, 1, EffectType.Zornhau, EffectType.Zucken);
+                                        case "Redel" -> doppelsoeldner.ComboSkill(skillData, 8, 160, 1, EffectType.Zucken, null);
+                                        //パードナー
+                                        case "Indulgence" -> pardoner.Indulgence(skillData);
+                                        case "Indulgendia" -> pardoner.Indulgendia(skillData);
+                                        case "Forgiveness" -> pardoner.Forgiveness(skillData, 20);
+                                        case "DiscernEvil" -> pardoner.DiscernEvil(skillData);
+                                        case "IncreaseMagicDef" -> priest.HolyBuff(skillData, new ParticleData(Particle.SPELL_WITCH), EffectType.IncreaseMagicDef);
+                                        //クロノマンサー
+                                        case "Slow" -> chronomancer.Slow(skillData);
+                                        case "Stop" -> chronomancer.Stop(skillData);
+                                        case "Path" -> chronomancer.Path(skillData);
+                                        case "TimeForward" -> chronomancer.TimeForward(skillData);
+                                        case "BackMasking" -> chronomancer.BackMasking(skillData);
+                                        //アルケミスト
+                                        case "Alchemy" -> alchemist.AlchemyView();
+                                        //シェリフ
+                                        case "QuickDraw" -> novice.TriggerShot(skillData, 1);
+                                        case "Fanning" -> sheriff.Fanning(skillData);
+                                        case "HeadShot" -> sheriff.HeadShot(skillData);
+                                        case "PeaceMaker" -> sheriff.PeaceMaker(skillData);
+                                        case "Redemption" -> sheriff.Redemption(skillData);
+                                    }
+                                    MultiThread.TaskRun(() -> {
+                                        if (skillData.CastTime > 0) {
+                                            while (SkillCastProgress < 1) {
+                                                SkillCastProgress = (float) SkillProcess.SkillCastTime / skillData.CastTime;
+                                                player.sendTitle(" ", "§e" + String.format("%.0f", SkillCastProgress * 100) + "%", 0, 10, 0);
+                                                SkillProcess.SkillCastTime++;
+                                                MultiThread.sleepTick(1);
+                                            }
+                                            player.sendMessage("Tick: " + SkillProcess.SkillCastTime);
+                                        } else {
+                                            MultiThread.sleepMillis(10);
+                                            SkillCastProgress = 1f;
+                                        }
+                                    }, "CastTime: " + player.getName());
+                                    playerData.changeMana(-skillData.Mana);
+                                    useStack(skillData);
+                                    setSkillCoolTime(skillData);
+                                } else {
+                                    player.sendMessage("§c[デバフ効果]§aによりスキルを発動できません");
+                                    playSound(player, SoundList.Nope);
                                 }
-                                switch (skillData.Id) {
-                                    //ノービス
-                                    case "Slash" -> novice.Slash(skillData, 5, 70);
-                                    case "Vertical" -> novice.Vertical(skillData, 10, 2.5);
-                                    case "Smite" -> novice.Smite(skillData, 4);
-                                    case "Rain" -> novice.Rain(skillData, 5);
-                                    case "DoubleTrigger" -> novice.TriggerShot(skillData, 2);
-                                    case "FireBall" -> novice.FireBall(skillData);
-                                    //ソードマン
-                                    case "Bash" -> novice.Slash(skillData, 6, 90);
-                                    case "Thrust" -> novice.Vertical(skillData, 10, 3);
-                                    case "PainBarrier" -> swordman.PainBarrier(skillData);
-                                    case "Feint" -> swordman.Feint(skillData);
-                                    //ガンナー
-                                    case "TripleTrigger" -> novice.TriggerShot(skillData, 3);
-                                    case "ChargeShot" -> novice.TriggerShot(skillData, 1);
-                                    case "Aiming" -> gunner.Aiming(skillData);
-                                    case "Rolling" -> gunner.Rolling(skillData);
-                                    //メイジ
-                                    case "Infall" -> mage.Infall(skillData, 10);
-                                    case "Teleportation" -> mage.Teleportation(skillData);
-                                    case "MagicMissile" -> mage.MagicMissile(skillData);
-                                    //クレシック
-                                    case "Heal" -> cleric.Heal(skillData, 15);
-                                    case "Cure" -> cleric.Cure(skillData, 15);
-                                    case "Fade" -> cleric.Fade(skillData);
-                                    case "Resurrection" -> cleric.Resurrection(skillData, 15);
-                                    //テイマー
-                                    case "PetAttack" -> tamer.PetAttack(skillData);
-                                    case "PetHeal" -> tamer.PetHeal(skillData);
-                                    case "PetBoost" -> tamer.PetBoost(skillData);
-                                    //プリースト
-                                    case "MassHeal" -> priest.MassHeal(skillData);
-                                    case "Monstrance" -> priest.Monstrance(skillData);
-                                    case "HolyDefense" -> priest.HolyBuff(skillData, new ParticleData(Particle.FIREWORKS_SPARK), EffectType.HolyDefense);
-                                    case "HolyAttack" -> priest.HolyBuff(skillData, new ParticleData(Particle.REDSTONE), EffectType.HolyAttack);
-                                    case "Revive" -> priest.HolyBuff(skillData, new ParticleData(Particle.VILLAGER_HAPPY), EffectType.Revive);
-                                }
-                                playerData.changeMana(-skillData.Mana);
-                                setSkillCoolTime(skillData);
                             } else {
-                                player.sendMessage("§c[デバフ効果]§aによりスキルを発動できません");
+                                player.sendMessage("§b[マナ]§aが足りません");
                                 playSound(player, SoundList.Nope);
                             }
                         } else {
-                            player.sendMessage("§b[マナ]§aが足りません");
+                            player.sendMessage("§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです");
                             playSound(player, SoundList.Nope);
                         }
                     } else {
-                        player.sendMessage("§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです");
+                        player.sendMessage("§e[" + skillData.Display + "]§aの§c[使用条件]§aを満たしていません");
                         playSound(player, SoundList.Nope);
                     }
-                } else {
-                    player.sendMessage("§e[" + skillData.Display + "]§aの§c[使用条件]§aを満たしていません");
-                    playSound(player, SoundList.Nope);
                 }
             }
-        }
+        }, "SkillCast: " + player.getName());
     }
 
     void setSkillCoolTime(SkillData skillData) {
         SkillCoolTime.put(skillData.Id, skillData.CoolTime);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!SkillCoolTime.containsKey(skillData.Id)) {
-                    this.cancel();
-                    return;
-                }
-                SkillCoolTime.put(skillData.Id, getSkillCoolTime(skillData) - 1);
-                if (getSkillCoolTime(skillData) < 1) {
-                    SkillCoolTime.remove(skillData.Id);
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, 1);
+    }
+
+    public int SkillStack(SkillData skillData) {
+        return SkillStack.getOrDefault(skillData.Id, skillData.Stack);
+    }
+
+    void useStack(SkillData skillData) {
+        SkillStack.put(skillData.Id, SkillStack(skillData)-1);
+    }
+
+    public void resetSkillCoolTime(String skill) {
+        SkillCoolTime.remove(skill);
+        SkillStack.put(skill, getSkillData(skill).Stack);
     }
 
     public void resetSkillCoolTime(SkillData skillData) {
         SkillCoolTime.remove(skillData.Id);
+        SkillStack.put(skillData.Id, skillData.Stack);
     }
 
     public void resetSkillCoolTimeWaited(SkillData skillData) {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> resetSkillCoolTime(skillData), 5);
+        MultiThread.TaskRunSynchronizedLater(() -> resetSkillCoolTime(skillData), 5);
     }
 
     public int getSkillCoolTime(SkillData skillData) {
@@ -209,24 +298,15 @@ public class Skill {
     }
 
     public boolean hasSkill(String skill) {
+        SkillData skillData = DataBase.getSkillData(skill);
         for (ClassData classData : playerData.Classes.classSlot) {
-            SkillData skillData = DataBase.getSkillData(skill);
-            if (classData != null && classData.SkillList.contains(skillData)) {
-                if (playerData.Classes.getClassLevel(classData) >= skillData.ReqLevel) {
-                    return true;
+            if (classData != null) {
+                if (classData.SkillList.contains(skillData)) {
+                    return playerData.Classes.getClassLevel(classData) >= skillData.ReqLevel;
                 }
             }
         }
         return false;
-    }
-
-    void addSkillLevel(SkillData skillData, int add) {
-        if (SkillPoint >= add) {
-            SkillPoint -= add;
-            SkillLevel.put(skillData.Id, getSkillLevel(skillData) + add);
-        } else {
-            player.sendMessage("§eポイント§aが足りません");
-        }
     }
 
     void setSkillLevel(SkillData skillData, int attr) {
@@ -244,7 +324,19 @@ public class Skill {
         return SkillLevel.getOrDefault(skillData.Id, 1);
     }
 
-    private boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList) {
+    public boolean CategoryCheck(SkillData skillData) {
+        boolean ReqMainHand = true;
+        boolean ReqOffHand = true;
+        if (skillData.ReqMainHand.size() > 0) {
+            ReqMainHand = CategoryCheck(EquipmentSlot.MainHand, skillData.ReqMainHand);
+        }
+        if (skillData.ReqOffHand.size() > 0) {
+            ReqOffHand = CategoryCheck(EquipmentSlot.OffHand, skillData.ReqOffHand);
+        }
+        return ReqMainHand && ReqOffHand;
+    }
+
+    public boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList) {
         if (categoryList.size() == 0) return true;
         boolean check = false;
         String Display = "";

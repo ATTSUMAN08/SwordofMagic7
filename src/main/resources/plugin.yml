@@ -4,82 +4,101 @@ main: swordofmagic7.System
 api-version: 1.18
 authors: [ MomiNeko ]
 description: Swordofmagic7
-softdepend: [ HolographicDisplays, Citizens, LibsDisguises ]
+depend: [ HolographicDisplays, Citizens, LibsDisguises, ProtocolLib ]
 
 commands:
-  gm:
-    permission: debug.som7
-    description: description
-    usage: /<command> 1|2|3
   get:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getRune:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getExp:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getLevel:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getClassExp:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getClassLevel:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   getEffect:
-    permission: debug.som7
+    permission: som7.developer
     description: description
     usage: /<command>
   mobSpawn:
     aliases: ms
-    permission: debug.som7
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  save:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  load:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  bukkitTasks:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  loadedPlayer:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  SomReload:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  test:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  setItemEquipmentStatusMultiply:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  itemDataEdit:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  mobSpawnerDataEdit:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+
+  gm:
+    permission: som7.builder
+    description: description
+    usage: /<command> 1|2|3
+  flySpeed:
+    aliases: fs
+    permission: som7.builder
     description: description
     usage: /<command>
   playMode:
     aliases: pm
-    permission: debug.som7
+    permission: som7.builder
     description: description
     usage: /<command>
-  save:
-    permission: debug.som7
+
+  dataReload:
+    permission: som7.data.reload
     description: description
     usage: /<command>
-  load:
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  flySpeed:
-    aliases: fs
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  bukkitTasks:
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  loadedPlayer:
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  SomReload:
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  test:
-    permission: debug.som7
-    description: description
-    usage: /<command>
-  setItemEquipmentStatusMultiply:
-    permission: debug.som7
+  titleReload:
+    aliases: tr
+    permission: som7.title.editor
     description: description
     usage: /<command>
 
@@ -131,6 +150,9 @@ commands:
   reqExp:
     description: description
     usage: /<command>
+  reqExpAll:
+    description: description
+    usage: /<command>
   taggame:
     description: description
     usage: /<command>
@@ -180,5 +202,38 @@ commands:
     usage: /<command>
   sideBarToDo:
     aliases: sbtd
+    description: description
+    usage: /<command>
+  fishingDisplayNum:
+    aliases: fdn
+    description: description
+    usage: /<command>
+  fishingUseCombo:
+    aliases: fuc
+    description: description
+    usage: /<command>
+  setTitle:
+    description: description
+    usage: /<command>
+  HoloSelfView:
+    aliases: hsv
+    description: description
+    usage: /<command>
+  checkTitle:
+    description: description
+    usage: /<command>
+  reqlifeExp:
+    description: description
+    usage: /<command>
+  reqlifeExpAll:
+    description: description
+    usage: /<command>
+  auction:
+    description: description
+    usage: /<command>
+  market:
+    description: description
+    usage: /<command>
+  setFishingCombo:
     description: description
     usage: /<command>

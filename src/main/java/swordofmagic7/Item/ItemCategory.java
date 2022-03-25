@@ -1,13 +1,14 @@
 package swordofmagic7.Item;
 
 public enum ItemCategory {
-    Item("アイテム"),
+    Equipment("装備"),
+    Tool("ツール"),
     Potion("ポーション"),
+    Cook("料理"),
+    Item("アイテム"),
     Material("素材"),
     PetEgg("ペットエッグ"),
     PetFood("ペットフード"),
-    Equipment("装備"),
-    Tool("ツール"),
     ;
     String Display;
 
@@ -50,5 +51,13 @@ public enum ItemCategory {
 
     public boolean isTool() {
         return this == Tool;
+    }
+
+    public boolean isCook() {
+        return this == Cook;
+    }
+
+    public boolean isTriggerAble() {
+        return isEquipment() || isCook() || isPotion() || isTool();
     }
 }

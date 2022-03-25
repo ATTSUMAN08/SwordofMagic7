@@ -4,13 +4,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemStackData;
-import swordofmagic7.Life.LifeStatus;
-import swordofmagic7.Life.LifeType;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 
@@ -24,6 +20,7 @@ public class Classes {
     public static final int MaxSlot = 4;
     public static final int MaxLevel = 15;
     public static final int[] SlotReqLevel = {1, 10, 30, 50};
+    public static final ClassData defaultClass = getClassData("Novice");
     private final Player player;
     private final PlayerData playerData;
     private final HashMap<ClassData, Integer> ClassLevel = new HashMap<>();
@@ -36,19 +33,29 @@ public class Classes {
             ClassLevel.put(classData, 1);
             ClassExp.put(classData, 0);
         }
-        classSlot[0] = getClassData("Novice");
+        classSlot[0] = defaultClass;
     }
 
+    public static int[] ReqExp;
     public static int ReqExp(int Level) {
-        double reqExp = 100f;
-        reqExp *= Math.pow(Level, 1.5);
-        if (Level >= 30) reqExp *= 3;
-        if (Level >= 50) reqExp *= 3;
-        return (int) Math.round(reqExp);
+        if (ReqExp == null) {
+            ReqExp = new int[PlayerData.MaxLevel+1];
+            for (int level = 0; level < ReqExp.length; level++) {
+                double reqExp = 100f;
+                reqExp *= Math.pow(level, 1.8);
+                reqExp *= Math.ceil(level/10f);
+                if (level >= 30) reqExp *= 2;
+                if (level >= 50) reqExp *= 2;
+                ReqExp[level] = (int) Math.round(reqExp);
+            }
+        }
+        if (Level < 0) return 100;
+        if (Level > PlayerData.MaxLevel) return Integer.MAX_VALUE;
+        return ReqExp[Level];
     }
 
     public ClassData lastClass() {
-        ClassData lastClass = getClassData("Novice");
+        ClassData lastClass = defaultClass;
         for (ClassData classData : classSlot) {
             if (classData != null){
                 lastClass = classData;
@@ -149,14 +156,14 @@ public class Classes {
         for (Map.Entry<ClassData, Integer> classes : classData.ReqClass.entrySet()) {
             if (playerData.Classes.getClassLevel(classes.getKey()) < classes.getValue()) {
                 changeAble = false;
-                reqText.add("§7・§e§l" + classes.getKey().Display + " Lv" + classes.getValue() + " §c✖");
+                reqText.add("§7・" + classes.getKey().getDisplay(true) + " Lv" + classes.getValue() + " §c✖");
             } else {
-                reqText.add("§7・§e§l" + classes.getKey().Display + " Lv" + classes.getValue() + " §b✔");
+                reqText.add("§7・" + classes.getKey().getDisplay(true) + " Lv" + classes.getValue() + " §b✔");
             }
         }
         if (changeAble) {
             classSlot[slot] = classData;
-            player.sendMessage("§e[クラススロット" + (slot+1) + "]§aを" + classData.Color + "[" + classData.Display + "]§aに§b転職§aしました");
+            player.sendMessage("§e[クラススロット" + (slot+1) + "]§aを" + classData.getDisplay(true, true) + "§aに§b転職§aしました");
             playSound(player, SoundList.LevelUp);
         } else {
             player.sendMessage(decoText("§c転職条件"));
@@ -176,16 +183,36 @@ public class Classes {
         if (isSlotMenu) {
             SelectSlot = -1;
             for (int i = 0; i < SlotReqLevel.length; i++) {
-                inv.setItem(i, new ItemStackData(Material.END_CRYSTAL, decoLore("クラススロット[" + (i+1) + "]"), decoLore("必要レベル") + SlotReqLevel[i]).view());
+                List<String> lore = new ArrayList<>();
+                lore.add(decoLore("必要レベル") + SlotReqLevel[i]);
+                if (classSlot[i] != null) {
+                    lore.add(decoLore("使用状況") + classSlot[i].getDisplay());
+                } else {
+                    lore.add(decoLore("使用状況") + "§7§l未使用");
+                }
+                inv.setItem(i, new ItemStackData(Material.END_CRYSTAL, decoText("クラススロット[" + (i+1) + "]"), lore).view());
             }
         } else {
             HashMap<Integer, String> ClassTable = new HashMap<>();
             ClassTable.put(0, "Novice");
+            ClassTable.put(1, "Alchemist");
+
             ClassTable.put(9, "Swordman");
+            ClassTable.put(10, "Peltast");
+            ClassTable.put(11, "Doppelsoeldner");
+
             ClassTable.put(18, "Mage");
+            ClassTable.put(19, "Elementalist");
+            ClassTable.put(20, "Chronomancer");
+
             ClassTable.put(27, "Gunner");
+            ClassTable.put(28, "BulletMarker");
+            ClassTable.put(29, "Sheriff");
+
             ClassTable.put(36, "Cleric");
             ClassTable.put(37, "Priest");
+            ClassTable.put(38, "Pardoner");
+
             ClassTable.put(45, "Tamer");
             for (Map.Entry<Integer, String> data : ClassTable.entrySet()) {
                 ClassData classData = getClassData(data.getValue());
@@ -210,21 +237,23 @@ public class Classes {
             } else if (ClassSelectCache[slot] != null) {
                 for (ClassData classData : classSlot) {
                     if (classData == ClassSelectCache[slot]) {
-                        player.sendMessage("§aすでに" + classData.Color + classData.Display + "]§aは使用されています");
+                        player.sendMessage("§aすでに[" + classData.Color + classData.Display + "]§aは使用されています");
                         playSound(player, SoundList.Nope);
                         return;
                     }
                 }
-                if (!(playerData.Equipment.isEquip(EquipmentSlot.MainHand)
-                        || playerData.Equipment.isEquip(EquipmentSlot.OffHand)
-                        || playerData.Equipment.isEquip(EquipmentSlot.Armor))) {
-                    ClassData classData = ClassSelectCache[slot];
-                    ClassChange(classData, SelectSlot);
-                } else {
-                    player.sendMessage("§e[装備]§aを外してください");
-                    playSound(player, SoundList.Nope);
-                }
+                ClassData classData = ClassSelectCache[slot];
+                ClassChange(classData, SelectSlot);
             }
         }
+    }
+
+    public ClassData topClass() {
+        for (int i = MaxSlot-1; i >= 0; i--) {
+            if (classSlot[i] != null) {
+                return classSlot[i];
+            }
+        }
+        return defaultClass;
     }
 }

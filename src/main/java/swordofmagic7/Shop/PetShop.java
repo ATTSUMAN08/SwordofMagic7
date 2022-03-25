@@ -7,12 +7,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
-import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
-import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Pet.PetData;
-import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
@@ -28,9 +24,11 @@ public class PetShop {
 
     private static final String PetShopDisplay = "§lペットショップ";
     public static final String PetSyntheticDisplay = "§lペット配合";
+    public static final String PetEvolutionDisplay = "§lペット進化";
     public static final String PetSellDisplay = "§lペット売却";
     private static final ItemStack PetShopFreeWolf = new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l100メルの配布ペットです").view();
     private static final ItemStack PetSynthetic = new ItemStackData(Material.HEART_OF_THE_SEA, decoText("ペット配合"), "§a§l同種のペットを配合して成長率を上げます\n§a§l成長率は合計の70%の値になります\n§a§l成長率の上限は200%です").view();
+    private static final ItemStack PetEvolution = new ItemStackData(Material.END_CRYSTAL, decoText("ペット進化"), "§a§l同名のペットを配合して\n§a§l最大レベルを上げます").view();
     private static final ItemStack PetSellItem = new ItemStackData(Material.GOLD_NUGGET, decoText("ペット売却"), "§a§lペットショップにペットを売ります").view();
 
     private final Player player;
@@ -46,7 +44,8 @@ public class PetShop {
         Inventory inv = decoInv(PetShopDisplay, 1);
         inv.setItem(0, PetShopFreeWolf);
         inv.setItem(1, PetSynthetic);
-        inv.setItem(2, PetSellItem);
+        inv.setItem(2, PetEvolution);
+        inv.setItem(8, PetSellItem);
         player.openInventory(inv);
     }
 
@@ -57,7 +56,6 @@ public class PetShop {
 
     public Inventory PetSellInv() {
         Inventory inv = decoInv(PetSellDisplay, 5);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.PetInventory, false);
         int slot = 0;
         for (PetParameter pet : PetSell) {
@@ -69,7 +67,6 @@ public class PetShop {
 
     public void PetSyntheticOpen() {
         Inventory inv = decoAnvil(PetSyntheticDisplay);
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.PetInventory, false);
         player.openInventory(inv);
     }
@@ -97,6 +94,9 @@ public class PetShop {
                 }
             } else if (equalItem(currentItem, PetSynthetic)) {
                 PetSyntheticOpen();
+                playSound(player, SoundList.MenuOpen);
+            } else if (equalItem(currentItem, PetEvolution)) {
+                playerData.PetEvolution.PetEvolutionView();
                 playSound(player, SoundList.MenuOpen);
             } else if (equalItem(currentItem, PetSellItem)) {
                 PetSellView();

@@ -1,6 +1,5 @@
 package swordofmagic7.Inventory;
 
-import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Pet.PetParameter;
 
 import java.util.Comparator;

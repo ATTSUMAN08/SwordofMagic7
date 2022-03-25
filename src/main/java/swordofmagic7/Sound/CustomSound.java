@@ -4,8 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import swordofmagic7.System;
+import swordofmagic7.MultiThread.MultiThread;
 
 public class CustomSound {
     public static void playSound(Player player, SoundList sound) {
@@ -32,32 +31,20 @@ public class CustomSound {
     }
 
     public static void playSound(Player player, SoundList sound, int count, int wait) {
-        new BukkitRunnable() {
-            int i = 0;
-            @Override
-            public void run() {
-                if (i < count) {
-                    playSound(player, player.getLocation(), sound);
-                } else {
-                    this.cancel();
-                }
-                i++;
+        MultiThread.TaskRun(() -> {
+            for (int i = 0; i < count; i++) {
+                playSound(player, player.getLocation(), sound);
+                MultiThread.sleepTick(wait);
             }
-        }.runTaskTimerAsynchronously(System.plugin, 0, wait);
+        }, "playSound: " + player.getName());
     }
 
     public static void playSound(Location location, SoundList sound, int count, int wait) {
-        new BukkitRunnable() {
-            int i = 0;
-            @Override
-            public void run() {
-                if (i < count) {
-                    playSound(location, sound);
-                } else {
-                    this.cancel();
-                }
-                i++;
+        MultiThread.TaskRun(() -> {
+            for (int i = 0; i < count; i++) {
+                playSound(location, sound);
+                MultiThread.sleepTick(wait);
             }
-        }.runTaskTimerAsynchronously(System.plugin, 0, wait);
+        }, "playSound: " + location.getWorld().getName());
     }
 }

@@ -7,16 +7,31 @@ import java.util.HashMap;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 
-public class MapData {
+public class MapData implements Cloneable {
     public String Id;
     public String Display;
     public String Color;
     public int Level = 0;
     public boolean Safe;
-    public HashMap<Material, String> GatheringData = new HashMap<>();
+    public HashMap<String, String> GatheringData = new HashMap<>();
+
+    public boolean isGathering(Material material) {
+        return GatheringData.containsKey(material.toString());
+    }
 
     public void enter(Player player) {
         playerData(player).Map = this;
         player.sendTitle(Color + "§l" + Display, Color + "§l推奨Lv" + Level, 20, 40, 20);
+    }
+
+    @Override
+    public MapData clone() {
+        try {
+            MapData clone = (MapData) super.clone();
+            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

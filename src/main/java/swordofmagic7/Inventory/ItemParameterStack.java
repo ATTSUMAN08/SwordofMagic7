@@ -13,7 +13,7 @@ import java.util.List;
 import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Function.Log;
 
-public class ItemParameterStack {
+public class ItemParameterStack implements Cloneable {
         public ItemParameter itemParameter;
         public ItemParameterStack() {
         this.itemParameter = new ItemParameter();
@@ -81,4 +81,14 @@ public class ItemParameterStack {
                 return itemParameter.viewItem(Amount, format);
         }
 
+        @Override
+        public ItemParameterStack clone() {
+                try {
+                        ItemParameterStack clone = (ItemParameterStack) super.clone();
+                        // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+                        return clone;
+                } catch (CloneNotSupportedException e) {
+                        throw new AssertionError();
+                }
+        }
 }

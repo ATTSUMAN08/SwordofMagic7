@@ -7,22 +7,22 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
+import swordofmagic7.Life.LifeType;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.UpgradeDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.random;
 
 public class Upgrade {
 
     private final Player player;
     private final PlayerData playerData;
-    private final Random random = new Random();
 
     public Upgrade(Player player, PlayerData playerData) {
         this.player = player;
@@ -30,14 +30,18 @@ public class Upgrade {
     }
 
     public void UpgradeView() {
-        playerData.Menu.ViewInventoryCache = playerData.ViewInventory;
         playerData.setView(ViewInventoryType.ItemInventory, false);
         Inventory inv = decoAnvil(UpgradeDisplay);
         player.openInventory(inv);
     }
 
     private int UpgradeCost(ItemParameter item) {
-        return (int) Math.round(item.itemEquipmentData.UpgradeCost * Math.pow(3, (item.itemEquipmentData.Plus/3f + 1) /3));
+        double cost = item.itemEquipmentData.UpgradeCost * Math.pow(3, (item.itemEquipmentData.Plus/3f + 1) /3);
+        return (int) Math.round(cost);
+    }
+
+    private int UpgradeMinCost(ItemParameter item) {
+        return Math.round(UpgradeCost(item)/2f * (1/(1+playerData.LifeStatus.getLevel(LifeType.Smith)/30f)));
     }
 
     private final ItemParameter[] UpgradeCache = new ItemParameter[2];
@@ -49,7 +53,8 @@ public class Upgrade {
                     if (UpgradeCache[0] != null) {
                         int cost = UpgradeCost(UpgradeCache[0]);
                         if (playerData.ItemInventory.hasItemParameter(UpgradeStone, cost)) {
-                            int removeCost = (int) Math.round(cost/2f * random.nextDouble() + cost/2f);
+                            int minCost = UpgradeMinCost(UpgradeCache[0]);
+                            int removeCost = (int) Math.round(minCost * random.nextDouble() + minCost);
                             playerData.ItemInventory.removeItemParameter(UpgradeStone, removeCost);
                             if (UpgradeCache[1].itemEquipmentData.Plus < 10) {
                                 UpgradeCache[0] = UpgradeCache[1].clone();
@@ -58,6 +63,7 @@ public class Upgrade {
                                 playerData.ItemInventory.addItemParameter(UpgradeCache[1], 1);
                             }
                             player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
+                            playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
                             playSound(player, SoundList.LevelUp);
                         } else {
                             player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");
@@ -91,8 +97,9 @@ public class Upgrade {
                 inv.setItem(AnvilUISlot[0], UpgradeCache[0].viewItem(1, format));
                 List<String> Lore = new ArrayList<>();
                 int cost = UpgradeCost(UpgradeCache[0]);
+                int minCost = UpgradeMinCost(UpgradeCache[0]);
                 Lore.add(decoLore("必要強化石") + cost + "個");
-                Lore.add(decoLore("消費強化石") + cost/2 + "～" + cost + "個");
+                Lore.add(decoLore("消費強化石") + minCost + "～" + cost + "個");
                 ItemStack viewCost = new ItemStackData(Material.AMETHYST_SHARD, decoText("強化コスト"), Lore).view();
                 inv.setItem(AnvilUISlot[1], viewCost);
                 UpgradeCache[1] = UpgradeCache[0].clone();
