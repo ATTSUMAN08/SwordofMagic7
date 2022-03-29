@@ -28,8 +28,11 @@ import swordofmagic7.Life.Lumber.LumberData;
 import swordofmagic7.Life.Lumber.LumberItemData;
 import swordofmagic7.Life.Mine.MineData;
 import swordofmagic7.Life.Mine.MineItemData;
+import swordofmagic7.Life.Smith.MakeData;
+import swordofmagic7.Life.Smith.MakeItemData;
 import swordofmagic7.Life.Smith.SmeltData;
 import swordofmagic7.Map.MapData;
+import swordofmagic7.Menu.TitleMenu;
 import swordofmagic7.Mob.*;
 import swordofmagic7.Npc.NpcData;
 import swordofmagic7.Pet.PetData;
@@ -82,6 +85,11 @@ public class DataLoader {
                 itemParameter.Lore = data.getStringList("Lore");
                 itemParameter.Sell = data.getInt("Sell");
                 itemParameter.Category = ItemCategory.Item.getItemCategory(data.getString("Category"));
+                if (data.isSet("Materialization")) {
+                    itemParameter.Materialization = data.getString("Materialization");
+                    if (!MaterializationMap.containsKey(itemParameter.Materialization)) MaterializationMap.put(itemParameter.Materialization, new ArrayList<>());
+                    if (itemParameter.Category.isEquipment()) MaterializationMap.get(itemParameter.Materialization).add(itemParameter.Id);
+                }
                 if (data.isSet("Color.R")) {
                     itemParameter.color = Color.fromRGB(data.getInt("Color.R"), data.getInt("Color.G"), data.getInt("Color.B"));
                 }
@@ -99,6 +107,9 @@ public class DataLoader {
                     itemParameter.itemCook.isBuff = data.getBoolean("Cook.Buff", false);
                     itemParameter.itemCook.BuffTime = data.getInt("Cook.BuffTime", 0);
                     itemParameter.itemCook.CoolTime = data.getInt("Cook.CoolTime", 0);
+                    itemParameter.itemCook.Health = data.getInt("Cook.Health", 0);
+                    itemParameter.itemCook.Mana = data.getInt("Cook.Mana", 0);
+
                     for (StatusParameter param : StatusParameter.values()) {
                         String fixed = "Cook.Fixed." + param;
                         String multiply = "Cook.Multiply." + param;
@@ -401,9 +412,10 @@ public class DataLoader {
                     int Amount = data.getInt("Amount");
                     int Exp = data.getInt("Exp");
                     int ReqLevel = data.getInt("ReqLevel");
-                    AlchemyData alchemyData = new AlchemyData(itemParameter, Amount, Exp, ReqLevel, itemRecipe);
+                    AlchemyData alchemyData = new AlchemyData(itemParameter, Amount, ReqLevel, Exp, itemRecipe);
                     AlchemyDataList.put(fileName, alchemyData);
                 } else {
+                    AlchemyShopMap.clear();
                     int slot = 0;
                     for (String str : data.getStringList("GUI")) {
                         String[] split  = str.split(",Slot:");
@@ -427,6 +439,32 @@ public class DataLoader {
                 ItemRecipe recipe = getItemRecipe(data.getString("Recipe"));
                 SmeltData lifeData = new SmeltData(item, Amount, ReqLevel, Exp, recipe);
                 SmeltDataList.put(fileName, lifeData);
+            } catch (Exception e) {
+                loadError(file);
+            }
+        }
+
+        for (File file : dumpFile(new File(DataBasePath, "Life/Make"))) {
+            try {
+                FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                String fileName = file.getName().replace(".yml", "");
+                MakeData makeData = new MakeData();
+                List<MakeItemData> list = new ArrayList<>();
+                for (String str : data.getStringList("Item")) {
+                    MakeItemData makeItemData = new MakeItemData();
+                    String[] split = str.split(",");
+                    makeItemData.itemParameter = getItemParameter(split[0]);
+                    makeItemData.Amount = Integer.parseInt(split[1]);
+                    makeItemData.Percent = Double.parseDouble(split[2]);
+                    list.add(makeItemData);
+                }
+                makeData.Display = data.getString("Display");
+                makeData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
+                makeData.makeList = list;
+                makeData.ReqLevel = data.getInt("ReqLevel");
+                makeData.Exp = data.getInt("Exp");
+                makeData.itemRecipe = getItemRecipe(data.getString("Recipe"));
+                MakeDataList.put(fileName, makeData);
             } catch (Exception e) {
                 loadError(file);
             }
@@ -491,23 +529,31 @@ public class DataLoader {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                ClassData classData = new ClassData();
-                classData.Id = fileName;
-                classData.Color = data.getString("Color");
-                classData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
-                classData.Display = data.getString("Display");
-                classData.Lore = data.getStringList("Lore");
-                classData.Nick = data.getString("Nick");
-                if (data.isSet("ProductionClass")) classData.ProductionClass = data.getBoolean("ProductionClass");
-                List<SkillData> Skills = new ArrayList<>();
-                for (String str : data.getStringList("SkillList")) {
-                    if (SkillDataList.containsKey(str)) {
-                        Skills.add(SkillDataList.get(str));
+                if (!fileName.equals("GUI")) {
+                    ClassData classData = new ClassData();
+                    classData.Id = fileName;
+                    classData.Color = data.getString("Color");
+                    classData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
+                    classData.Display = data.getString("Display");
+                    classData.Lore = data.getStringList("Lore");
+                    classData.Nick = data.getString("Nick");
+                    if (data.isSet("ProductionClass")) classData.ProductionClass = data.getBoolean("ProductionClass");
+                    List<SkillData> Skills = new ArrayList<>();
+                    for (String str : data.getStringList("SkillList")) {
+                        if (SkillDataList.containsKey(str)) {
+                            Skills.add(SkillDataList.get(str));
+                        }
+                    }
+                    classData.SkillList = Skills;
+                    ClassList.put(fileName, classData);
+                    ClassListDisplay.put(classData.Display, classData);
+                } else {
+                    ClassDataMap.clear();
+                    for (String str : data.getStringList("ClassGUI")) {
+                        String[] split = str.split(",");
+                        ClassDataMap.put(Integer.parseInt(split[1]), split[0]);
                     }
                 }
-                classData.SkillList = Skills;
-                ClassList.put(fileName, classData);
-                ClassListDisplay.put(classData.Display, classData);
             } catch (Exception e) {
                 loadError(file);
             }
@@ -538,6 +584,7 @@ public class DataLoader {
                 MobData mobData = new MobData();
                 mobData.Id = fileName;
                 mobData.Display = data.getString("Display");
+                mobData.Lore = data.getStringList("Lore");
                 String entityType = data.getString("Type").toUpperCase();
                 if (EntityType.fromName(entityType) != null) {
                     mobData.entityType = EntityType.valueOf(entityType);
@@ -578,8 +625,10 @@ public class DataLoader {
                                     mobSkillData.Percent = Double.parseDouble(skillData.replace("Percent:", ""));
                                 } else if (skillData.contains("CoolTime:")) {
                                     mobSkillData.CoolTime = Integer.parseInt(skillData.replace("CoolTime:", ""));
-                                } else if (skillData.contains("Health:")) {
-                                    mobSkillData.Health = Double.parseDouble(skillData.replace("Health:", ""));
+                                } else if (skillData.contains("MaxHealth:")) {
+                                    mobSkillData.maxHealth = Double.parseDouble(skillData.replace("MaxHealth:", ""));
+                                } else if (skillData.contains("MinHealth:")) {
+                                    mobSkillData.minHealth = Double.parseDouble(skillData.replace("MinHealth:", ""));
                                 } else if (skillData.contains("Available:")) {
                                     mobSkillData.Available = Integer.parseInt(skillData.replace("Available:", ""));
                                 } else if (skillData.contains("Interrupt:")) {
@@ -697,13 +746,32 @@ public class DataLoader {
         }
     }
 
+    public static int MaxTitleSlot = 0;
     public static void TitleDataLoad() {
+        TitleGUIMap.clear();
         for (File file : dumpFile(new File(DataBasePath, "TitleData/"))) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                TitleData titleData = new TitleData(fileName, data.getStringList("Display"), data.getStringList("Lore"));
-                TitleDataList.put(fileName, titleData);
+                if (!fileName.equals("GUI")) {
+                    Material icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
+                    int amount = data.getInt("Amount", 1);
+                    TitleData titleData = new TitleData(fileName, icon, amount, data.getStringList("Display"), data.getStringList("Lore"));
+                    TitleDataList.put(fileName, titleData);
+                } else {
+                    int slot = 0;
+                    for (String str : data.getStringList("TitleGUI")) {
+                        String[] split = str.split(",");
+                        if (split.length != 1) {
+                            int i = Integer.parseInt(split[1]);
+                            slot = i == -1 ? (int) Math.ceil(slot/9f)*9 : i;
+                        }
+                        TitleGUIMap.put(slot, split[0]);
+                        slot++;
+                        if (MaxTitleSlot < slot) MaxTitleSlot = slot;
+                        if (TitleMenu.nonSlotVertical(slot)) slot++;
+                    }
+                }
             } catch (Exception e) {
                 loadError(file);
             }

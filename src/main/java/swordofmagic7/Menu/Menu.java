@@ -1,10 +1,7 @@
 package swordofmagic7.Menu;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -12,13 +9,19 @@ import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Cook.Cook;
 import swordofmagic7.Life.Smith.Smelt;
 import swordofmagic7.Life.Smith.SmithEquipment;
+import swordofmagic7.Life.Smith.SmithMake;
 import swordofmagic7.Market.Market;
+import swordofmagic7.Mob.MobInfo;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Tutorial;
 
 import java.util.List;
@@ -48,6 +51,8 @@ public class Menu {
     public final Smelt Smelt;
     public final Market Market;
     public final SmithEquipment SmithEquipment;
+    public final SmithMake smithMake;
+    public final MobInfo mobInfo;
 
     public Menu(Player player, PlayerData playerData) {
         this.player = player;
@@ -61,6 +66,8 @@ public class Menu {
         Smelt = new Smelt(playerData);
         Market = new Market(playerData);
         SmithEquipment = new SmithEquipment(playerData);
+        smithMake = new SmithMake(playerData);
+        mobInfo = new MobInfo(playerData);
     }
 
     public void UserMenuView() {
@@ -117,6 +124,7 @@ public class Menu {
         final InventoryView view = event.getView();
         final ItemStack currentItem = event.getCurrentItem();
         final InventoryAction action = event.getAction();
+        final ClickType clickType = event.getClick();
         final Inventory ClickInventory = event.getClickedInventory();
         final int Slot = event.getSlot();
         event.setCancelled(true);
@@ -150,9 +158,12 @@ public class Menu {
                     case 35 -> playerData.ItemInventory.downScrollTick(playerData.ItemInventory.getList().size());
                     default -> {
                         if (index > -1) {
+                            ItemParameterStack clickedItemStack = playerData.ItemInventory.getItemParameterStack(index);
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
-                                if (EquipAble() && clickedItem.Category.isEquipment()) {
+                                if (clickType.isShiftClick()) {
+                                    player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat()));
+                                } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
                                     playSound(player, SoundList.Click);
                                 } else if (EquipAble() && clickedItem.Category.isPetEgg()) {
@@ -176,13 +187,22 @@ public class Menu {
                 switch (Slot) {
                     case 17 -> playerData.RuneInventory.upScrollTick();
                     case 35 -> playerData.RuneInventory.downScrollTick(playerData.RuneInventory.getList().size());
+                    default -> {
+                        if (clickType.isShiftClick()) {
+                            RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
+                            player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat()));
+                        }
+                    }
                 }
             } else if (playerData.ViewInventory.isPet()) {
                 switch (Slot) {
                     case 17 -> playerData.PetInventory.upScrollTick();
                     case 35 -> playerData.PetInventory.downScrollTick(playerData.PetInventory.getList().size());
                     default -> {
-                        if (EquipAble() && index > -1) {
+                        if (clickType.isShiftClick()) {
+                            PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
+                            player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat()));
+                        } else if (EquipAble() && index > -1) {
                             playerData.PetInventory.getPetParameter(index).spawn();
                         }
                     }
@@ -237,6 +257,8 @@ public class Menu {
                 Cook.CookMenuClick(view, currentItem, Slot);
                 Smelt.SmeltMenuClick(view, currentItem, Slot);
                 Market.MarketMenuClick(view, currentItem, Slot);
+                smithMake.MakeMenuClick(view, currentItem, Slot);
+                mobInfo.MobInfoClick(view, currentItem, Slot);
                 playerData.Skill.getAlchemist().AlchemyClick(view, currentItem, Slot);
             } else if (ClickInventory == view.getBottomInventory()) {
 

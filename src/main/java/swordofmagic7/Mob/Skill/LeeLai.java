@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemySkillManager;
@@ -29,9 +30,9 @@ public class LeeLai {
     public LeeLai(EnemySkillManager manager) {
         this.Manager = manager;
 
-        Glory.add("栄光デバフを周囲に付与しようとしています！");
-        Reflection.add("10秒間ダメージの10%が反射されます！");
-        Seiko.add("被ダメージが1/3倍になります！");
+        Glory.add("§c栄光デバフを周囲に付与しようとしています！");
+        Reflection.add("§c15秒間ダメージの10%が反射されます！");
+        Seiko.add("§cリーライの被ダメージが1/3倍になります！");
     }
 
     private void radiusMessage(List<String> message) {
@@ -86,13 +87,14 @@ public class LeeLai {
                 location.add(location.getDirection().clone().setY(0).normalize().multiply(5));
                 ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0);
                 int i = 0;
+                Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
                 while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                     if (i < CastTime) {
                         ParticleManager.CircleParticle(Manager.particleCasting, location, 5, 72);
                     } else {
                         for (Player player : PlayerList.getNear(location, 5)) {
                             ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), player.getEyeLocation(), 0, 10);
-                            playerData(player).EffectManager.addEffect(EffectType.Rigidity, 60);
+                            playerData(player).EffectManager.addEffect(EffectType.Stun, 60);
                         }
                         break;
                     }
@@ -115,13 +117,16 @@ public class LeeLai {
                 Location location = Manager.enemyData.entity.getLocation();
                 ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.3f, Function.VectorUp);
                 int i = 0;
+                Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
                 while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                     if (i < CastTime) {
-                        ParticleManager.CircleParticle(Manager.particleCasting, location, 10, 72);
+                        ParticleManager.CircleParticle(Manager.particleCasting, location, 12, 72);
                     } else {
-                        for (Player player : PlayerList.getNear(location, 5)) {
+                        for (Player player : PlayerList.getNear(location, 12)) {
+                            PlayerData playerData = playerData(player);
                             ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), player.getEyeLocation(), 0, 10);
-                            playerData(player).EffectManager.addEffect(EffectType.Rigidity, 60);
+                            playerData.EffectManager.addEffect(EffectType.Glory, 600);
+                            playerData.changeHealth(playerData.Status.Health/2);
                         }
                         break;
                     }
@@ -139,13 +144,13 @@ public class LeeLai {
     public void Reflection() {
         MultiThread.TaskRun(() -> {
             radiusMessage(Reflection);
-            Manager.enemyData.effectManager.addEffect(EffectType.Reflection, 200);
+            Manager.enemyData.effectManager.addEffect(EffectType.Reflection, 300);
             ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC, 0, true, 2.5f);
             while (Manager.enemyData.isAlive() && !Manager.setCancel && Manager.enemyData.effectManager.hasEffect(EffectType.Reflection)) {
                 ParticleManager.spawnParticle(particleData, Manager.enemyData.entity.getLocation());
                 MultiThread.sleepTick(Manager.period);
             }
-        }, "Glory");
+        }, "Reflection");
     }
 
     public void Seiko() {

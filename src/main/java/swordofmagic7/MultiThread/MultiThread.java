@@ -1,6 +1,7 @@
 package swordofmagic7.MultiThread;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,19 +67,24 @@ public class MultiThread extends Thread {
         }
     }
 
-    public static void TaskRunLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
+    public static BukkitTask TaskRunLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, tick);
+                return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
             }
         }
+        return null;
     }
 
     public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick) {
         TaskRunSynchronizedLater(runnable, tick, "未定義");
+    }
+
+    public static void TaskRunTimer(MultiThreadRunnable runnable, int tick) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, tick);
     }
 
     public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {

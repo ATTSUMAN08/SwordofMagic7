@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 
@@ -25,9 +24,10 @@ public class Smith {
     public void SmithMenuView() {
         Inventory inv = decoInv(SmithMenuDisplay, 1);
         inv.setItem(0, SmithMenu_SmeltingIcon);
-        inv.setItem(1, SmithMenu_CreateEquipmentIcon);
+        inv.setItem(1, SmithMenu_MakeEquipmentIcon);
         inv.setItem(2, SmithMenu_UpgradeEquipmentIcon);
         inv.setItem(3, SmithMenu_MaterializationIcon);
+        inv.setItem(4, SmithMenu_DecryptionIcon);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
     }
@@ -36,12 +36,14 @@ public class Smith {
         if (equalInv(view, SmithMenuDisplay)) {
             if (equalItem(currentItem, SmithMenu_SmeltingIcon)) {
                 playerData.Menu.Smelt.SmeltMenuView();
-            } else if (equalItem(currentItem, SmithMenu_CreateEquipmentIcon)) {
-                playerData.Shop.ShopOpen(DataBase.getShopData("装備制作"));
             } else if (equalItem(currentItem, SmithMenu_UpgradeEquipmentIcon)) {
                 playerData.Upgrade.UpgradeView();
             } else if (equalItem(currentItem, SmithMenu_MaterializationIcon)) {
                 playerData.Menu.SmithEquipment.Materialization();
+            } else if (equalItem(currentItem, SmithMenu_MakeEquipmentIcon)) {
+                playerData.Menu.smithMake.MakeMenuView();
+            } else if (equalItem(currentItem, SmithMenu_DecryptionIcon)) {
+                playerData.Menu.SmithEquipment.Decryption();
             }
             playSound(player, SoundList.Click);
         }

@@ -16,7 +16,6 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.TitleMenu.nonSlot;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -36,7 +35,7 @@ public class Cook {
         this.playerData = playerData;
     }
 
-    public static String CookMenuDisplay = "料理メニュー";
+    public static String CookMenuDisplay = "§l料理メニュー";
 
     public void CookMenuView() {
         playerData.statistics.checkTitle();
@@ -85,7 +84,7 @@ public class Cook {
         if (equalInv(view, CookMenuDisplay)) {
             if (Slot < 45) {
                 if (currentItem != null) {
-                    if (!nonSlot().contains(Slot) && CookArray[Slot] != null) {
+                    if (CookArray[Slot] != null) {
                         CookData data = CookArray[Slot];
                         if (playerData.LifeStatus.getLevel(LifeType.Cook) >= data.ReqLevel) {
                             List<String> reqList = new ArrayList<>();

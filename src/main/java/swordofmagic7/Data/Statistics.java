@@ -5,7 +5,9 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
+import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Life.LifeType;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Title.TitleManager;
 
 import java.util.ArrayList;
@@ -23,14 +25,19 @@ public class Statistics {
         this.player = player;
         this.playerData = playerData;
         titleManager = playerData.titleManager;
+        MultiThread.TaskRunTimer(() -> {
+            playTime++;
+        }, 20);
     }
 
+    public int playTime = 0;
     public int MaxFishingCombo = 0;
     public double MaxFishingCPS = 0;
     public int TotalEnemyKills = 0;
 
     public List<String> getStringList() {
         List<String> list = new ArrayList<>();
+        list.add(decoLore("プレイ時間") + String.format("%.2f", playTime/3600f) + "時間");
         list.add(decoLore("釣獲最大コンボ") + MaxFishingCombo);
         list.add(decoLore("釣獲最高CPS") + String.format("%.2f", MaxFishingCPS));
         list.add(decoLore("エネミ討伐数") + TotalEnemyKills);
@@ -52,6 +59,7 @@ public class Statistics {
         if (TotalEnemyKills >= 5000) titleManager.addTitle("エネミー討伐5000");
         if (TotalEnemyKills >= 10000) titleManager.addTitle("エネミー討伐10000");
         if (TotalEnemyKills >= 25000) titleManager.addTitle("エネミー討伐25000");
+        if (TotalEnemyKills >= 50000) titleManager.addTitle("エネミー討伐50000");
         if (TotalEnemyKills >= 100000) titleManager.addTitle("エネミー討伐100000");
         if (TotalEnemyKills >= 250000) titleManager.addTitle("エネミー討伐250000");
         if (TotalEnemyKills >= 1000000) titleManager.addTitle("エネミー討伐1000000");
@@ -82,15 +90,21 @@ public class Statistics {
             titleManager.addTitle("グリフィア討伐");
             if ((AusMineB4.StartTime-AusMineB4.Time) < 100) titleManager.addTitle("グリフィア討伐2");
         }
+        if (mobId.equals("リーライ")) {
+            titleManager.addTitle("リーライ討伐");
+            if ((TarnetB1.StartTime- TarnetB1.Time) < 60) titleManager.addTitle("リーライ討伐2");
+        }
     }
 
     public void save(FileConfiguration data) {
+        data.set("Statistics.PlayTime", playTime);
         data.set("Statistics.MaxFishingCombo", MaxFishingCombo);
         data.set("Statistics.MaxFishingCPS", MaxFishingCPS);
         data.set("Statistics.TotalEnemyKills", TotalEnemyKills);
     }
 
     public void load(FileConfiguration data) {
+        playTime = data.getInt("Statistics.PlayTime", 0);
         MaxFishingCombo = data.getInt("Statistics.MaxFishingCombo", 0);
         MaxFishingCPS = data.getDouble("Statistics.MaxFishingCPS", 0d);
         TotalEnemyKills = data.getInt("Statistics.TotalEnemyKills", 0);

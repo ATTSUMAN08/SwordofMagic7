@@ -19,6 +19,7 @@ import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
+import static swordofmagic7.System.plugin;
 import static swordofmagic7.System.random;
 
 public class AusMineB3 {
@@ -48,7 +49,7 @@ public class AusMineB3 {
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DungeonTrigger);
                 int spawnWait = 0;
-                while (Time > 0 && Health > 0 && list.size() > 0) {
+                while (Time > 0 && Health > 0 && list.size() > 0 && plugin.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     spawnWait++;

@@ -12,6 +12,7 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.*;
 
+import static swordofmagic7.Data.DataBase.ClassDataMap;
 import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -164,6 +165,7 @@ public class Classes {
         if (changeAble) {
             classSlot[slot] = classData;
             player.sendMessage("§e[クラススロット" + (slot+1) + "]§aを" + classData.getDisplay(true, true) + "§aに§b転職§aしました");
+            playerData.EffectManager.clearEffect();
             playSound(player, SoundList.LevelUp);
         } else {
             player.sendMessage(decoText("§c転職条件"));
@@ -193,28 +195,7 @@ public class Classes {
                 inv.setItem(i, new ItemStackData(Material.END_CRYSTAL, decoText("クラススロット[" + (i+1) + "]"), lore).view());
             }
         } else {
-            HashMap<Integer, String> ClassTable = new HashMap<>();
-            ClassTable.put(0, "Novice");
-            ClassTable.put(1, "Alchemist");
-
-            ClassTable.put(9, "Swordman");
-            ClassTable.put(10, "Peltast");
-            ClassTable.put(11, "Doppelsoeldner");
-
-            ClassTable.put(18, "Mage");
-            ClassTable.put(19, "Elementalist");
-            ClassTable.put(20, "Chronomancer");
-
-            ClassTable.put(27, "Gunner");
-            ClassTable.put(28, "BulletMarker");
-            ClassTable.put(29, "Sheriff");
-
-            ClassTable.put(36, "Cleric");
-            ClassTable.put(37, "Priest");
-            ClassTable.put(38, "Pardoner");
-
-            ClassTable.put(45, "Tamer");
-            for (Map.Entry<Integer, String> data : ClassTable.entrySet()) {
+            for (Map.Entry<Integer, String> data : ClassDataMap.entrySet()) {
                 ClassData classData = getClassData(data.getValue());
                 ClassSelectCache[data.getKey()] = classData;
                 inv.setItem(data.getKey(), classData.view());

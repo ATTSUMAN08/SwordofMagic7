@@ -6,6 +6,7 @@ public enum ItemCategory {
     Potion("ポーション"),
     Cook("料理"),
     Item("アイテム"),
+    Materialization("素材化装備"),
     Material("素材"),
     PetEgg("ペットエッグ"),
     PetFood("ペットフード"),
@@ -55,6 +56,10 @@ public enum ItemCategory {
 
     public boolean isCook() {
         return this == Cook;
+    }
+
+    public boolean isMaterialization() {
+        return this == Materialization;
     }
 
     public boolean isTriggerAble() {

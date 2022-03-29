@@ -24,7 +24,6 @@ import static swordofmagic7.Data.DataBase.getShopData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Function.decoInv;
 import static swordofmagic7.Function.equalItem;
-import static swordofmagic7.Menu.TitleMenu.nonSlot;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -95,7 +94,7 @@ public class Alchemist {
         if (equalInv(view, AlchemyShopDisplay)) {
             if (Slot < 45) {
                 if (currentItem != null) {
-                    if (!nonSlot().contains(Slot) && AlchemyArray[Slot] != null) {
+                    if (AlchemyArray[Slot] != null) {
                         AlchemyData data = AlchemyArray[Slot];
                         if (playerData.LifeStatus.getLevel(LifeType.Cook) >= data.ReqLevel) {
                             List<String> reqList = new ArrayList<>();

@@ -22,7 +22,7 @@ public class Editor {
     public static void itemDataEditCommand(CommandSender sender, String[] args) {
         if (sender instanceof ConsoleCommandSender || sender.hasPermission("som7.developer")) {
             try {
-                if (args.length == 7 && args[0].equalsIgnoreCase("create")) {
+                if (args.length >= 7 && args[0].equalsIgnoreCase("create")) {
                     String series = args[1];
                     for (EquipmentCategory suffix : EquipmentCategory.values()) {
                         if (suffix != EquipmentCategory.Baton) {
@@ -50,6 +50,7 @@ public class Editor {
                             data.set("EquipmentCategory", itemData.itemEquipmentData.EquipmentCategory.toString());
                             data.set("EquipmentSlot", itemData.itemEquipmentData.EquipmentSlot.toString());
                             data.set("Sell", itemData.Sell);
+                            if (args.length >= 8) data.set("Materialization", args[7]);
                             for (StatusParameter param : StatusParameter.values()) {
                                 if (itemData.itemEquipmentData.Parameter().getOrDefault(param, 0d) > 0) {
                                     data.set(param.toString(), itemData.itemEquipmentData.Parameter().get(param));
@@ -61,6 +62,7 @@ public class Editor {
                             data.set("UpgradeCost", itemData.itemEquipmentData.UpgradeCost);
                             data.set("StatusMultiply", Double.parseDouble(args[6]));
                             data.save(file);
+                            sender.sendMessage(file.getName() + "を作成しました");
                         }
                     }
                     return;
@@ -149,6 +151,7 @@ public class Editor {
                                 data.set("Location.x", location.getBlockX());
                                 data.set("Location.y", location.getBlockY());
                                 data.set("Location.z", location.getBlockZ());
+                                player.sendMessage(file.getName() + " Edit " + dataPath + " to " + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ());
                             } else {
                                 sender.sendMessage("プレイヤーのみ実行できます");
                             }
@@ -166,6 +169,46 @@ public class Editor {
                 }
             } else {
                 sender.sendMessage("/mobSpawnerDataEditCommand <spawnerId> <Path> <Value>");
+            }
+        }
+    }
+
+    public static void mobSpawnerDataCreateCommand(Player player, String[] args) {
+        if (player.hasPermission("som7.developer")) {
+            if (args.length >= 7) {
+                String name = args[0];
+                int level = Integer.parseInt(args[1]);
+                int index = Integer.parseInt(args[2]);
+                int radius = Integer.parseInt(args[3]);
+                int radiusY = Integer.parseInt(args[4]);
+                int maxMob = Integer.parseInt(args[5]);
+                int perSpawn = Integer.parseInt(args[6]);
+                File file = new File(DataBasePath, "Spawner/" + name + "/" + name + "Lv" + level + "_" + index + ".yml");
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                        Location loc = player.getLocation();
+                        data.set("MobData", name);
+                        data.set("Level", level);
+                        data.set("Radius", radius);
+                        data.set("RadiusY", radiusY);
+                        data.set("MaxMob", maxMob);
+                        data.set("PerSpawn", perSpawn);
+                        data.set("Location.world", loc.getWorld().getName());
+                        data.set("Location.x", loc.getBlockX());
+                        data.set("Location.y", loc.getBlockY());
+                        data.set("Location.z", loc.getBlockZ());
+                        data.save(file);
+                        player.sendMessage(file.getName() + "を作成しました");
+                    } catch (Exception e) {
+                        player.sendMessage("File作成中にエラーが発生しました");
+                    }
+                } else {
+                    player.sendMessage("すでに存在しているSpawnerIDです");
+                }
+            } else {
+                player.sendMessage("/mobSpawnerDataCreate <mobName> <level> <index> <radius> <radiusY> <maxMob> <perSpawn>");
             }
         }
     }

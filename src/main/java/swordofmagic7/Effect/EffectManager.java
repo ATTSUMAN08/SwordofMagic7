@@ -53,10 +53,12 @@ public class EffectManager {
                                 }
                             } else if (effectType.isSlow()) {
                                 potionSlow(entity, 1);
+                            } else if (effectType.isBlind()) {
+                                potionBlind(entity, 1);
                             }
                         }
                         if (ownerType == EffectOwnerType.Player) {
-                            if (effectType == EffectType.Indulgendia && Math.floorMod(effect.getValue().time, 10) == 0) {
+                            if (effectType == EffectType.Indulgendia && Math.floorMod(effect.getValue().time, 20) == 0) {
                                 playerData.changeHealth(effect.getValue().doubleData[0]);
                             }
                         }
@@ -75,6 +77,13 @@ public class EffectManager {
             entity.removePotionEffect(PotionEffectType.SLOW);
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3, tier, false, false));
         }, "PotionSlow");
+    }
+
+    public void potionBlind(LivingEntity entity, int tier) {
+        MultiThread.TaskRunSynchronized(() -> {
+            entity.removePotionEffect(PotionEffectType.BLINDNESS);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 3, tier, false, false));
+        }, "PotionBlind");
     }
 
     public boolean hasEffect(EffectType effect) {
@@ -139,6 +148,10 @@ public class EffectManager {
             case Enemy -> player.sendMessage("§e" + enemyData.mobData.Display + "§aの" + effectType.color() + "[" + effectType.Display + "]§aを§b解除§aしました");
         }
 
+    }
+
+    public void clearEffect() {
+        Effect.clear();
     }
 
     public void statusUpdate() {

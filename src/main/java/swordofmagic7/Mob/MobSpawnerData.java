@@ -30,18 +30,19 @@ public class MobSpawnerData {
             Started = true;
             Bukkit.getScheduler().runTaskTimer(plugin, () -> {
                 int perSpawn = PerSpawn;
-                for (EnemyData data : new ArrayList<>(SpawnedList)) {
+                for (EnemyData data : SpawnedList) {
                     if (data.entity == null || data.entity.isDead() || data.isDead()) {
                         data.delete();
-                        SpawnedList.remove(data);
-                    } else if (data.entity.getLocation().distance(location) > Radius + 24) {
+                    } else if (data.entity.getLocation().distance(location) > Radius + mobData.Search) {
                         data.entity.teleportAsync(location);
+                        data.resetPriority();
                     }
                 }
+                SpawnedList.removeIf(data -> data.entity == null || data.entity.isDead() || data.isDead());
                 if (SpawnedList.size() + perSpawn > MaxMob) {
                     perSpawn = MaxMob - SpawnedList.size();
                 }
-                if (perSpawn > 0 && PlayerList.getNear(location, Radius + 48).size() > 0) {
+                if (perSpawn > 0 && PlayerList.getNear(location, Radius + mobData.Search).size() > 0) {
                     for (int i = 0; i < perSpawn; i++) spawn();
                 }
             }, 0, 20);

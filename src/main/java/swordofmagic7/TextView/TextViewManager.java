@@ -6,6 +6,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RuneParameter;
+import swordofmagic7.Pet.PetParameter;
 
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.unDecoText;
@@ -49,6 +52,23 @@ public class TextViewManager {
         player.sendMessage(decoLore("/textView Item <SlotId>") + "アイテムをチャットに表示します");
         player.sendMessage(decoLore("/textView Rune <SlotId>") + "ルーンをチャットに表示します");
         player.sendMessage(decoLore("/textView Pet <SlotId>") + "ペットをチャットに表示します");
+    }
+
+    public static String itemDecoString(ItemParameterStack stack, String format) {
+        return itemDecoString(stack.itemParameter.viewItem(stack.Amount, format));
+    }
+
+
+    public static String itemDecoString(ItemParameter itemParameter, String format) {
+        return itemDecoString(itemParameter.viewItem(1, format));
+    }
+
+    public static String itemDecoString(RuneParameter runeParameter, String format) {
+        return itemDecoString(runeParameter.viewRune(format));
+    }
+
+    public static String itemDecoString(PetParameter petParameter, String format) {
+        return itemDecoString(petParameter.viewPet(format));
     }
 
     public static String itemDecoString(ItemStack itemView) {

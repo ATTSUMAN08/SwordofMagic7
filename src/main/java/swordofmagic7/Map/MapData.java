@@ -2,6 +2,7 @@ package swordofmagic7.Map;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import swordofmagic7.Data.PlayerData;
 
 import java.util.HashMap;
 
@@ -20,7 +21,9 @@ public class MapData implements Cloneable {
     }
 
     public void enter(Player player) {
-        playerData(player).Map = this;
+        PlayerData playerData = playerData(player);
+        playerData.Map = this;
+        playerData.EffectManager.clearEffect();
         player.sendTitle(Color + "§l" + Display, Color + "§l推奨Lv" + Level, 20, 40, 20);
     }
 

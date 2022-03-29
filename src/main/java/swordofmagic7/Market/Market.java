@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.TitleMenu.nonSlot;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -208,7 +207,7 @@ public class Market {
         if (equalInv(view, MarketMenuDisplay)) {
             if (Slot < 45) {
                 if (currentItem != null) {
-                    if (!nonSlot().contains(Slot) && MarketArray[Slot] != null) {
+                    if (MarketArray[Slot] != null) {
                         MarketContainer market = MarketContainer.getMarket(MarketArray[Slot].marketData.Owner);
                         int index = MarketArray[Slot].index;
                         MarketData marketData = market.marketData.get(index);

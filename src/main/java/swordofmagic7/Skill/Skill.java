@@ -124,7 +124,7 @@ public class Skill {
                         if (SkillStack(skillData) > 0) {
                             if (playerData.Status.Mana >= skillData.Mana) {
                                 if (!playerData.EffectManager.isSkillsNotAvailable()) {
-                                    Tutorial.tutorialTrigger(player, 4);
+                                    Tutorial.tutorialTrigger(player, 7);
                                     if (hasSkill("MagicEfficiently")) {
                                         SkillData MagicEfficiently = getSkillData("MagicEfficiently");
                                         skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100));
@@ -231,7 +231,6 @@ public class Skill {
                                                 SkillProcess.SkillCastTime++;
                                                 MultiThread.sleepTick(1);
                                             }
-                                            player.sendMessage("Tick: " + SkillProcess.SkillCastTime);
                                         } else {
                                             MultiThread.sleepMillis(10);
                                             SkillCastProgress = 1f;

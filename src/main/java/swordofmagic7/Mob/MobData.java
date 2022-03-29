@@ -8,6 +8,7 @@ import java.util.List;
 
 public class MobData {
     public String Id;
+    public List<String> Lore;
     public String Display;
     public EntityType entityType;
     public MobDisguise disguise;

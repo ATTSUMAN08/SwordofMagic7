@@ -110,6 +110,7 @@ public final class Damage {
             Multiply = playerData.Status.DamageCauseMultiply.get(damageCause);
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
+            playerData.setTargetEntity(victim);
         } else if (MobManager.isEnemy(attacker)) {
             EnemyData enemyData = MobManager.EnemyTable(attacker.getUniqueId());
             ATK = enemyData.ATK;
@@ -236,7 +237,7 @@ public final class Damage {
                 if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
                     enemyData.Health = enemyData.MaxHealth * HPStop;
                     for (MobSkillData skillData : enemyData.mobData.SkillList) {
-                        if (skillData.Health == HPStop) {
+                        if (skillData.maxHealth == HPStop) {
                             enemyData.skillManager.mobSkillCast(skillData);
                         }
                     }

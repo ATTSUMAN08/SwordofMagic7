@@ -20,6 +20,7 @@ import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
+import static swordofmagic7.System.plugin;
 
 public class AusMineB4 {
     private static final Location EventLocation = new Location(world,704, 119, 1979);
@@ -34,7 +35,7 @@ public class AusMineB4 {
             "§cグリフィア§aを討伐しました！",
             "§eスニーク§aを続けると§e退場§aします"};
     public static boolean Start() {
-        if (!Start) {
+        if (!Start && (Enemy == null || Enemy.isDead())) {
             Start = true;
             MultiThread.TaskRunSynchronized(() -> {
                 Enemy = MobManager.mobSpawn(getMobData("グリフィア"), 25, EventLocation);
@@ -43,7 +44,7 @@ public class AusMineB4 {
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                     Message(Players, DungeonQuestTrigger, "§cグリフィア§aを討伐せよ", null, SoundList.DungeonTrigger);
-                    while (Time > 0 && Enemy.isAlive() && list.size() > 0) {
+                    while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
                         Time--;

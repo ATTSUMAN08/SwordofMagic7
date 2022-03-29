@@ -9,6 +9,8 @@ import swordofmagic7.Dungeon.AusMine.AusMineB1;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB3;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
+import swordofmagic7.Dungeon.Tarnet.TarnetB1;
+import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Sound.SoundList;
@@ -31,10 +33,12 @@ public class WarpGateParameter {
     public void usePlayer(Player player) {
         if (Trigger != null) {
             if (Trigger.equals("AusMineB1") && AusMineB1.Start()) return;
-            else if (Trigger.equals("AusMineB2") && AusMineB2.Start()) return;
-            else if (Trigger.equals("AusMineB3") && AusMineB3.Start()) return;
-            else if (Trigger.equals("AusMineB4") && AusMineB4.Start()) return;
-        }
+            if (Trigger.equals("AusMineB2") && AusMineB2.Start()) return;
+            if (Trigger.equals("AusMineB3") && AusMineB3.Start()) return;
+            if (Trigger.equals("AusMineB4") && AusMineB4.Start()) return;
+            if (Trigger.equals("TarnetB1")) TarnetB1.Start();
+            if (Trigger.equals("TarnetB3")) TarnetB3.Start();
+        } else if (!isActive) return;
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).Location;
         player.teleportAsync(TargetLocation);

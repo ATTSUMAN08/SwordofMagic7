@@ -4,8 +4,12 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import org.bukkit.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -142,6 +146,8 @@ public class PlayerData {
     public PartyData Party;
     public InstantBuff instantBuff;
     public boolean isLoaded = false;
+    public boolean isPTChat = false;
+    public LivingEntity targetEntity = null;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -180,6 +186,7 @@ public class PlayerData {
         PetInventory.start();
 
         InitializeHologram();
+        InitializeBossBar();
     }
 
     public Hologram hologram;
@@ -223,17 +230,35 @@ public class PlayerData {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (player.isOnline()) {
+                    if (player.isOnline() && !hologram.isDeleted()) {
                         hologramLine[2].setText(holoTitle);
                         hologram.teleport(playerHoloLocation());
                     } else {
                         if (!hologram.isDeleted()) hologram.delete();
-                        hologram = null;
                         this.cancel();
                     }
                 }
             }.runTaskTimer(plugin, 0, 1);
         }, "HologramInitialize: " + player.getName());
+    }
+
+    public void InitializeBossBar() {
+        BossBar bossBar = Bukkit.createBossBar("§7§lNon Target", BarColor.RED, BarStyle.SOLID);
+        bossBar.addPlayer(player);
+        MultiThread.TaskRun(() -> {
+            while (plugin.isEnabled() && player.isOnline()) {
+                if (targetEntity != null && !targetEntity.isDead()) {
+                    double percent = targetEntity.getHealth()/targetEntity.getMaxHealth();
+                    bossBar.setTitle("§c§l" + targetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]");
+                    bossBar.setProgress(percent);
+                } else {
+                    bossBar.setTitle("§7§lNon Target");
+                    bossBar.setProgress(1);
+                }
+                MultiThread.sleepTick(10);
+            }
+            bossBar.removeAll();
+        }, "PlayerBossBar: " + player.getName());
     }
 
     public Location playerHoloLocation() {
@@ -481,31 +506,12 @@ public class PlayerData {
         }
         FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
 
-        Set<String> rollback = new HashSet<>();
-        for (Map.Entry<String, ClassData> classData : getClassList().entrySet()) {
-            if (Classes.getClassLevel(classData.getValue()) < swordofmagic7.Classes.Classes.MaxLevel) {
-                if (Classes.getClassLevel(classData.getValue()) == data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
-                    if (Classes.getClassExp(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Exp", 0)) {
-                        rollback.add("クラス経験値[" + classData.getKey() + "]");
-                    }
-                } else if (Classes.getClassLevel(classData.getValue()) < data.getInt("ClassData." + classData.getKey() + ".Level", 0)) {
-                    rollback.add("クラスレベル[" + classData.getKey() + "]");
-                }
-            }
-        }
-        if (Level < MaxLevel) {
-            if (Level == data.getInt("Level")) {
-                if (Exp < data.getInt("Exp")) {
-                    rollback.add("プレイヤー経験値");
-                }
-            } else if (Level < data.getInt("Level")) {
-                rollback.add("プレイヤーレベル");
-            }
-        }
 
-        if (rollback.size() > 0) {
-            player.sendMessage("§eロールバック§aを検知したため§bセーブ§aを中断しました");
-            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId() + ", " + rollback);
+
+        if (statistics.playTime < data.getInt("Statistics.PlayTime")) {
+            player.sendMessage("§eロールバック§aを検知したため§e前回セーブ§aから§bロード§aしました");
+            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId());
+            if (player.isOnline()) load();
             return;
         }
 
@@ -857,6 +863,15 @@ public class PlayerData {
 
     public boolean isRightClickHold() {
         return RightClickHold || player.isHandRaised() || player.isBlocking();
+    }
+
+    private BukkitTask TargetEntityTask;
+    public void setTargetEntity(LivingEntity entity) {
+        targetEntity = entity;
+        if (TargetEntityTask != null) TargetEntityTask.cancel();
+        TargetEntityTask = MultiThread.TaskRunLater(() -> {
+            targetEntity = null;
+        }, 100, "TargetEntityTask: " + player.getName());
     }
 
     public void revival() {

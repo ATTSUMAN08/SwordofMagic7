@@ -231,8 +231,7 @@ public class EnemyData {
                                 }
                             }
                         }
-
-                        if (SpawnLocation.distance(entity.getLocation()) > 64) entity.teleportAsync(SpawnLocation);
+                        if (SpawnLocation.distance(entity.getLocation()) > mobData.Search) entity.teleportAsync(SpawnLocation);
                         MultiThread.sleepTick(10);
                     }
                 }
@@ -242,6 +241,10 @@ public class EnemyData {
 
     public void addPriority(LivingEntity entity, double addPriority) {
         Priority.put(entity, Priority.getOrDefault(entity, 0d) + addPriority);
+    }
+
+    public void resetPriority() {
+        Priority.clear();
     }
 
     public void delete() {

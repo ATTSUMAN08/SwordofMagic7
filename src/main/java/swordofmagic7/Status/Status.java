@@ -248,6 +248,8 @@ public class Status {
                 SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
                 SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
 
+                if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK /= 2;
+
                 String color = "§f";
                 if (playerData.PvPMode) color = "§c";
                 player.setPlayerListName(playerData.Classes.lastClass().Color + "§l" + playerData.Classes.lastClass().Display + " " + color + "§l" + playerData.Nick);

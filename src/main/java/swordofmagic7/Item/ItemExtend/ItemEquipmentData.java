@@ -24,7 +24,7 @@ public class ItemEquipmentData implements Cloneable {
     public HashMap<StatusParameter, Double> Parameter() {
         HashMap<StatusParameter, Double> Parameter = new HashMap<>();
         for (StatusParameter statusParameter : StatusParameter.values()) {
-            double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05);
+            double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05+(Math.pow(Plus, 1.8)/100));
             for (RuneParameter rune : Rune) {
                 parameter += rune.Parameter(statusParameter);
             }

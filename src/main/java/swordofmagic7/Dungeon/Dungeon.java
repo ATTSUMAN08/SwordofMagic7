@@ -1,6 +1,7 @@
 package swordofmagic7.Dungeon;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import swordofmagic7.Sound.SoundList;
 import java.util.Set;
 
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.createTouchHologram;
 
 public class Dungeon {
     public static final double Radius = 64;
@@ -32,13 +34,14 @@ public class Dungeon {
     }
 
     public static void Trigger(String trigger) {
-        if (trigger.equalsIgnoreCase("アルターターネット")) {
-            TarnetEnter.start();
-        }
+
     }
 
     public static void Initialize() {
         TarnetEnter.reset();
+        createTouchHologram("§e§lアルターターネット", new Location(world, 3109, 132, 749.5), (Player player) -> {
+            TarnetEnter.start();
+        });
     }
 
     public static void BossBarAdd(BossBar bossBar, Set<Player> Players) {

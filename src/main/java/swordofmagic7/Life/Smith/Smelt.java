@@ -17,7 +17,6 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.TitleMenu.nonSlot;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -83,7 +82,7 @@ public class Smelt {
         if (equalInv(view, SmeltMenuDisplay)) {
             if (Slot < 45) {
                 if (currentItem != null) {
-                    if (!nonSlot().contains(Slot) && SmeltArray[Slot] != null) {
+                    if (SmeltArray[Slot] != null) {
                         SmeltData data = SmeltArray[Slot];
                         if (playerData.LifeStatus.getLevel(LifeType.Smith) >= data.ReqLevel) {
                             List<String> reqList = new ArrayList<>();

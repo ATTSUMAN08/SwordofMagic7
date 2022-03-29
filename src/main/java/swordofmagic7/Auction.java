@@ -99,7 +99,9 @@ public class Auction {
                                     Function.BroadCast("§e入札者§aが現れなかったため§eオークション§aが§c終了§aしました", SoundList.Tick);
                                 }
                                 for (Player loopPlayer : PlayerList.PlayerList) {
-                                    playerData(loopPlayer).ViewBar.resetSideBar("Auction");
+                                    if (loopPlayer.isOnline()) {
+                                        playerData(loopPlayer).ViewBar.resetSideBar("Auction");
+                                    }
                                 }
                                 Owner = null;
                                 Better = null;

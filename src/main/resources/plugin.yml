@@ -76,6 +76,10 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  mobSpawnerDataCreate:
+    permission: som7.developer
+    description: description
+    usage: /<command>
 
   gm:
     permission: som7.builder
@@ -235,5 +239,13 @@ commands:
     description: description
     usage: /<command>
   setFishingCombo:
+    description: description
+    usage: /<command>
+  mobInfo:
+    aliases: mi
+    description: description
+    usage: /<command>
+  serverInfo:
+    aliases: si
     description: description
     usage: /<command>

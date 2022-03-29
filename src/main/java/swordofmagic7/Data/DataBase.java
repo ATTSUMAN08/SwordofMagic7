@@ -16,6 +16,7 @@ import swordofmagic7.Life.Harvest.HarvestData;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.Life.Lumber.LumberData;
 import swordofmagic7.Life.Mine.MineData;
+import swordofmagic7.Life.Smith.MakeData;
 import swordofmagic7.Life.Smith.SmeltData;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.TeleportGateParameter;
@@ -65,6 +66,7 @@ public final class DataBase {
     public static final HashMap<String, RuneParameter> RuneList = new HashMap<>();
     public static final HashMap<String, ClassData> ClassList = new HashMap<>();
     public static final HashMap<String, ClassData> ClassListDisplay = new HashMap<>();
+    public static final HashMap<Integer, String> ClassDataMap = new HashMap<>();
     public static final HashMap<String, SkillData> SkillDataList = new HashMap<>();
     public static final HashMap<String, SkillData> SkillDataDisplayList = new HashMap<>();
     public static final HashMap<String, MobData> MobList = new HashMap<>();
@@ -83,9 +85,12 @@ public final class DataBase {
     public static final HashMap<String, AnglerData> AnglerDataList = new HashMap<>();
     public static final HashMap<String, CookData> CookDataList = new HashMap<>();
     public static final HashMap<String, SmeltData> SmeltDataList = new HashMap<>();
+    public static final HashMap<String, MakeData> MakeDataList = new HashMap<>();
     public static final HashMap<String, TitleData> TitleDataList = new HashMap<>();
+    public static final HashMap<Integer, String> TitleGUIMap = new HashMap<>();
     public static final HashMap<String, AlchemyData> AlchemyDataList = new HashMap<>();
     public static final HashMap<Integer, String> AlchemyShopMap = new HashMap<>();
+    public static final HashMap<String, List<String>> MaterializationMap = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(OfflinePlayer player) {
         return ItemStackPlayerHead(player, null, null);

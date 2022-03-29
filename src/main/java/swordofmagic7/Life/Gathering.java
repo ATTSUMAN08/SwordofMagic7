@@ -45,7 +45,7 @@ public class Gathering {
     public void ChangeBlock(Block block, Material material, int time) {
         MultiThread.TaskRun(() -> {
             ChangeBlock.put(block.getLocation(), material.createBlockData());
-            MultiThread.sleepTick(5);
+            MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), material.createBlockData());
             int i = 0;
             while (i < time) {
@@ -58,7 +58,7 @@ public class Gathering {
                 MultiThread.sleepTick(20);
             }
             ChangeBlock.remove(block.getLocation());
-            MultiThread.sleepTick(5);
+            MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), block.getBlockData());
         }, "ChangeBlock");
     }

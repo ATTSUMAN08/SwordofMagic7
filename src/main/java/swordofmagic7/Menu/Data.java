@@ -53,9 +53,11 @@ public record Data() {
 
     public static final String SmithMenuDisplay = "§l鍛冶場";
     static final ItemStack SmithMenu_SmeltingIcon = new ItemStackData(Material.FURNACE, decoText("製錬炉"), "§a§l製錬炉メニューを開きます").view();
-    static final ItemStack SmithMenu_CreateEquipmentIcon = new ItemStackData(Material.CRAFTING_TABLE, decoText("装備制作"), "§a§l装備制作メニューを開きます").view();
+    static final ItemStack SmithMenu_MakeEquipmentIcon = new ItemStackData(Material.SMITHING_TABLE, decoText("装備制作"), "§a§l装備制作メニューを開きます\n§a§lリストの上から順に抽選されます").view();
+    static final ItemStack SmithMenu_CreateEquipmentIcon = new ItemStackData(Material.CRAFTING_TABLE, decoText("簡易装備制作"), "§a§l簡易装備制作メニューを開きます").view();
     static final ItemStack SmithMenu_UpgradeEquipmentIcon = new ItemStackData(Material.ANVIL, decoText("装備強化"), "§a§l装備強化メニューを開きます\n§a§l強化石を消費して装備の強化値を上げます\n§a§l強化石は必要量の50%~100%個消費されます").view();
     static final ItemStack SmithMenu_MaterializationIcon = new ItemStackData(Material.TURTLE_EGG, decoText("装備素材化"), "§a§l装備素材化メニューを開きます").view();
+    static final ItemStack SmithMenu_DecryptionIcon = new ItemStackData(Material.ENDER_CHEST, decoText("素材化復号"), "§a§l装備素復号メニューを開きます").view();
 
     public static String NonMel = "§eメル§aが足りません";
 

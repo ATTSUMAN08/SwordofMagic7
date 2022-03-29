@@ -31,12 +31,8 @@ public class ItemCook {
                 InstantBuffData instantBuffData = new InstantBuffData(Fixed, Multiply, BuffTime);
                 playerData.instantBuff.instantBuff(currentItem.Display, instantBuffData);
             } else {
-                if (Fixed.containsKey(StatusParameter.MaxHealth)) {
-                    playerData.changeHealth(Health);
-                }
-                if (Fixed.containsKey(StatusParameter.MaxMana)) {
-                    playerData.changeMana(Mana);
-                }
+                playerData.changeHealth(Health);
+                playerData.changeMana(Mana);
             }
             Function.sendMessage(player, "§e[" + currentItem.Display + "]§aを使用しました", SoundList.Eat);
             playerData.ItemInventory.removeItemParameter(currentItem, 1);

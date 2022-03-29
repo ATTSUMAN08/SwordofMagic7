@@ -9,8 +9,7 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashMap;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PartyManager {
@@ -69,10 +68,11 @@ public class PartyManager {
                 }
                 if (none) player.sendMessage("§7・§c公開中のパーティなし");
                 return;
-            } else if (args[0].equalsIgnoreCase("chat") && args.length == 2) {
+            } else if (args[0].equalsIgnoreCase("chat")) {
                 if (playerData.Party != null) {
+                    if (playerData.isPTChat)
                     for (Player member : playerData.Party.Members) {
-                        Function.sendMessage(member, args[1], SoundList.Tick);
+                        Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(args[1], "§f"), SoundList.Tick);
                     }
                 } else {
                     Function.sendMessage(player, "§eパーティ§aに参加していません", SoundList.Tick);

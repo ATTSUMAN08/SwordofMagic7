@@ -255,6 +255,8 @@ public class Events implements Listener {
                     playerData.Menu.Market.MarketMenuView();
                 } else if (shop.equalsIgnoreCase("チュートリアル最低限編")) {
                     Tutorial.tutorialTrigger(player, 0);
+                } else if (shop.equalsIgnoreCase("チュートリアルスキル編")) {
+                    Tutorial.tutorialTrigger(player, 5);
                 } else {
                     Dungeon.Trigger(shop);
                 }
@@ -557,6 +559,10 @@ public class Events implements Listener {
                 EnemyTable(entity.getUniqueId()).delete();
             } else if (entity.getName().contains("§c§l《")) {
                 entity.remove();
+            } else if (PetManager.isPet(entity)) {
+                PetManager.PetParameter(entity).cage();
+            } else if (!ignoreEntity(entity)) {
+                entity.remove();
             }
         }
     }
@@ -569,5 +575,12 @@ public class Events implements Listener {
     @EventHandler
     void onFishing(PlayerFishEvent event) {
         playerData(event.getPlayer()).Gathering.Fishing(event);
+    }
+
+    @EventHandler
+    void onTeleport(PlayerTeleportEvent event) {
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
+            event.setCancelled(true);
+        }
     }
 }

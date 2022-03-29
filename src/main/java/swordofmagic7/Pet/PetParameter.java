@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
@@ -111,8 +112,8 @@ public class PetParameter implements Cloneable {
     }
 
     int ReqExp() {
-        double reqExp = playerData.Classes.ReqExp(Level);
-        reqExp *= GrowthRate;
+        double reqExp = Classes.ReqExp(Level);
+        reqExp *= GrowthRate/2;
         return (int) Math.round(reqExp);
     }
 

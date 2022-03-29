@@ -4,19 +4,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.TitleData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
-import static swordofmagic7.Data.DataBase.BrownItemFlame;
-import static swordofmagic7.Function.decoInv;
-import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataLoader.MaxTitleSlot;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.TitleMenuDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
@@ -32,14 +29,8 @@ public class TitleMenu {
         this.playerData = playerData;
     }
 
-    public static List<Integer> nonSlot() {
-        List<Integer> list = new ArrayList<>();
-        list.add(8);
-        list.add(17);
-        list.add(26);
-        list.add(35);
-        list.add(44);
-        return list;
+    public static boolean nonSlotVertical(int slot) {
+        return Math.floorMod(slot+1, 9) == 0;
     }
 
     public void TitleMenuView() {
@@ -47,30 +38,31 @@ public class TitleMenu {
         Inventory inv = decoInv(TitleMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunLater(() -> TitleMenuView(0), 1, "TitleMenuView: " + player.getName());
+        MultiThread.TaskRunSynchronizedLater(() -> TitleMenuView(0), 1, "TitleMenuView: " + player.getName());
     }
 
     public void TitleMenuView(int scroll) {
         if (equalInv(player.getOpenInventory(), TitleMenuDisplay)) {
             Scroll = scroll;
             ItemStack[] itemStacks = new ItemStack[54];
-            List<TitleData> titleList = new ArrayList<>(DataBase.TitleDataList.values());
-            titleList.sort(new TitleSort());
             int slot = 0;
-            int index = scroll * 8;
+            int index = scroll * 9;
             for (int i = 0; i < 48; i++) {
-                if (titleList.size() > index) {
-                    TitleData titleData = titleList.get(index);
+                if (TitleGUIMap.containsKey(index)) {
+                    TitleData titleData = TitleDataList.get(TitleGUIMap.get(index));
                     itemStacks[slot] = titleData.view(playerData.titleManager.TitleList.contains(titleData.Id));
-                    TitleArray[slot] = titleList.get(index);
-                    index++;
+                    TitleArray[slot] = titleData;
+                }
+                index++;
+                slot++;
+                if (nonSlotVertical(slot)) {
+                    itemStacks[slot] = BrownItemFlame;
                     slot++;
-                    if (nonSlot().contains(slot)) slot++;
-                } else break;
+                    index++;
+                }
             }
-            for (int i : nonSlot()) {
-                itemStacks[i] = BrownItemFlame;
-            }
+            if (Scroll > 0) itemStacks[8] = UpScrollItem;
+            if (MaxTitleSlot/9-5 > 0) itemStacks[53] = DownScrollItem;
             player.getOpenInventory().getTopInventory().setStorageContents(itemStacks);
             playSound(player, SoundList.Tick);
         }
@@ -79,13 +71,13 @@ public class TitleMenu {
     public void TitleMenuClick(InventoryView view, ItemStack currentItem, int Slot) {
         if (equalInv(view, TitleMenuDisplay)) {
             if (currentItem != null) {
-                if (!nonSlot().contains(Slot) && TitleArray[Slot] != null) {
+                if (!nonSlotVertical(Slot) && TitleArray[Slot] != null) {
                     playerData.titleManager.setTitle(TitleArray[Slot]);
-                } else if (Slot == 8 && Scroll < Math.max(0, (DataBase.TitleDataList.size()/8-5))) {
-                    Scroll++;
-                    TitleMenuView(Scroll);
-                } else if (Slot == 45 && Scroll > 1) {
+                } else if (equalItem(currentItem, UpScrollItem)) {
                     Scroll--;
+                    TitleMenuView(Scroll);
+                } else if (equalItem(currentItem, DownScrollItem)) {
+                    Scroll++;
                     TitleMenuView(Scroll);
                 }
             }

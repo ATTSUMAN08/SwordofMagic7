@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.gmail.filoghost.holographicdisplays.api.handler.TouchHandler;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -57,6 +58,12 @@ public final class System extends JavaPlugin {
     public static Hologram createHologram(String key, Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
         HologramSet.add(hologram);
+        return hologram;
+    }
+
+    public static Hologram createTouchHologram(String Display, Location location, TouchHandler touchHandler) {
+        Hologram hologram = HologramsAPI.createHologram(plugin, location);
+        hologram.appendTextLine(Display).setTouchHandler(touchHandler);
         return hologram;
     }
 
@@ -116,6 +123,9 @@ public final class System extends JavaPlugin {
                 if (hologram.isDeleted()) HologramSet.remove(hologram);
             }
         }, 200, 6000), "AutoSave");
+
+        createTouchHologram("§e§l鍛冶場", new Location(world, 1149.5, 97.75, 17.5), (Player player) -> playerData(player).Menu.Smith.SmithMenuView());
+        createTouchHologram("§e§l料理場", new Location(world, 1159.5, 94.5, 66.5), (Player player) -> playerData(player).Menu.Cook.CookMenuView());
     }
 
     @Override
@@ -123,7 +133,7 @@ public final class System extends JavaPlugin {
 
         MultiThread.closeMultiThreads();
 
-        for (Hologram hologram : HologramSet) {
+        for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
             if (!hologram.isDeleted()) hologram.delete();
         }
 
@@ -160,7 +170,10 @@ public final class System extends JavaPlugin {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 CloseInventory(player);
             }
-            Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7"), 1);
+            for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
+                if (!hologram.isDeleted()) hologram.delete();
+            }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7"), 5);
             return true;
         }
         if (sender instanceof Player player) {
@@ -338,6 +351,9 @@ public final class System extends JavaPlugin {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataEdit")) {
                     Editor.mobSpawnerDataEditCommand(player, args);
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataCreate")) {
+                    Editor.mobSpawnerDataCreateCommand(player, args);
                     return true;
                 }
             }
@@ -608,6 +624,17 @@ public final class System extends JavaPlugin {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("market")) {
                 Market.marketCommand(playerData, args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("mobInfo")) {
+                playerData.Menu.mobInfo.MobInfoView();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("serverInfo")) {
+                Runtime runtime = Runtime.getRuntime();
+                int ex = 1048576;
+                player.sendMessage(decoLore("UseRAM") + (runtime.totalMemory()-runtime.freeMemory())/ex);
+                player.sendMessage(decoLore("FreeRAM") + runtime.freeMemory()/ex);
+                player.sendMessage(decoLore("TotalRAM") + runtime.totalMemory()/ex);
+                player.sendMessage(decoLore("MaxRAM") + runtime.maxMemory()/ex);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("setFishingCombo")) {
                 if (!playerData.Gathering.FishingUseCombo) {

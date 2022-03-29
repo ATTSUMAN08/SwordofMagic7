@@ -37,6 +37,7 @@ public class ItemParameter implements Cloneable {
     public ItemPotion itemPotion = new ItemPotion();
     public ItemPetFood itemPetFood = new ItemPetFood();
     public ItemCook itemCook = new ItemCook();
+    public String Materialization;
     public java.io.File File;
 
     Material getIcon() {
@@ -83,6 +84,8 @@ public class ItemParameter implements Cloneable {
         }
         if (Category.isCook()) {
             Lore.add(decoText("§3§l料理効果"));
+            if (itemCook.Health > 0) Lore.add(decoLore("体力回復") + itemCook.Health);
+            if (itemCook.Mana > 0) Lore.add(decoLore("マナ回復") + itemCook.Mana);
             for (StatusParameter param : StatusParameter.values()) {
                 if (itemCook.Fixed.containsKey(param)) {
                     Lore.add(decoLore(param.Display) + Function.decoDoubleToString(Math.round(itemCook.Fixed.get(param)), "%.0f"));

@@ -21,7 +21,8 @@ public class SmithEquipment {
     private final Player player;
     private final PlayerData playerData;
 
-    public static final String SmeltEquipmentMaterializationDisplay = "§l武具素材化";
+    public static final String SmeltEquipmentMaterializationDisplay = "§l装備素材化";
+    public static final String SmeltEquipmentDecryptionDisplay = "§l素材化復号";
 
     public SmithEquipment(PlayerData playerData) {
         this.playerData = playerData;
@@ -29,8 +30,19 @@ public class SmithEquipment {
     }
 
     public ItemParameter[] MaterializationCache = new ItemParameter[2];
+    public ItemParameter[] DecryptionCache = new ItemParameter[8];
     public void Materialization() {
         Inventory inv = decoAnvil(SmeltEquipmentMaterializationDisplay);
+        playerData.setView(ViewInventoryType.ItemInventory, false);
+        player.openInventory(inv);
+        playSound(player, SoundList.MenuOpen);
+    }
+
+    EquipmentCategory selectCategory = EquipmentCategory.Blade;
+    public void Decryption() {
+        selectCategory = EquipmentCategory.Blade;
+        Inventory inv = decoInv(SmeltEquipmentDecryptionDisplay, 1);
+        inv.setItem(1, ItemFlame);
         playerData.setView(ViewInventoryType.ItemInventory, false);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
@@ -43,50 +55,81 @@ public class SmithEquipment {
                     playerData.ItemInventory.addItemParameter(MaterializationCache[0], 1);
                     MaterializationCache[0] = null;
                     MaterializationCache[1] = null;
-                } else if (Slot == AnvilUISlot[2] && MaterializationCache[1] != null) {
-                    playerData.ItemInventory.addItemParameter(MaterializationCache[1], 1);
+                } else if (Slot == AnvilUISlot[2] && MaterializationCache[0] != null && MaterializationCache[1] != null) {
+                    playerData.ItemInventory.addItemParameter(MaterializationCache[1], MaterializationCache[0].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1);
                     Function.sendMessage(player, "§e[" + MaterializationCache[0].Display + "]§aを素材化しました", SoundList.LevelUp);
                     MaterializationCache[0] = null;
                     MaterializationCache[1] = null;
                 }
-            } else {
+            } else if (index > -1) {
                 MaterializationCache[1] = null;
                 ItemParameter item = playerData.ItemInventory.getItemParameter(index);
                 if (item.itemEquipmentData.Rune.size() > 0) {
                     Function.sendMessage(player, "§eルーン§aを外してください", SoundList.Nope);
                     return;
                 }
-                String id = item.Id;
-                for (EquipmentCategory category : EquipmentCategory.values()) {
-                    if (category.DefaultEquipmentSlot == EquipmentSlot.MainHand) {
-                        id = "武器素材" + id.replace(category.Display2, "");
+                if (item.Materialization != null) {
+                    if (ItemList.containsKey("素材化装備" + item.Materialization)) {
+                        MaterializationCache[1] = DataBase.getItemParameter("素材化装備" + item.Materialization);
+                        if (MaterializationCache[0] != null)
+                            playerData.ItemInventory.addItemParameter(MaterializationCache[0], 1);
+                        MaterializationCache[0] = item;
+                        playerData.ItemInventory.removeItemParameter(item, 1);
                     } else {
-                        id = "防具素材" + id.replace(category.Display2, "");
+                        Function.sendMessage(player, "§a素材化アイテムが未実装です", SoundList.Nope);
                     }
-                    if (DataBase.getItemList().containsKey(id)) {
-                        MaterializationCache[1] = DataBase.getItemParameter(id);
-                        break;
-                    }
-                }
-                if (MaterializationCache[1] != null) {
-                    if (MaterializationCache[0] != null) {
-                        playerData.ItemInventory.addItemParameter(MaterializationCache[0], 1);
-                    }
-                    MaterializationCache[0] = item;
-                    playerData.ItemInventory.removeItemParameter(item, 1);
                 } else {
                     Function.sendMessage(player, "§aこの装備は素材化出来ません", SoundList.Nope);
-                    return;
                 }
             }
             if (MaterializationCache[0] != null) {
                 view.getTopInventory().setItem(AnvilUISlot[0], MaterializationCache[0].viewItem(1, playerData.ViewFormat()));
                 view.getTopInventory().setItem(AnvilUISlot[1], AirItem);
-                view.getTopInventory().setItem(AnvilUISlot[2], MaterializationCache[1].viewItem(1, playerData.ViewFormat()));
+                view.getTopInventory().setItem(AnvilUISlot[2], MaterializationCache[1].viewItem(MaterializationCache[0].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1, playerData.ViewFormat()));
             } else {
                 view.getTopInventory().setItem(AnvilUISlot[0], AirItem);
                 view.getTopInventory().setItem(AnvilUISlot[1], AirItem);
                 view.getTopInventory().setItem(AnvilUISlot[2], AirItem);
+            }
+        } else if (equalInv(view, SmeltEquipmentDecryptionDisplay)) {
+            if (view.getTopInventory() == ClickInventory) {
+                if (DecryptionCache[0] != null) {
+                    int index2 = Slot-1;
+                   if (0 == Slot) {
+                        DecryptionCache[0] = null;
+                   } else if (1 < Slot && DecryptionCache[index2] != null) {
+                        int amount = DecryptionCache[index2].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1;
+                        if (playerData.ItemInventory.hasItemParameter(DecryptionCache[0], amount)) {
+                            playerData.ItemInventory.addItemParameter(DecryptionCache[index2], 1);
+                            playerData.ItemInventory.removeItemParameter(DecryptionCache[0], amount);
+                            sendMessage(player, "§e[" + DecryptionCache[index2].Display + "§ax" + amount + "§e]§aを§b復号§aしました");
+                        } else {
+                            sendMessage(player, "§e[" + DecryptionCache[0].Display + "§ax" + amount + "§e]§aが必要です");
+                        }
+                   }
+                }
+            } else if (index > -1) {
+                ItemParameter item = playerData.ItemInventory.getItemParameter(index);
+                if (item.Category.isMaterialization()) {
+                    DecryptionCache[0] = item;
+                } else {
+                    player.sendMessage("§e素材化装備§aを選択してください");
+                    playSound(player, SoundList.Nope);
+                }
+            }
+            if (DecryptionCache[0] != null) {
+                view.getTopInventory().setItem(0, DecryptionCache[0].viewItem(1, playerData.ViewFormat()));
+                int i = 1;
+                for (String itemId : MaterializationMap.get(DecryptionCache[0].Materialization)) {
+                    DecryptionCache[i] = DataBase.getItemParameter(itemId);
+                    view.getTopInventory().setItem(i+1, DecryptionCache[i].viewItem(1, playerData.ViewFormat()));
+                    i++;
+                }
+            } else {
+                view.getTopInventory().setItem(0, AirItem);
+                for (int i = 2; i < 9; i++) {
+                    view.getTopInventory().setItem(i, AirItem);
+                }
             }
         }
     }

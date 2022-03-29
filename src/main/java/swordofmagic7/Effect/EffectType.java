@@ -13,6 +13,8 @@ public enum EffectType {
     TimeTravelSequelae("タイムトラベル後遺症", EffectRank.Impossible, false, "[パス]の効果を受け無くなります"),
     PeaceMaker("ピースメーカー", false, "[氷結]と同じ状態になり攻撃力が減少します"),
     Glory("栄光", false, "被ダメージが2倍になります"),
+    Blind("盲目", false, "視界が暗くなります"),
+    InsufficientFilling("充填不足", EffectRank.Impossible, false, "攻撃力が半分になります"),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Invincible("無敵", EffectRank.Impossible, true, "ダメージを受け無くなります"),
@@ -92,6 +94,10 @@ public enum EffectType {
 
     public boolean isSlow() {
         return this == Slow;
+    }
+
+    public boolean isBlind() {
+        return this == Blind;
     }
 
     public String color() {

@@ -89,7 +89,7 @@ public class Trigger {
                             playSound(player, SoundList.Nope);
                         } else {
                             playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), TriggerMenuCache.get(Slot));
-                            Tutorial.tutorialTrigger(player, 3);
+                            Tutorial.tutorialTrigger(player, 6);
                         }
                     }
                     playerData.HotBar.unSelectSlot();

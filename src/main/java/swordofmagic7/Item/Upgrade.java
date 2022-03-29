@@ -36,12 +36,24 @@ public class Upgrade {
     }
 
     private int UpgradeCost(ItemParameter item) {
-        double cost = item.itemEquipmentData.UpgradeCost * Math.pow(3, (item.itemEquipmentData.Plus/3f + 1) /3);
+        double cost = item.itemEquipmentData.UpgradeCost * (1+item.itemEquipmentData.Plus/10f);
         return (int) Math.round(cost);
     }
 
     private int UpgradeMinCost(ItemParameter item) {
         return Math.round(UpgradeCost(item)/2f * (1/(1+playerData.LifeStatus.getLevel(LifeType.Smith)/30f)));
+    }
+
+    private int UpgradeMel(ItemParameter item) {
+        return UpgradeMinCost(item)*33;
+    }
+
+    public double UpgradePercent(int plus) {
+        double percent = plus >= 10 ? 0.5 : 1;
+        if (5 <= plus && plus < 10) {
+            percent = (14-plus)/10f;
+        }
+        return percent;
     }
 
     private final ItemParameter[] UpgradeCache = new ItemParameter[2];
@@ -52,21 +64,50 @@ public class Upgrade {
                 if (Slot == AnvilUISlot[2]) {
                     if (UpgradeCache[0] != null) {
                         int cost = UpgradeCost(UpgradeCache[0]);
-                        if (playerData.ItemInventory.hasItemParameter(UpgradeStone, cost)) {
-                            int minCost = UpgradeMinCost(UpgradeCache[0]);
-                            int removeCost = (int) Math.round(minCost * random.nextDouble() + minCost);
-                            playerData.ItemInventory.removeItemParameter(UpgradeStone, removeCost);
-                            if (UpgradeCache[1].itemEquipmentData.Plus < 10) {
-                                UpgradeCache[0] = UpgradeCache[1].clone();
+                        int minCost = UpgradeMinCost(UpgradeCache[0]);
+                        int mel = UpgradeMel(UpgradeCache[0]);
+                        if (playerData.Mel >= mel) {
+                            if (playerData.ItemInventory.hasItemParameter(UpgradeStone, cost)) {
+                                double percent = UpgradePercent(UpgradeCache[0].itemEquipmentData.Plus);
+                                int removeCost = (int) Math.round(minCost * random.nextDouble() + minCost);
+                                playerData.ItemInventory.removeItemParameter(UpgradeStone, removeCost);
+                                playerData.Mel -= mel;
+                                int plus = UpgradeCache[1].itemEquipmentData.Plus;
+                                if (random.nextDouble() < percent) {
+                                    UpgradeCache[0] = UpgradeCache[1].clone();
+                                    String text = "§e[" + UpgradeCache[1].Display + "+" + plus + "]§aの強化に§b成功§aしました §b[" + Math.pow(0.5, (plus-10))*100 + "%]";
+                                    if (plus >= 15) {
+                                        BroadCast(playerData.getNick() + "§aさんが" + text);
+                                        playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
+                                        UpgradeCache[0] = null;
+                                    } else {
+                                        player.sendMessage(text);
+                                    }
+                                    playSound(player, SoundList.LevelUp);
+                                    for (int i = 15; i < 25; i++) {
+                                        if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
+                                    }
+                                } else {
+                                    String text = "§e[" + UpgradeCache[1].Display + "+" + UpgradeCache[1].itemEquipmentData.Plus + "]§aの強化に§c失敗§aしました §b[" + Math.pow(0.5, (plus-10))*100 + "%]";
+                                    if (UpgradeCache[1].itemEquipmentData.Plus >= 15) {
+                                        BroadCast(playerData.getNick() + "§aさんが" + text);
+                                    } else {
+                                        player.sendMessage(text);
+                                    }
+                                    if (UpgradeCache[0].itemEquipmentData.Plus > 10) {
+                                        UpgradeCache[0].itemEquipmentData.Plus = 10;
+                                        player.sendMessage("§e[" + UpgradeCache[0].Display + "]§aの§e強化値§aが§e+10§aに落ちました");
+                                    }
+                                    playSound(player, SoundList.Tick);
+                                }
+                                player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
+                                playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
                             } else {
-                                UpgradeCache[0] = null;
-                                playerData.ItemInventory.addItemParameter(UpgradeCache[1], 1);
+                                player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");
+                                playSound(player, SoundList.Nope);
                             }
-                            player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
-                            playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
-                            playSound(player, SoundList.LevelUp);
                         } else {
-                            player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");
+                            player.sendMessage("§e" + mel + "メル§a必要です");
                             playSound(player, SoundList.Nope);
                         }
                     }
@@ -78,7 +119,7 @@ public class Upgrade {
             } else if (index > -1) {
                 ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(index);
                 if (itemParameter.Category == ItemCategory.Equipment) {
-                    if (itemParameter.itemEquipmentData.Plus < 10) {
+                    if (itemParameter.itemEquipmentData.Plus < 25) {
                         if (UpgradeCache[0] != null) {
                             playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                         }
@@ -86,8 +127,7 @@ public class Upgrade {
                         UpgradeCache[0] = itemParameter;
                         playSound(player, SoundList.Click);
                     } else {
-                        player.sendMessage("§c[強化上限]§aです");
-                        playSound(player, SoundList.Nope);
+                        sendMessage(player, "§c強化上限§aです", SoundList.Nope);
                     }
                 }
             }
@@ -99,7 +139,9 @@ public class Upgrade {
                 int cost = UpgradeCost(UpgradeCache[0]);
                 int minCost = UpgradeMinCost(UpgradeCache[0]);
                 Lore.add(decoLore("必要強化石") + cost + "個");
+                Lore.add(decoLore("必要メル") + UpgradeMel(UpgradeCache[0]));
                 Lore.add(decoLore("消費強化石") + minCost + "～" + cost + "個");
+                Lore.add(decoLore("強化成功率") + String.format("%.0f", UpgradePercent(UpgradeCache[0].itemEquipmentData.Plus)*100) + "%");
                 ItemStack viewCost = new ItemStackData(Material.AMETHYST_SHARD, decoText("強化コスト"), Lore).view();
                 inv.setItem(AnvilUISlot[1], viewCost);
                 UpgradeCache[1] = UpgradeCache[0].clone();

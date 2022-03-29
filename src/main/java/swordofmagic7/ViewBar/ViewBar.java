@@ -181,7 +181,8 @@ public class ViewBar {
             String amount = "";
             if (effect.getKey().view) {
                 if (effect.getValue().stack > 1) amount = "[" + effect.getValue().stack + "]";
-                EffectList.add(decoLore(effect.getKey().Display + amount) + String.format("%.1f", effect.getValue().time / 20f) + "秒");
+                String color = effect.getKey().Buff ? "§e§l" : "§c§l";
+                EffectList.add(decoLore(color + effect.getKey().Display + amount) + String.format("%.1f", effect.getValue().time / 20f) + "秒");
             }
         }
         if (EffectList.size() > 0) {
