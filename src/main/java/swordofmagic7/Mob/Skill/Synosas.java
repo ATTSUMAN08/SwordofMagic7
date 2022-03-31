@@ -164,16 +164,15 @@ public class Synosas {
             TarnetB3.radiusMessage("§a危険です！§e[過充填区域]§aから離れてください！");
             int i = 0;
             ParticleData particleData = new ParticleData(Particle.EXPLOSION_HUGE);
-            TarnetB3.Danger = true;
+            TarnetB3.useParticle = TarnetB3.particleData2;
+            TarnetB3.useRadius = 20;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : TarnetB3.Players2) {
                         ParticleManager.spawnParticle(particleData, player.getEyeLocation());
                         PlayerData playerData = PlayerData.playerData(player);
-                        if (!playerData.isDead) {
-                            playerData.dead();
-                            MultiThread.sleepTick(1);
-                        }
+                        playerData.dead();
+                        MultiThread.sleepTick(1);
                     }
                     playSound(TarnetB3.OverLocation[TarnetB3.selectOver], SoundList.Explosion);
                     break;
@@ -181,7 +180,8 @@ public class Synosas {
                 i += Manager.period;
                 MultiThread.sleepTick(Manager.period);
             }
-            TarnetB3.Danger = false;
+            TarnetB3.useParticle = TarnetB3.particleData;
+            TarnetB3.useRadius = 15;
             Manager.CastSkill(false);
         }, "Disappointment");
     }

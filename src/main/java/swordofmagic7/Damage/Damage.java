@@ -96,6 +96,8 @@ public final class Damage {
         double Resistance = 1;
         EffectManager attackerEffectManager;
         EffectManager victimEffectManager;
+        int attackerLevel;
+        int victimLevel;
 
         Set<Player> HoloView = new HashSet<>();
         if (attacker instanceof Player player) {
@@ -107,6 +109,7 @@ public final class Damage {
             CriticalRate = playerData.Status.CriticalRate;
             CriticalMultiply = playerData.Status.CriticalMultiply;
             Multiply = playerData.Status.DamageCauseMultiply.get(damageCause);
+            attackerLevel = playerData.Level;
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
             playerData.setTargetEntity(victim);
@@ -115,13 +118,15 @@ public final class Damage {
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
+            attackerLevel = enemyData.Level;
             attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
             PetParameter petParameter = PetManager.PetParameter(attacker);
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
-            petParameter.DecreaseStamina(1, 0.1);
+            attackerLevel = petParameter.Level;
+            petParameter.DecreaseStamina(1, 1);
             attackerEffectManager = petParameter.effectManager;
         } else return;
         if (victim instanceof Player player) {
@@ -131,6 +136,7 @@ public final class Damage {
             DEF = playerData.Status.DEF;
             EVA = playerData.Status.EVA;
             CriticalResist = playerData.Status.CriticalResist;
+            victimLevel = playerData.Level;
             Resistance = playerData.Status.DamageCauseResistance.get(damageCause);
             victimEffectManager = playerData.EffectManager;
         } else if (MobManager.isEnemy(victim)) {
@@ -138,6 +144,7 @@ public final class Damage {
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
+            victimLevel = enemyData.Level;
             victimEffectManager = enemyData.effectManager;
             enemyData.HitCount++;
         } else if (PetManager.isPet(victim)) {
@@ -145,7 +152,8 @@ public final class Damage {
             DEF = petParameter.DEF;
             EVA = petParameter.EVA;
             CriticalResist = petParameter.CriticalResist;
-            petParameter.DecreaseStamina(1, 0.7);
+            victimLevel = petParameter.Level;
+            petParameter.DecreaseStamina(3, 1);
             victimEffectManager = petParameter.effectManager;
         } else return;
 
@@ -200,6 +208,9 @@ public final class Damage {
                 randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation(), HoloView);
             }
         }
+        if (victimLevel - attackerLevel > 30) {
+            damage /= 1+(victimLevel - attackerLevel)/10f;
+        }
 
         boolean victimDead = false;
         if (victim instanceof Player player) {
@@ -223,7 +234,7 @@ public final class Damage {
             victimHealth = playerData.Status.Health;
         } else if (MobManager.isEnemy(victim)) {
             if (victimEffectManager.hasEffect(EffectType.Glory)) damage *= 2;
-            if (victimEffectManager.hasEffect(EffectType.Seiko)) damage /= 3;
+            if (victimEffectManager.hasEffect(EffectType.Seiko)) damage /= 2;
             if (victimEffectManager.hasEffect(EffectType.Reflection)) {
                 double ReflectionDamage = -damage/10;
                 if (attacker instanceof Player player) {

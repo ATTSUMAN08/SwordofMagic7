@@ -5,6 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.RayTrace;
 
@@ -14,6 +15,12 @@ import java.util.Set;
 import static swordofmagic7.System.random;
 
 public final class ParticleManager {
+
+    public static void onLoad() {
+        MultiThread.TaskRunTimer(() -> {
+            particleCount = particleCount < 0 ? 0 : particleCount -500;
+        }, 1);
+    }
 
     public static double angle(Vector vector) {
         return angle(new Vector(), vector);
@@ -97,8 +104,8 @@ public final class ParticleManager {
 
     private static int particleCount = 0;
     public static void spawnParticle(ParticleData particleData, Location location) {
-        particleCount++;
         if (particleCount > 10000) return;
+        particleCount++;
         float speed;
         Vector vector;
         Vector offset;
@@ -118,7 +125,6 @@ public final class ParticleManager {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
             }
         }
-        particleCount--;
     }
 
     public static void FanShapedParticle(ParticleData particleData, Location location, double radius, double angle, double density) {

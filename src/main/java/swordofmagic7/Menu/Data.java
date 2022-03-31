@@ -41,6 +41,7 @@ public record Data() {
     static final ItemStack SettingMenu_FishingUseCombo = new ItemStackData(Material.WATER_BUCKET, decoText("釣獲モード"), "§a§l釣獲モードを切り替えます\n§a§lTA時は自動釣獲が有効になります").view();
     static final ItemStack SettingMenu_HoloSelfViewIcon = new ItemStackData(Material.NAME_TAG, decoText("自視点ステータスバー"), "§a§l自視点ステータスバーの表示を切り替えます").view();
     static final ItemStack SettingMenu_ShopAmountResetIcon = new ItemStackData(Material.GOLD_NUGGET, decoText("ショップ購入数初期化"), "§a§l[ショップ/買取屋]を開くたびに[購入数/売却数]を\n§a§lリセットするか切り替えます").view();
+    static final ItemStack SettingMenu_NaturalMessageIcon = new ItemStackData(Material.GOLD_NUGGET, decoText("当たり前条件メッセージ"), "§a§l当たり前の条件満たしてない時に出てくる\n§a§lメッセージを表示するか切り替えます").view();
     static final ItemStack SettingMenu_ViewFormat = new ItemStackData(Material.COMMAND_BLOCK, decoText("表示桁数"), "§a§lステータスなどの数値の表示桁数を変更します").view();
     static final ItemStack SettingMenu_ItemInventorySort = new ItemStackData(Material.CHEST, decoText("アイテムインベントリ [ソート方法]"), "§a§lアイテムインベントリのソート方法を変更します").view();
     static final ItemStack SettingMenu_RuneInventorySort = new ItemStackData(Material.ENDER_CHEST, decoText("ルーンインベントリ [ソート方法]"), "§a§lルーンインベントリのソート方法を変更します").view();

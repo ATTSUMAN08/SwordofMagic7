@@ -36,6 +36,7 @@ import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextViewManager;
@@ -127,10 +128,10 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
-            for (Hologram hologram : new HashSet<>(HologramSet)) {
-                if (hologram.isDeleted()) HologramSet.remove(hologram);
-            }
+            HologramSet.removeIf(Hologram::isDeleted);
         }, 200, 6000), "AutoSave");
+
+        ParticleManager.onLoad();
 
         createTouchHologram("§e§l鍛冶場", new Location(world, 1149.5, 97.75, 17.5), (Player player) -> playerData(player).Menu.Smith.SmithMenuView());
         createTouchHologram("§e§l料理場", new Location(world, 1159.5, 94.5, 66.5), (Player player) -> playerData(player).Menu.Cook.CookMenuView());
@@ -642,7 +643,19 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                 Market.marketCommand(playerData, args);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("mobInfo")) {
-                playerData.Menu.mobInfo.MobInfoView();
+                if (args.length >= 1) {
+                    if (MobList.containsKey(args[0])) {
+                        MobData mobData = getMobData(args[0]);
+                        List<String> message = new ArrayList<>();
+                        message.add(decoText(mobData.Display));
+                        message.addAll(playerData.Menu.mobInfo.toStringList(mobData));
+                        sendMessage(player, message, SoundList.Nope);
+                    } else {
+                        sendMessage(player, "§a存在しない§cエネミー§aです", SoundList.Nope);
+                    }
+                } else {
+                    playerData.Menu.mobInfo.MobInfoView();
+                }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("itemInfo")) {
                 if (args.length == 1) {
@@ -705,6 +718,9 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                     player.sendMessage("§e/channel <channel>");
                 }
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("nickReset")) {
+                playerData.Nick = player.getName();
+                sendMessage(player, "§eプレイヤ名§aを§e[" + playerData.getNick() + "]§aに§cリセット§aしました", SoundList.Tick);
             }
         }
         return false;

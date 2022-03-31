@@ -19,8 +19,9 @@ import java.util.UUID;
 import static swordofmagic7.Data.DataBase.DataBasePath;
 
 public class MarketContainer {
-    public static HashMap<UUID, MarketContainer> MarketContainers = new HashMap<>();
-    public static MarketContainer getMarket(UUID uuid) {
+    public static HashMap<String, MarketContainer> MarketContainers = new HashMap<>();
+    public static MarketContainer getMarket(UUID uuidData) {
+        String uuid = uuidData.toString();
         if (!MarketContainers.containsKey(uuid)) {
             MarketContainers.put(uuid, new MarketContainer(uuid));
         } else {
@@ -39,18 +40,18 @@ public class MarketContainer {
         }
     }
 
-    public final UUID uuid;
+    public final String uuid;
     public int Mel = 0;
     public List<MarketData> marketData = new ArrayList<>();
 
-    public MarketContainer(UUID uuid) {
+    public MarketContainer(String uuid) {
         this.uuid = uuid;
         load();
     }
 
     public void save() {
         File marketFile = new File(DataBasePath, "Market/" + uuid + ".yml");
-        if (marketData.size() > 0) {
+        if (marketData.size() > 0 && Mel == 0) {
             if (!marketFile.exists()) {
                 try {
                     marketFile.createNewFile();
@@ -81,15 +82,15 @@ public class MarketContainer {
 
     public MarketContainer load() {
         File marketFile = new File(DataBasePath, "Market/" + uuid + ".yml");
+        marketData.clear();
         if (marketFile.exists()) {
             FileConfiguration data = YamlConfiguration.loadConfiguration(marketFile);
             List<String> stringData = data.getStringList("Market");
-            marketData.clear();
             for (String str : stringData) {
                 marketData.add(new MarketData(str));
             }
             Mel = data.getInt("Mel", 0);
-            if (marketData.size() == 0) {
+            if (marketData.size() == 0 && Mel == 0) {
                 try {
                     Files.deleteIfExists(marketFile.toPath());
                 } catch (IOException e) {

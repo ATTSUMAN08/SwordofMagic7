@@ -32,7 +32,7 @@ public class LeeLai {
 
         Glory.add("§c栄光デバフを周囲に付与しようとしています！");
         Reflection.add("§c15秒間ダメージの10%が反射されます！");
-        Seiko.add("§cリーライの被ダメージが1/3倍になります！");
+        Seiko.add("§cリーライの被ダメージが1/2倍になります！");
     }
 
     private void radiusMessage(List<String> message) {

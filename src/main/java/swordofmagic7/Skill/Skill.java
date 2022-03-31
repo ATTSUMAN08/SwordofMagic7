@@ -127,7 +127,7 @@ public class Skill {
                                     Tutorial.tutorialTrigger(player, 7);
                                     if (hasSkill("MagicEfficiently")) {
                                         SkillData MagicEfficiently = getSkillData("MagicEfficiently");
-                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100));
+                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100) * (1+playerData.Level/100f));
                                     }
                                     skillData.CastTime = (int) Math.floor(skillData.CastTime * (1 / playerData.Status.SkillCastTime));
                                     skillData.RigidTime = (int) Math.floor(skillData.RigidTime * (1 / playerData.Status.SkillRigidTime));
@@ -240,19 +240,16 @@ public class Skill {
                                     useStack(skillData);
                                     setSkillCoolTime(skillData);
                                 } else {
-                                    player.sendMessage("§c[デバフ効果]§aによりスキルを発動できません");
-                                    playSound(player, SoundList.Nope);
+                                    sendMessage(player, "§c[デバフ効果]§aによりスキルを発動できません", SoundList.Nope);
                                 }
                             } else {
-                                player.sendMessage("§b[マナ]§aが足りません");
-                                playSound(player, SoundList.Nope);
+                                sendMessage(player, "§b[マナ]§aが足りません", SoundList.Nope);
                             }
-                        } else {
-                            player.sendMessage("§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです");
-                            playSound(player, SoundList.Nope);
+                        } else if (playerData.NaturalMessage) {
+                            sendMessage(player, "§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです", SoundList.Nope);
                         }
                     } else {
-                        sendMessage(player, "§a現在の§eクラス構成§aでは使用できません", SoundList.Nope);
+                        sendMessage(player, "§a現在の§eクラス§aでは使用出来ないか§eクラスレベル§aが足りません", SoundList.Nope);
                     }
                 }
             }
@@ -370,11 +367,11 @@ public class Skill {
                 for (SkillData skill : playerData.Classes.classSlot[i].SkillList) {
                     if (skill.SkillType.isPassive()) {
                         SkillMenuCache.put(slotPassive, skill.Id);
-                        inv.setItem(slotPassive, skill.view());
+                        inv.setItem(slotPassive, skill.view(playerData));
                         slotPassive--;
                     } else {
                         SkillMenuCache.put(slotActive, skill.Id);
-                        inv.setItem(slotActive, skill.view());
+                        inv.setItem(slotActive, skill.view(playerData));
                         slotActive++;
                     }
                 }

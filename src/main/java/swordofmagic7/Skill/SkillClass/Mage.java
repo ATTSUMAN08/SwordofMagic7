@@ -59,6 +59,7 @@ public class Mage {
                 origin = ray.HitPosition;
             }
             origin.add(player.getEyeLocation().getDirection().multiply(-1));
+            origin.add(0, 0.2, 0);
             final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
 
 

@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class SkillData implements Cloneable {
     public List<EquipmentCategory> ReqMainHand = new ArrayList<>();
     public List<EquipmentCategory> ReqOffHand = new ArrayList<>();
 
-    public ItemStack view() {
+    public ItemStack view(PlayerData playerData) {
         if (Icon == null) Icon = Material.END_CRYSTAL;
         ItemStack item = new ItemStack(Icon);
         ItemMeta meta = item.getItemMeta();
@@ -41,7 +42,7 @@ public class SkillData implements Cloneable {
         Lore.add(decoText("§3§lスキル情報"));
         Lore.add(decoLore("スキルタイプ") + SkillType.Display);
         if (SkillType.isActive()) {
-            Lore.add(decoLore("消費マナ") + Mana);
+            Lore.add(decoLore("消費マナ") + Mana * (1+playerData.Level/100f));
             Lore.add(decoLore("詠唱時間") + (double) CastTime / 20 + "秒");
             Lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
             Lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");

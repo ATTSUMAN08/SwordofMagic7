@@ -8,7 +8,6 @@ import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Life.LifeType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Skill.Skill;
@@ -20,10 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Data.DataBase.getShopData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Function.decoInv;
-import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -96,7 +92,7 @@ public class Alchemist {
                 if (currentItem != null) {
                     if (AlchemyArray[Slot] != null) {
                         AlchemyData data = AlchemyArray[Slot];
-                        if (playerData.LifeStatus.getLevel(LifeType.Cook) >= data.ReqLevel) {
+                        if (playerData.Classes.getClassLevel(getClassData("Alchemist")) >= data.ReqLevel) {
                             List<String> reqList = new ArrayList<>();
                             boolean cookAble = true;
                             for (ItemParameterStack stack : data.itemRecipe.ReqStack) {
@@ -118,6 +114,7 @@ public class Alchemist {
                                 playerData.ItemInventory.addItemParameter(item, Amount);
                                 player.sendMessage("§e[" + item.Display + "§ax" + Amount + "§e]§aを§e調合§aしました");
                                 playerData.Classes.addClassExp(DataBase.getClassData("Alchemist"), data.Exp * AlchemyAmount);
+                                playerData.statistics.MakePotionCount += AlchemyAmount;
                                 playSound(player, SoundList.LevelUp);
                             } else {
                                 player.sendMessage(decoText("必要物リスト"));

@@ -74,6 +74,7 @@ public class Upgrade {
                                 playerData.Mel -= mel;
                                 int plus = UpgradeCache[1].itemEquipmentData.Plus;
                                 String perText = plus > 10 ? "§b[" + Math.pow(0.5, (plus - 10)) * 100 + "%]" : "";
+                                playerData.statistics.UpgradeUseCostCount += removeCost;
                                 if (random.nextDouble() < percent) {
                                     UpgradeCache[0] = UpgradeCache[1].clone();
                                     String text = "§e[" + UpgradeCache[1].Display + "+" + plus + "]§aの強化に§b成功§aしました " + perText;

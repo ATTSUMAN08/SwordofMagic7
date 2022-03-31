@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Vector;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -98,16 +97,14 @@ public class PetParameter implements Cloneable {
     public void addExp(int add) {
         if (MaxLevel > Level && PlayerData.MaxLevel > Level) {
             Exp += add;
-            boolean levelUp = false;
             while (ReqExp() <= Exp) {
                 Exp -= ReqExp();
                 Level++;
                 updateStatus();
-                levelUp = true;
+                sendMessage(player,"§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました", SoundList.LevelUp);
                 if (MaxLevel <= Level) Exp = 0;
             }
-            if (levelUp)
-                BroadCast(playerData.getNick() + "§aさんの§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました");
+
         }
     }
 
@@ -304,26 +301,13 @@ public class PetParameter implements Cloneable {
         stopAI();
         LastLocation = entity.getLocation();
         if (entity instanceof Mob mob) {
-            Pathfinder pathfinder = mob.getPathfinder();
             MultiThread.TaskRun(() ->{
+                Pathfinder pathfinder = mob.getPathfinder();
                 runAITask = true;
                 while (isRunnableAI()) {
-                    Vector vector;
-                    Location location;
-                    double range;
-                    if (target != null && AIState.isAttack()) {
-                        location = target.getLocation();
-                        range = 2;
-                    } else {
-                        location = player.getEyeLocation();
-                        range = 4;
-                    }
-                    vector = location.toVector().subtract(entity.getLocation().toVector());
                     MultiThread.TaskRunSynchronized(() -> {
+                        Location location = target != null && AIState.isAttack() ? target.getLocation() : player.getEyeLocation();
                         pathfinder.moveTo(location, 1.5d);
-                        if (LastLocation.distance(entity.getLocation()) < 0.5 && location.distance(entity.getLocation()) > range) {
-                            entity.setVelocity(vector.normalize().multiply(0.5).setY(0.5));
-                        }
                         LastLocation = entity.getLocation();
                         mob.lookAt(location);
                         pathfinder.moveTo(location, 1.5d);

@@ -150,6 +150,8 @@ public class PlayerData {
     public boolean isPTChat = false;
     public LivingEntity targetEntity = null;
     public String saveTeleportServer = null;
+    public boolean NaturalMessage = true;
+    public Location logoutLocation = null;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -295,11 +297,8 @@ public class PlayerData {
 
     void DamageLog(DamageLogType bool) {
         DamageLog = bool;
-        String msg = "§c[ダメージログ]§aを";
-        msg += "§b[" + DamageLog.Display + "]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§c[ダメージログ]§aを§b[" + DamageLog.Display + "]§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void ExpLog() {
@@ -308,12 +307,8 @@ public class PlayerData {
 
     void ExpLog(boolean bool) {
         ExpLog = bool;
-        String msg = "§e[経験値ログ]§aを";
-        if (bool) msg += "§b[有効]";
-        else msg += "§c[無効]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[経験値ログ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void DropLog() {
@@ -327,11 +322,8 @@ public class PlayerData {
 
     void DropLog(DropLogType bool) {
         DropLog = bool;
-        String msg = "§e[ドロップログ]§aを";
-        msg += "§b[" + DropLog.Display + "]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[ドロップログ]§aを§b[" + DropLog.Display + "]§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void PvPMode() {
@@ -340,12 +332,18 @@ public class PlayerData {
 
     void PvPMode(boolean bool) {
         PvPMode = bool;
-        String msg = "§e[PvPモード]§aを";
-        if (bool) msg += "§b[有効]";
-        else msg += "§c[無効]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[PvPモード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
+    }
+
+    public void NaturalMessage() {
+        NaturalMessage(!NaturalMessage);
+    }
+
+    void NaturalMessage(boolean bool) {
+        NaturalMessage = bool;
+        String msg = "§e[当たり前条件メッセージ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void StrafeMode() {
@@ -358,11 +356,8 @@ public class PlayerData {
 
     void StrafeMode(StrafeType mode) {
         StrafeMode = mode;
-        String msg = "§e[ストレイフ条件]§aを";
-        msg += "§b[" + StrafeMode.Display + "]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[ストレイフ条件]§aを§b[" + StrafeMode.Display + "]§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void CastMode() {
@@ -375,11 +370,8 @@ public class PlayerData {
 
     void CastMode(CastType bool) {
         CastMode = bool;
-        String msg = "§e[キャストモード]§aを";
-        msg += "§b[" + CastMode.Display + "]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[キャストモード]§aを§b[" + CastMode.Display + "]§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void FishingDisplayNum() {
@@ -388,12 +380,8 @@ public class PlayerData {
 
     void FishingDisplayNum(boolean bool) {
         FishingDisplayNum = bool;
-        String msg = "§e[釣獲コンボ表記]§aを";
-        if (bool) msg += "§b[数字]";
-        else msg += "§c[アルファベット]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[釣獲コンボ表記]§aを" + (bool ? "§b[数字]" : "§c[アルファベット]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void FishingUseCombo() {
@@ -402,17 +390,12 @@ public class PlayerData {
 
     void FishingUseCombo(boolean bool) {
         if (Gathering.FishingInProgress) {
-            player.sendMessage("§e釣獲中§aは切り替えできません");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§e釣獲中§aは切り替えできません", SoundList.Nope);
             return;
         }
         Gathering.FishingUseCombo = bool;
-        String msg = "§e[釣獲モード]§aを";
-        if (bool) msg += "§b[エンドレス]";
-        else msg += "§c[タイムアタック]";
-        msg += "§aにしました";
-        player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        String msg = "§e[釣獲モード]§aを" + (bool ? "§b[エンドレス]" : "§c[タイムアタック]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public void HoloSelfView() {
@@ -424,12 +407,8 @@ public class PlayerData {
         if (bool) visibilityManager.showTo(player);
         else visibilityManager.hideTo(player);
         if (message) {
-            String msg = "§e[自視点ステータスバー]§aを";
-            if (bool) msg += "§b[表示]";
-            else msg += "§c[非表示]";
-            msg += "§aにしました";
-            player.sendMessage(msg);
-            playSound(player, SoundList.Click);
+            String msg = "§e[自視点ステータスバー]§aを" + (bool ? "§b[表示]" : "§c[非表示]") + "§aにしました";
+            sendMessage(player, msg, SoundList.Click);
         }
     }
 
@@ -439,8 +418,8 @@ public class PlayerData {
 
     public void setViewFormat(int ViewFormat) {
         this.ViewFormat = ViewFormat;
-        player.sendMessage("§e表記小数桁数§aを§e[" + ViewFormat + "桁]§aに§e設定§aしました");
-        playSound(player, SoundList.Click);
+        String msg = "§e表記小数桁数§aを§e[" + ViewFormat + "桁]§aに§e設定§aしました";
+        sendMessage(player, msg, SoundList.Click);
         viewUpdate();
     }
 
@@ -473,19 +452,17 @@ public class PlayerData {
     public static final int MaxLevel = 50;
 
     public void addPlayerExp(int addExp) {
-        if (Level >= MaxLevel) {
-            Exp = 0;
-            addExp = 0;
-        } else {
-            Exp += addExp;
-        }
+        Exp += addExp;
         if (ReqExp(Level) <= Exp) {
             int addLevel = 0;
             while (ReqExp(Level) <= Exp) {
                 Exp -= ReqExp(Level);
                 addLevel++;
             }
-            addPlayerLevel(addLevel);
+            if (Level >= 50) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv50"), 1);
+            else if (Level >= 30) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv30"), 1);
+            else if (Level >= 10) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv10"), 1);
+            if (Level < MaxLevel) addPlayerLevel(addLevel);
         }
         if (ExpLog) player.sendMessage("§e経験値§7: §a+" + addExp);
     }
@@ -519,11 +496,12 @@ public class PlayerData {
             return;
         }
 
-        data.set("Location.x", player.getLocation().getX());
-        data.set("Location.y", player.getLocation().getY());
-        data.set("Location.z", player.getLocation().getZ());
-        data.set("Location.yaw", player.getLocation().getYaw());
-        data.set("Location.pitch", player.getLocation().getPitch());
+        Location lastLocation = logoutLocation != null ? logoutLocation : player.getLocation();
+        data.set("Location.x", lastLocation.getX());
+        data.set("Location.y", lastLocation.getY());
+        data.set("Location.z", lastLocation.getZ());
+        data.set("Location.yaw", lastLocation.getYaw());
+        data.set("Location.pitch", lastLocation.getPitch());
 
         data.set("Mel", Mel);
         data.set("Health", Status.Health);
@@ -547,6 +525,7 @@ public class PlayerData {
         data.set("Others.FishingSetCombo", Gathering.FishingSetCombo);
         data.set("Setting.PlayMode", PlayMode);
         data.set("Setting.ViewFormat", ViewFormat);
+        data.set("Setting.NaturalMessage", NaturalMessage);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -665,6 +644,7 @@ public class PlayerData {
             Gathering.FishingUseCombo = data.getBoolean("Setting.FishingUseCombo", true);
             PlayMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
+            NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));
@@ -901,44 +881,48 @@ public class PlayerData {
     public void dead() {
         final Location LastDeadLocation = player.getLocation();
         MultiThread.TaskRunSynchronized(() -> {
-            player.setGameMode(GameMode.SPECTATOR);
-            player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
-            isDead = true;
-            deadTime = 1200;
-            Hologram hologram = createHologram("DeadHologram:" + player.getName(), player.getEyeLocation());
-            hologram.appendTextLine(Nick);
-            ItemStack head = ItemStackPlayerHead(player);
-            head.setAmount(1);
-            hologram.appendItemLine(head);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    deadTime -= 10;
-                    if (deadTime <= 0) {
-                        this.cancel();
-                        player.teleportAsync(player.getWorld().getSpawnLocation());
-                        player.setGameMode(GameMode.SURVIVAL);
-                        Status.Health = Status.MaxHealth;
-                        Status.Mana = Status.MaxMana;
-                        player.resetTitle();
-                        Map = getMapData("Alden");
-                        hologram.delete();
-                    } else if (RevivalReady) {
-                        this.cancel();
-                        RevivalReady = false;
-                        player.teleportAsync(LastDeadLocation);
-                        player.setGameMode(GameMode.SURVIVAL);
-                        Status.Health = Status.MaxHealth/2;
-                        player.resetTitle();
-                        hologram.delete();
-                    } else {
-                        LastDeadLocation.setPitch(player.getLocation().getPitch());
-                        LastDeadLocation.setYaw(player.getLocation().getYaw());
-                        player.teleportAsync(LastDeadLocation);
-                        if (deadTime < 1100) player.sendTitle("§4§lYou Are Dead", "§e§lスニークでリスポーン", 0, 20, 0);
+            if (!isDead) {
+                isDead = true;
+                player.setGameMode(GameMode.SPECTATOR);
+                player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
+                deadTime = 1200;
+                Hologram hologram = createHologram("DeadHologram:" + player.getName(), player.getEyeLocation());
+                hologram.appendTextLine(Nick);
+                ItemStack head = ItemStackPlayerHead(player);
+                head.setAmount(1);
+                hologram.appendItemLine(head);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        deadTime -= 10;
+                        if (deadTime <= 0) {
+                            this.cancel();
+                            isDead = false;
+                            player.teleportAsync(player.getWorld().getSpawnLocation());
+                            player.setGameMode(GameMode.SURVIVAL);
+                            Status.Health = Status.MaxHealth;
+                            Status.Mana = Status.MaxMana;
+                            player.resetTitle();
+                            Map = getMapData("Alden");
+                            hologram.delete();
+                        } else if (RevivalReady) {
+                            this.cancel();
+                            isDead = false;
+                            RevivalReady = false;
+                            player.teleportAsync(LastDeadLocation);
+                            player.setGameMode(GameMode.SURVIVAL);
+                            Status.Health = Status.MaxHealth / 2;
+                            player.resetTitle();
+                            hologram.delete();
+                        } else {
+                            LastDeadLocation.setPitch(player.getLocation().getPitch());
+                            LastDeadLocation.setYaw(player.getLocation().getYaw());
+                            player.teleportAsync(LastDeadLocation);
+                            if (deadTime < 1100) player.sendTitle("§4§lYou Are Dead", "§e§lスニークでリスポーン", 0, 20, 0);
+                        }
                     }
-                }
-            }.runTaskTimer(plugin, 0, 10);
+                }.runTaskTimer(plugin, 0, 15);
+            }
         }, "PlayerDead: " + player.getName());
     }
 }

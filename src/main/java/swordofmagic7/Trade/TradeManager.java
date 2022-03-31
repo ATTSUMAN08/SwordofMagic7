@@ -25,7 +25,7 @@ public class TradeManager {
         if (args.length > 0) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target != null && target.isOnline() && target != player) {
-                if (args.length == 1) {
+                if (false && args.length == 1) {
                     TradeData tradeData = new TradeData(player, target);
                     tradeData.requestTrade();
                     TradeRequest.put(target, tradeData);

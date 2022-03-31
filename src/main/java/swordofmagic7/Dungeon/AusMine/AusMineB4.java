@@ -61,13 +61,7 @@ public class AusMineB4 {
                     }
                     ViewBar.resetSideBar(Players, "AusMineB4");
                     if (Enemy.isDead()) {
-                        Message(Players, DungeonQuestClear, "§e5秒後帰還します", ClearText, SoundList.LevelUp);
-                        MultiThread.sleepTick(100);
-                        MultiThread.TaskRunSynchronized(() -> {
-                            for (Player player : PlayerList.getNear(EventLocation, Radius)) {
-                                player.teleportAsync(getWarpGate("AusForest_to_AusMineB1").Location);
-                            }
-                        });
+                        MessageTeleport(Players, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").Location);
                     } else {
                         Enemy.delete();
                         Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);

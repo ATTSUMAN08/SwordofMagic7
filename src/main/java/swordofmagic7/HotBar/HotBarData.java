@@ -56,7 +56,7 @@ public class HotBarData implements Cloneable {
         switch (category) {
             case Skill -> {
                 SkillData skillData = getSkillData(Icon);
-                item = skillData.view().clone();
+                item = skillData.view(playerData).clone();
                 if (playerData.Skill.SkillStack(skillData) > 0) {
                     amount = playerData.Skill.SkillStack(skillData);
                 } else {

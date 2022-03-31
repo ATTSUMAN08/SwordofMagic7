@@ -101,6 +101,7 @@ public class Smelt {
                                         playerData.ItemInventory.removeItemParameter(stack.itemParameter, stack.Amount * SmeltAmount);
                                     }
                                 }
+                                playerData.statistics.SmeltCount += SmeltAmount;
                                 playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), data.Amount * SmeltAmount);
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, data.Exp * SmeltAmount);
                                 player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + data.Amount * SmeltAmount + "§e]§aを§e精錬§aしました");
@@ -146,6 +147,6 @@ public class Smelt {
 
 class SmeltSort implements Comparator<SmeltData> {
     public int compare(SmeltData Smelt, SmeltData Smelt2) {
-        return Smelt2.ReqLevel - Smelt.ReqLevel;
+        return Smelt.ReqLevel - Smelt2.ReqLevel;
     }
 }

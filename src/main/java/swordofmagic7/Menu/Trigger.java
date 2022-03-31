@@ -42,9 +42,13 @@ public class Trigger {
 
     private final HashMap<Integer, HotBarData> TriggerMenuCache = new HashMap<>();
     public void TriggerMenuView() {
-        Inventory inv = decoInv(TriggerMenuDisplay, 6);
-        player.openInventory(inv);
-        MultiThread.TaskRunSynchronizedLater(() -> TriggerMenuView(0), 1);
+        if (!equalInv(player.getOpenInventory(), TriggerMenuDisplay)) {
+            Inventory inv = decoInv(TriggerMenuDisplay, 6);
+            player.openInventory(inv);
+            MultiThread.TaskRunSynchronizedLater(() -> TriggerMenuView(0), 1);
+        } else {
+            TriggerMenuView(scroll);
+        }
     }
     public void TriggerMenuView(int scroll) {
         this.scroll = scroll;
@@ -103,16 +107,17 @@ public class Trigger {
                     scroll++;
                     TriggerMenuView(scroll);
                 } else {
+                    int index = Slot+scroll*9;
                     if (playerData.HotBar.getSelectSlot() != -1) {
                         if (currentItem.getType() == Material.BARRIER) {
                             playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), new HotBarData());
-                        } else if (TriggerMenuCache.containsKey(Slot)) {
-                            HotBarData hotBar = TriggerMenuCache.get(Slot);
+                        } else if (TriggerMenuCache.containsKey(index)) {
+                            HotBarData hotBar = TriggerMenuCache.get(index);
                             if (hotBar.category == HotBarCategory.Skill && getSkillData(hotBar.Icon).SkillType.isPassive()) {
                                 player.sendMessage("§e[" + getSkillData(hotBar.Icon).Display + "]§aは§eパッシブスキル§aです");
                                 playSound(player, SoundList.Nope);
                             } else {
-                                playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), TriggerMenuCache.get(Slot));
+                                playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), TriggerMenuCache.get(index));
                                 Tutorial.tutorialTrigger(player, 6);
                             }
                         }

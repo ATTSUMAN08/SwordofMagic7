@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.BrownItemFlame;
+import static swordofmagic7.Data.DataBase.getPetList;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -88,6 +89,7 @@ public class MobInfo {
         for (DropItemData itemData : mobData.DropItemTable) {
             list.add("§7・§e§l" + itemData.itemParameter.Display + "§a§lx" + itemData.MinAmount + "-" + itemData.MaxAmount + "§b§l -> §e§l" + String.format(playerData.ViewFormat(), itemData.Percent*100) + "%");
         }
+        list.add(getPetList().containsKey(mobData.Id) ? "§b§l懐柔可能" : "§c§l懐柔不可");
         return list;
     }
 }

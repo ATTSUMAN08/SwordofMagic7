@@ -27,9 +27,10 @@ public class Setting {
         inv.setItem(2, SettingMenu_PetInventorySort);
         inv.setItem(11, SettingMenu_PetInventorySortReverse);
 
-        inv.setItem(4, SettingMenu_DamageLogIcon);
-        inv.setItem(5, SettingMenu_ExpLogIcon);
-        inv.setItem(6, SettingMenu_DropLogIcon);
+        inv.setItem(3, SettingMenu_DamageLogIcon);
+        inv.setItem(4, SettingMenu_ExpLogIcon);
+        inv.setItem(5, SettingMenu_DropLogIcon);
+        inv.setItem(6, SettingMenu_NaturalMessageIcon);
         inv.setItem(7, SettingMenu_StrafeModeIcon);
         inv.setItem(8, SettingMenu_CastModeIcon);
         inv.setItem(12, SettingMenu_ShopAmountResetIcon);
@@ -53,6 +54,8 @@ public class Setting {
                 playerData.StrafeMode();
             } else if (equalItem(currentItem, SettingMenu_CastModeIcon)) {
                 playerData.CastMode();
+            } else if (equalItem(currentItem, SettingMenu_NaturalMessageIcon)) {
+                playerData.NaturalMessage();
             } else if (equalItem(currentItem, SettingMenu_ShopAmountResetIcon)) {
                 playerData.Shop.AmountReset();
             } else if (equalItem(currentItem, SettingMenu_PvPModeIcon)) {

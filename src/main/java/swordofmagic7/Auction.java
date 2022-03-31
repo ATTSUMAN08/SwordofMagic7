@@ -33,7 +33,7 @@ public class Auction {
                             if (args.length >= 3) {
                                 stack.Amount = Integer.parseInt(args[2]);
                             }
-                            if (!playerData.ItemInventory.hasItemParameter(stack)) {
+                            if (!playerData.ItemInventory.hasItemParameter(stack) || stack.Amount < 1) {
                                 Function.sendMessage(player, "§e所持数§a以上は§b出品§aできません", SoundList.Nope);
                                 return;
                             }
@@ -77,10 +77,17 @@ public class Auction {
                                     if (!Owner.ItemInventory.hasItemParameter(stack)) {
                                         error = "§e出品者§aが§e出品物§aを§c紛失§aしたため§eオークション§aを終了します";
                                         break;
+                                    } else if (!Owner.player.isOnline()) {
+                                        error = "§e出品者§aが§c失踪§aしたため§eオークション§aを終了します";
+                                        break;
                                     } else if (Better != null && Better.Mel < Mel) {
                                         Better = null;
                                         Mel = StartMel;
-                                        Function.BroadCast("§e入札者§aの§eメル残高§a§e入札額§a下回ったため§eオークション§aを§b入札§aを取り消します", SoundList.Tick);
+                                        Function.BroadCast("§e入札者§aの§eメル残高§a§e入札額§a下回ったため§eオークション§aの§b入札§aを取り消します", SoundList.Tick);
+                                    } else if (Better != null && !Better.player.isOnline()) {
+                                        Better = null;
+                                        Mel = StartMel;
+                                        Function.BroadCast("§e入札者§aの§c失踪§aしたため§eオークション§aの§b入札§aを取り消します", SoundList.Tick);
                                     }
                                 }
                                 if (error != null) {

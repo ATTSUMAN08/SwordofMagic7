@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetManager {
@@ -62,15 +63,12 @@ public class PetManager {
             if (pet.player == player) {
                 playerData.PetSelect = pet;
                 playerData.PetSelect.entity = entity;
-                player.sendMessage("§e[" + pet.petData.Display + "]§aを選択しました");
-                playSound(player, SoundList.Click);
+                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました", SoundList.Click);
             } else {
-                player.sendMessage("§a自身の§e[ペット]§aを選択してください");
-                playSound(player, SoundList.Nope);
+                sendMessage(player, "§a自身の§e[ペット]§aを選択してください", SoundList.Nope);
             }
         } else {
-            player.sendMessage(ReqPetSelect);
-            playSound(player, SoundList.Nope);
+            sendMessage(player, ReqPetSelect, SoundList.Nope);
         }
     }
 
@@ -100,11 +98,9 @@ public class PetManager {
                     pet.target = null;
                 }
             }
-            player.sendMessage("§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました");
-            playSound(player, SoundList.Click);
+            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました", SoundList.Click);
         } else {
-            player.sendMessage(ReqCommandPetSelect);
-            playSound(player, SoundList.Nope);
+            sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
         }
     }
 
@@ -131,13 +127,11 @@ public class PetManager {
                         playSound(player, SoundList.Click);
                     }
                 } else {
-                    player.sendMessage("§c[攻撃対象]§aを選択してください");
-                    playSound(player, SoundList.Nope);
+                    sendMessage(player, "§c[攻撃対象]§aを選択してください", SoundList.Nope);
                 }
             }
         } else {
-            player.sendMessage(ReqCommandPetSelect);
-            playSound(player, SoundList.Nope);
+            sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
         }
     }
 }

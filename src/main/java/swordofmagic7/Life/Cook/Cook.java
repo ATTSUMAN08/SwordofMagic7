@@ -114,6 +114,7 @@ public class Cook {
                                             }
                                         }
                                     }
+                                    playerData.statistics.CookCount += CookAmount;
                                     for (Map.Entry<String, Integer> reward : rewardList.entrySet()) {
                                         ItemParameter item = DataBase.getItemParameter(reward.getKey());
                                         playerData.ItemInventory.addItemParameter(item, reward.getValue());

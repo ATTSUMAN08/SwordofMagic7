@@ -116,6 +116,7 @@ public class SmithMake {
                                 }
                                 playerData.ItemInventory.addItemParameter(item.clone(), amount);
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, data.Exp);
+                                playerData.statistics.MakeEquipmentCount++;
                                 player.sendMessage("§e[" + item.Display + "§ax" + amount + "§e]§aを§e制作§aしました");
                                 playSound(player, SoundList.LevelUp);
                             } else {

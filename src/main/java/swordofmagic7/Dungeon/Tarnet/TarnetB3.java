@@ -43,8 +43,10 @@ public class TarnetB3 {
     private static final double Radius = Dungeon.Radius*2;
     private static final String sidebarId = "TarnetB3";
     public static float SkillTime = -1;
-    private static final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, VectorUp);
-    private static final ParticleData particleData2 = new ParticleData(Particle.LAVA, 0.1f, VectorUp);
+    public static final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, VectorUp);
+    public static final ParticleData particleData2 = new ParticleData(Particle.LAVA, 0.1f, VectorUp);
+    public static ParticleData useParticle = particleData;
+    public static double useRadius = 15;
     public static boolean Danger = false;
     private static final String[] EnterTextData = new String[]{};
     private static final String[] ClearText = new String[]{
@@ -83,13 +85,13 @@ public class TarnetB3 {
                         ViewBar.setSideBar(Players, sidebarId, textData);
                         Set<Player> deBuff = new HashSet<>(list);
                         Players2 = new HashSet<>(list);
-                        deBuff.removeIf(player -> player.getLocation().distance(OverLocation[selectOver]) < 15);
+                        deBuff.removeIf(player -> player.getLocation().distance(OverLocation[selectOver]) < useRadius);
                         Players2.removeAll(deBuff);
                         for (Player player : deBuff) {
                             PlayerData.playerData(player).EffectManager.addEffect(EffectType.InsufficientFilling, 25);
                         }
                         for (int i = 0; i < 4; i++) {
-                            ParticleManager.CircleParticle(Danger ? particleData2 : particleData, OverLocation[selectOver], 15, 72);
+                            ParticleManager.CircleParticle(useParticle, OverLocation[selectOver], useRadius, 72);
                             MultiThread.sleepTick(5);
                         }
                         selectOverTimer++;
@@ -101,13 +103,7 @@ public class TarnetB3 {
                     }
                     ViewBar.resetSideBar(Players, sidebarId);
                     if (Enemy.isDead()) {
-                        MultiThread.sleepTick(100);
-                        Message(Players, DungeonQuestClear, "§e5秒後帰還します", ClearText, SoundList.LevelUp);
-                        MultiThread.TaskRunSynchronized(() -> {
-                            for (Player player : PlayerList.getNear(EventLocation, Radius)) {
-                                player.teleportAsync(getWarpGate("TarnetB1_to_Nefritas").Location);
-                            }
-                        });
+                        MessageTeleport(Players, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").Location);
                     } else {
                         Enemy.delete();
                         Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);

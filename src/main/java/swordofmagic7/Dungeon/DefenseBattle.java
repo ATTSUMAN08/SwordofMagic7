@@ -38,7 +38,7 @@ public class DefenseBattle {
     public static int EnemyCount = 0;
     public static int wave = 1;
     public static double Health = 10000;
-    public static int startTime = 3600;
+    public static int startTime = 1200;
     public static int time = startTime;
     private static final int Radius = 96;
     private static final String sidebarId = "DefenseBattle";
@@ -76,7 +76,7 @@ public class DefenseBattle {
         if (i == 1) time = startTime;
         MultiThread.TaskRun(() -> {
             wave = i;
-            Health = 10000 + 1500*(i-1);
+            Health = 10000 + 1000*(i-1);
             EnemyCount = 50 + wave*5;
             Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DungeonTrigger);
             Set<Player> Players = new HashSet<>();
@@ -84,7 +84,7 @@ public class DefenseBattle {
                 Players = PlayerList.getNear(targetLocation, Radius);
                 MultiThread.TaskRunSynchronized(() -> {
                     for (int i2 = 0; i2 < 5; i2++) {
-                        if (EnemyCount > 0) {
+                        if (EnemyCount > 0 && EnemyList.size() < 50) {
                             MobData mobData = MobList.get(random.nextInt(MobList.size() - 1));
                             Location location = spawnLocation[random.nextInt(spawnLocation.length - 1)];
                             EnemyData enemyData = MobManager.mobSpawn(mobData, wave * 5, location);
@@ -113,7 +113,7 @@ public class DefenseBattle {
                 textData.add(decoText("防衛戦 [生命の樹]"));
                 textData.add(decoLore("現在Wave") + wave);
                 textData.add(decoLore("生命の樹の耐久") + String.format("%.0f", Health));
-                textData.add(decoLore("残りエネミー数") + (EnemyList.size() + EnemyCount) + "体");
+                textData.add(decoLore("残りエネミー数") + (EnemyList.size() + EnemyCount) + "体 §8§l(" + EnemyCount + ")");
                 textData.add(decoLore("残り時間") + time + "秒");
                 ViewBar.setSideBar(Players, sidebarId, textData);
                 Set<Player> finalPlayers = Players;

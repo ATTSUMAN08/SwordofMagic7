@@ -265,3 +265,6 @@ commands:
     aliases: ch
     description: description
     usage: /<command>
+  nickReset:
+    description: description
+    usage: /<command>

@@ -25,7 +25,7 @@ public class ItemCook {
     public void useCook(Player player, ItemParameter currentItem) {
         PlayerData playerData = PlayerData.playerData(player);
         if (playerData.useCookCoolTime > 0) {
-            Function.sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.useCookCoolTime + "秒]§aです", SoundList.Nope);
+            if (playerData.NaturalMessage) Function.sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.useCookCoolTime + "秒]§aです", SoundList.Nope);
         } else {
             if (isBuff) {
                 InstantBuffData instantBuffData = new InstantBuffData(Fixed, Multiply, BuffTime);

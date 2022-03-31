@@ -6,6 +6,7 @@ import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
@@ -63,17 +65,24 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        if (ServerId.equalsIgnoreCase("Event")) {
-            for (Player player1 : PlayerList.PlayerList) {
-                if (player1.getAddress() == player.getAddress()) {
-                    player.kickPlayer("§eEventServer§aでは§cサブアカウント§aは§b許可§aされていません");
-                }
+    public void onLogin(PlayerLoginEvent event) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                return;
             }
         }
+    }
 
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        for (Player player1 : Bukkit.getOnlinePlayers()) {
+            if (player != player1 && player1.getAddress().toString().split(":")[0].equals(player.getAddress().toString().split(":")[0])) {
+                player.kickPlayer("§cすでにログインしています");
+                return;
+            }
+        }
         playerData(player).load();
         PlayerList.load();
     }
@@ -441,10 +450,14 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
+        if (playerData.isPTChat) {
+            playerData.Party.chat(playerData, event.getMessage());
+            event.setMessage("$cancel");
+        }
         if (event.getMessage().contains("${")) {
             event.setCancelled(true);
         }

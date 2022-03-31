@@ -2,7 +2,7 @@ package swordofmagic7.Attribute;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -145,19 +145,18 @@ public class Attribute {
         AttributeMenuCache.setItem(8, point);
     }
 
-    public void AttributeMenuClick(InventoryView view, InventoryAction action, ItemStack currentItem) {
+    public void AttributeMenuClick(InventoryView view, ClickType clickType, ItemStack currentItem) {
         if (equalInv(view, AttributeMenuDisplay)) {
             Attribute attr = playerData.Attribute;
             for (AttributeType attrType : AttributeType.values()) {
                 if (currentItem.getType() == attrType.Icon) {
-                    switch (action) {
-                        case MOVE_TO_OTHER_INVENTORY -> attr.addAttribute(attrType, 10);
-                        case PICKUP_ALL -> attr.addAttribute(attrType, 1);
-                        case PICKUP_HALF -> {
-                            if (playerData.Map.Safe) {
-                                attr.revAttribute(attrType, 1);
-                            } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
-                        }
+                    int x = clickType.isShiftClick() ? 10 : 1;
+                    if (clickType.isLeftClick()) {
+                        attr.addAttribute(attrType, x);
+                    } else if (clickType.isRightClick()) {
+                        if (playerData.Map.Safe) {
+                            attr.revAttribute(attrType, x);
+                        } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
                     }
                 }
             }

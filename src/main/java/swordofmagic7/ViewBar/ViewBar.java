@@ -3,8 +3,6 @@ package swordofmagic7.ViewBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.*;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Data.PlayerData;
@@ -91,6 +89,8 @@ public class ViewBar {
         team.addEntry(player.getName());
         team.setCanSeeFriendlyInvisibles(true);
         MultiThread.TaskRun(() -> {
+            if (status.Health < 0) status.Health = status.MaxHealth;
+            if (status.Mana < 0) status.Mana = status.MaxMana;
             while (player.isOnline() && plugin.isEnabled()) {
                 try {
                     if (playerData.PlayMode && playerData.isLoaded) {
@@ -100,8 +100,10 @@ public class ViewBar {
                         float ExpPercent = (float) Exp / ReqExp;
                         if (Float.isNaN(ExpPercent)) ExpPercent = 0.999f;
                         ExpPercent = Math.min(0.001f, Math.max(0.999f, ExpPercent));
-                        if (status.Health < 0) status.Health = status.MaxHealth;
-                        if (status.Mana < 0) status.Mana = status.MaxMana;
+                        status.Health += status.HealthRegen / 40;
+                        status.Mana += status.ManaRegen / 40;
+                        status.Health = Math.min(Math.max(status.Health, 0), status.MaxHealth);
+                        status.Mana = Math.min(Math.max(status.Mana, 0), status.MaxMana);
                         HealthPercent = status.Health / status.MaxHealth;
                         ManaPercent = status.Mana / status.MaxMana;
                         if (HealthPercent < 0.2) HealthPercentColor = "§c§l";
@@ -115,18 +117,11 @@ public class ViewBar {
                                 "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》"
                         );
 
-                        status.Health += status.HealthRegen / 100;
-                        status.Mana += status.ManaRegen / 100;
-                        status.Health = Math.min(Math.max(status.Health, 0), status.MaxHealth);
-                        status.Mana = Math.min(Math.max(status.Mana, 0), status.MaxMana);
-
                         MultiThread.TaskRunSynchronized(() -> {
                             player.setAbsorptionAmount(0);
                             player.setMaxHealth(20);
                             player.setHealth(Math.min(Math.max(Math.floor(status.Health / status.MaxHealth * 20), 0.5), 20));
-                            player.setFoodLevel((int) Math.ceil(ManaPercent * 20));
-                            player.removePotionEffect(PotionEffectType.JUMP);
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 3, 0, false, false));
+                            player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));
                         });
 
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
@@ -145,7 +140,7 @@ public class ViewBar {
 
                         ViewSideBar();
                         playerData.HotBar.UpdateHotBar();
-                        MultiThread.sleepTick(2);
+                        MultiThread.sleepTick(5);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

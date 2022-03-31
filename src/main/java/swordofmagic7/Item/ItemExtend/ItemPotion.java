@@ -9,6 +9,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemPotion implements Cloneable {
@@ -24,8 +25,7 @@ public class ItemPotion implements Cloneable {
             multiply += DataBase.getSkillData("PotionSommelier").ParameterValue(0)/100;
         }
         if (playerData.PotionCoolTime.containsKey(PotionType)) {
-            player.sendMessage("§c[使用可能]§aまで§c[" + playerData.PotionCoolTime.get(PotionType) + "秒]§aです");
-            playSound(player, SoundList.Nope);
+            if (playerData.NaturalMessage) sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.PotionCoolTime.get(PotionType) + "秒]§aです", SoundList.Nope);
         } else {
             if (PotionType.isHealth()) {
                 if (playerData.Status.Health < playerData.Status.MaxHealth) {

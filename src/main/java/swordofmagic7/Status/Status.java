@@ -1,6 +1,8 @@
 package swordofmagic7.Status;
 
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
@@ -100,13 +102,18 @@ public class Status {
         return combatPower/2.2;
     }
 
-    double LevelMultiply() {
+    public int totalLevel() {
         int level = playerData.Level;
         for (ClassData classData : classes.classSlot) {
             if (classData != null) {
                 level += classes.getClassLevel(classData) - 1;
             }
         }
+        return level;
+    }
+
+    double LevelMultiply() {
+        int level = totalLevel();
         return Math.pow(1.01, level) + level *0.05;
     }
 
@@ -254,7 +261,10 @@ public class Status {
                 if (playerData.PvPMode) color = "§c";
                 player.setPlayerListName(playerData.Classes.topClass().Color + "§l" + playerData.Classes.topClass().Display + " " + color + playerData.Nick);
 
-                MultiThread.TaskRunSynchronized(() -> player.setWalkSpeed(0.24f));
+                MultiThread.TaskRunSynchronized(() -> {
+                    player.setWalkSpeed(0.24f);
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false));
+                });
             }
         }, "StatusUpdate: " + player.getName());
     }

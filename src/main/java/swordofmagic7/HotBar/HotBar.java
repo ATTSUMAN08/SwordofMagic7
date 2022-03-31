@@ -11,6 +11,7 @@ import swordofmagic7.Sound.SoundList;
 import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.getSkillData;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class HotBar {
@@ -66,8 +67,8 @@ public class HotBar {
                 default -> player.sendMessage("§e[ホットバー" + (index + 1) + "]§aは§eセット§aされていません");
             }
             UpdateHotBar();
-        } else {
-            player.sendMessage("§e[硬直]§a中は使用できません");
+        } else if (playerData.NaturalMessage) {
+            sendMessage(player, "§e[硬直]§a中は使用できません", SoundList.LevelUp);
         }
     }
 

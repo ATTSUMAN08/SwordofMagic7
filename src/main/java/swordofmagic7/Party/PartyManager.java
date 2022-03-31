@@ -70,9 +70,11 @@ public class PartyManager {
                 return;
             } else if (args[0].equalsIgnoreCase("chat")) {
                 if (playerData.Party != null) {
-                    if (playerData.isPTChat)
-                    for (Player member : playerData.Party.Members) {
-                        Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(args[1], "§f"), SoundList.Tick);
+                    if (args.length >= 2) {
+                        playerData.Party.chat(playerData, args[1]);
+                    } else {
+                        playerData.isPTChat = ! playerData.isPTChat;
+                        sendMessage(player, "§eチャットモード§aを§e[" + (playerData.isPTChat ? "パーティ" : "全体") + "]§aにしました");
                     }
                 } else {
                     Function.sendMessage(player, "§eパーティ§aに参加していません", SoundList.Tick);

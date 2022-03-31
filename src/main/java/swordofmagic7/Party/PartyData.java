@@ -15,8 +15,7 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Party.PartyManager.PartyInvites;
 import static swordofmagic7.Party.PartyManager.PartyList;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -140,5 +139,11 @@ public class PartyData {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    public void chat(PlayerData playerData, String message) {
+        for (Player member : playerData.Party.Members) {
+            Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(message, "§f"), SoundList.Tick);
+        }
     }
 }

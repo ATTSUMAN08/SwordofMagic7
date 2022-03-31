@@ -66,7 +66,7 @@ public class Market {
                                 int Mel = stack.itemParameter.Sell;
                                 if (args.length >= 3) {
                                     int amount = Integer.parseInt(args[2]);
-                                    if (stack.Amount >= amount) {
+                                    if (amount > 0 && stack.Amount >= amount) {
                                         stack.Amount = amount;
                                     } else {
                                         Function.sendMessage(player, "§a所持数以上は出品できません", SoundList.Nope);
@@ -101,6 +101,7 @@ public class Market {
                         if (index < market.marketData.size()) {
                             MarketData marketData = market.marketData.get(index);
                             String itemText = "§e[" + marketData.itemParameterStack.itemParameter.Display + "§ax" + marketData.itemParameterStack.Amount + "§e]";
+                            playerData.ItemInventory.addItemParameter(market.marketData.get(index).itemParameterStack);
                             market.marketData.remove(index);
                             Function.sendMessage(player, itemText + "§aを取り下げました", SoundList.Tick);
                             market.save();
@@ -183,16 +184,14 @@ public class Market {
                     index++;
                 } else break;
             }
-            itemStacks[45] = ShopFlame;
+            itemStacks[45] = page > 1 ? PreviousPageItem : ShopFlame;
             itemStacks[46] = ItemFlame(-100);
             itemStacks[47] = ItemFlame(-10);
             itemStacks[48] = ItemFlame(-1);
             itemStacks[50] = ItemFlame(1);
             itemStacks[51] = ItemFlame(10);
             itemStacks[52] = ItemFlame(100);
-            itemStacks[53] = ShopFlame;
-            if (page > 1) itemStacks[45] = PreviousPageItem;
-            if (page < Math.ceil(marketList.size()/45f)) itemStacks[53] = NextPageItem;
+            itemStacks[53] = page < Math.ceil(marketList.size()/45f) ? NextPageItem : ShopFlame;
             itemStacks[49] = ItemFlameAmount(MarketPrefix, BuyAmount);
             int i = 0;
             for (ItemStack itemStack : itemStacks) {

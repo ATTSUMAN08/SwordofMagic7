@@ -110,18 +110,19 @@ public class EnemyData {
     }
 
     public static double StatusMultiply(int level) {
-        return Math.pow(0.74+(level/3f), 1.4);
+        return Math.pow(0.74+(level/3f), 1.45);
     }
 
     public void statusUpdate() {
         double multiply = StatusMultiply(Level);
-        MaxHealth = mobData.Health * multiply;
+        double multiply2 = Level >= 30 ? Math.pow(multiply, 1.1) : multiply;
+        MaxHealth = mobData.Health * multiply2;
         ATK = mobData.ATK * multiply;
-        DEF = mobData.DEF * multiply;
+        DEF = mobData.DEF * multiply2;
         ACC = mobData.ACC * multiply;
         EVA = mobData.EVA * multiply;
         CriticalRate = mobData.CriticalRate * multiply;
-        CriticalResist = mobData.CriticalResist * multiply;
+        CriticalResist = mobData.CriticalResist * multiply2;
         Exp = mobData.Exp * multiply;
         ClassExp = mobData.Exp;
 
@@ -158,50 +159,37 @@ public class EnemyData {
                     while (isRunnableAI()) {
                         mob.lookAt(DefenseAI);
                         Pathfinder pathfinder = mob.getPathfinder();
-                        MultiThread.TaskRunSynchronized(() -> pathfinder.moveTo(DefenseAI, mobData.Mov/10+0.7));
+                        MultiThread.TaskRunSynchronized(() -> pathfinder.moveTo(DefenseAI, mobData.Mov));
                         LastLocation = entity.getLocation();
-                        MultiThread.sleepTick(15);
+                        MultiThread.sleepTick(20);
                     }
                 } else {
                     while (isRunnableAI()) {
-                        Location targetLocation = null;
-                        if (overrideTargetLocation != null) {
-                            targetLocation = overrideTargetLocation;
-                        } else if (target != null) {
-                            targetLocation = target.getEyeLocation();
-                        }
-                        Location finalTargetLocation = targetLocation;
-                        MultiThread.TaskRunSynchronized(() -> {
-                            if (finalTargetLocation != null) {
-                                mob.lookAt(finalTargetLocation);
+                        Location targetLocation = overrideTargetLocation != null ? overrideTargetLocation : target != null ? target.getLocation() : null;
+                        if (targetLocation != null) {
+                            MultiThread.TaskRunSynchronized(() -> {
+                                mob.lookAt(targetLocation);
                                 Pathfinder pathfinder = mob.getPathfinder();
-                                pathfinder.moveTo(finalTargetLocation, mobData.Mov);
-                            }
-                        }, "PathFindMove: " + uuid);
+                                pathfinder.moveTo(targetLocation, mobData.Mov);
+                            }, "PathFindMove: " + uuid);
+                        }
 
                         double topPriority = 0;
-                        for (Map.Entry<LivingEntity, Double> priority : new HashMap<>(Priority).entrySet()) {
+                        Priority.entrySet().removeIf(entry -> (entry.getKey() instanceof Player player && !Function.isAlive(player))
+                                || entry.getKey().getLocation().distance(entity.getLocation()) > mobData.Search
+                                || entry.getKey().isDead());
+                        for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
                             double Priority = priority.getValue();
                             LivingEntity priorityTarget = priority.getKey();
-                            if (entity.getLocation().distance(priorityTarget.getLocation()) < mobData.Search) {
-                                if (priorityTarget instanceof Player player) {
-                                    if (Function.isAlive(player)) {
-                                        PlayerData targetData = playerData(player);
-                                        if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
-                                            Priority = 0;
-                                            this.Priority.put(priority.getKey(), 0d);
-                                        } else if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
-                                            Priority = 0;
-                                            if (target == player) target = null;
-                                        }
-                                    } else {
-                                        this.Priority.remove(priorityTarget);
-                                    }
-                                } else if (priorityTarget.isDead()) {
-                                    this.Priority.remove(priorityTarget);
+                            if (priorityTarget instanceof Player player) {
+                                PlayerData targetData = playerData(player);
+                                if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
+                                    Priority = 0;
+                                    this.Priority.put(priority.getKey(), 0d);
+                                } else if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
+                                    Priority = 0;
+                                    if (target == player) target = null;
                                 }
-                            } else {
-                                this.Priority.remove(priorityTarget);
                             }
                             if (topPriority < Priority) {
                                 target = priorityTarget;
@@ -243,7 +231,7 @@ public class EnemyData {
                             }
                         }
                         if (!isDefenseBattle && SpawnLocation.distance(entity.getLocation()) > mobData.Search + 32) entity.teleportAsync(SpawnLocation);
-                        MultiThread.sleepTick(10);
+                        MultiThread.sleepTick(20);
                     }
                 }
             }, "EnemyAI: " + uuid);
