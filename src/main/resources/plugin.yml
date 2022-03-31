@@ -80,6 +80,14 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  defenseBattleStartWave:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  defenseBattleEndWave:
+    permission: som7.developer
+    description: description
+    usage: /<command>
 
   gm:
     permission: som7.builder
@@ -247,5 +255,13 @@ commands:
     usage: /<command>
   serverInfo:
     aliases: si
+    description: description
+    usage: /<command>
+  itemInfo:
+    aliases: ii
+    description: description
+    usage: /<command>
+  channel:
+    aliases: ch
     description: description
     usage: /<command>

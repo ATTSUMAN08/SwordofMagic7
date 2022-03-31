@@ -22,9 +22,14 @@ public class Dungeon {
     public static final World world = Bukkit.getWorld("world");
 
     public static void Message(Set<Player> players, String title, String subtitle, String[] textData, SoundList sound) {
+        Message(players, title, subtitle, textData, sound, false);
+    }
+
+    public static void Message(Set<Player> players, String title, String subtitle, String[] textData, SoundList sound, boolean nonFade) {
         for (Player player : players) {
             if (player.isOnline()) {
-                player.sendTitle(title, subtitle, 30, 50, 30);
+                if (nonFade) player.sendTitle(title, subtitle, 0, 21, 5);
+                else player.sendTitle(title, subtitle, 30, 50, 30);
                 if (textData != null) for (String text : textData) {
                     player.sendMessage(text);
                 }
@@ -39,9 +44,12 @@ public class Dungeon {
 
     public static void Initialize() {
         TarnetEnter.reset();
+        DefenseBattle.onLoad();
         createTouchHologram("§e§lアルターターネット", new Location(world, 3109, 132, 749.5), (Player player) -> {
             TarnetEnter.start();
         });
+
+        //createTouchHologram("§e§l防衛戦", new Location(world, 1200.5, 86.2, 99.5), DefenseBattle::teleport);
     }
 
     public static void BossBarAdd(BossBar bossBar, Set<Player> Players) {

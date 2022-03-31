@@ -2,6 +2,7 @@ package swordofmagic7.Shop;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -155,13 +156,13 @@ public class Shop {
     }
 
     private int SellAmount = 1;
-    public void ShopSellClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
+    public void ShopSellClick(InventoryView view, Inventory ClickInventory, ClickType clickType, int index, int Slot) {
         if (equalInv(view, ShopSellDisplay) && playerData.ViewInventory.isItem()) {
             if (view.getTopInventory() == ClickInventory) {
                 if (Slot < 45) {
                     if (SellInventory.getList().size() > Slot) {
                         ItemParameterStack stack = SellInventory.getList().get(Slot);
-                        int Amount = Math.min(SellAmount, stack.Amount);
+                        int Amount = clickType.isShiftClick() ? stack.Amount : Math.min(SellAmount, stack.Amount);
                         int Mel = stack.itemParameter.Sell * Amount;
                         if (playerData.Mel >= Mel) {
                             playerData.Mel -= Mel;
@@ -190,7 +191,7 @@ public class Shop {
             } else if (ClickInventory == player.getInventory() && index > -1) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
                 ItemParameter item = stack.itemParameter;
-                int Amount = Math.min(stack.Amount, SellAmount);
+                int Amount = clickType.isShiftClick() ? stack.Amount : Math.min(SellAmount, stack.Amount);
                 SellInventory.addItemParameter(item, Amount);
                 playerData.ItemInventory.removeItemParameter(item, Amount);
                 int Mel = item.Sell * Amount;

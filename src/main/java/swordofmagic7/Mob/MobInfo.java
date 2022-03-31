@@ -12,6 +12,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.BrownItemFlame;
@@ -44,6 +45,7 @@ public class MobInfo {
         int slot = 0;
         int index = scroll * 8;
         List<MobData> list = new ArrayList<>(DataBase.MobList.values());
+        list.sort(new MobInfoSort());
         ItemStack[] itemStacks = new ItemStack[54];
         for (int i = 0; i < 48; i++) {
             if (list.size() > index) {
@@ -87,5 +89,11 @@ public class MobInfo {
             list.add("§7・§e§l" + itemData.itemParameter.Display + "§a§lx" + itemData.MinAmount + "-" + itemData.MaxAmount + "§b§l -> §e§l" + String.format(playerData.ViewFormat(), itemData.Percent*100) + "%");
         }
         return list;
+    }
+}
+
+class MobInfoSort implements Comparator<MobData> {
+    public int compare(MobData mobData, MobData mobData2) {
+        return mobData.Display.compareTo(mobData2.Display);
     }
 }

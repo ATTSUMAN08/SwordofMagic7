@@ -9,6 +9,7 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
+import swordofmagic7.Item.RewardBox;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
 import swordofmagic7.Life.Cook.CookData;
@@ -48,6 +49,7 @@ public final class DataBase {
     public static ItemStack FlameItem(int i) {
         return new ItemStackData(Material.IRON_BARS, "§7§l空スロット[" + i + "]", 1).view();
     }
+    public static String ServerId = "Initialize";
     public static final int[] AnvilUISlot = new int[3];
     public static final ItemStack ItemFlame = new ItemStackData(Material.IRON_BARS, " ", 1).view();
     public static final ItemStack ShopFlame = new ItemStackData(Material.IRON_BARS, " ", 2).view();
@@ -91,6 +93,8 @@ public final class DataBase {
     public static final HashMap<String, AlchemyData> AlchemyDataList = new HashMap<>();
     public static final HashMap<Integer, String> AlchemyShopMap = new HashMap<>();
     public static final HashMap<String, List<String>> MaterializationMap = new HashMap<>();
+    public static final HashMap<String, List<String>> ItemInfoData = new HashMap<>();
+    public static final HashMap<String, List<RewardBox>> RewardBoxList = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(OfflinePlayer player) {
         return ItemStackPlayerHead(player, null, null);

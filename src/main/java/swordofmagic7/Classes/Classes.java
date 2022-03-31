@@ -46,7 +46,7 @@ public class Classes {
                 reqExp *= Math.pow(level, 1.8);
                 reqExp *= Math.ceil(level/10f);
                 if (level >= 30) reqExp *= 2;
-                if (level >= 50) reqExp *= 2;
+                if (level >= 50) reqExp *= 4;
                 ReqExp[level] = (int) Math.round(reqExp);
             }
         }
@@ -230,11 +230,6 @@ public class Classes {
     }
 
     public ClassData topClass() {
-        for (int i = MaxSlot-1; i >= 0; i--) {
-            if (classSlot[i] != null) {
-                return classSlot[i];
-            }
-        }
-        return defaultClass;
+        return classSlot[0];
     }
 }

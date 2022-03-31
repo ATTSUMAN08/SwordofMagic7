@@ -42,7 +42,7 @@ public class Cleric {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            Ray ray = rayLocationEntity(player.getEyeLocation(), length, 1, skillProcess.PredicateA());
+            Ray ray = rayLocationEntity(player.getEyeLocation(), length, 1, skillProcess.PredicateA().and(entity -> entity instanceof Player player && playerData(player).Status.Health < playerData(player).Status.MaxHealth));
             Player target;
             if (ray.isHitEntity()) {
                 target = (Player) ray.HitEntity;

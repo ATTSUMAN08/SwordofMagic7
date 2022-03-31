@@ -5,6 +5,7 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;
+import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.Sound.SoundList;
@@ -32,22 +33,37 @@ public class SideBarToDo {
     public void SideBarToDoCommand(String[] args) {
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("itemAmount") || args[0].equalsIgnoreCase("iA")) {
-                if (args.length == 2) {
-                    ItemParameter item = null;
-                    if (DataBase.ItemList.containsKey(args[1])) {
-                        item = DataBase.getItemParameter(args[1]);
-                    } else {
-                        try {
-                            item = playerData.ItemInventory.getItemParameter(Integer.parseInt(args[1]));
-                        } catch (Exception ignored) {
+                if (args.length >= 2) {
+                    for (int i = 1; i < args.length; i++) {
+                        ItemParameter item = null;
+                        if (DataBase.ItemList.containsKey(args[i])) {
+                            item = DataBase.getItemParameter(args[i]);
+                        } else {
+                            try {
+                                item = playerData.ItemInventory.getItemParameter(Integer.parseInt(args[i]));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        if (item != null) {
+                            SideBarToDoData data = new SideBarToDoData(SideBarToDoType.ItemAmount, item);
+                            list.add(data);
+                        } else {
+                            player.sendMessage("§e" + args[i] + "§aは存在しない§eアイテム§aです");
                         }
                     }
-                    if (item != null) {
-                        SideBarToDoData data = new SideBarToDoData(SideBarToDoType.ItemAmount, item);
-                        list.add(data);
-                    } else {
-                        player.sendMessage("§a存在しない§eアイテム§aです");
+                }
+            } else if (args[0].equalsIgnoreCase("recipeInfo") || args[0].equalsIgnoreCase("rI")) {
+                if (DataBase.ItemRecipeList.containsKey(args[1])) {
+                    for (ItemParameterStack stack : DataBase.getItemRecipe(args[1]).ReqStack) {
+                        SideBarToDoData data = new SideBarToDoData(SideBarToDoType.ItemAmount, stack.itemParameter);
+                        if (data.key != null) {
+                            list.add(data);
+                        } else {
+                            viewHelp();
+                        }
                     }
+                } else {
+                    player.sendMessage("§e" + args[1] + "§aは存在しない§eレシピ§aです");
                 }
             } else if (args[0].equalsIgnoreCase("lifeInfo") || args[0].equalsIgnoreCase("lI")) {
                 SideBarToDoData data = new SideBarToDoData(SideBarToDoType.LifeInfo, LifeType.getData(args[1]));
@@ -114,6 +130,7 @@ public class SideBarToDo {
     void viewHelp() {
         player.sendMessage(decoText("SideBarToDo Commands"));
         player.sendMessage("§e/sideBarToDo itemAmount <ItemName>");
+        player.sendMessage("§e/sideBarToDo recipeInfo <RecipeId>");
         player.sendMessage("§e/sideBarToDo LifeInfo <LifeID>");
         player.sendMessage("§e/sideBarToDo ClassInfo <ClassID>");
         player.sendMessage("§e/sideBarToDo clear [<index>]");

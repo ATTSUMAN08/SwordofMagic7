@@ -109,10 +109,10 @@ public class ViewBar {
                         else HealthPercentColor = "§a§l";
                         player.setLevel(Level);
                         player.setExp(ExpPercent);
-                        player.sendActionBar("§6§l《§e§l" + playerData.getNick(true) + " Lv" + Level + "§6§l》" +
-                                "§c§l《Health: " + (int) Math.round(status.Health) + "/" + (int) Math.round(status.MaxHealth) + "》" +
-                                "§b§l《Mana: " + (int) Math.round(status.Mana) + "/" + (int) Math.round(status.MaxMana) + "》" +
-                                "§a§l《Exp: " + playerData.viewExpPercent() + "%》"
+                        player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
+                                "§c§l《§cHealth: " + (int) Math.round(status.Health) + "/" + (int) Math.round(status.MaxHealth) + "§c§l》" +
+                                "§b§l《§bMana: " + (int) Math.round(status.Mana) + "/" + (int) Math.round(status.MaxMana) + "§b§l》" +
+                                "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》"
                         );
 
                         status.Health += status.HealthRegen / 100;

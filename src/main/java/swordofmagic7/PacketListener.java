@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import swordofmagic7.Data.PlayerData;
 
+import static swordofmagic7.Life.Gathering.ChangeBlock;
+
 public class PacketListener extends PacketAdapter {
     public PacketListener(Plugin plugin, PacketType... types) {
         super(plugin, types);
@@ -29,8 +31,8 @@ public class PacketListener extends PacketAdapter {
         PacketContainer packet = event.getPacket();
         Location location = packet.getBlockPositionModifier().read(0).toLocation(player.getWorld());
         if (player.getGameMode() != GameMode.CREATIVE) {
-            if (playerData.Gathering.ChangeBlock.containsKey(location)) {
-                BlockData blockData = playerData.Gathering.ChangeBlock.get(location);
+            if (ChangeBlock(player).checkLocation(location)) {
+                BlockData blockData = ChangeBlock(player).get(location);
                 packet.getBlockData().write(0, WrappedBlockData.createData(blockData));
             }
         }

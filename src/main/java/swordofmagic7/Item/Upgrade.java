@@ -73,9 +73,10 @@ public class Upgrade {
                                 playerData.ItemInventory.removeItemParameter(UpgradeStone, removeCost);
                                 playerData.Mel -= mel;
                                 int plus = UpgradeCache[1].itemEquipmentData.Plus;
+                                String perText = plus > 10 ? "§b[" + Math.pow(0.5, (plus - 10)) * 100 + "%]" : "";
                                 if (random.nextDouble() < percent) {
                                     UpgradeCache[0] = UpgradeCache[1].clone();
-                                    String text = "§e[" + UpgradeCache[1].Display + "+" + plus + "]§aの強化に§b成功§aしました §b[" + Math.pow(0.5, (plus-10))*100 + "%]";
+                                    String text = "§e[" + UpgradeCache[1].Display + "+" + plus + "]§aの強化に§b成功§aしました " + perText;
                                     if (plus >= 15) {
                                         BroadCast(playerData.getNick() + "§aさんが" + text);
                                         playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
@@ -88,7 +89,7 @@ public class Upgrade {
                                         if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
                                     }
                                 } else {
-                                    String text = "§e[" + UpgradeCache[1].Display + "+" + UpgradeCache[1].itemEquipmentData.Plus + "]§aの強化に§c失敗§aしました §b[" + Math.pow(0.5, (plus-10))*100 + "%]";
+                                    String text = "§e[" + UpgradeCache[1].Display + "+" + UpgradeCache[1].itemEquipmentData.Plus + "]§aの強化に§c失敗§aしました " + perText;
                                     if (UpgradeCache[1].itemEquipmentData.Plus >= 15) {
                                         BroadCast(playerData.getNick() + "§aさんが" + text);
                                     } else {

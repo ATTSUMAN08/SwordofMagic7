@@ -1,5 +1,7 @@
 package swordofmagic7;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -31,6 +33,7 @@ import java.util.function.Predicate;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.System.plugin;
 import static swordofmagic7.System.random;
 
 public final class Function {
@@ -285,5 +288,12 @@ public final class Function {
     public static void sendMessage(Player player, List<String> message, SoundList sound) {
         sendMessage(player, message);
         playSound(player, sound);
+    }
+
+    public static void teleportServer(Player player, String server) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF(server);
+        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
     }
 }

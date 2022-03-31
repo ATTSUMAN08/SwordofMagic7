@@ -6,6 +6,7 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
+import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Title.TitleManager;
@@ -34,6 +35,15 @@ public class Statistics {
     public int MaxFishingCombo = 0;
     public double MaxFishingCPS = 0;
     public int TotalEnemyKills = 0;
+    public int MineCount = 0;
+    public int FishingCount = 0;
+    public int HarvestCount = 0;
+    public int LumberCount = 0;
+    public int CookCount = 0;
+    public int UpgradeUseCostCount = 0;
+    public int MakeEquipmentCount = 0;
+    public int SmeltCount = 0;
+    public int MakePotionCount = 0;
 
     public List<String> getStringList() {
         List<String> list = new ArrayList<>();
@@ -41,6 +51,15 @@ public class Statistics {
         list.add(decoLore("釣獲最大コンボ") + MaxFishingCombo);
         list.add(decoLore("釣獲最高CPS") + String.format("%.2f", MaxFishingCPS));
         list.add(decoLore("エネミ討伐数") + TotalEnemyKills);
+        list.add(decoLore("採掘数") + MineCount);
+        list.add(decoLore("釣獲数") + FishingCount);
+        list.add(decoLore("採取数") + HarvestCount);
+        list.add(decoLore("伐採数") + LumberCount);
+        list.add(decoLore("料理数") + CookCount);
+        list.add(decoLore("精錬数") + SmeltCount);
+        list.add(decoLore("消費強化石数") + UpgradeUseCostCount);
+        list.add(decoLore("鍛冶装備作成数") + MakeEquipmentCount);
+        list.add(decoLore("ポーション作成数") + MakePotionCount);
         return list;
     }
 
@@ -82,17 +101,23 @@ public class Statistics {
 
     public void enemyKill(String mobId) {
         playerData.statistics.TotalEnemyKills++;
-        if (mobId.equals("サイモア")) {
-            titleManager.addTitle("サイモア討伐");
-            if ((AusMineB2.StartTime-AusMineB2.Time) < 60) titleManager.addTitle("サイモア討伐2");
-        }
-        if (mobId.equals("グリフィア")) {
-            titleManager.addTitle("グリフィア討伐");
-            if ((AusMineB4.StartTime-AusMineB4.Time) < 100) titleManager.addTitle("グリフィア討伐2");
-        }
-        if (mobId.equals("リーライ")) {
-            titleManager.addTitle("リーライ討伐");
-            if ((TarnetB1.StartTime- TarnetB1.Time) < 60) titleManager.addTitle("リーライ討伐2");
+        switch (mobId) {
+            case "サイモア" -> {
+                titleManager.addTitle("サイモア討伐");
+                if ((AusMineB2.StartTime-AusMineB2.Time) < 60) titleManager.addTitle("サイモア討伐2");
+            }
+            case "グリフィア" -> {
+                titleManager.addTitle("グリフィア討伐");
+                if ((AusMineB4.StartTime-AusMineB4.Time) < 100) titleManager.addTitle("グリフィア討伐2");
+            }
+            case "リーライ" -> {
+                titleManager.addTitle("リーライ討伐");
+                if ((TarnetB1.StartTime- TarnetB1.Time) < 60) titleManager.addTitle("リーライ討伐2");
+            }
+            case "シノサス" -> {
+                titleManager.addTitle("シノサス討伐");
+                if ((TarnetB3.StartTime- TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
+            }
         }
     }
 
@@ -101,6 +126,15 @@ public class Statistics {
         data.set("Statistics.MaxFishingCombo", MaxFishingCombo);
         data.set("Statistics.MaxFishingCPS", MaxFishingCPS);
         data.set("Statistics.TotalEnemyKills", TotalEnemyKills);
+        data.set("Statistics.MineCount", MineCount);
+        data.set("Statistics.FishingCount", FishingCount);
+        data.set("Statistics.HarvestCount", HarvestCount);
+        data.set("Statistics.LumberCount", LumberCount);
+        data.set("Statistics.CookCount", CookCount);
+        data.set("Statistics.SmeltCount", SmeltCount);
+        data.set("Statistics.UpgradeUseCostCount", UpgradeUseCostCount);
+        data.set("Statistics.MakeEquipmentCount", MakeEquipmentCount);
+        data.set("Statistics.MakePotionCount", MakePotionCount);
     }
 
     public void load(FileConfiguration data) {
@@ -108,5 +142,14 @@ public class Statistics {
         MaxFishingCombo = data.getInt("Statistics.MaxFishingCombo", 0);
         MaxFishingCPS = data.getDouble("Statistics.MaxFishingCPS", 0d);
         TotalEnemyKills = data.getInt("Statistics.TotalEnemyKills", 0);
+        MineCount = data.getInt("Statistics.MineCount", 0);
+        FishingCount = data.getInt("Statistics.FishingCount", 0);
+        HarvestCount = data.getInt("Statistics.HarvestCount", 0);
+        LumberCount = data.getInt("Statistics.LumberCount", 0);
+        CookCount = data.getInt("Statistics.CookCount", 0);
+        SmeltCount = data.getInt("Statistics.SmeltCount", 0);
+        UpgradeUseCostCount = data.getInt("Statistics.UpgradeUseCostCount", 0);
+        MakeEquipmentCount = data.getInt("Statistics.MakeEquipmentCount", 0);
+        MakePotionCount = data.getInt("Statistics.MakePotionCount", 0);
     }
 }

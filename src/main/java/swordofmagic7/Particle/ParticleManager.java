@@ -95,7 +95,10 @@ public final class ParticleManager {
         return 0 < r0 && r0 < 1 && 0 < r1 && r1 < 1;
     }
 
+    private static int particleCount = 0;
     public static void spawnParticle(ParticleData particleData, Location location) {
+        particleCount++;
+        if (particleCount > 10000) return;
         float speed;
         Vector vector;
         Vector offset;
@@ -115,6 +118,7 @@ public final class ParticleManager {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
             }
         }
+        particleCount--;
     }
 
     public static void FanShapedParticle(ParticleData particleData, Location location, double radius, double angle, double density) {

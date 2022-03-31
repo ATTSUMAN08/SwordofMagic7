@@ -1,5 +1,6 @@
 package swordofmagic7.Effect;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -48,7 +49,7 @@ public class EffectManager {
                         if (entity != null) {
                             if (effectType.isCrowdControl()) {
                                 if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                                    entity.setVelocity(Function.VectorDown);
+                                    stunVelocity(entity);
                                     potionSlow(entity, 127);
                                 }
                             } else if (effectType.isSlow()) {
@@ -70,6 +71,11 @@ public class EffectManager {
                 MultiThread.sleepTick(2);
             }
         }, "EffectManager: " + ThreadTag);
+    }
+
+    public void stunVelocity(LivingEntity entity) {
+        if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return;
+        entity.setVelocity(Function.VectorDown);
     }
 
     public void potionSlow(LivingEntity entity, int tier) {

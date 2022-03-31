@@ -1,9 +1,7 @@
 package swordofmagic7.Life;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
@@ -41,10 +39,19 @@ public class Gathering {
         this.playerData = playerData;
     }
 
-    public HashMap<Location, BlockData> ChangeBlock = new HashMap<>();
-    public void ChangeBlock(Block block, Material material, int time) {
+    public static HashMap<String, ChangeBlock> ChangeBlock = new HashMap<>();
+
+    public static ChangeBlock ChangeBlock(Player player) {
+        String uuid = player.getUniqueId().toString();
+        if (!ChangeBlock.containsKey(uuid)) {
+            ChangeBlock.put(uuid, new ChangeBlock());
+        }
+        return ChangeBlock.get(uuid);
+    }
+
+    public static void ChangeBlock(Player player, Block block, Material material, int time) {
         MultiThread.TaskRun(() -> {
-            ChangeBlock.put(block.getLocation(), material.createBlockData());
+            ChangeBlock(player).put(block.getLocation(), material.createBlockData());
             MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), material.createBlockData());
             int i = 0;
@@ -57,14 +64,14 @@ public class Gathering {
                 }
                 MultiThread.sleepTick(20);
             }
-            ChangeBlock.remove(block.getLocation());
+            ChangeBlock(player).remove(block.getLocation());
             MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), block.getBlockData());
         }, "ChangeBlock");
     }
 
     public void BlockBreak(PlayerData playerData, Block block) {
-        if (!playerData.Gathering.ChangeBlock.containsKey(block.getLocation())) {
+        if (!ChangeBlock(player).checkLocation(block.getLocation())) {
             MapData mapData = playerData.Map;
             LifeStatus lifeStatus = playerData.LifeStatus;
             Material playerTool = player.getInventory().getItemInMainHand().getType();
@@ -74,6 +81,7 @@ public class Gathering {
             Material material = null;
             if (playerTool == Material.IRON_PICKAXE && MineDataList.containsKey(key)) {
                 MineData data = MineDataList.get(key);
+                playerData.Equipment.setToolEquipment(data.ReqLevel);
                 if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Mine)) {
                     CoolTime = data.CoolTime;
                     if (block.getType().toString().contains(Material.DEEPSLATE.toString())) {
@@ -82,10 +90,14 @@ public class Gathering {
                         material = Material.COBBLESTONE;
                     }
                     lifeStatus.addLifeExp(LifeType.Mine, data.Exp);
+                    playerData.statistics.MineCount++;
                     for (MineItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Mine));
                         }
+                    }
+                    if (random.nextDouble() <= 0.05) {
+                        playerData.ItemInventory.addItemParameter(getItemParameter("強化石"), 1);
                     }
                 } else {
                     player.sendMessage("§e[採掘レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
@@ -93,10 +105,12 @@ public class Gathering {
                 }
             } else if (playerTool == Material.IRON_AXE && LumberDataList.containsKey(key)) {
                 LumberData data = LumberDataList.get(key);
+                playerData.Equipment.setToolEquipment(data.ReqLevel);
                 if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Lumber)) {
                     CoolTime = data.CoolTime;
                     material = Material.STRIPPED_OAK_WOOD;
                     lifeStatus.addLifeExp(LifeType.Lumber, data.Exp);
+                    playerData.statistics.LumberCount++;
                     for (LumberItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Lumber));
@@ -112,6 +126,7 @@ public class Gathering {
                     CoolTime = data.CoolTime;
                     material = Material.VOID_AIR;
                     lifeStatus.addLifeExp(LifeType.Harvest, data.Exp);
+                    playerData.statistics.HarvestCount++;
                     for (HarvestItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
                             playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Harvest));
@@ -123,7 +138,7 @@ public class Gathering {
                 }
             }
             if (material != null) {
-                ChangeBlock(block, material, CoolTime);
+                ChangeBlock(player, block, material, CoolTime);
                 playerData.viewUpdate();
             }
         }
@@ -242,6 +257,7 @@ public class Gathering {
                         int amount = playerData.LifeStatus.getMultiplyAmount(LifeType.Angler);
                         playerData.ItemInventory.addItemParameter(hitData.itemParameter, amount);
                         playerData.LifeStatus.addLifeExp(LifeType.Angler, (int) Math.round(data.Exp * hitData.expMultiply * multiply));
+                        playerData.statistics.FishingCount++;
                         double timePerSecond = requestFishingCommand.length / (time * 0.01);
                         if (FishingUseCombo) FishingComboBoost++;
                         player.sendMessage("§e[" + hitData.itemParameter.Display + "§ax" + amount + "§e]§aを釣りあげました！ §b[" + combo + "Combo] §e[" + String.format("%.2f", time * 0.01) + "秒] §c[" + String.format("%.2f", timePerSecond) + "/秒] §7[" + FishingMissCount + "Miss] §b[+" + (int) ((multiply - 1) * 100) + "%]");

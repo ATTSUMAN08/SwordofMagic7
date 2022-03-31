@@ -27,6 +27,7 @@ import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectOwnerType;
 import swordofmagic7.Equipment.Equipment;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Function;
 import swordofmagic7.HotBar.HotBar;
 import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.InstantBuff.InstantBuff;
@@ -148,6 +149,7 @@ public class PlayerData {
     public boolean isLoaded = false;
     public boolean isPTChat = false;
     public LivingEntity targetEntity = null;
+    public String saveTeleportServer = null;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -488,7 +490,9 @@ public class PlayerData {
         if (ExpLog) player.sendMessage("§e経験値§7: §a+" + addExp);
     }
 
+    private boolean isNonSave = false;
     public void save() {
+        if (isNonSave) return;
         if (Tutorial.TutorialProcess.containsKey(player)) {
             player.sendMessage(Tutorial.TutorialNonSave);
             return;
@@ -618,6 +622,19 @@ public class PlayerData {
         try {
             data.save(playerFile);
             player.sendMessage("§eプレイヤデータ§aの§bセーブ§aが完了しました");
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                if (saveTeleportServer != null) {
+                    isNonSave = true;
+                    Function.teleportServer(player, saveTeleportServer);
+                }
+                MultiThread.TaskRunSynchronizedLater(() -> {
+                    if (player.isOnline() && saveTeleportServer != null) {
+                        saveTeleportServer = null;
+                        isNonSave = false;
+                        player.sendMessage("§eチャンネル§aの移動に失敗しました");
+                    }
+                }, 20);
+            }, 5);
         } catch (Exception e) {
             e.printStackTrace();
         }

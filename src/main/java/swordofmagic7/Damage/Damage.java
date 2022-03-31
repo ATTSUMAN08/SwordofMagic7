@@ -19,10 +19,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.System.*;
@@ -100,7 +97,9 @@ public final class Damage {
         EffectManager attackerEffectManager;
         EffectManager victimEffectManager;
 
+        Set<Player> HoloView = new HashSet<>();
         if (attacker instanceof Player player) {
+            HoloView.add(player);
             if (!Function.isAlive(player)) return;
             PlayerData playerData = playerData(player);
             ATK = playerData.Status.ATK;
@@ -126,6 +125,7 @@ public final class Damage {
             attackerEffectManager = petParameter.effectManager;
         } else return;
         if (victim instanceof Player player) {
+            HoloView.add(player);
             if (!Function.isAlive(player)) return;
             PlayerData playerData = playerData(player);
             DEF = playerData.Status.DEF;
@@ -190,14 +190,14 @@ public final class Damage {
                 if (random.nextDouble() <= criRate) {
                     criCount++;
                     damage += baseDamage * CriticalMultiply;
-                    randomHologram("§b§l❤" + String.format("%.1f", baseDamage * CriticalMultiply), victim.getEyeLocation());
+                    randomHologram("§b§l❤" + String.format("%.1f", baseDamage * CriticalMultiply), victim.getEyeLocation(), HoloView);
                 } else {
                     hitCount++;
                     damage += baseDamage;
-                    randomHologram("§c§l❤" + String.format("%.1f", baseDamage), victim.getEyeLocation());
+                    randomHologram("§c§l❤" + String.format("%.1f", baseDamage), victim.getEyeLocation(), HoloView);
                 }
             } else {
-                randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation());
+                randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation(), HoloView);
             }
         }
 
@@ -325,10 +325,10 @@ public final class Damage {
     }
 
     static void randomHologram(String string, Location loc) {
-        randomHologram(string, loc, new ArrayList<>());
+        randomHologram(string, loc, new HashSet<>());
     }
 
-    static void randomHologram(String string, Location loc, List<Player> players) {
+    static void randomHologram(String string, Location loc, Set<Player> players) {
         double x = random.nextDouble() * 2 - 1;
         double y = random.nextDouble() + 1;
         double z = random.nextDouble() * 2 - 1;
@@ -336,11 +336,9 @@ public final class Damage {
             loc.add(x, y, z);
             Hologram hologram = createHologram("DamageHologram:" + UUID.randomUUID(), loc);
             VisibilityManager manager = hologram.getVisibilityManager();
-            if (players.size() > 0) {
-                manager.setVisibleByDefault(false);
-                for (Player player : players) {
-                    manager.showTo(player);
-                }
+            manager.setVisibleByDefault(false);
+            for (Player player : players) {
+                manager.showTo(player);
             }
             hologram.appendTextLine(string);
             MultiThread.TaskRunSynchronizedLater(hologram::delete, 20);

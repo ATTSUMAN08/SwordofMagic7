@@ -116,10 +116,14 @@ public class Auction {
                             if (playerData != Owner) {
                                 int reqMel = (int) Math.ceil(Mel * 1.05f);
                                 if (reqMel <= index) {
-                                    Better = playerData;
-                                    Mel = index;
-                                    Function.BroadCast(Better.getNick() + "§aさんが§e" + index + "メル§aで§b入札§aしました", SoundList.Tick);
-                                    if (time < 10) time = 10;
+                                    if (playerData.Mel >= index) {
+                                        Better = playerData;
+                                        Mel = index;
+                                        Function.BroadCast(Better.getNick() + "§aさんが§e" + index + "メル§aで§b入札§aしました", SoundList.Tick);
+                                        if (time < 10) time = 10;
+                                    } else {
+                                        Function.sendMessage(player, "§eメル§aが足りません", SoundList.Nope);
+                                    }
                                 } else {
                                     Function.sendMessage(player, "§e" + reqMel + "メル§a以上でないと§b入札§a出来ません", SoundList.Nope);
                                 }

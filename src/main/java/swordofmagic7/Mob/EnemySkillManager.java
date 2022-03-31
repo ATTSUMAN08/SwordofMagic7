@@ -36,11 +36,12 @@ public class EnemySkillManager {
     void tickSkillTrigger() {
         for (MobSkillData skill : enemyData.mobData.SkillList) {
             if (skill.maxHealth >= enemyData.Health / enemyData.MaxHealth) {
-                if (skill.Available == -1 || Available.getOrDefault(skill.Skill, 0) < skill.Available) {
-                    if (!CoolTime.containsKey(skill.Skill) && random.nextDouble() < skill.Percent){
-                        if (SkillReady) {
-                            mobSkillCast(skill);
-                        }
+                if (enemyData.Health / enemyData.MaxHealth >= skill.minHealth) {
+                    if (skill.Available == -1 || Available.getOrDefault(skill.Skill, 0) < skill.Available) {
+                        if (!CoolTime.containsKey(skill.Skill) && random.nextDouble() < skill.Percent) {
+                            if (SkillReady) {
+                                mobSkillCast(skill);
+                            }
                         /*
                         if (skill.Interrupt && !SkillReady) {
                             setCancel = true;
@@ -49,6 +50,7 @@ public class EnemySkillManager {
                             mobSkillCast(skill);
                         }
                          */
+                        }
                     }
                 }
             }

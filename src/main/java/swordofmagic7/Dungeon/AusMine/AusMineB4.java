@@ -33,7 +33,7 @@ public class AusMineB4 {
     public static float SkillTime = -1;
     private static final String[] ClearText = new String[]{
             "§cグリフィア§aを討伐しました！",
-            "§eスニーク§aを続けると§e退場§aします"};
+            };
     public static boolean Start() {
         if (!Start && (Enemy == null || Enemy.isDead())) {
             Start = true;
@@ -61,15 +61,11 @@ public class AusMineB4 {
                     }
                     ViewBar.resetSideBar(Players, "AusMineB4");
                     if (Enemy.isDead()) {
-                        Message(Players, DungeonQuestClear, ClearText[1], ClearText, SoundList.LevelUp);
+                        Message(Players, DungeonQuestClear, "§e5秒後帰還します", ClearText, SoundList.LevelUp);
                         MultiThread.sleepTick(100);
                         MultiThread.TaskRunSynchronized(() -> {
                             for (Player player : PlayerList.getNear(EventLocation, Radius)) {
-                                if (!player.isSneaking()) {
-                                    player.teleportAsync(getWarpGate("AusMineB4_to_AusMineB4Boss").Location);
-                                } else {
-                                    player.teleportAsync(getWarpGate("AusForest_to_AusMineB1").Location);
-                                }
+                                player.teleportAsync(getWarpGate("AusForest_to_AusMineB1").Location);
                             }
                         });
                     } else {

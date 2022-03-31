@@ -82,7 +82,7 @@ public class SmithEquipment {
                     Function.sendMessage(player, "§aこの装備は素材化出来ません", SoundList.Nope);
                 }
             }
-            if (MaterializationCache[0] != null) {
+            if (MaterializationCache[0] != null && MaterializationCache[1] != null) {
                 view.getTopInventory().setItem(AnvilUISlot[0], MaterializationCache[0].viewItem(1, playerData.ViewFormat()));
                 view.getTopInventory().setItem(AnvilUISlot[1], AirItem);
                 view.getTopInventory().setItem(AnvilUISlot[2], MaterializationCache[1].viewItem(MaterializationCache[0].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1, playerData.ViewFormat()));
@@ -102,7 +102,7 @@ public class SmithEquipment {
                         if (playerData.ItemInventory.hasItemParameter(DecryptionCache[0], amount)) {
                             playerData.ItemInventory.addItemParameter(DecryptionCache[index2], 1);
                             playerData.ItemInventory.removeItemParameter(DecryptionCache[0], amount);
-                            sendMessage(player, "§e[" + DecryptionCache[index2].Display + "§ax" + amount + "§e]§aを§b復号§aしました");
+                            sendMessage(player, "§e[" + DecryptionCache[index2].Display + "§e]§aを§b復号§aしました");
                         } else {
                             sendMessage(player, "§e[" + DecryptionCache[0].Display + "§ax" + amount + "§e]§aが必要です");
                         }
@@ -124,6 +124,7 @@ public class SmithEquipment {
                     DecryptionCache[i] = DataBase.getItemParameter(itemId);
                     view.getTopInventory().setItem(i+1, DecryptionCache[i].viewItem(1, playerData.ViewFormat()));
                     i++;
+                    if (DecryptionCache.length == i) break;
                 }
             } else {
                 view.getTopInventory().setItem(0, AirItem);

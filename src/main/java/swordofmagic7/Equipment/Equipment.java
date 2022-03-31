@@ -1,10 +1,12 @@
 package swordofmagic7.Equipment;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Life.LifeType;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
@@ -37,9 +39,24 @@ public class Equipment {
         return EquipSlot.getOrDefault(slot, new ItemParameter());
     }
 
+    private int reqLevel = 0;
+    public void setToolEquipment(int level) {
+        reqLevel = level;
+    }
+
     public void viewEquip() {
         if (isEquip(EquipmentSlot.MainHand)) {
-            player.getInventory().setItem(8, EquipSlot.get(EquipmentSlot.MainHand).viewItem(1, playerData.ViewFormat()));
+            ItemStack item = EquipSlot.get(EquipmentSlot.MainHand).viewItem(1, playerData.ViewFormat());
+            if (EquipSlot.get(EquipmentSlot.MainHand).Category.isTool()) {
+                int digSpeed = 0;
+                if (item.getType() == Material.IRON_PICKAXE) {
+                    digSpeed = (int) Math.floor((playerData.LifeStatus.getLevel(LifeType.Mine)-reqLevel)/5f);
+                } else if (item.getType() == Material.IRON_AXE) {
+                    digSpeed = (int) Math.floor((playerData.LifeStatus.getLevel(LifeType.Lumber)-reqLevel)/5f);
+                }
+                if (digSpeed > 0) item.addUnsafeEnchantment(Enchantment.DIG_SPEED, digSpeed);
+            }
+            player.getInventory().setItem(8, item);
         } else player.getInventory().setItem(8, new ItemStack(Material.AIR));
 
         if (isEquip(EquipmentSlot.OffHand)) {
@@ -64,7 +81,7 @@ public class Equipment {
                 reqText.add("§eアイテムデータ§aが§c不正§aです");
             }
             if (playerData.Level < param.itemEquipmentData.ReqLevel) {
-                reqText.add("レベルが足りません");
+                reqText.add("§aレベルが足りません §c[要求:" + param.itemEquipmentData.ReqLevel + ",現在:" + playerData.Level + "]");
                 req = true;
             }
             if (req) {

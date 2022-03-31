@@ -175,7 +175,7 @@ public class Status {
                 }
 
                 if (playerData.EffectManager.Effect.size() > 0) {
-                    for (Map.Entry<EffectType, EffectData> data : new HashMap<>(playerData.EffectManager.Effect).entrySet()) {
+                    for (Map.Entry<EffectType, EffectData> data : playerData.EffectManager.Effect.entrySet()) {
                         EffectType effectType = data.getKey();
                         EffectData effectData = data.getValue();
                         for (StatusParameter param : StatusParameter.values()) {
@@ -248,11 +248,11 @@ public class Status {
                 SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
                 SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
 
-                if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK /= 2;
+                if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK *= 0.1f;
 
                 String color = "§f";
                 if (playerData.PvPMode) color = "§c";
-                player.setPlayerListName(playerData.Classes.lastClass().Color + "§l" + playerData.Classes.lastClass().Display + " " + color + "§l" + playerData.Nick);
+                player.setPlayerListName(playerData.Classes.topClass().Color + "§l" + playerData.Classes.topClass().Display + " " + color + playerData.Nick);
 
                 MultiThread.TaskRunSynchronized(() -> player.setWalkSpeed(0.24f));
             }

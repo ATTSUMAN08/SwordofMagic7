@@ -2,6 +2,7 @@ package swordofmagic7;
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
@@ -64,6 +65,15 @@ public class Events implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        if (ServerId.equalsIgnoreCase("Event")) {
+            for (Player player1 : PlayerList.PlayerList) {
+                if (player1.getAddress() == player.getAddress()) {
+                    player.kickPlayer("§eEventServer§aでは§cサブアカウント§aは§b許可§aされていません");
+                }
+            }
+        }
+
         playerData(player).load();
         PlayerList.load();
     }
@@ -582,5 +592,10 @@ public class Events implements Listener {
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    void onSpectate(PlayerStartSpectatingEntityEvent event) {
+        event.setCancelled(true);
     }
 }

@@ -75,7 +75,7 @@ public class Cook {
             if (page > 1) itemStacks[45] = PreviousPageItem;
             if (page < MaxPage()) itemStacks[53] = NextPageItem;
             itemStacks[49] = ItemFlameAmount(CookPrefix, CookAmount);
-            player.getOpenInventory().getTopInventory().setStorageContents(itemStacks);
+            MultiThread.TaskRunSynchronized(() -> player.getOpenInventory().getTopInventory().setContents(itemStacks));
             playSound(player, SoundList.Tick);
         }
     }

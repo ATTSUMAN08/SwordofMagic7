@@ -11,12 +11,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import swordofmagic7.Classes.ClassData;
+import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RewardBox;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
 import swordofmagic7.Life.Angler.AnglerItemData;
@@ -48,26 +50,31 @@ import swordofmagic7.Status.StatusParameter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoText;
 
 public class DataLoader {
 
     public static void AllLoad() {
-        DataLoader.ItemDataLoad();
-        DataLoader.RuneDataLoad();
-        DataLoader.PetDataLoad();
-        DataLoader.RecipeDataLoad();
-        DataLoader.MapDataLoad();
-        DataLoader.LifeDataLoad();
-        DataLoader.SkillDataLoad();
-        DataLoader.ClassDataLoad();
-        DataLoader.MobDataLoad();
-        DataLoader.ShopDataLoad();
-        DataLoader.TitleDataLoad();
-        DataLoader.NpcDataLoad();
-        DataLoader.MobSpawnerDataLoad();
+        ItemDataLoad();
+        RuneDataLoad();
+        PetDataLoad();
+        RecipeDataLoad();
+        MapDataLoad();
+        LifeDataLoad();
+        SkillDataLoad();
+        ClassDataLoad();
+        MobDataLoad();
+        ShopDataLoad();
+        TitleDataLoad();
+        NpcDataLoad();
+        MobSpawnerDataLoad();
+        ItemInfoDataLoad();
+        DefenseBattleMobListLoad();
+        RewardBoxListLoad();
         Log("§aDataLoader -> AllLoad");
     }
 
@@ -85,6 +92,7 @@ public class DataLoader {
                 itemParameter.Lore = data.getStringList("Lore");
                 itemParameter.Sell = data.getInt("Sell");
                 itemParameter.Category = ItemCategory.Item.getItemCategory(data.getString("Category"));
+                itemParameter.CustomModelData = data.getInt("Model", 0);
                 if (data.isSet("Materialization")) {
                     itemParameter.Materialization = data.getString("Materialization");
                     if (!MaterializationMap.containsKey(itemParameter.Materialization)) MaterializationMap.put(itemParameter.Materialization, new ArrayList<>());
@@ -107,9 +115,8 @@ public class DataLoader {
                     itemParameter.itemCook.isBuff = data.getBoolean("Cook.Buff", false);
                     itemParameter.itemCook.BuffTime = data.getInt("Cook.BuffTime", 0);
                     itemParameter.itemCook.CoolTime = data.getInt("Cook.CoolTime", 0);
-                    itemParameter.itemCook.Health = data.getInt("Cook.Health", 0);
-                    itemParameter.itemCook.Mana = data.getInt("Cook.Mana", 0);
-
+                    itemParameter.itemCook.Health = data.getDouble("Cook.Health", 0);
+                    itemParameter.itemCook.Mana = data.getDouble("Cook.Mana", 0);
                     for (StatusParameter param : StatusParameter.values()) {
                         String fixed = "Cook.Fixed." + param;
                         String multiply = "Cook.Multiply." + param;
@@ -120,8 +127,6 @@ public class DataLoader {
                             itemParameter.itemCook.Multiply.put(param, data.getDouble(multiply));
                         }
                     }
-                    itemParameter.itemCook.Health = data.getDouble("Cook.Fixed.Health", 0);
-                    itemParameter.itemCook.Mana = data.getDouble("Cook.Fixed.Mana", 0);
                 } else if (itemParameter.Category.isPetFood()) {
                     itemParameter.itemPetFood.Stamina = data.getInt("PetFood.Stamina");
                 }
@@ -808,6 +813,59 @@ public class DataLoader {
                 double z = data.getDouble("Location.z");
                 mobSpawnerData.location = new Location(Bukkit.getWorld(data.getString("Location.w", "world")), x, y, z);
                 MobSpawnerList.put(fileName, mobSpawnerData);
+            } catch (Exception e) {
+                loadError(file);
+            }
+        }
+    }
+
+    public static void ItemInfoDataLoad() {
+        for (ItemParameter itemData : ItemList.values()) {
+            ItemInfoData.put(itemData.Id, new ArrayList<>());
+            for (String str : itemData.Lore) {
+                ItemInfoData.get(itemData.Id).add("§a§l" + str);
+            }
+            ItemInfoData.get(itemData.Id).add(decoText("§3§lドロップ情報"));
+        }
+        for (MobData mobData : MobList.values()) {
+            for (DropItemData dropData : mobData.DropItemTable) {
+                ItemInfoData.get(dropData.itemParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
+            }
+        }
+        for (ItemParameter itemData : ItemList.values()) {
+            ItemInfoData.get(itemData.Id).add(decoText("§3§l使用用途"));
+        }
+        for (Map.Entry<String, ItemRecipe> recipe : ItemRecipeList.entrySet()) {
+            for (ItemParameterStack stack : recipe.getValue().ReqStack) {
+                ItemInfoData.get(stack.itemParameter.Id).add("§7・§e§l" + recipe.getKey());
+            }
+        }
+    }
+
+    public static void DefenseBattleMobListLoad() {
+        File file = new File(DataBasePath, "DefenseBattle.yml");
+        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        DefenseBattle.MobList.clear();
+        for (String name : data.getStringList("MobList")) {
+            DefenseBattle.MobList.add(DataBase.getMobData(name));
+        }
+    }
+
+    public static void RewardBoxListLoad() {
+        for (File file : dumpFile(new File(DataBasePath, "RewardBox/"))) {
+            try {
+                String fileName = file.getName().replace(".yml", "");
+                FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                List<RewardBox> list = new ArrayList<>();
+                for (String str : data.getStringList("RewardBox")) {
+                    String[] split = str.split(",");
+                    RewardBox rewardBox = new RewardBox();
+                    rewardBox.id = split[0];
+                    rewardBox.amount = Integer.parseInt(split[1]);
+                    rewardBox.percent = Double.parseDouble(split[2]);
+                    list.add(rewardBox);
+                }
+                RewardBoxList.put(fileName, list);
             } catch (Exception e) {
                 loadError(file);
             }

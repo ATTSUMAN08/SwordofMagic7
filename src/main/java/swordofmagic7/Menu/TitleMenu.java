@@ -9,8 +9,6 @@ import swordofmagic7.Data.TitleData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.Comparator;
-
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.DataLoader.MaxTitleSlot;
 import static swordofmagic7.Function.*;
@@ -82,11 +80,5 @@ public class TitleMenu {
                 }
             }
         }
-    }
-}
-
-class TitleSort implements Comparator<TitleData> {
-    public int compare(TitleData title, TitleData title2) {
-        return title.Id.compareTo(title2.Id);
     }
 }

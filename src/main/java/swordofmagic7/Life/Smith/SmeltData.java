@@ -34,6 +34,7 @@ public class SmeltData {
         Lore.add(Function.decoText("§3§l精錬情報"));
         Lore.add(Function.decoLore("必要鍛冶レベル") + ReqLevel);
         Lore.add(Function.decoLore("鍛冶経験値") + Exp);
+        if (Amount >= 100) Lore.add(Function.decoLore("精錬個数") + Amount);
         for (ItemParameterStack stack : itemRecipe.ReqStack) {
             Lore.add(decoLore(stack.itemParameter.Id) + stack.Amount + "個");
         }

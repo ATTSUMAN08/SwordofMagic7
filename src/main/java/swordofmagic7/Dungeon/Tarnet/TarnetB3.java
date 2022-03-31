@@ -48,7 +48,8 @@ public class TarnetB3 {
     public static boolean Danger = false;
     private static final String[] EnterTextData = new String[]{};
     private static final String[] ClearText = new String[]{
-            "§cシノサス§aを討伐しました！"};
+            "§cシノサス§aを討伐しました！",
+    };
 
     public static void radiusMessage(String message) {
         for (Player player : Players) {
@@ -100,14 +101,18 @@ public class TarnetB3 {
                     }
                     ViewBar.resetSideBar(Players, sidebarId);
                     if (Enemy.isDead()) {
-                        Able = true;
-                        getWarpGate("TarnetB1BOSS_to_TarnetB2").ActiveAtTime(ElevatorActiveTime);
-                        Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
-                        MultiThread.sleepTick(ElevatorActiveTime);
+                        MultiThread.sleepTick(100);
+                        Message(Players, DungeonQuestClear, "§e5秒後帰還します", ClearText, SoundList.LevelUp);
+                        MultiThread.TaskRunSynchronized(() -> {
+                            for (Player player : PlayerList.getNear(EventLocation, Radius)) {
+                                player.teleportAsync(getWarpGate("TarnetB1_to_Nefritas").Location);
+                            }
+                        });
                     } else {
                         Enemy.delete();
                         Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
                     }
+
                     Players.clear();
                     Able = false;
                     Start = false;

@@ -252,8 +252,7 @@ public class Skill {
                             playSound(player, SoundList.Nope);
                         }
                     } else {
-                        player.sendMessage("§e[" + skillData.Display + "]§aの§c[使用条件]§aを満たしていません");
-                        playSound(player, SoundList.Nope);
+                        sendMessage(player, "§a現在の§eクラス構成§aでは使用できません", SoundList.Nope);
                     }
                 }
             }

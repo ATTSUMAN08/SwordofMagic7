@@ -29,7 +29,6 @@ import swordofmagic7.PlayerList;
 import swordofmagic7.Quest.QuestData;
 import swordofmagic7.Quest.QuestProcess;
 import swordofmagic7.Quest.QuestReqContentKey;
-import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.*;
@@ -73,6 +72,7 @@ public class EnemyData {
     public Location SpawnLocation;
     public LivingEntity target;
     public Location overrideTargetLocation;
+    public boolean isDefenseBattle = false;
     private boolean isDead = false;
 
     public boolean isDead() {
@@ -158,9 +158,9 @@ public class EnemyData {
                     while (isRunnableAI()) {
                         mob.lookAt(DefenseAI);
                         Pathfinder pathfinder = mob.getPathfinder();
-                        pathfinder.moveTo(DefenseAI, mobData.Mov);
+                        MultiThread.TaskRunSynchronized(() -> pathfinder.moveTo(DefenseAI, mobData.Mov/10+0.7));
                         LastLocation = entity.getLocation();
-                        MultiThread.sleepTick(10);
+                        MultiThread.sleepTick(15);
                     }
                 } else {
                     while (isRunnableAI()) {
@@ -197,6 +197,8 @@ public class EnemyData {
                                     } else {
                                         this.Priority.remove(priorityTarget);
                                     }
+                                } else if (priorityTarget.isDead()) {
+                                    this.Priority.remove(priorityTarget);
                                 }
                             } else {
                                 this.Priority.remove(priorityTarget);
@@ -208,8 +210,17 @@ public class EnemyData {
                         }
 
                         if (target == null && mobData.Hostile) {
-                            List<LivingEntity> Targets = SkillProcess.Nearest(entity.getLocation(), PlayerList.getNearLivingEntity(entity.getLocation(), mobData.Search));
-                            if (Targets.size() > 0) Priority.put(Targets.get(0), 1d);
+                            Set<Player> Targets = PlayerList.getNear(entity.getLocation(), mobData.Search);
+                            int topLevel = 0;
+                            LivingEntity target = null;
+                            for (Player player : Targets) {
+                                PlayerData playerData = playerData(player);
+                                if (playerData.Level > topLevel) {
+                                    topLevel = playerData.Level;
+                                    target = player;
+                                }
+                            }
+                            if (target != null) Priority.put(target, 1d);
                         }
 
                         if (target != null) {
@@ -231,7 +242,7 @@ public class EnemyData {
                                 }
                             }
                         }
-                        if (SpawnLocation.distance(entity.getLocation()) > mobData.Search) entity.teleportAsync(SpawnLocation);
+                        if (!isDefenseBattle && SpawnLocation.distance(entity.getLocation()) > mobData.Search + 32) entity.teleportAsync(SpawnLocation);
                         MultiThread.sleepTick(10);
                     }
                 }
@@ -260,10 +271,10 @@ public class EnemyData {
     }
 
     public static int decayExp(int exp, int playerLevel, int mobLevel) {
-        if (playerLevel < mobLevel + 15) {
+        if (playerLevel < mobLevel + 20) {
             return exp;
-        } else if (playerLevel > mobLevel + 15 && mobLevel + 30 > playerLevel) {
-            double decay = ((mobLevel + 30) - playerLevel)/15f;
+        } else if (playerLevel > mobLevel + 20 && mobLevel + 40 < playerLevel) {
+            double decay = ((mobLevel + 40) - playerLevel)/20f;
             return (int) Math.round(exp * decay);
         } else {
             return 1;
@@ -311,56 +322,58 @@ public class EnemyData {
                 }
                 List<String> Holo = new ArrayList<>();
                 Holo.add("§e§lEXP §a§l+" + exp);
-                for (DropItemData dropData : DropItemTable) {
-                    if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                        if (random.nextDouble() <= dropData.Percent) {
-                            int amount;
-                            if (dropData.MaxAmount != dropData.MinAmount) {
-                                amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
-                            } else {
-                                amount = dropData.MinAmount;
-                            }
-                            playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
-                            Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                            if (playerData.DropLog.isItem()) {
-                                player.sendMessage("§b[+]§e" + dropData.itemParameter.Display + "§ax" + amount);
-                            }
-                            if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
-                                BroadCast(playerData.getNick() + "§aさんが§e[" + dropData.itemParameter.Display + "§ax" + amount + "§e]§aを§e獲得§aしました", SoundList.Tick);
-                            }
-                        }
-                    }
-                }
-                for (DropRuneData dropData : mobData.DropRuneTable) {
-                    if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                        if (random.nextDouble() <= dropData.Percent) {
-                            RuneParameter runeParameter = dropData.runeParameter.clone();
-                            runeParameter.Quality = random.nextDouble();
-                            runeParameter.Level = Level;
-                            playerData.RuneInventory.addRuneParameter(runeParameter);
-                            Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                            if (playerData.DropLog.isRune()) {
-                                player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality*100) + "%]");
+                if (!isDefenseBattle) {
+                    for (DropItemData dropData : DropItemTable) {
+                        if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                            if (random.nextDouble() <= dropData.Percent) {
+                                int amount;
+                                if (dropData.MaxAmount != dropData.MinAmount) {
+                                    amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
+                                } else {
+                                    amount = dropData.MinAmount;
+                                }
+                                playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
+                                Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
+                                if (playerData.DropLog.isItem()) {
+                                    player.sendMessage("§b[+]§e" + dropData.itemParameter.Display + "§ax" + amount);
+                                }
+                                if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
+                                    BroadCast(playerData.getNick() + "§aさんが§e[" + dropData.itemParameter.Display + "§ax" + amount + "§e]§aを§e獲得§aしました", SoundList.Tick);
+                                }
                             }
                         }
                     }
-                }
-                for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
-                    QuestData questData = data.getKey();
-                    if (questData.type.isEnemy()) {
-                        for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
-                            QuestReqContentKey key = reqContent.getKey();
-                            if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
-                                playerData.QuestManager.processQuest(questData, key, 1);
+                    for (DropRuneData dropData : mobData.DropRuneTable) {
+                        if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                            if (random.nextDouble() <= dropData.Percent) {
+                                RuneParameter runeParameter = dropData.runeParameter.clone();
+                                runeParameter.Quality = random.nextDouble();
+                                runeParameter.Level = Level;
+                                playerData.RuneInventory.addRuneParameter(runeParameter);
+                                Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                                if (playerData.DropLog.isRune()) {
+                                    player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                }
                             }
                         }
                     }
-                }
-                if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
-                    if (random.nextDouble() <= 0.01) {
-                        PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Level+30, 0, random.nextDouble()+0.5);
-                        playerData.PetInventory.addPetParameter(pet);
-                        Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                    for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
+                        QuestData questData = data.getKey();
+                        if (questData.type.isEnemy()) {
+                            for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
+                                QuestReqContentKey key = reqContent.getKey();
+                                if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
+                                    playerData.QuestManager.processQuest(questData, key, 1);
+                                }
+                            }
+                        }
+                    }
+                    if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
+                        if (random.nextDouble() <= 0.01) {
+                            PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Level + 30, 0, random.nextDouble() + 0.5);
+                            playerData.PetInventory.addPetParameter(pet);
+                            Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                        }
                     }
                 }
                 Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);

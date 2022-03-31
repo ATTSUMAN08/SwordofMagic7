@@ -55,7 +55,9 @@ public class TextViewManager {
     }
 
     public static String itemDecoString(ItemParameterStack stack, String format) {
-        return itemDecoString(stack.itemParameter.viewItem(stack.Amount, format));
+        ItemStack itemView = stack.itemParameter.viewItem(stack.Amount, format);
+        itemView.setAmount(stack.Amount);
+        return itemDecoString(itemView);
     }
 
 

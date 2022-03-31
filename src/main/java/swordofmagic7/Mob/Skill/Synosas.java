@@ -110,12 +110,15 @@ public class Synosas {
             Manager.CastSkill(true);
             int i = 0;
             ParticleData particleData = new ParticleData(Particle.EXPLOSION_NORMAL);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                         ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), player.getEyeLocation(), 1, 3);
+                        ParticleManager.spawnParticle(particleData2, player.getEyeLocation());
+                        playSound(player, SoundList.Explosion);
                         PlayerData playerData = PlayerData.playerData(player);
-                        playerData.changeHealth(playerData.Status.Health-(playerData.Status.MaxHealth/2));
+                        playerData.changeHealth(-playerData.Status.MaxHealth/2);
                     }
                     break;
                 }
@@ -167,8 +170,10 @@ public class Synosas {
                     for (Player player : TarnetB3.Players2) {
                         ParticleManager.spawnParticle(particleData, player.getEyeLocation());
                         PlayerData playerData = PlayerData.playerData(player);
-                        playerData.dead();
-                        MultiThread.sleepTick(1);
+                        if (!playerData.isDead) {
+                            playerData.dead();
+                            MultiThread.sleepTick(1);
+                        }
                     }
                     playSound(TarnetB3.OverLocation[TarnetB3.selectOver], SoundList.Explosion);
                     break;

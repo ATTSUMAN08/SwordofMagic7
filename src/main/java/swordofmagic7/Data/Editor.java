@@ -47,10 +47,10 @@ public class Editor {
                             data.set("Display", itemData.Display);
                             data.set("Lore", itemData.Lore);
                             data.set("Category", itemData.Category.toString());
+                            if (args.length >= 8) data.set("Materialization", args[7]);
                             data.set("EquipmentCategory", itemData.itemEquipmentData.EquipmentCategory.toString());
                             data.set("EquipmentSlot", itemData.itemEquipmentData.EquipmentSlot.toString());
                             data.set("Sell", itemData.Sell);
-                            if (args.length >= 8) data.set("Materialization", args[7]);
                             for (StatusParameter param : StatusParameter.values()) {
                                 if (itemData.itemEquipmentData.Parameter().getOrDefault(param, 0d) > 0) {
                                     data.set(param.toString(), itemData.itemEquipmentData.Parameter().get(param));
@@ -96,7 +96,7 @@ public class Editor {
                             File file = item.File;
                             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                             switch (dataPath) {
-                                case Durable, ReqLevel, RuneSlot, UpgradeCost -> {
+                                case Durable, ReqLevel, RuneSlot, UpgradeCost, Sell -> {
                                     int value = Integer.parseInt(args[2]);
                                     data.set(String.valueOf(dataPath), value);
                                 }
@@ -104,6 +104,7 @@ public class Editor {
                                     double value = Double.parseDouble(args[2]);
                                     data.set(String.valueOf(dataPath), value);
                                 }
+                                default -> sender.sendMessage("Missing DataPath" + " -> " + dataPath);
                             }
                             try {
                                 data.save(file);

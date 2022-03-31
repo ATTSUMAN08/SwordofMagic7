@@ -30,6 +30,7 @@ import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Data.DataBase.ItemFlame;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.Item.ItemUse.useItem;
 import static swordofmagic7.Life.Smith.SmithEquipment.SmeltEquipmentMaterializationDisplay;
 import static swordofmagic7.Menu.Data.*;
 import static swordofmagic7.Shop.PetShop.*;
@@ -157,11 +158,11 @@ public class Menu {
                     case 17 -> playerData.ItemInventory.upScrollTick();
                     case 35 -> playerData.ItemInventory.downScrollTick(playerData.ItemInventory.getList().size());
                     default -> {
-                        if (index > -1) {
+                        if (index > -1 && Slot != 26) {
                             ItemParameterStack clickedItemStack = playerData.ItemInventory.getItemParameterStack(index);
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
-                                if (clickType.isShiftClick()) {
+                                if (clickType.isShiftClick() && clickType.isRightClick()) {
                                     player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat()));
                                 } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
@@ -178,6 +179,8 @@ public class Menu {
                                     playSound(player, SoundList.Click);
                                 } else if (EquipAble() && clickedItem.Category.isPetFood()) {
                                     clickedItem.itemPetFood.usePetFood(player, clickedItem);
+                                } else if (EquipAble() && clickedItem.Category.isItem()) {
+                                    useItem(playerData, clickedItemStack);
                                 }
                             }
                         }
@@ -188,7 +191,7 @@ public class Menu {
                     case 17 -> playerData.RuneInventory.upScrollTick();
                     case 35 -> playerData.RuneInventory.downScrollTick(playerData.RuneInventory.getList().size());
                     default -> {
-                        if (clickType.isShiftClick()) {
+                        if (index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
                             player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat()));
                         }
@@ -199,11 +202,12 @@ public class Menu {
                     case 17 -> playerData.PetInventory.upScrollTick();
                     case 35 -> playerData.PetInventory.downScrollTick(playerData.PetInventory.getList().size());
                     default -> {
-                        if (clickType.isShiftClick()) {
+                        if (index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
                             player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat()));
                         } else if (EquipAble() && index > -1) {
-                            playerData.PetInventory.getPetParameter(index).spawn();
+                            PetParameter pet = playerData.PetInventory.getPetParameter(index);
+                            if (pet != null) pet.spawn();
                         }
                     }
                 }
@@ -242,7 +246,7 @@ public class Menu {
             playerData.PetShop.PetShopClick(view, ClickInventory, currentItem, index, Slot);
             playerData.PetEvolution.PetEvolutionClick(view, ClickInventory, index, Slot);
             playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);
-            playerData.Shop.ShopSellClick(view, ClickInventory, index, Slot);
+            playerData.Shop.ShopSellClick(view, ClickInventory, clickType, index, Slot);
             SmithEquipment.SmeltMenuClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
                 playerData.Classes.ClassSelectClick(view, Slot);

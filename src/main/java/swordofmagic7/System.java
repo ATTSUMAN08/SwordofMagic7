@@ -15,12 +15,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.DataLoader;
 import swordofmagic7.Data.Editor;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
@@ -49,7 +52,7 @@ import static swordofmagic7.Mob.MobManager.getEnemyTable;
 import static swordofmagic7.Party.PartyManager.partyCommand;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public final class System extends JavaPlugin {
+public final class System extends JavaPlugin implements PluginMessageListener {
 
     public static Plugin plugin;
     public static final Random random = new Random();
@@ -71,8 +74,13 @@ public final class System extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        reloadConfig();
         plugin = this;
         EnemyTable = getEnemyTable();
+        ServerId = getConfig().getString("ServerId");
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
         //MultiThread.SynchronizedLoopCaster();
 
         Tutorial.onLoad();
@@ -355,6 +363,14 @@ public final class System extends JavaPlugin {
                 } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataCreate")) {
                     Editor.mobSpawnerDataCreateCommand(player, args);
                     return true;
+                } else if (cmd.getName().equalsIgnoreCase("defenseBattleStartWave")) {
+                    int wave = 1;
+                    if (args.length == 1) wave = Integer.parseInt(args[0]);
+                    DefenseBattle.startWave(wave);
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("defenseBattleEndWave")) {
+                    DefenseBattle.endWave();
+                    return true;
                 }
             }
 
@@ -628,6 +644,19 @@ public final class System extends JavaPlugin {
             } else if (cmd.getName().equalsIgnoreCase("mobInfo")) {
                 playerData.Menu.mobInfo.MobInfoView();
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("itemInfo")) {
+                if (args.length == 1) {
+                    if (ItemList.containsKey(args[0])) {
+                        ItemParameter item = getItemParameter(args[0]);
+                        List<String> list = new ArrayList<>();
+                        list.add(decoText(item.Display));
+                        list.addAll(ItemInfoData.get(item.Id));
+                        sendMessage(player, list);
+                    } else player.sendMessage("§a存在しない§eアイテム§aです");
+                } else {
+                    player.sendMessage("§e/itemInfo <ItemID>");
+                }
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("serverInfo")) {
                 Runtime runtime = Runtime.getRuntime();
                 int ex = 1048576;
@@ -654,6 +683,28 @@ public final class System extends JavaPlugin {
                 }
                 playSound(player, SoundList.Tick);
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("channel")) {
+                if (args.length == 1) {
+                    String teleportServer;
+                    switch (args[0]) {
+                        case "1" -> teleportServer = "CH1";
+                        case "2" -> teleportServer = "CH2";
+                        case "3" -> teleportServer = "CH3";
+                        case "4" -> teleportServer = "CH4";
+                        case "5" -> teleportServer = "CH5";
+                        case "Ev", "ev", "Event", "event" -> teleportServer = "Event";
+                        case "dev", "Dev" -> teleportServer = "Dev";
+                        default -> {
+                            player.sendMessage("存在しないチャンネルです");
+                            return true;
+                        }
+                    }
+                    playerData.saveTeleportServer = "Som7" + teleportServer;
+                    playerData.save();
+                } else {
+                    player.sendMessage("§e/channel <channel>");
+                }
+                return true;
             }
         }
         return false;
@@ -669,5 +720,10 @@ public final class System extends JavaPlugin {
     public static HashMap<BukkitTask, String> BukkitTaskTag = new HashMap<>();
     public static void BTTSet(BukkitTask task, String tag) {
         BukkitTaskTag.put(task, tag);
+    }
+
+    @Override
+    public void onPluginMessageReceived(@NonNull String channel, @NonNull Player player, byte[] message) {
+
     }
 }
