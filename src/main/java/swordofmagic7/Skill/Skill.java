@@ -41,7 +41,7 @@ public class Skill {
     public float SkillCastProgress = 0f;
     public final HashMap<String, Integer> SkillCoolTime = new HashMap<>();
     private final HashMap<String, Integer> SkillLevel = new HashMap<>();
-    private final HashMap<String, Integer> SkillStack = new HashMap<>();
+    public final HashMap<String, Integer> SkillStack = new HashMap<>();
     int SkillPoint = 0;
     public static final int millis = 50;
 
@@ -87,16 +87,13 @@ public class Skill {
 
         MultiThread.TaskRun(() -> {
             while (player.isOnline() && plugin.isEnabled()) {
-                for (Map.Entry<String, Integer> data : new HashMap<>(SkillCoolTime).entrySet()) {
+                for (Map.Entry<String, Integer> data : SkillCoolTime.entrySet()) {
                     String key = data.getKey();
                     int cooltime = data.getValue()-1;
-                    if (cooltime > 0) {
-                        SkillCoolTime.put(key, cooltime);
-                    } else {
-                        SkillCoolTime.remove(key);
-                        SkillStack.put(key, getSkillData(key).Stack);
-                    }
+                    SkillCoolTime.put(key, cooltime);
+                    if (cooltime <= 0) SkillStack.put(key, getSkillData(key).Stack);
                 }
+                SkillCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
                 if (SkillProcess.normalAttackCoolTime > 0) SkillProcess.normalAttackCoolTime--;
                 MultiThread.sleepTick(1);
             }
@@ -349,8 +346,7 @@ public class Skill {
         if (check) {
             return true;
         } else {
-            player.sendMessage("§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります", SoundList.Nope);
             return false;
         }
     }

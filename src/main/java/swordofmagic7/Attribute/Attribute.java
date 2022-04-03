@@ -82,6 +82,7 @@ public class Attribute {
             Parameter.put(attr, 0);
         }
         AttributePoint = (playerData.Level-1)*5;
+        AttributePoint += playerData.titleManager.TitleList.size();
     }
 
     public ItemStack attributeView(AttributeType type) {

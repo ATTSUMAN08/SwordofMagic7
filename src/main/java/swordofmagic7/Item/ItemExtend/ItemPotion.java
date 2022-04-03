@@ -70,17 +70,6 @@ public class ItemPotion implements Cloneable {
             playerData.PotionCoolTime.put(PotionType, CoolTime);
             playSound(player, SoundList.Heal);
             MultiThread.TaskRunSynchronized(() -> player.setCooldown(Material.GLASS_BOTTLE, CoolTime*20));
-            MultiThread.TaskRun(() -> {
-                while (playerData.PotionCoolTime.containsKey(PotionType)) {
-                    int cooltime = playerData.PotionCoolTime.get(PotionType)-1;
-                    if (cooltime > 0) {
-                        playerData.PotionCoolTime.put(PotionType, cooltime);
-                    } else {
-                        playerData.PotionCoolTime.remove(PotionType);
-                    }
-                    MultiThread.sleepTick(20);
-                }
-            }, "PotionCoolTimeTask: " + player.getName());
         }
     }
 

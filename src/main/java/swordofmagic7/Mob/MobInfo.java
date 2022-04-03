@@ -89,6 +89,9 @@ public class MobInfo {
         for (DropItemData itemData : mobData.DropItemTable) {
             list.add("§7・§e§l" + itemData.itemParameter.Display + "§a§lx" + itemData.MinAmount + "-" + itemData.MaxAmount + "§b§l -> §e§l" + String.format(playerData.ViewFormat(), itemData.Percent*100) + "%");
         }
+        for (DropRuneData runeData : mobData.DropRuneTable) {
+            list.add("§7・§e§l" + runeData.runeParameter.Display + "§b§l -> §e§l" + String.format(playerData.ViewFormat(), runeData.Percent*100) + "%");
+        }
         list.add(getPetList().containsKey(mobData.Id) ? "§b§l懐柔可能" : "§c§l懐柔不可");
         return list;
     }

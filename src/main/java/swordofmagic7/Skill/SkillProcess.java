@@ -62,47 +62,31 @@ public class SkillProcess {
         }
         if (enemy == player) {
             return false;
-        }
-        if (enemy instanceof Player target) {
-            if (isAlive(target)) {
-                PlayerData targetData = playerData(target);
-                if (playerData.Party == null) {
-                    return playerData.PvPMode && targetData.PvPMode;
-                } else if (playerData.Party == targetData.Party) {
-                    return false;
-                }
-            } else return false;
+        } else if (enemy instanceof Player target) {
+            return isAlive(target) && !isPlayerAllies(target);
         } else if (MobManager.isEnemy(enemy)) {
             MobManager.EnemyTable(enemy.getUniqueId()).updateEntity();
             return true;
         } else return false;
-        return false;
     }
 
     public boolean isAllies(Player target) {
-        if (target == player) {
-            return false;
-        }
-        if (isAlive(target)) {
-            PlayerData targetData = playerData(target);
-            if (playerData.Party == null) {
-                return !(playerData.PvPMode && targetData.PvPMode);
-            } else return playerData.Party == targetData.Party;
-        }
-        return false;
+        if (target == player) return false;
+        return isAlive(target) && isPlayerAllies(target);
     }
 
     public boolean isRevivalAble(Player target) {
-        if (target == player) {
-            return false;
-        }
-        if (target.isOnline() && !isAlive(target)) {
-            PlayerData targetData = playerData(target);
-            if (playerData.Party == null) {
-                return !(playerData.PvPMode && targetData.PvPMode);
+        if (target == player) return false;
+        return target.isOnline() && !isAlive(target) && isPlayerAllies(target);
+    }
+
+    public boolean isPlayerAllies(Player target) {
+        PlayerData targetData = playerData(target);
+        if (playerData.PvPMode && targetData.PvPMode) {
+            if (playerData.Party == null || targetData.Party == null) {
+                return false;
             } else return playerData.Party == targetData.Party;
-        }
-        return false;
+        } else return true;
     }
 
     public static Set<LivingEntity> FanShapedCollider(Location location, double radius, double angle, Predicate<LivingEntity> Predicate, boolean single) {

@@ -88,6 +88,14 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  sendData:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  classSelect:
+    permission: som7.developer
+    description: description
+    usage: /<command>
 
   gm:
     permission: som7.builder
@@ -261,8 +269,8 @@ commands:
     aliases: ii
     description: description
     usage: /<command>
-  channel:
-    aliases: ch
+  ch:
+    aliases: channel
     description: description
     usage: /<command>
   nickReset:

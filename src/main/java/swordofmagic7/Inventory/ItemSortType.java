@@ -33,6 +33,6 @@ class ItemSortAmount implements Comparator<ItemParameterStack> {
     public int compare(ItemParameterStack item, ItemParameterStack item2) {
         if (item.Amount == item2.Amount) {
             return new ItemSortName().compare(item, item2);
-        } else return item2.Amount - item.Amount;
+        } else return item.Amount - item2.Amount;
     }
 }

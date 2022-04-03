@@ -49,6 +49,7 @@ public class StatusInfo {
                 statusMeta.setDisplayName(decoText(playerData.Nick));
                 List<String> statusLore = new ArrayList<>();
                 statusLore.add(decoLore("現在位置") + playerData.Map.Display);
+                statusLore.add(decoLore("所持メル") + playerData.Mel + "メル");
                 statusLore.add(decoLore("レベル") + playerData.Level + "/" + PlayerData.MaxLevel);
                 statusLore.add(decoLore("経験値") + playerData.viewExpPercent());
                 statusLore.add(decoLore("戦闘力") + String.format(format, playerData.Status.getCombatPower()));

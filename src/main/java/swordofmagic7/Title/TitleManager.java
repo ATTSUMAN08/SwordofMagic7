@@ -45,6 +45,7 @@ public class TitleManager {
     }
     public void addTitle(TitleData title) {
         if (title != null && !TitleList.contains(title.Id)) {
+            playerData.Attribute.addPoint(1);
             TitleList.add(title.Id);
             player.sendMessage("§e称号[" + title.Id + "§e]§aを獲得しました");
             playSound(player, SoundList.Tick);

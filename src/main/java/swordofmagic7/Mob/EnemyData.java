@@ -35,7 +35,7 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.BroadCast;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.*;
 
@@ -59,8 +59,6 @@ public class EnemyData {
     public final EffectManager effectManager;
     public int HitCount = 0;
 
-    public Location DefenseAI;
-
     public void updateEntity() {
         MultiThread.TaskRunSynchronized(() -> {
             entity = (LivingEntity) Bukkit.getEntity(uuid);
@@ -72,6 +70,8 @@ public class EnemyData {
     public Location SpawnLocation;
     public LivingEntity target;
     public Location overrideTargetLocation;
+    public Location nonTargetLocation;
+    public Location DefenseAI;
     public boolean isDefenseBattle = false;
     private boolean isDead = false;
 
@@ -116,13 +116,14 @@ public class EnemyData {
     public void statusUpdate() {
         double multiply = StatusMultiply(Level);
         double multiply2 = Level >= 30 ? Math.pow(multiply, 1.1) : multiply;
+        double multiply3 = Level >= 30 ? Math.pow(multiply, 1.04) : multiply;
         MaxHealth = mobData.Health * multiply2;
         ATK = mobData.ATK * multiply;
-        DEF = mobData.DEF * multiply2;
+        DEF = mobData.DEF * multiply3;
         ACC = mobData.ACC * multiply;
         EVA = mobData.EVA * multiply;
         CriticalRate = mobData.CriticalRate * multiply;
-        CriticalResist = mobData.CriticalResist * multiply2;
+        CriticalResist = mobData.CriticalResist * multiply3;
         Exp = mobData.Exp * multiply;
         ClassExp = mobData.Exp;
 
@@ -165,12 +166,16 @@ public class EnemyData {
                     }
                 } else {
                     while (isRunnableAI()) {
-                        Location targetLocation = overrideTargetLocation != null ? overrideTargetLocation : target != null ? target.getLocation() : null;
+                        Location targetLocation = null;
+                        if (overrideTargetLocation != null) targetLocation = overrideTargetLocation;
+                        else if (target != null) targetLocation = target.getLocation();
+                        else if (nonTargetLocation != null) targetLocation = nonTargetLocation;
                         if (targetLocation != null) {
+                            Location finalTargetLocation = targetLocation;
                             MultiThread.TaskRunSynchronized(() -> {
-                                mob.lookAt(targetLocation);
+                                mob.lookAt(finalTargetLocation);
                                 Pathfinder pathfinder = mob.getPathfinder();
-                                pathfinder.moveTo(targetLocation, mobData.Mov);
+                                pathfinder.moveTo(finalTargetLocation, mobData.Mov);
                             }, "PathFindMove: " + uuid);
                         }
 
@@ -230,7 +235,7 @@ public class EnemyData {
                                 }
                             }
                         }
-                        if (!isDefenseBattle && SpawnLocation.distance(entity.getLocation()) > mobData.Search + 32) entity.teleportAsync(SpawnLocation);
+                        if (!isDefenseBattle && SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) entity.teleportAsync(SpawnLocation);
                         MultiThread.sleepTick(20);
                     }
                 }
@@ -238,8 +243,10 @@ public class EnemyData {
         }
     }
 
+    private final Map<LivingEntity, Double> TotalDamageTable = new HashMap<>();
     public void addPriority(LivingEntity entity, double addPriority) {
         Priority.put(entity, Priority.getOrDefault(entity, 0d) + addPriority);
+        TotalDamageTable.put(entity, TotalDamageTable.getOrDefault(entity, 0d) + addPriority);
     }
 
     public void resetPriority() {
@@ -263,7 +270,7 @@ public class EnemyData {
             return exp;
         } else if (playerLevel > mobLevel + 20 && mobLevel + 40 < playerLevel) {
             double decay = ((mobLevel + 40) - playerLevel)/20f;
-            return (int) Math.round(exp * decay);
+            return (int) Math.max(Math.round(exp * decay), 1);
         } else {
             return 1;
         }
@@ -285,6 +292,24 @@ public class EnemyData {
             }, "EnemyDead: " + uuid);
         }
 
+        if (mobData.enemyType.isBoss()) {
+            List<Map.Entry<LivingEntity, Double>> entries = new ArrayList<>(TotalDamageTable.entrySet());
+            entries.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
+            List<String> message = new ArrayList<>();
+            message.add(decoText("ダメージランキング"));
+            int i = 1;
+            for (Map.Entry<LivingEntity, Double> entry : entries) {
+                message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
+                i++;
+                if (i > 5) break;
+            }
+            for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
+                if (player.isOnline()) {
+                    sendMessage(player, message, SoundList.Tick);
+                }
+            }
+        }
+
         int exp = (int) Math.floor(Exp);
         int classExp = (int) Math.floor(ClassExp);
         List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
@@ -293,7 +318,7 @@ public class EnemyData {
         for (Player player : Involved) {
             if (player.isOnline()) {
                 PlayerData playerData = playerData(player);
-                playerData.statistics.enemyKill(mobData.Id);
+                playerData.statistics.enemyKill(mobData);
                 Classes classes = playerData.Classes;
                 List<ClassData> classList = new ArrayList<>();
                 for (ClassData classData : classes.classSlot) {
@@ -322,9 +347,7 @@ public class EnemyData {
                                 }
                                 playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
                                 Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                                if (playerData.DropLog.isItem()) {
-                                    player.sendMessage("§b[+]§e" + dropData.itemParameter.Display + "§ax" + amount);
-                                }
+                                if (playerData.DropLog.isItem()) ItemGetLog(player, dropData.itemParameter, amount);
                                 if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
                                     BroadCast(playerData.getNick() + "§aさんが§e[" + dropData.itemParameter.Display + "§ax" + amount + "§e]§aを§e獲得§aしました", SoundList.Tick);
                                 }
@@ -358,7 +381,7 @@ public class EnemyData {
                     }
                     if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
                         if (random.nextDouble() <= 0.01) {
-                            PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Level + 30, 0, random.nextDouble() + 0.5);
+                            PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
                             playerData.PetInventory.addPetParameter(pet);
                             Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
                         }

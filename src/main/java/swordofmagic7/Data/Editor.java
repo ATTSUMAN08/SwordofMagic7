@@ -47,7 +47,10 @@ public class Editor {
                             data.set("Display", itemData.Display);
                             data.set("Lore", itemData.Lore);
                             data.set("Category", itemData.Category.toString());
-                            if (args.length >= 8) data.set("Materialization", args[7]);
+                            if (args.length >= 8) {
+                                data.set("Materialization", args[7]);
+                                createMaterialization(args[7]);
+                            }
                             data.set("EquipmentCategory", itemData.itemEquipmentData.EquipmentCategory.toString());
                             data.set("EquipmentSlot", itemData.itemEquipmentData.EquipmentSlot.toString());
                             data.set("Sell", itemData.Sell);
@@ -104,6 +107,11 @@ public class Editor {
                                     double value = Double.parseDouble(args[2]);
                                     data.set(String.valueOf(dataPath), value);
                                 }
+                                case Materialization -> {
+                                    String value = args[2];
+                                    data.set(String.valueOf(dataPath), value);
+                                    createMaterialization(value);
+                                }
                                 default -> sender.sendMessage("Missing DataPath" + " -> " + dataPath);
                             }
                             try {
@@ -126,6 +134,31 @@ public class Editor {
             }
             sender.sendMessage("/itemDataEditCommand <itemId> <Path> <Value>");
             sender.sendMessage("/itemDataEditCommand create <SeriesName> <Sell> <ReqLevel> <RuneSlot> <UpgradeCost> <StatusMultiply>");
+        }
+    }
+
+    public static void createMaterialization(String str) {
+        File file = new File(DataBasePath, "ItemData/Material/素材化装備/素材化装備" + str + ".yml");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        data.set("Display", "素材化装備" + str);
+        data.set("Material", "TURTLE_EGG");
+        List<String> lore = new ArrayList<>();
+        lore.add(str + "装備を素材化した物です");
+        data.set("Lore", lore);
+        data.set("Category", "Materialization");
+        data.set("Materialization", str);
+        data.set("Sell", 30);
+        try {
+            data.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -222,6 +255,7 @@ enum ItemDataPaths {
     RuneSlot,
     UpgradeCost,
     StatusMultiply,
+    Materialization,
 }
 
 enum MobSpawnerDataPaths {

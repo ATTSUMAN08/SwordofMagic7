@@ -191,6 +191,17 @@ public class PlayerData {
 
         InitializeHologram();
         InitializeBossBar();
+
+        MultiThread.TaskRun(() -> {
+            while (player.isOnline() && plugin.isEnabled()) {
+                if (useCookCoolTime > 0) useCookCoolTime--;
+                for (Map.Entry<ItemPotionType, Integer> entry : PotionCoolTime.entrySet()) {
+                    PotionCoolTime.merge(entry.getKey(), -1, Integer::sum);
+                }
+                PotionCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
+                MultiThread.sleepTick(20);
+            }
+        }, "CoolTimeTask: " + player.getName());
     }
 
     public Hologram hologram;
@@ -433,7 +444,7 @@ public class PlayerData {
 
     public void saveCloseInventory() {
         CloseInventory(player);
-        Bukkit.getScheduler().runTaskLater(plugin, this::save, 1);
+        Bukkit.getScheduler().runTaskLater(plugin, this::save, 2);
     }
 
     public void addPlayerLevel(int addLevel) {
@@ -442,7 +453,9 @@ public class PlayerData {
             Level = MaxLevel;
             Exp = 0;
         } else {
-            BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました");
+            changeHealth(Status.MaxHealth);
+            changeMana(Status.MaxMana);
+            BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました", false);
             Attribute.addPoint(addLevel * 5);
             if (Level == MaxLevel) Exp = 0;
             playSound(player, SoundList.LevelUp);
@@ -470,7 +483,7 @@ public class PlayerData {
     private boolean isNonSave = false;
     public void save() {
         if (isNonSave) return;
-        if (Tutorial.TutorialProcess.containsKey(player)) {
+        if (Tutorial.TutorialProcess.containsKey(player) && Level == 1) {
             player.sendMessage(Tutorial.TutorialNonSave);
             return;
         }
@@ -495,6 +508,14 @@ public class PlayerData {
             if (player.isOnline()) load();
             return;
         }
+
+        if (Menu.SmithEquipment.MaterializationCache[0] != null) ItemInventory.addItemParameter(Menu.SmithEquipment.MaterializationCache[0], 1);
+        if (Upgrade.UpgradeCache[0] != null) ItemInventory.addItemParameter(Upgrade.UpgradeCache[0], 1);
+        if (RuneShop.RuneCache != null) ItemInventory.addItemParameter(RuneShop.RuneCache, 1);
+        if (RuneShop.RuneUpgradeCache[0] != null) RuneInventory.addRuneParameter(RuneShop.RuneUpgradeCache[0]);
+        if (RuneShop.RuneUpgradeCache[1] != null) RuneInventory.addRuneParameter(RuneShop.RuneUpgradeCache[1]);
+        if (PetShop.PetSyntheticCache[0] != null) PetInventory.addPetParameter(PetShop.PetSyntheticCache[0]);
+        if (PetShop.PetSyntheticCache[1] != null) PetInventory.addPetParameter(PetShop.PetSyntheticCache[1]);
 
         Location lastLocation = logoutLocation != null ? logoutLocation : player.getLocation();
         data.set("Location.x", lastLocation.getX());
@@ -595,6 +616,18 @@ public class PlayerData {
             }
         }
         data.set("Inventory.HotBar", hotBarList);
+
+        List<String> skillCT = new ArrayList<>();
+        List<String> potionCT = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : Skill.SkillCoolTime.entrySet()) {
+            skillCT.add(entry.getKey() + "," + entry.getValue());
+        }
+        for (Map.Entry<ItemPotionType, Integer> entry : PotionCoolTime.entrySet()) {
+            potionCT.add(entry.getKey().toString() + "," + entry.getValue());
+        }
+        data.set("CoolTime.Skill", skillCT);
+        data.set("CoolTime.Potion", potionCT);
+        data.set("CoolTime.Cook", useCookCoolTime);
 
         statistics.save(data);
 
@@ -716,6 +749,17 @@ public class PlayerData {
                 i++;
             }
             HotBar.setHotBar(hotBarData);
+
+            for (String str : data.getStringList("CoolTime.Skill")) {
+                String[] split = str.split(",");
+                Skill.SkillCoolTime.put(split[0], Integer.valueOf(split[1]));
+                Skill.SkillStack.put(split[0], 0);
+            }
+            for (String str : data.getStringList("CoolTime.Potion")) {
+                String[] split = str.split(",");
+                PotionCoolTime.put(ItemPotionType.valueOf(split[0]), Integer.valueOf(split[1]));
+            }
+            useCookCoolTime = data.getInt("CoolTime.Cook");
 
             if (PlayMode) {
                 viewUpdate();
@@ -862,6 +906,25 @@ public class PlayerData {
         return RightClickHold || player.isHandRaised() || player.isBlocking();
     }
 
+    private double DPS = 0;
+    public int getDPS() {
+        DPS = Math.max(0, DPS);
+        return (int) Math.floor(DPS/5);
+    }
+    public void addDPS(double dps) {
+        MultiThread.TaskRun(() -> {
+            for (int i = 0 ; i < 4; i++) {
+                DPS += dps/4;
+                MultiThread.sleepTick(5);
+            }
+            MultiThread.sleepTick(80);
+            for (int i = 0 ; i < 4; i++) {
+                DPS -= dps/4;
+                MultiThread.sleepTick(5);
+            }
+        }, "DPS: " + player.getName());
+    }
+
     private BukkitTask TargetEntityTask;
     public void setTargetEntity(LivingEntity entity) {
         targetEntity = entity;
@@ -882,6 +945,7 @@ public class PlayerData {
         final Location LastDeadLocation = player.getLocation();
         MultiThread.TaskRunSynchronized(() -> {
             if (!isDead) {
+                logoutLocation = player.getWorld().getSpawnLocation();
                 isDead = true;
                 player.setGameMode(GameMode.SPECTATOR);
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
@@ -897,6 +961,7 @@ public class PlayerData {
                         deadTime -= 10;
                         if (deadTime <= 0) {
                             this.cancel();
+                            logoutLocation = null;
                             isDead = false;
                             player.teleportAsync(player.getWorld().getSpawnLocation());
                             player.setGameMode(GameMode.SURVIVAL);
@@ -907,6 +972,7 @@ public class PlayerData {
                             hologram.delete();
                         } else if (RevivalReady) {
                             this.cancel();
+                            logoutLocation = null;
                             isDead = false;
                             RevivalReady = false;
                             player.teleportAsync(LastDeadLocation);

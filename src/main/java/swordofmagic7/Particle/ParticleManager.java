@@ -22,33 +22,26 @@ public final class ParticleManager {
         }, 1);
     }
 
-    public static double angle(Vector vector) {
+    public static int angle(Vector vector) {
         return angle(new Vector(), vector);
     }
 
-    public static double angle(Vector vector, Vector vector2) {
+    public static int angle(Vector vector, Vector vector2) {
         double angle = Math.atan2(vector.getZ() - vector2.getZ(), vector.getX() - vector2.getX());
         if (angle < 0) {
             angle += 2 * Math.PI;
         }
-        return Math.floor(angle * 360 / (2 * Math.PI));
+        return (int) Math.floor(angle * 360 / (2 * Math.PI));
     }
 
     public static Set<LivingEntity> FanShapedCollider(Location location, Set<LivingEntity> targetList, double angle) {
         Set<LivingEntity> Return = new HashSet<>();
         for (LivingEntity target : targetList) {
             Location location2 = target.getLocation();
-            angle /= 2;
-            double Angle = angle(location.getDirection());
-            double Angle2 = angle(location.toVector(), location2.toVector());
-            if (Angle - angle < 0) {
-                double AngleAux = 360 + (Angle - angle);
-                if (AngleAux <= Angle2 || Angle2 <= Angle + angle) Return.add(target);
-            } else if (360 < Angle + angle) {
-                double AngleAux = (Angle + angle) - 360;
-                if (Angle - angle <= Angle2 || Angle2 <= AngleAux) Return.add(target);
-            } else {
-                if (Angle - angle <= Angle2 && Angle2 <= Angle + angle) Return.add(target);
+            int Angle = angle(location.getDirection());
+            int Angle2 = angle(location.toVector(), location2.toVector());
+            if (Math.abs(Angle % 360 - Angle2 % 360) < angle/2) {
+                Return.add(target);
             }
         }
         return Return;

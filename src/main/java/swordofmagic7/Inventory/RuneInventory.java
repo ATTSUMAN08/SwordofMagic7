@@ -16,7 +16,7 @@ import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class RuneInventory extends BasicInventory {
-    public final int MaxSlot = 300;
+    public final int MaxSlot = 500;
     private final java.util.List<RuneParameter> List = new ArrayList<>();
 
     public RuneInventory(Player player, PlayerData playerData) {

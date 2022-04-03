@@ -90,7 +90,7 @@ public class LifeStatus {
     public void addLifeLevel(LifeType type, int level) {
         if (getLevel(type) < MaxLifeLevel) {
             Level.put(type, getLevel(type)+level);
-            BroadCast(playerData.getNick() + "§aさんの§e[" + type.Display + "レベル]§aが§e[Lv" + getLevel(type) + "]§aになりました");
+            BroadCast(playerData.getNick() + "§aさんの§e[" + type.Display + "レベル]§aが§e[Lv" + getLevel(type) + "]§aになりました", false);
             playSound(player, SoundList.LevelUp);
         }
     }

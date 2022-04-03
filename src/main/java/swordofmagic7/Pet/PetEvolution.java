@@ -70,11 +70,15 @@ public class PetEvolution {
                             Function.sendMessage(player, "§aこれ以上§c最大レベル§aを上げれません", SoundList.Nope);
                         }
                     } else {
-                        if (Cache[0].Level >= petParameter.Level) {
-                            Cache[1] = petParameter;
-                            playerData.PetInventory.removePetParameter(index);
+                        if (Cache[0].petData.Id.equals(petParameter.petData.Id)) {
+                            if (Cache[0].MaxLevel >= petParameter.MaxLevel) {
+                                Cache[1] = petParameter;
+                                playerData.PetInventory.removePetParameter(index);
+                            } else {
+                                Function.sendMessage(player, "§e素体ペット§aより§e最大レベル§a高い§eペット§aは素材に出来ません", SoundList.Nope);
+                            }
                         } else {
-                            Function.sendMessage(player, "§e素体ペット§aより§eレベル§a高い§eペット§aは素材に出来ません", SoundList.Nope);
+                            Function.sendMessage(player, "§e同種ペット§aのみ§e素材に出来ます", SoundList.Nope);
                         }
                     }
                     playSound(player, SoundList.Click);
@@ -91,7 +95,7 @@ public class PetEvolution {
             }
             if (Cache[0] != null && Cache[1] != null) {
                 Cache[2] = Cache[0].clone();
-                Cache[2].MaxLevel++;
+                Cache[2].MaxLevel = Math.min(Cache[2].MaxLevel + 5,  PlayerData.MaxLevel);
                 inv.setItem(AnvilUISlot[2], Cache[2].viewPet(format));
             } else {
                 inv.setItem(AnvilUISlot[2], AirItem);

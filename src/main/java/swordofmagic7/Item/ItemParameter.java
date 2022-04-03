@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemExtend.*;
 import swordofmagic7.Status.StatusParameter;
+import swordofmagic7.TextView.TextView;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -150,6 +151,18 @@ public class ItemParameter implements Cloneable {
 
         item.setAmount(amount);
         return item;
+    }
+
+    public TextView getTextView(int amount, String format) {
+        ItemStack item = viewItem(amount, format);
+        String suffix = "";
+        if (amount > 1) suffix = "§ax" + amount;
+        if (Category.isEquipment()) suffix = "§c+" + itemEquipmentData.Plus;
+        StringBuilder hoverText = new StringBuilder(item.getItemMeta().getDisplayName());
+        for (String str : item.getLore()) {
+            hoverText.append("\n").append(str);
+        }
+        return new TextView().addText("§e[" + Display + suffix + "§e]").addHover(hoverText.toString());
     }
 
     @Override

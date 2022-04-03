@@ -39,12 +39,7 @@ public class ItemCook {
             playerData.useCookCoolTime = CoolTime;
             playSound(player, SoundList.Heal);
             MultiThread.TaskRunSynchronized(() -> player.setCooldown(currentItem.Icon, CoolTime*20));
-            MultiThread.TaskRun(() -> {
-                while (playerData.useCookCoolTime > 0) {
-                    playerData.useCookCoolTime--;
-                    MultiThread.sleepTick(20);
-                }
-            }, "useCookCoolTimeTask: " + player.getName());
+
         }
     }
 }

@@ -282,6 +282,7 @@ public class PetParameter implements Cloneable {
         }
         meta.setLore(Lore);
         item.setItemMeta(meta);
+        item.setAmount(Math.min(100, Level));
         return item;
     }
 
@@ -328,7 +329,7 @@ public class PetParameter implements Cloneable {
                         if ((target.getLocation().distance(entity.getLocation()) > 32)
                                 || (MobManager.isEnemy(target) && MobManager.EnemyTable(target.getUniqueId()).isDead())
                                 || (target instanceof Player player && !Function.isAlive(player))
-                                || target.isDead()) {
+                                || (target != null && target.isDead())) {
                             target = null;
                         } else if (target.getLocation().distance(entity.getLocation()) < 2) {
                             Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);

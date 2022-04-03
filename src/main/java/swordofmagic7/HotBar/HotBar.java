@@ -68,7 +68,7 @@ public class HotBar {
             }
             UpdateHotBar();
         } else if (playerData.NaturalMessage) {
-            sendMessage(player, "§e[硬直]§a中は使用できません", SoundList.LevelUp);
+            sendMessage(player, "§e[硬直]§a中は使用できません", SoundList.Nope);
         }
     }
 

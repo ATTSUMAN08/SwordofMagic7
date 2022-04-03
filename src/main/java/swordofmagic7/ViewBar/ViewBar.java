@@ -114,7 +114,8 @@ public class ViewBar {
                         player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
                                 "§c§l《§cHealth: " + (int) Math.round(status.Health) + "/" + (int) Math.round(status.MaxHealth) + "§c§l》" +
                                 "§b§l《§bMana: " + (int) Math.round(status.Mana) + "/" + (int) Math.round(status.MaxMana) + "§b§l》" +
-                                "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》"
+                                "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
+                                "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );
 
                         MultiThread.TaskRunSynchronized(() -> {
@@ -126,7 +127,7 @@ public class ViewBar {
 
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
-                            playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] §f" + player.getName() + " §eLv" + playerData.Level);
+                            playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] §f" + player.getName() + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
 
                             if (isAlive(player) && !player.isSneaking()) {

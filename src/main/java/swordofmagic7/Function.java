@@ -3,6 +3,7 @@ package swordofmagic7;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,9 +14,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -132,14 +136,47 @@ public final class Function {
         return unColored(str);
     }
 
+    public static void BroadCast(String str, boolean isNatural) {
+        BroadCast(str, null, isNatural);
+    }
+
     public static void BroadCast(String str) {
-        BroadCast(str, null);
+        BroadCast(str, null, true);
     }
 
     public static void BroadCast(String str, SoundList sound) {
+        BroadCast(str, sound, true);
+    }
+
+    public static void BroadCast(String str, SoundList sound, boolean isNatural) {
         for (Player player : PlayerList.get()) {
-            player.sendMessage(str);
-            if (sound != null) playSound(player, sound);
+            if (player.isOnline()) {
+                PlayerData playerData = PlayerData.playerData(player);
+                if (playerData.NaturalMessage || isNatural) {
+                    player.sendMessage(str);
+                    if (sound != null) playSound(player, sound);
+                }
+            }
+        }
+    }
+
+    public static void BroadCast(TextComponent text) {
+        BroadCast(text, null, true);
+    }
+
+    public static void BroadCast(TextComponent text, SoundList sound) {
+        BroadCast(text, sound, true);
+    }
+
+    public static void BroadCast(TextComponent text, SoundList sound, boolean isNatural) {
+        for (Player player : PlayerList.get()) {
+            if (player.isOnline()) {
+                PlayerData playerData = PlayerData.playerData(player);
+                if (playerData.NaturalMessage || isNatural) {
+                    player.spigot().sendMessage(text);
+                    if (sound != null) playSound(player, sound);
+                }
+            }
         }
     }
 
@@ -274,6 +311,10 @@ public final class Function {
         player.sendMessage(message);
     }
 
+    public static void sendMessage(Player player, TextComponent message) {
+        player.spigot().sendMessage(message);
+    }
+
     public static void sendMessage(Player player, List<String> message) {
         for (String str : message) {
             player.sendMessage(str);
@@ -285,9 +326,22 @@ public final class Function {
         playSound(player, sound);
     }
 
+    public static void sendMessage(Player player, TextComponent message, SoundList sound) {
+        sendMessage(player, message);
+        playSound(player, sound);
+    }
+
     public static void sendMessage(Player player, List<String> message, SoundList sound) {
         sendMessage(player, message);
         playSound(player, sound);
+    }
+
+    public static void ItemGetLog(Player player, ItemParameterStack stack) {
+        ItemGetLog(player, stack.itemParameter, stack.Amount);
+    }
+
+    public static void ItemGetLog(Player player, ItemParameter itemParameter, int amount) {
+        player.sendMessage("§b[+]§e" + itemParameter.Display + "§ax" + amount);
     }
 
     public static void teleportServer(Player player, String server) {

@@ -72,7 +72,7 @@ public class WarpGateParameter {
         Hologram hologram = createHologram("WarpGateHologram:" + Id, Location.clone().add(0, 4, 0));
         hologram.appendTextLine(NextMap.Color + "§l《" + NextMap.Display + "》");
         hologram.appendTextLine("");
-        hologram.appendTextLine(NextMap.Color + "§l推奨Lv" + NextMap.Level);
+        hologram.appendTextLine(NextMap.Color + "§lエネミーLv" + NextMap.Level);
         world = Location.getWorld();
         MultiThread.TaskRun(() -> {
             int i = 0;

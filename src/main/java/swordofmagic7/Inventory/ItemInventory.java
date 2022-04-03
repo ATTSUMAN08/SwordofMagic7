@@ -20,7 +20,7 @@ import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
-    public final int MaxSlot = 300;
+    public final int MaxSlot = 500;
     private final List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Category;
@@ -189,8 +189,8 @@ public class ItemInventory extends BasicInventory {
         if (param1.Id.equals(param2.Id)) {
             if (param1.Category.isEquipment()) {
                 if (param1.itemEquipmentData.Durable == param2.itemEquipmentData.Durable &&
-                    param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
-                    param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
+                        param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
+                        param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
                     if (0 < param1.itemEquipmentData.getRuneSize()) {
                         for (int i = 0; i < param1.itemEquipmentData.getRuneSize(); i++) {
                             final RuneParameter rune1 = param1.itemEquipmentData.getRune(i);

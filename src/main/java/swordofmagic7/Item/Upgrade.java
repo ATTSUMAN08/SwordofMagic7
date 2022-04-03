@@ -56,7 +56,7 @@ public class Upgrade {
         return percent;
     }
 
-    private final ItemParameter[] UpgradeCache = new ItemParameter[2];
+    public final ItemParameter[] UpgradeCache = new ItemParameter[2];
     private final ItemParameter UpgradeStone = getItemParameter("強化石");
     public void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
         if (equalInv(view, UpgradeDisplay)) {

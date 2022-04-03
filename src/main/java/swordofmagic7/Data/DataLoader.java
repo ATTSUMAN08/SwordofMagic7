@@ -453,28 +453,44 @@ public class DataLoader {
             try {
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                 String fileName = file.getName().replace(".yml", "");
-                MakeData makeData = new MakeData();
-                List<MakeItemData> list = new ArrayList<>();
-                for (String str : data.getStringList("Item")) {
-                    MakeItemData makeItemData = new MakeItemData();
-                    String[] split = str.split(",");
-                    makeItemData.itemParameter = getItemParameter(split[0]);
-                    makeItemData.Amount = Integer.parseInt(split[1]);
-                    makeItemData.Percent = Double.parseDouble(split[2]);
-                    list.add(makeItemData);
+                if (!fileName.equals("GUI")) {
+                    MakeData makeData = new MakeData();
+                    List<MakeItemData> list = new ArrayList<>();
+                    for (String str : data.getStringList("Item")) {
+                        MakeItemData makeItemData = new MakeItemData();
+                        String[] split = str.split(",");
+                        makeItemData.itemParameter = getItemParameter(split[0]);
+                        makeItemData.Amount = Integer.parseInt(split[1]);
+                        makeItemData.Percent = Double.parseDouble(split[2]);
+                        list.add(makeItemData);
+                    }
+                    makeData.Display = data.getString("Display");
+                    makeData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
+                    makeData.makeList = list;
+                    makeData.ReqLevel = data.getInt("ReqLevel");
+                    makeData.Exp = data.getInt("Exp");
+                    makeData.itemRecipe = getItemRecipe(data.getString("Recipe"));
+                    MakeDataList.put(fileName, makeData);
+                } else {
+                    int slot = 0;
+                    for (String str : data.getStringList("MakeGUI")) {
+                        String[] split = str.split(",");
+                        if (split.length != 1) {
+                            int i = Integer.parseInt(split[1]);
+                            slot = i == -1 ? (int) Math.ceil(slot/9f)*9 : i;
+                        }
+                        MakeGUIMap.put(slot, split[0]);
+                        slot++;
+                        if (MaxMakeSlot < slot) MaxMakeSlot = slot;
+                        if (TitleMenu.nonSlotVertical(slot)) slot++;
+                    }
                 }
-                makeData.Display = data.getString("Display");
-                makeData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
-                makeData.makeList = list;
-                makeData.ReqLevel = data.getInt("ReqLevel");
-                makeData.Exp = data.getInt("Exp");
-                makeData.itemRecipe = getItemRecipe(data.getString("Recipe"));
-                MakeDataList.put(fileName, makeData);
             } catch (Exception e) {
                 loadError(file);
             }
         }
     }
+    public static int MaxMakeSlot = 0;
 
     public static void SkillDataLoad() {
         File skillDirectories = new File(DataBasePath, "SkillData/");
@@ -736,7 +752,13 @@ public class DataLoader {
                         } else if (str2.contains("Amount:")) {
                             shopSlot.Amount = Integer.parseInt(str2.replace("Amount:", ""));
                         } else if (str2.contains("Slot:")) {
-                            slot = Integer.parseInt(str2.replace("Slot:", ""));
+                            String str3 = str2.replace("Slot:", "");
+                            if (str3.contains("+")) {
+                                slot += Integer.parseInt(str3.replace("+", ""));
+                            } else {
+                                int index = Integer.parseInt(str3);
+                                slot = index == -1 ? (int) (Math.ceil(slot / 9f) * 9) : index;
+                            }
                         } else if (str2.contains("Recipe:")) {
                             shopSlot.itemRecipe = getItemRecipe(str2.replace("Recipe:", ""));
                         }
@@ -822,18 +844,35 @@ public class DataLoader {
     public static void ItemInfoDataLoad() {
         for (ItemParameter itemData : ItemList.values()) {
             ItemInfoData.put(itemData.Id, new ArrayList<>());
-            for (String str : itemData.Lore) {
-                ItemInfoData.get(itemData.Id).add("§a§l" + str);
-            }
-            ItemInfoData.get(itemData.Id).add(decoText("§3§lドロップ情報"));
+            ItemInfoData.get(itemData.Id).addAll(itemData.viewItem(1, "%.0f").getLore());
+            ItemInfoData.get(itemData.Id).add(decoText("§3§l入手方法"));
         }
         for (MobData mobData : MobList.values()) {
             for (DropItemData dropData : mobData.DropItemTable) {
                 ItemInfoData.get(dropData.itemParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
             }
         }
+        for (ShopData shopData : ShopList.values()) {
+            for (ShopSlot shopSlot : shopData.Data.values()) {
+                ItemInfoData.get(shopSlot.itemParameter.Id).add("§7・§e§l" + shopData.Display + " §b§l-> §e§l購入§a§lor§e§l制作");
+            }
+        }
+        for (CookData cookData : CookDataList.values()) {
+            for (CookItemData cookItemData : cookData.CookItemData) {
+                ItemInfoData.get(cookItemData.itemParameter.Id).add("§7・§e§l料理場");
+            }
+        }
+        for (SmeltData smeltData : SmeltDataList.values()) {
+            ItemInfoData.get(smeltData.itemParameter.Id).add("§7・§e§l鍛冶場 §b§l-> §e§l精錬");
+        }
+        for (MakeData makeData : MakeDataList.values()) {
+            for (MakeItemData makeItemData : makeData.makeList) {
+                ItemInfoData.get(makeItemData.itemParameter.Id).add("§7・§e§l鍛冶場 §b§l-> §e§l装備制作 §b§l-> §e§l" + makeData.Display);
+            }
+        }
         for (ItemParameter itemData : ItemList.values()) {
             ItemInfoData.get(itemData.Id).add(decoText("§3§l使用用途"));
+            if (itemData.Materialization != null) ItemInfoData.get(itemData.Id).add("§7・§e§l素材化装備" + itemData.Materialization);
         }
         for (Map.Entry<String, ItemRecipe> recipe : ItemRecipeList.entrySet()) {
             for (ItemParameterStack stack : recipe.getValue().ReqStack) {

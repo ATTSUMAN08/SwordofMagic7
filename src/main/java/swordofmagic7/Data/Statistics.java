@@ -8,6 +8,7 @@ import swordofmagic7.Dungeon.AusMine.AusMineB4;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.Life.LifeType;
+import swordofmagic7.Mob.MobData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Title.TitleManager;
 
@@ -35,6 +36,9 @@ public class Statistics {
     public int MaxFishingCombo = 0;
     public double MaxFishingCPS = 0;
     public int TotalEnemyKills = 0;
+    public int TotalBossEnemyKills = 0;
+    public int DownCount = 0;
+    public int DeathCount = 0;
     public int MineCount = 0;
     public int FishingCount = 0;
     public int HarvestCount = 0;
@@ -44,6 +48,8 @@ public class Statistics {
     public int MakeEquipmentCount = 0;
     public int SmeltCount = 0;
     public int MakePotionCount = 0;
+    public int StrafeCount = 0;
+    public int WallJumpCount = 0;
 
     public List<String> getStringList() {
         List<String> list = new ArrayList<>();
@@ -51,6 +57,9 @@ public class Statistics {
         list.add(decoLore("釣獲最大コンボ") + MaxFishingCombo);
         list.add(decoLore("釣獲最高CPS") + String.format("%.2f", MaxFishingCPS));
         list.add(decoLore("エネミ討伐数") + TotalEnemyKills);
+        list.add(decoLore("ボスエネミ討伐数") + TotalBossEnemyKills);
+        list.add(decoLore("ダウン回数") + DownCount);
+        list.add(decoLore("死亡回数") + DeathCount);
         list.add(decoLore("採掘数") + MineCount);
         list.add(decoLore("釣獲数") + FishingCount);
         list.add(decoLore("採取数") + HarvestCount);
@@ -60,6 +69,8 @@ public class Statistics {
         list.add(decoLore("消費強化石数") + UpgradeUseCostCount);
         list.add(decoLore("鍛冶装備作成数") + MakeEquipmentCount);
         list.add(decoLore("ポーション作成数") + MakePotionCount);
+        list.add(decoLore("ストレイフ回数") + StrafeCount);
+        list.add(decoLore("壁ジャンプ数") + WallJumpCount);
         return list;
     }
 
@@ -72,16 +83,6 @@ public class Statistics {
         if (MaxFishingCombo >= 100) titleManager.addTitle("釣獲コンボ100");
         if (MaxFishingCombo >= 200) titleManager.addTitle("釣獲コンボ200");
         if (MaxFishingCombo >= 300) titleManager.addTitle("釣獲コンボ300");
-
-        if (TotalEnemyKills >= 500) titleManager.addTitle("エネミー討伐500");
-        if (TotalEnemyKills >= 2500) titleManager.addTitle("エネミー討伐2500");
-        if (TotalEnemyKills >= 5000) titleManager.addTitle("エネミー討伐5000");
-        if (TotalEnemyKills >= 10000) titleManager.addTitle("エネミー討伐10000");
-        if (TotalEnemyKills >= 25000) titleManager.addTitle("エネミー討伐25000");
-        if (TotalEnemyKills >= 50000) titleManager.addTitle("エネミー討伐50000");
-        if (TotalEnemyKills >= 100000) titleManager.addTitle("エネミー討伐100000");
-        if (TotalEnemyKills >= 250000) titleManager.addTitle("エネミー討伐250000");
-        if (TotalEnemyKills >= 1000000) titleManager.addTitle("エネミー討伐1000000");
 
         for (ClassData classData : DataBase.ClassList.values()) {
             if (playerData.Classes.getClassLevel(classData) >= 15) {
@@ -97,11 +98,26 @@ public class Statistics {
                 titleManager.addTitle(lifeType.Display + "レベル30");
             }
         }
+
+        checkTitleEnemyKill();
     }
 
-    public void enemyKill(String mobId) {
+    public void checkTitleEnemyKill() {
+        if (TotalEnemyKills >= 500) titleManager.addTitle("エネミー討伐500");
+        if (TotalEnemyKills >= 2500) titleManager.addTitle("エネミー討伐2500");
+        if (TotalEnemyKills >= 5000) titleManager.addTitle("エネミー討伐5000");
+        if (TotalEnemyKills >= 10000) titleManager.addTitle("エネミー討伐10000");
+        if (TotalEnemyKills >= 25000) titleManager.addTitle("エネミー討伐25000");
+        if (TotalEnemyKills >= 50000) titleManager.addTitle("エネミー討伐50000");
+        if (TotalEnemyKills >= 100000) titleManager.addTitle("エネミー討伐100000");
+        if (TotalEnemyKills >= 250000) titleManager.addTitle("エネミー討伐250000");
+        if (TotalEnemyKills >= 1000000) titleManager.addTitle("エネミー討伐1000000");
+    }
+
+    public void enemyKill(MobData mobData) {
         playerData.statistics.TotalEnemyKills++;
-        switch (mobId) {
+        if (mobData.enemyType.isBoss()) TotalBossEnemyKills++;
+        switch (mobData.Id) {
             case "サイモア" -> {
                 titleManager.addTitle("サイモア討伐");
                 if ((AusMineB2.StartTime-AusMineB2.Time) < 60) titleManager.addTitle("サイモア討伐2");
@@ -119,6 +135,7 @@ public class Statistics {
                 if ((TarnetB3.StartTime- TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
             }
         }
+        checkTitleEnemyKill();
     }
 
     public void save(FileConfiguration data) {
@@ -126,6 +143,9 @@ public class Statistics {
         data.set("Statistics.MaxFishingCombo", MaxFishingCombo);
         data.set("Statistics.MaxFishingCPS", MaxFishingCPS);
         data.set("Statistics.TotalEnemyKills", TotalEnemyKills);
+        data.set("Statistics.TotalBossEnemyKills", TotalBossEnemyKills);
+        data.set("Statistics.DownCount", DownCount);
+        data.set("Statistics.DeathCount", DeathCount);
         data.set("Statistics.MineCount", MineCount);
         data.set("Statistics.FishingCount", FishingCount);
         data.set("Statistics.HarvestCount", HarvestCount);
@@ -135,6 +155,8 @@ public class Statistics {
         data.set("Statistics.UpgradeUseCostCount", UpgradeUseCostCount);
         data.set("Statistics.MakeEquipmentCount", MakeEquipmentCount);
         data.set("Statistics.MakePotionCount", MakePotionCount);
+        data.set("Statistics.StrafeCount", StrafeCount);
+        data.set("Statistics.WallJumpCount", WallJumpCount);
     }
 
     public void load(FileConfiguration data) {
@@ -142,6 +164,9 @@ public class Statistics {
         MaxFishingCombo = data.getInt("Statistics.MaxFishingCombo", 0);
         MaxFishingCPS = data.getDouble("Statistics.MaxFishingCPS", 0d);
         TotalEnemyKills = data.getInt("Statistics.TotalEnemyKills", 0);
+        TotalBossEnemyKills = data.getInt("Statistics.TotalBossEnemyKills", 0);
+        DownCount = data.getInt("Statistics.DownCount", 0);
+        DeathCount = data.getInt("Statistics.DeathCount", 0);
         MineCount = data.getInt("Statistics.MineCount", 0);
         FishingCount = data.getInt("Statistics.FishingCount", 0);
         HarvestCount = data.getInt("Statistics.HarvestCount", 0);
@@ -151,5 +176,7 @@ public class Statistics {
         UpgradeUseCostCount = data.getInt("Statistics.UpgradeUseCostCount", 0);
         MakeEquipmentCount = data.getInt("Statistics.MakeEquipmentCount", 0);
         MakePotionCount = data.getInt("Statistics.MakePotionCount", 0);
+        StrafeCount = data.getInt("Statistics.StrafeCount", 0);
+        WallJumpCount = data.getInt("Statistics.WallJumpCount", 0);
     }
 }

@@ -28,10 +28,11 @@ public class RuneShop {
     private static final String RunePolishDisplay = "§lルーン研磨";
     private static final ItemStack RuneShopMenu_RuneCrash = new ItemStackData(Material.GUNPOWDER, decoText("ルーン粉砕"), "§a§lルーンを砕いて粉に変えます").view();
     private static final ItemStack RuneShopMenu_RuneEquip = new ItemStackData(Material.CHAINMAIL_CHESTPLATE, decoText("ルーン装着"), "§a§l武具にルーンを装着できます").view();
-    private static final ItemStack RuneShopMenu_RuneUpgrade = new ItemStackData(Material.ANVIL, decoText("ルーン強化"), "§a§l同名・同レベルのルーンを合成して\n§a§lルーンのレベルを上げます\n§a§l品質は合計の55%の値になります").view();
+    private static final ItemStack RuneShopMenu_RuneUpgrade = new ItemStackData(Material.ANVIL, decoText("ルーン強化"), "§a§l同名のルーンを合成して\n§a§lルーンのレベルを上げます\n§a§l品質は合計の55%の値になります").view();
     private static final ItemStack RuneShopMenu_RunePolish = new ItemStackData(Material.GRINDSTONE, decoText("ルーン研磨"), "§a§lルーンの粉末を使用して\n§a§lルーンの品質を上げます\n§a§l品質は最大の70%まで上がります").view();
     private final Player player;
     private final PlayerData playerData;
+    private double maxQuality = 0.7;
 
     public RuneShop(Player player, PlayerData playerData) {
         this.player = player;
@@ -105,8 +106,8 @@ public class RuneShop {
         player.openInventory(inv);
     }
 
-    private ItemParameter RuneCache;
-    private final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
+    public ItemParameter RuneCache;
+    public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     private final ItemParameter RunePowder = getItemParameter("ルーンの粉");
     public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ItemStack currentItem, int index, int Slot) {
         String format = playerData.ViewFormat();
@@ -242,13 +243,16 @@ public class RuneShop {
                     playSound(player, SoundList.Click);
                 } else if (RuneUpgradeCache[1] == null) {
                     RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
-                    if (RuneUpgradeCache[0].Id.equals(rune.Id) && RuneUpgradeCache[0].Level == rune.Level) {
-                        RuneUpgradeCache[1] = rune.clone();
-                        playerData.RuneInventory.removeRuneParameter(index);
-                        playSound(player, SoundList.Click);
+                    if (RuneUpgradeCache[0].Id.equals(rune.Id)) {
+                        if (RuneUpgradeCache[0].Level >= rune.Level) {
+                            RuneUpgradeCache[1] = rune.clone();
+                            playerData.RuneInventory.removeRuneParameter(index);
+                            playSound(player, SoundList.Click);
+                        } else {
+                            sendMessage(player, "§e素体ルーン§aより§e高レベル§aな§eルーン§aは素材に出来ません", SoundList.Nope);
+                        }
                     } else {
-                        player.sendMessage("§e[同名・同レベル]§aの§e[ルーン]§aを選択してください");
-                        playSound(player, SoundList.Nope);
+                        sendMessage(player, "§e[同名]§aの§e[ルーン]§aを選択してください", SoundList.Nope);
                     }
                 }
             }
@@ -261,7 +265,7 @@ public class RuneShop {
             }
             if (RuneUpgradeCache[0] != null && RuneUpgradeCache[1] != null) {
                 RuneUpgradeCache[2] = getRuneParameter(RuneUpgradeCache[0].Id);
-                RuneUpgradeCache[2].Level = RuneUpgradeCache[0].Level+1;
+                RuneUpgradeCache[2].Level = Math.min(RuneUpgradeCache[0].Level+1, PlayerData.MaxLevel);
                 RuneUpgradeCache[2].Quality = Math.min(2, (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55);
                 inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));
             } else {
@@ -273,9 +277,13 @@ public class RuneShop {
             if (ClickInventory == inv) {
                 if (Slot == AnvilUISlot[2]) {
                     if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
-                        playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
+                        if (RuneUpgradeCache[2].Quality < maxQuality) {
+                            RuneUpgradeCache[0] = RuneUpgradeCache[2];
+                        } else {
+                            playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
+                            RuneUpgradeCache[0] = null;
+                        }
                         playerData.ItemInventory.removeItemParameter(RunePowder, 1);
-                        RuneUpgradeCache[0] = null;
                         player.sendMessage("§e[ルーン]§aを§b研磨§aしました");
                         playSound(player, SoundList.LevelUp);
                     } else {
@@ -290,18 +298,18 @@ public class RuneShop {
             } else if (index > -1) {
                 if (RuneUpgradeCache[0] != null) playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
                 RuneUpgradeCache[0] = playerData.RuneInventory.getRuneParameter(index).clone();
-                if (RuneUpgradeCache[0].Quality < 0.7) {
+                if (RuneUpgradeCache[0].Quality < maxQuality) {
                     playerData.RuneInventory.removeRuneParameter(index);
                     playSound(player, SoundList.Click);
                 } else {
                     RuneUpgradeCache[0] = null;
-                    player.sendMessage("§e[品質]§aが§e[70%以上]§aです");
+                    player.sendMessage("§e[品質]§aが§e[" + String.format("%.0f", maxQuality*100) + "%以上]§aです");
                     playSound(player, SoundList.Nope);
                 }
             }
             if (RuneUpgradeCache[0] != null) {
                 RuneUpgradeCache[2] = RuneUpgradeCache[0].clone();
-                RuneUpgradeCache[2].Quality = Math.min(0.7, RuneUpgradeCache[2].Quality*1.2);
+                RuneUpgradeCache[2].Quality = Math.min(0.7, RuneUpgradeCache[2].Quality*1.1+0.05);
                 inv.setItem(AnvilUISlot[0], RuneUpgradeCache[0].viewRune(format));
                 inv.setItem(AnvilUISlot[1], RunePowder.viewItem(1, format));
                 inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));

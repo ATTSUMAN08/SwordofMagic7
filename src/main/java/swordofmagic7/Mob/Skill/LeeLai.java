@@ -145,9 +145,9 @@ public class LeeLai {
         MultiThread.TaskRun(() -> {
             radiusMessage(Reflection);
             Manager.enemyData.effectManager.addEffect(EffectType.Reflection, 300);
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC, 0, true, 2.5f);
+            ParticleData particleData = new ParticleData(Particle.END_ROD, 0, true, 2.5f);
             while (Manager.enemyData.isAlive() && !Manager.setCancel && Manager.enemyData.effectManager.hasEffect(EffectType.Reflection)) {
-                ParticleManager.spawnParticle(particleData, Manager.enemyData.entity.getLocation());
+                ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), 2, 5);
                 MultiThread.sleepTick(Manager.period);
             }
         }, "Reflection");

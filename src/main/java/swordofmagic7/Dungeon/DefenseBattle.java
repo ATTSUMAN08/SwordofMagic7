@@ -88,7 +88,11 @@ public class DefenseBattle {
                             MobData mobData = MobList.get(random.nextInt(MobList.size() - 1));
                             Location location = spawnLocation[random.nextInt(spawnLocation.length - 1)];
                             EnemyData enemyData = MobManager.mobSpawn(mobData, wave * 5, location);
-                            enemyData.DefenseAI = targetLocation;
+                            if (random.nextDouble() < 0.5) {
+                                enemyData.DefenseAI = targetLocation;
+                            } else {
+                                enemyData.nonTargetLocation = targetLocation;
+                            }
                             enemyData.isDefenseBattle = true;
                             EnemyList.add(enemyData);
                             EnemyCount--;

@@ -64,8 +64,6 @@ public class PetManager {
                 playerData.PetSelect = pet;
                 playerData.PetSelect.entity = entity;
                 sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました", SoundList.Click);
-            } else {
-                sendMessage(player, "§a自身の§e[ペット]§aを選択してください", SoundList.Nope);
             }
         } else {
             sendMessage(player, ReqPetSelect, SoundList.Nope);

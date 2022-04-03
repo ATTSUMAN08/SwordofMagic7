@@ -58,7 +58,9 @@ public final class PlayerList {
             if (Function.isAlive(player)) {
                 if (player.getLocation().distance(loc) <= radius) List.add(player);
                 for (PetParameter pet : playerData(player).PetSummon) {
-                    if (pet.entity.getLocation().distance(loc) <= radius) List.add(pet.entity);
+                    try {
+                        if (pet.entity.getLocation().distance(loc) <= radius) List.add(pet.entity);
+                    } catch (Exception ignored) {}
                 }
             }
         }

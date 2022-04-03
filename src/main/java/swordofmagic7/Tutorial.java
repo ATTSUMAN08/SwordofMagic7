@@ -46,8 +46,8 @@ public class Tutorial {
             boolean start = false;
             for (TutorialData data : TutorialList) {
                 if (data.start == i) {
-                    BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§b開始§aしました");
-                    player.sendMessage(TutorialNonSave);
+                    BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§b開始§aしました", false);
+                    if (playerData.Level == 1) player.sendMessage(TutorialNonSave);
                     start = true;
                 }
             }
@@ -58,7 +58,7 @@ public class Tutorial {
                 for (TutorialData data : TutorialList) {
                     if (data.end == i) {
                         TutorialProcess.remove(player);
-                        BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§eクリア§aしました");
+                        BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§eクリア§aしました", false);
                     }
                 }
             }

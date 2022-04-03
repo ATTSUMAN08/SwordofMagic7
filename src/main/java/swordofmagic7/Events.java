@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,6 +43,7 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,10 +68,15 @@ public class Events implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
-                return;
+        if (!ServerId.equalsIgnoreCase("Dev")) {
+            List<String> ignoreList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
+            if (!ignoreList.contains(event.getPlayer().getUniqueId().toString())) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
+                        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                        return;
+                    }
+                }
             }
         }
     }
@@ -77,12 +84,6 @@ public class Events implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        for (Player player1 : Bukkit.getOnlinePlayers()) {
-            if (player != player1 && player1.getAddress().toString().split(":")[0].equals(player.getAddress().toString().split(":")[0])) {
-                player.kickPlayer("§cすでにログインしています");
-                return;
-            }
-        }
         playerData(player).load();
         PlayerList.load();
     }
@@ -178,7 +179,7 @@ public class Events implements Listener {
                 event.setCancelled(true);
             }
         }
-        if (Function.isHoldFishingRod(player) && action.isRightClick()) {
+        if (block == null && Function.isHoldFishingRod(player) && action.isRightClick()) {
             playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
             event.setCancelled(false);
         }
@@ -395,8 +396,12 @@ public class Events implements Listener {
                 Set<LivingEntity> victims = new HashSet<>();
                 victims.add((LivingEntity) victim);
                 skillProcess.normalAttack(victims);
-            } else if (PetManager.isPet(victim)) {
-                attackerData.PetManager.PetSelect((LivingEntity) victim);
+            } else if (PetManager.isPet(victim) && attackerData.PetManager.usingBaton()) {
+                if (attacker.isSneaking()) {
+                    attackerData.PetManager.PetAISelect();
+                } else {
+                    attackerData.PetManager.PetSelect((LivingEntity) victim);
+                }
             } else if (event.getEntity() instanceof Player player) {
                 if (TagGame.isPlayer(attacker) || TagGame.isPlayer(player)) {
                     if (!attacker.hasPotionEffect(PotionEffectType.BLINDNESS)) {
@@ -580,10 +585,12 @@ public class Events implements Listener {
         for (Entity entity : event.getEntities()) {
             if (MobManager.isEnemy(entity)) {
                 EnemyTable(entity.getUniqueId()).delete();
+                entity.remove();
             } else if (entity.getName().contains("§c§l《")) {
                 entity.remove();
             } else if (PetManager.isPet(entity)) {
                 PetManager.PetParameter(entity).cage();
+                entity.remove();
             } else if (!ignoreEntity(entity)) {
                 entity.remove();
             }

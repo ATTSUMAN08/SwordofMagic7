@@ -88,6 +88,7 @@ public final class DataBase {
     public static final HashMap<String, CookData> CookDataList = new HashMap<>();
     public static final HashMap<String, SmeltData> SmeltDataList = new HashMap<>();
     public static final HashMap<String, MakeData> MakeDataList = new HashMap<>();
+    public static final HashMap<Integer, String> MakeGUIMap = new HashMap<>();
     public static final HashMap<String, TitleData> TitleDataList = new HashMap<>();
     public static final HashMap<Integer, String> TitleGUIMap = new HashMap<>();
     public static final HashMap<String, AlchemyData> AlchemyDataList = new HashMap<>();

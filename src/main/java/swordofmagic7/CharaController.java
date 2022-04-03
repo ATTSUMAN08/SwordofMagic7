@@ -22,6 +22,7 @@ public class CharaController {
             player.setVelocity(loc.getDirection().normalize().multiply(-0.7).setY(0.6));
             playerData.WallKicked = true;
             playerData.Strafe = 2;
+            playerData.statistics.WallJumpCount++;
             player.setAllowFlight(true);
             MultiThread.TaskRun(() -> {
                 MultiThread.sleepTick(12);
@@ -47,6 +48,7 @@ public class CharaController {
                 if (y < 0) y /=2;
             }
             player.setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(0.7).setY(y));
+            playerData.statistics.StrafeCount++;
         }
     }
 }

@@ -86,20 +86,35 @@ public class Status {
         return FixedStatus.getOrDefault(param, 0d);
     }
 
+    private double CombatPower;
     public double getCombatPower() {
+        return CombatPower;
+    }
+
+    public void setCombatPower() {
         double combatPower = 0;
-        combatPower += MaxHealth/1.2;
-        combatPower += HealthRegen*12;
-        combatPower += MaxMana/1.2;
-        combatPower += ManaRegen*12;
-        combatPower += ATK*1.2;
-        combatPower += DEF*1.2;
-        combatPower += ACC*1.2;
-        combatPower += EVA*1.2;
+        combatPower += MaxHealth/10;
+        combatPower += HealthRegen*10;
+        combatPower += MaxMana/10;
+        combatPower += ManaRegen*10;
+        combatPower += ATK;
+        combatPower += DEF;
+        combatPower += HLP;
+        combatPower += ACC*3;
+        combatPower += EVA*3;
+        combatPower += CriticalRate*3;
+        combatPower += CriticalResist*3;
+        combatPower += SkillCooltime;
+        combatPower += SkillCastTime;
+        combatPower += SkillRigidTime;
+        for (DamageCause damageCause : DamageCause.values()) {
+            combatPower += DamageCauseMultiply.getOrDefault(damageCause,0d);
+            combatPower += DamageCauseResistance.getOrDefault(damageCause,0d);
+        }
         for (AttributeType attr : AttributeType.values()) {
             combatPower += playerData.Attribute.getAttribute(attr)*7.5;
         }
-        return combatPower/2.2;
+        CombatPower = combatPower/10;
     }
 
     public int totalLevel() {
@@ -260,7 +275,9 @@ public class Status {
                 String color = "§f";
                 if (playerData.PvPMode) color = "§c";
                 player.setPlayerListName(playerData.Classes.topClass().Color + "§l" + playerData.Classes.topClass().Display + " " + color + playerData.Nick);
+                player.setDisplayName(playerData.Nick);
 
+                setCombatPower();
                 MultiThread.TaskRunSynchronized(() -> {
                     player.setWalkSpeed(0.24f);
                     player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false));

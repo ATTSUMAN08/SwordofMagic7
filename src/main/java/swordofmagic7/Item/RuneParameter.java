@@ -32,7 +32,7 @@ public class RuneParameter implements Cloneable {
     }
 
     public double Parameter(StatusParameter param) {
-        return (Parameter.get(param) + (Parameter.get(param)*(Quality*0.2))) * (Math.pow(Level, 1.4) / Level);
+        return Parameter.get(param) * (Math.pow(1.035, Level)) * (Quality*2+1);
     }
 
     public ItemStack viewRune(String format) {

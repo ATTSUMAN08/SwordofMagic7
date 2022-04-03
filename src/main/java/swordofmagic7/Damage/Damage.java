@@ -256,7 +256,11 @@ public final class Damage {
                     break;
                 }
             }
-            if (!isStop) enemyData.Health -= damage;
+            if (isStop) {
+                enemyData.effectManager.addEffect(EffectType.Invincible, 10);
+            } else {
+                enemyData.Health -= damage;
+            }
             enemyData.addPriority(attacker, damage);
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);
@@ -307,7 +311,9 @@ public final class Damage {
         final String CR = " §b[CR:" + String.format("%.0f", criRate * 100) + "%]";
         final String R = " §b[R:" + String.format("%.1f", (1 - (1 / Resistance)) * 100) + "%]";
         if (attacker instanceof Player player) {
-            DamageLogType DamageLog = playerData(player).DamageLog;
+            PlayerData playerData = playerData(player);
+            playerData.addDPS(damage);
+            DamageLogType DamageLog = playerData.DamageLog;
             if (DamageLog.isDamageOnly()) {
                 String damageLog = "§a≫" + damageText;
                 if (DamageLog.isDetail()) {

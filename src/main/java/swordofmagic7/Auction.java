@@ -5,6 +5,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class Auction {
                             if (args.length >= 4) {
                                 Mel = Integer.parseInt(args[3]);
                             } else Mel = 1;
+                            if (Mel < 1) Mel = 1;
                             int StartMel = Mel;
                             int reqMel = (int) Math.ceil(Mel * 0.01);
                             if (playerData.Mel < reqMel) {
@@ -50,8 +52,11 @@ public class Auction {
                             }
                             Owner = playerData;
                             Auctioning = true;
-                            Function.BroadCast(Owner.getNick() + "§aさんが§e[" + stack.itemParameter.Display + "§ax" + stack.Amount + "§e]§aを§eオークション§aに§e" + Mel + "メル§aから§b出品§aしました", SoundList.Tick);
                             MultiThread.TaskRun(() -> {
+                                TextView text = new TextView().addText(Owner.getNick() + "§aさんが");
+                                text.addView(stack.itemParameter.getTextView(stack.Amount, Owner.ViewFormat()));
+                                text.addText("§aを§eオークション§aに§e" + Mel + "メル§aから§b出品§aしました");
+                                Client.send(text);
                                 time = 30;
                                 String error = null;
                                 while (0 < time) {
@@ -94,7 +99,10 @@ public class Auction {
                                     Function.BroadCast(error, SoundList.Tick);
                                 } else if (Better != null) {
                                     int reqMel2 = (int) Math.ceil(Mel * 0.05);
-                                    Function.BroadCast(Better.getNick() + "§aさんが§e[" + stack.itemParameter.Display + "§ax" + stack.Amount + "§e]§aを§e" + Mel + "メル§aで§c落札§aしました", SoundList.Tick);
+                                    text = new TextView(Better.getNick() + "§aさんが");
+                                    text.addView(stack.itemParameter.getTextView(stack.Amount, Owner.ViewFormat()));
+                                    text.addText("§aを§e" + Mel + "メル§aで§c落札§aしました");
+                                    Client.send(text);
                                     Better.ItemInventory.addItemParameter(stack);
                                     Owner.ItemInventory.removeItemParameter(stack);
                                     Better.Mel -= Mel;

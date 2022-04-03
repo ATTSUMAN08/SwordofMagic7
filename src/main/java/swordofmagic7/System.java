@@ -58,6 +58,7 @@ public final class System extends JavaPlugin implements PluginMessageListener {
     public static Plugin plugin;
     public static final Random random = new Random();
     public static final Set<Hologram> HologramSet = new HashSet<>();
+    public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
 
     public static Hologram createHologram(String key, Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
@@ -82,7 +83,9 @@ public final class System extends JavaPlugin implements PluginMessageListener {
         ServerId = getConfig().getString("ServerId");
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
-        //MultiThread.SynchronizedLoopCaster();
+
+        Client.Host = getConfig().getString("Host", "localhost");
+        Client.connect();
 
         Tutorial.onLoad();
 
@@ -121,14 +124,30 @@ public final class System extends JavaPlugin implements PluginMessageListener {
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
             for (PlayerData playerData : new HashSet<>(PlayerData.playerDataList().values())) {
-                if (playerData.player.isOnline()) {
+                Player player = playerData.player;
+                if (player.isOnline()) {
                     playerData.saveCloseInventory();
+                    if (ServerId.equalsIgnoreCase("Event")) {
+                        if (PlayerLastLocation.containsKey(player)) {
+                            Location location = PlayerLastLocation.get(player);
+                            if (location.getBlockX() == player.getLocation().getBlockX()) {
+                                if (location.getBlockY() == player.getLocation().getBlockY()) {
+                                    if (location.getBlockZ() == player.getLocation().getBlockZ()) {
+                                        teleportServer(player, "Lobby");
+                                    }
+                                }
+                            }
+                        } else {
+                            PlayerLastLocation.put(player, player.getLocation());
+                        }
+                    }
                 } else {
                     playerData.remove();
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
             HologramSet.removeIf(Hologram::isDeleted);
+            PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
         }, 200, 6000), "AutoSave");
 
         ParticleManager.onLoad();
@@ -183,6 +202,13 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                 if (!hologram.isDeleted()) hologram.delete();
             }
             Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7"), 5);
+            return true;
+        } else if (cmd.getName().equalsIgnoreCase("sendData")) {
+            if (args.length == 1) {
+                Client.send(args[0]);
+            } else {
+                Log("/sendData <text>");
+            }
             return true;
         }
         if (sender instanceof Player player) {
@@ -371,6 +397,13 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("defenseBattleEndWave")) {
                     DefenseBattle.endWave();
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("classSelect")) {
+                    try {
+                        playerData.Classes.classSlot[Integer.parseInt(args[0])] = getClassData(args[1]);
+                    } catch (Exception e) {
+                        player.sendMessage("/classSelect <slot> <class>");
+                    }
                     return true;
                 }
             }
@@ -696,7 +729,7 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                 }
                 playSound(player, SoundList.Tick);
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("channel")) {
+            } else if (cmd.getName().equalsIgnoreCase("ch")) {
                 if (args.length == 1) {
                     String teleportServer;
                     switch (args[0]) {

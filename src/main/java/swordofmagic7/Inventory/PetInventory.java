@@ -118,11 +118,15 @@ public class PetInventory extends BasicInventory {
         playerData.ViewInventory = ViewInventoryType.PetInventory;
         int index = ScrollTick*8;
         int slot = 9;
-        if (List.size() > 0) switch (Sort) {
-            case Name -> List.sort(new PetSortName());
-            case Level -> List.sort(new PetSortLevel());
-            case GrowthRate -> List.sort(new PetSortGrowthRate());
-        }
+        Comparator<PetParameter> comparator = null;
+        try {
+            if (List.size() > 0) switch (Sort) {
+                case Name -> comparator = new PetSortName();
+                case Level -> comparator = new PetSortLevel();
+                case GrowthRate -> comparator = new PetSortGrowthRate();
+            }
+        } catch (Exception ignored) {}
+        if (comparator != null) List.sort(comparator);
         if (SortReverse) Collections.reverse(List);
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {

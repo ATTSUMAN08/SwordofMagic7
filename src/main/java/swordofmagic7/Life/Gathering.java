@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Function.ItemGetLog;
 import static swordofmagic7.Function.isAlive;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.System.plugin;
@@ -93,11 +94,14 @@ public class Gathering {
                     playerData.statistics.MineCount++;
                     for (MineItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Mine));
+                            int amount = lifeStatus.getMultiplyAmount(LifeType.Mine);
+                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
                         }
                     }
                     if (random.nextDouble() <= 0.05) {
                         playerData.ItemInventory.addItemParameter(getItemParameter("強化石"), 1);
+                        if (playerData.DropLog.isItem()) ItemGetLog(player, getItemParameter("強化石"), 1);
                     }
                 } else {
                     player.sendMessage("§e[採掘レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
@@ -113,7 +117,9 @@ public class Gathering {
                     playerData.statistics.LumberCount++;
                     for (LumberItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Lumber));
+                            int amount = lifeStatus.getMultiplyAmount(LifeType.Lumber);
+                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
                         }
                     }
                 } else {
@@ -129,7 +135,9 @@ public class Gathering {
                     playerData.statistics.HarvestCount++;
                     for (HarvestItemData itemData : data.itemData) {
                         if (random.nextDouble() <= itemData.Percent) {
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, lifeStatus.getMultiplyAmount(LifeType.Harvest));
+                            int amount = lifeStatus.getMultiplyAmount(LifeType.Harvest);
+                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
                         }
                     }
                 } else {
