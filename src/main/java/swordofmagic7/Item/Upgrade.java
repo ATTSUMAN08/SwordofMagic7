@@ -5,10 +5,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import swordofmagic7.Client;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,27 +77,24 @@ public class Upgrade {
                                 int plus = UpgradeCache[1].itemEquipmentData.Plus;
                                 String perText = plus > 10 ? "§b[" + Math.pow(0.5, (plus - 10)) * 100 + "%]" : "";
                                 playerData.statistics.UpgradeUseCostCount += removeCost;
+                                String itemText = "§e[" + UpgradeCache[1].Display + "§b+" + plus + "§e]";
+                                String suffix;
                                 if (random.nextDouble() < percent) {
                                     UpgradeCache[0] = UpgradeCache[1].clone();
-                                    String text = "§e[" + UpgradeCache[1].Display + "+" + plus + "]§aの強化に§b成功§aしました " + perText;
+                                    suffix = "§aの強化に§b成功§aしました " + perText;
                                     if (plus >= 15) {
-                                        BroadCast(playerData.getNick() + "§aさんが" + text);
                                         playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                                         UpgradeCache[0] = null;
                                     } else {
-                                        player.sendMessage(text);
+                                        player.sendMessage(itemText + suffix);
                                     }
                                     playSound(player, SoundList.LevelUp);
                                     for (int i = 15; i < 25; i++) {
                                         if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
                                     }
                                 } else {
-                                    String text = "§e[" + UpgradeCache[1].Display + "+" + UpgradeCache[1].itemEquipmentData.Plus + "]§aの強化に§c失敗§aしました " + perText;
-                                    if (UpgradeCache[1].itemEquipmentData.Plus >= 15) {
-                                        BroadCast(playerData.getNick() + "§aさんが" + text);
-                                    } else {
-                                        player.sendMessage(text);
-                                    }
+                                    suffix = "§aの強化に§c失敗§aしました " + perText;
+                                    player.sendMessage(itemText + suffix);
                                     if (UpgradeCache[0].itemEquipmentData.Plus > 10) {
                                         UpgradeCache[0].itemEquipmentData.Plus = 10;
                                         player.sendMessage("§e[" + UpgradeCache[0].Display + "]§aの§e強化値§aが§e+10§aに落ちました");
@@ -104,6 +103,13 @@ public class Upgrade {
                                 }
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
+
+                                if (UpgradeCache[1].itemEquipmentData.Plus >= 15) {
+                                    TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                    text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
+                                    text.addText(suffix);
+                                    Client.BroadCast(text);
+                                }
                             } else {
                                 player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");
                                 playSound(player, SoundList.Nope);

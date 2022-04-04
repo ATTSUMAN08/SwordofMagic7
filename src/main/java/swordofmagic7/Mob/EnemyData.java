@@ -13,6 +13,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
+import swordofmagic7.Client;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
@@ -24,12 +25,14 @@ import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Pet.PetData;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Quest.QuestData;
 import swordofmagic7.Quest.QuestProcess;
 import swordofmagic7.Quest.QuestReqContentKey;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 
 import java.util.*;
 
@@ -276,7 +279,7 @@ public class EnemyData {
         }
     }
 
-    public void dead() {
+    public synchronized void dead() {
         if (isDead) return;
         isDead = true;
         stopAI();
@@ -349,7 +352,11 @@ public class EnemyData {
                                 Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
                                 if (playerData.DropLog.isItem()) ItemGetLog(player, dropData.itemParameter, amount);
                                 if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
-                                    BroadCast(playerData.getNick() + "§aさんが§e[" + dropData.itemParameter.Display + "§ax" + amount + "§e]§aを§e獲得§aしました", SoundList.Tick);
+                                    TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                    text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
+                                    text.addText("§aを§e獲得§aしました");
+                                    text.setSound(SoundList.Tick);
+                                    Client.BroadCast(text);
                                 }
                             }
                         }
@@ -360,10 +367,18 @@ public class EnemyData {
                                 RuneParameter runeParameter = dropData.runeParameter.clone();
                                 runeParameter.Quality = random.nextDouble();
                                 runeParameter.Level = Level;
-                                playerData.RuneInventory.addRuneParameter(runeParameter);
-                                Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                                if (playerData.DropLog.isRune()) {
-                                    player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                if (playerData.RuneQualityFilter <= runeParameter.Quality) {
+                                    playerData.RuneInventory.addRuneParameter(runeParameter);
+                                    Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                                    if (playerData.DropLog.isRune()) {
+                                        player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                    }
+                                } else {
+                                    playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
+                                    Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
+                                    if (playerData.DropLog.isItem()) {
+                                        ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
+                                    }
                                 }
                             }
                         }
@@ -380,10 +395,21 @@ public class EnemyData {
                         }
                     }
                     if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
-                        if (random.nextDouble() <= 0.01) {
-                            PetParameter pet = new PetParameter(player, playerData, getPetData(mobData.Id), Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
-                            playerData.PetInventory.addPetParameter(pet);
-                            Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                        PetData petData = getPetData(mobData.Id);
+                        if (petData.BossPet) {
+                            if (random.nextDouble() <= 0.0005) {
+                                PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
+                                playerData.PetInventory.addPetParameter(pet);
+                                TextView text = new TextView("§e[" + mobData.Id + "]§aを§b懐柔§aしました");
+                                text.setSound(SoundList.Tick);
+                                Client.BroadCast(text);
+                            }
+                        } else {
+                            if (random.nextDouble() <= 0.01) {
+                                PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
+                                playerData.PetInventory.addPetParameter(pet);
+                                Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                            }
                         }
                     }
                 }

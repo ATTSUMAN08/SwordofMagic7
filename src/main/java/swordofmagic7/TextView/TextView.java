@@ -3,7 +3,7 @@ package swordofmagic7.TextView;
 import swordofmagic7.Sound.SoundList;
 
 public class TextView {
-    String data;
+    String data = "Reset";
 
     public TextView() {}
     public TextView(String str) {

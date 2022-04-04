@@ -217,6 +217,7 @@ public class DataLoader {
                 petData.EVA = data.getDouble("EVA");
                 petData.CriticalRate = data.getDouble("CriticalRate");
                 petData.CriticalResist = data.getDouble("CriticalResist");
+                petData.BossPet = data.getBoolean("BossPet", false);
                 PetList.put(fileName, petData);
             } catch (Exception e) {
                 loadError(file);

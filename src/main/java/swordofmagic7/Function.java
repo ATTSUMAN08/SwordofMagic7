@@ -46,6 +46,7 @@ public final class Function {
         Log(str, false);
     }
     public static void Log(String str, boolean stackTrace) {
+        Bukkit.getLogger().info(str);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("som7.log")) player.sendMessage(str);
         }

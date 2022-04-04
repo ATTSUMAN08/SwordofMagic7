@@ -15,16 +15,17 @@ import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class HotBar {
+    public static final int HotBarSize = 128;
     private final Player player;
     private final PlayerData playerData;
     private int SelectSlot = -1;
-    private HotBarData[] HotBarData = new HotBarData[32];
+    private HotBarData[] HotBarData = new HotBarData[HotBarSize];
 
     public HotBar(Player player, PlayerData playerData) {
         this.player = player;
         this.playerData = playerData;
 
-        for(int i = 0; i < 32; i++) {
+        for(int i = 0; i < HotBarData.length; i++) {
             HotBarData[i] = new HotBarData();
         }
     }
@@ -163,5 +164,31 @@ public class HotBar {
         System.arraycopy(HotBarDataOld, 0, HotBarData, 8, 24);
         System.arraycopy(HotBarDataOld, 24, HotBarData, 0, 8);
         playSound(player, SoundList.Tick);
+    }
+
+    public void SkillSlotCommand(String[] args) {
+        try {
+            int index = Integer.parseInt(args[1]);
+            if (1 <= index && index <= 3) {
+                if (args[0].equalsIgnoreCase("save")) {
+                    int slot = index * 32;
+                    for (int i = 0; i < 32; i++) {
+                        HotBarData[slot] = HotBarData[i];
+                        slot++;
+                    }
+                } else if (args[0].equalsIgnoreCase("load")) {
+                    int slot = index * 32;
+                    for (int i = 0; i < 32; i++) {
+                        HotBarData[i] = HotBarData[slot];
+                        slot++;
+                    }
+                }
+                playerData.viewUpdate();
+            } else {
+                sendMessage(player, "§e/skillSlot <save/load> <1~3>");
+            }
+        } catch (Exception e) {
+            sendMessage(player, "§e/skillSlot <save/load> <1~3>");
+        }
     }
 }

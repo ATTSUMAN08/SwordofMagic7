@@ -26,4 +26,5 @@ public class PetData {
     public double EVA;
     public double CriticalRate;
     public double CriticalResist;
+    public boolean BossPet;
 }

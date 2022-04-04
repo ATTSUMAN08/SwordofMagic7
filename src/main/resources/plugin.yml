@@ -276,3 +276,11 @@ commands:
   nickReset:
     description: description
     usage: /<command>
+  skillSlot:
+    aliases: ss
+    description: description
+    usage: /<command>
+  runeFilter:
+    aliases: rf
+    description: description
+    usage: /<command>

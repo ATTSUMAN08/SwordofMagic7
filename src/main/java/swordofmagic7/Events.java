@@ -215,11 +215,12 @@ public class Events implements Listener {
                                 playerData.PetManager.PetAISelect();
                             }
                         } else {
-                            playerData.Skill.SkillProcess.normalAttackTargetSelect();
                             if (playerData.PetManager.usingBaton()) {
                                 playerData.PetManager.PetSelect();
                             }
-                        }}
+                        }
+                        playerData.Skill.SkillProcess.normalAttackTargetSelect();
+                    }
                 }
             }
 
@@ -431,6 +432,8 @@ public class Events implements Listener {
                 } else {
                     playerData.HotBar.use(1);
                 }
+            } else {
+                CharaController.WallKick(player);
             }
             event.setCancelled(true);
         }
@@ -528,8 +531,9 @@ public class Events implements Listener {
             playerData.MapManager.WarpGateSelector();
             playerData.MapManager.TeleportGateSelector();
             if (Function.isHoldFishingRod(player)) playerData.Gathering.inputFishingCommand(FishingCommand.Shift);
+        } else {
+            CharaController.WallKick(player);
         }
-        CharaController.WallKick(player);
         if (playerData.isDead && playerData.deadTime < 1100) {
             playerData.deadTime = 0;
         }

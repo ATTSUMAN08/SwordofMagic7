@@ -10,6 +10,7 @@ import swordofmagic7.TextView.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
@@ -53,10 +54,10 @@ public class Auction {
                             Owner = playerData;
                             Auctioning = true;
                             MultiThread.TaskRun(() -> {
-                                TextView text = new TextView().addText(Owner.getNick() + "§aさんが");
+                                TextView text = new TextView("§bCH-" + ServerId + "§aで" + Owner.getNick() + "§aさんが");
                                 text.addView(stack.itemParameter.getTextView(stack.Amount, Owner.ViewFormat()));
                                 text.addText("§aを§eオークション§aに§e" + Mel + "メル§aから§b出品§aしました");
-                                Client.send(text);
+                                Client.BroadCast(text);
                                 time = 30;
                                 String error = null;
                                 while (0 < time) {
@@ -102,7 +103,7 @@ public class Auction {
                                     text = new TextView(Better.getNick() + "§aさんが");
                                     text.addView(stack.itemParameter.getTextView(stack.Amount, Owner.ViewFormat()));
                                     text.addText("§aを§e" + Mel + "メル§aで§c落札§aしました");
-                                    Client.send(text);
+                                    Client.BroadCast(text);
                                     Better.ItemInventory.addItemParameter(stack);
                                     Owner.ItemInventory.removeItemParameter(stack);
                                     Better.Mel -= Mel;
@@ -124,8 +125,8 @@ public class Auction {
                             }, "Auction");
                         } else {
                             Function.sendMessage(player, "§aすでに§eオークション§aが開催されています", SoundList.Nope);
-                            return;
                         }
+                        return;
                     } else if (type.equalsIgnoreCase("bet")) {
                         if (Auctioning) {
                             if (playerData != Owner) {

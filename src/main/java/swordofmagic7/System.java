@@ -754,6 +754,23 @@ public final class System extends JavaPlugin implements PluginMessageListener {
             } else if (cmd.getName().equalsIgnoreCase("nickReset")) {
                 playerData.Nick = player.getName();
                 sendMessage(player, "§eプレイヤ名§aを§e[" + playerData.getNick() + "]§aに§cリセット§aしました", SoundList.Tick);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("skillSlot")) {
+                playerData.HotBar.SkillSlotCommand(args);
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("runeFilter")) {
+                try {
+                    if (args[0].equalsIgnoreCase("Quality")) {
+                        double value = Double.parseDouble(args[1])/100;
+                        if (0 <= value && value <= 100) {
+                            playerData.RuneQualityFilter = value;
+                            sendMessage(player, "§eルーンフィルター[品質] §b-> §a" + value*100 + "%");
+                            return true;
+                        }
+                    }
+                } catch (Exception ignored) {}
+                sendMessage(player, "§e/runeFilter Quality <0~100>");
+                return true;
             }
         }
         return false;

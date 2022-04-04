@@ -108,7 +108,7 @@ public class RuneShop {
 
     public ItemParameter RuneCache;
     public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
-    private final ItemParameter RunePowder = getItemParameter("ルーンの粉");
+    public final ItemParameter RunePowder = getItemParameter("ルーンの粉");
     public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ItemStack currentItem, int index, int Slot) {
         String format = playerData.ViewFormat();
         if (equalInv(view, RuneShopMenuDisplay)) {

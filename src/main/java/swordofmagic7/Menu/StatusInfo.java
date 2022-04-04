@@ -50,9 +50,11 @@ public class StatusInfo {
                 List<String> statusLore = new ArrayList<>();
                 statusLore.add(decoLore("現在位置") + playerData.Map.Display);
                 statusLore.add(decoLore("所持メル") + playerData.Mel + "メル");
+                statusLore.add(decoLore("所持称号数") + playerData.titleManager.TitleList.size() + "個");
                 statusLore.add(decoLore("レベル") + playerData.Level + "/" + PlayerData.MaxLevel);
                 statusLore.add(decoLore("経験値") + playerData.viewExpPercent());
                 statusLore.add(decoLore("戦闘力") + String.format(format, playerData.Status.getCombatPower()));
+                statusLore.add(decoText("§3§l基本ステータス"));
                 statusLore.add(decoLore(StatusParameter.MaxHealth.Display) + String.format(format, status.Health) + "/" + String.format(format, status.MaxHealth) + " (" + String.format(format, status.BaseStatus(StatusParameter.MaxHealth)) + ")");
                 statusLore.add(StatusParameter.HealthRegen.DecoDisplay + String.format(format, status.HealthRegen) + " (" + String.format(format, status.BaseStatus(StatusParameter.HealthRegen)) + ")");
                 statusLore.add(decoLore(StatusParameter.MaxMana.Display) + String.format(format, status.Mana) + "/" + String.format(format, status.MaxMana) + " (" + String.format(format, status.BaseStatus(StatusParameter.MaxMana)) + ")");
@@ -64,6 +66,7 @@ public class StatusInfo {
                 statusLore.add(StatusParameter.EVA.DecoDisplay + String.format(format, status.EVA) + " (" + String.format(format, status.BaseStatus(StatusParameter.EVA)) + ")");
                 statusLore.add(StatusParameter.CriticalRate.DecoDisplay + String.format(format, status.CriticalRate) + " (" + String.format(format, status.BaseStatus(StatusParameter.CriticalRate)) + ")");
                 statusLore.add(StatusParameter.CriticalResist.DecoDisplay + String.format(format, status.CriticalResist) + " (" + String.format(format, status.BaseStatus(StatusParameter.CriticalResist)) + ")");
+                statusLore.add(decoText("§3§l倍率系ステータス"));
                 statusLore.add(StatusParameter.SkillCastTime.DecoDisplay + String.format(format, status.SkillCastTime*100) + " (" + String.format(format, 100/status.SkillCastTime) + "%)");
                 statusLore.add(StatusParameter.SkillRigidTime.DecoDisplay + String.format(format, status.SkillRigidTime*100) + " (" + String.format(format, 100/status.SkillRigidTime) + "%)");
                 statusLore.add(StatusParameter.SkillCooltime.DecoDisplay + String.format(format, status.SkillCooltime*100) + " (" + String.format(format, 100/status.SkillCooltime) + "%)");

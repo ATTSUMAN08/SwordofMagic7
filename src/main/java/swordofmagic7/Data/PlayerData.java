@@ -152,6 +152,7 @@ public class PlayerData {
     public String saveTeleportServer = null;
     public boolean NaturalMessage = true;
     public Location logoutLocation = null;
+    public double RuneQualityFilter = 0d;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -547,6 +548,7 @@ public class PlayerData {
         data.set("Setting.PlayMode", PlayMode);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.NaturalMessage", NaturalMessage);
+        data.set("Setting.RuneQualityFilter", RuneQualityFilter);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -678,6 +680,7 @@ public class PlayerData {
             PlayMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
             NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
+            RuneQualityFilter = data.getDouble("Setting.RuneQualityFilter",0d);
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));
@@ -743,12 +746,10 @@ public class PlayerData {
 
             List<String> hotBarList = data.getStringList("Inventory.HotBar");
             int i = 0;
-            HotBarData[] hotBarData = new HotBarData[32];
             for (String hotBar : hotBarList) {
-                hotBarData[i] = HotBarData.fromString(hotBar);
+                HotBar.setHotBar(i, HotBarData.fromString(hotBar));
                 i++;
             }
-            HotBar.setHotBar(hotBarData);
 
             for (String str : data.getStringList("CoolTime.Skill")) {
                 String[] split = str.split(",");

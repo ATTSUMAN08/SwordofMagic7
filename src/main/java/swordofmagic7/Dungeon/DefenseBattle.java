@@ -5,6 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import swordofmagic7.Client;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobData;
@@ -12,6 +13,7 @@ import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 import swordofmagic7.ViewBar.ViewBar;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,8 @@ public class DefenseBattle {
     private static final int Radius = 96;
     private static final String sidebarId = "DefenseBattle";
     public static boolean last = false;
+    static boolean isStart = false;
+    static boolean isAlarm = true;
 
     public static void onLoad() {
         spawnLocation[0] = new Location(world, 2279.5,66,2274.5);
@@ -60,11 +64,24 @@ public class DefenseBattle {
             DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
             String display = format.format(time);
             switch (display) {
-                case "14:00", "19:00", "22:00" -> {
-                    startWave(1);
+                case "13:55", "18:55", "21:55", "23:55" -> {
+                    if (isAlarm) {
+                        Client.BroadCast(new TextView("§aまもなく§c防衛戦§aが開始されます"));
+                        isAlarm = true;
+                    }
+                }
+                case "14:00", "19:00", "22:00", "00:00" -> {
+                    if (!isStart) {
+                        startWave(1);
+                        isStart = false;
+                    }
+                }
+                default -> {
+                    isAlarm = true;
+                    isStart = false;
                 }
             }
-        }, 20*60);
+        }, 100);
     }
 
     public static void teleport(Player player) {
@@ -74,6 +91,7 @@ public class DefenseBattle {
 
     public static void startWave(int i) {
         if (i == 1) time = startTime;
+        Client.BroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
         MultiThread.TaskRun(() -> {
             wave = i;
             Health = 10000 + 1000*(i-1);
@@ -153,6 +171,7 @@ public class DefenseBattle {
                 startWave(wave);
             } else {
                 Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DungeonTrigger);
+                Client.BroadCast(new TextView("§c防衛戦§aが終了しました"));
             }
         }, "DefenseBattle");
     }

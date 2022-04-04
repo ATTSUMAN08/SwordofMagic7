@@ -157,12 +157,12 @@ public class ItemParameter implements Cloneable {
         ItemStack item = viewItem(amount, format);
         String suffix = "";
         if (amount > 1) suffix = "§ax" + amount;
-        if (Category.isEquipment()) suffix = "§c+" + itemEquipmentData.Plus;
+        if (Category.isEquipment()) suffix = "§b+" + itemEquipmentData.Plus;
         StringBuilder hoverText = new StringBuilder(item.getItemMeta().getDisplayName());
         for (String str : item.getLore()) {
             hoverText.append("\n").append(str);
         }
-        return new TextView().addText("§e[" + Display + suffix + "§e]").addHover(hoverText.toString());
+        return new TextView().addText("§e[" + Display + suffix + "§e]").addHover(hoverText.toString()).reset();
     }
 
     @Override
