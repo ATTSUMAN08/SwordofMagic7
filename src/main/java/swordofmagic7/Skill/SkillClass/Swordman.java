@@ -37,7 +37,7 @@ public class Swordman {
             ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "PainBarrier: " + player.getName());
+        }, "PainBarrier");
     }
 
     public void Feint(SkillData skillData) {
@@ -50,6 +50,6 @@ public class Swordman {
             ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT_MAGIC), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "Feint: " + player.getName());
+        }, "Feint");
     }
 }

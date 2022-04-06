@@ -8,7 +8,7 @@ import swordofmagic7.Status.StatusParameter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class InstantBuff {
     private final Player player;
@@ -60,7 +60,7 @@ public class InstantBuff {
                 }
                 MultiThread.sleepTick(20);
             }
-        }, "InstantBuff: " + player.getName());
+        }, "InstantBuff");
     }
 
 }

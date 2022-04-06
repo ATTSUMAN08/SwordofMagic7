@@ -39,6 +39,7 @@ public class Statistics {
     public int TotalBossEnemyKills = 0;
     public int DownCount = 0;
     public int DeathCount = 0;
+    public int RevivalCount = 0;
     public int MineCount = 0;
     public int FishingCount = 0;
     public int HarvestCount = 0;
@@ -60,6 +61,7 @@ public class Statistics {
         list.add(decoLore("ボスエネミ討伐数") + TotalBossEnemyKills);
         list.add(decoLore("ダウン回数") + DownCount);
         list.add(decoLore("死亡回数") + DeathCount);
+        list.add(decoLore("復活回数") + RevivalCount);
         list.add(decoLore("採掘数") + MineCount);
         list.add(decoLore("釣獲数") + FishingCount);
         list.add(decoLore("採取数") + HarvestCount);
@@ -134,6 +136,9 @@ public class Statistics {
                 titleManager.addTitle("シノサス討伐");
                 if ((TarnetB3.StartTime- TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
             }
+            case "訓練用ダミー" -> {
+                titleManager.addTitle("訓練用ダミー討伐");
+            }
         }
         checkTitleEnemyKill();
     }
@@ -146,6 +151,7 @@ public class Statistics {
         data.set("Statistics.TotalBossEnemyKills", TotalBossEnemyKills);
         data.set("Statistics.DownCount", DownCount);
         data.set("Statistics.DeathCount", DeathCount);
+        data.set("Statistics.RevivalCount", RevivalCount);
         data.set("Statistics.MineCount", MineCount);
         data.set("Statistics.FishingCount", FishingCount);
         data.set("Statistics.HarvestCount", HarvestCount);
@@ -167,6 +173,7 @@ public class Statistics {
         TotalBossEnemyKills = data.getInt("Statistics.TotalBossEnemyKills", 0);
         DownCount = data.getInt("Statistics.DownCount", 0);
         DeathCount = data.getInt("Statistics.DeathCount", 0);
+        RevivalCount = data.getInt("Statistics.RevivalCount", 0);
         MineCount = data.getInt("Statistics.MineCount", 0);
         FishingCount = data.getInt("Statistics.FishingCount", 0);
         HarvestCount = data.getInt("Statistics.HarvestCount", 0);

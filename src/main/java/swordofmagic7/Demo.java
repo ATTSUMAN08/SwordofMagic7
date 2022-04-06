@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class Demo {
     public void run(LivingEntity entity, int stopCMD, int moveCMD) {

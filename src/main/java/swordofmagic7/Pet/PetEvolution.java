@@ -39,10 +39,14 @@ public class PetEvolution {
             if (view.getTopInventory() == ClickInventory) {
                 if (Slot == AnvilUISlot[2]) {
                     if (Cache[2] != null) {
-                        playerData.PetInventory.addPetParameter(Cache[2]);
-                        player.sendMessage("§e[" + Cache[2].petData.Display + "]§aの§e最大レベル§aが§eLv" + Cache[2].MaxLevel + "§aに進化しました");
-                        playSound(player, SoundList.LevelUp);
-                        Arrays.fill(Cache, null);
+                        int mel = (int) Math.round(Cache[2].Level*Cache[2].GrowthRate*30+300);
+                        if (playerData.Mel >= mel) {
+                            playerData.Mel -= mel;
+                            playerData.PetInventory.addPetParameter(Cache[2]);
+                            player.sendMessage("§e[" + Cache[2].petData.Display + "]§aの§e最大レベル§aが§eLv" + Cache[2].MaxLevel + "§aに進化しました §c[-" + mel + "メル]");
+                            playSound(player, SoundList.LevelUp);
+                            Arrays.fill(Cache, null);
+                        }
                     }
                 } else {
                     if (Slot == AnvilUISlot[0] && Cache[0] != null) {

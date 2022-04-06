@@ -62,7 +62,7 @@ public class Cleric {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Heal: " + player.getName());
+        }, "Heal");
     }
 
     public void Cure(SkillData skillData, double length) {
@@ -99,7 +99,7 @@ public class Cleric {
                 playSound(target, SoundList.Heal);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Cure: " + player.getName());
+        }, "Cure");
     }
 
     public void Fade(SkillData skillData) {
@@ -119,7 +119,7 @@ public class Cleric {
                 playSound(player, SoundList.Shoot);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Fade: " + player.getName());
+        }, "Fade");
     }
 
     public void Resurrection(SkillData skillData, double length) {
@@ -141,6 +141,6 @@ public class Cleric {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Resurrection: " + player.getName());
+        }, "Resurrection");
     }
 }

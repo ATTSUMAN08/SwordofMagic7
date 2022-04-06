@@ -66,7 +66,7 @@ public class Chronomancer {
             }
             playSound(player, SoundList.DeBuff);
             skillProcess.SkillRigid(skillData);
-        }, "Slow" + player.getName());
+        }, "Slow");
     }
 
     public void Stop(SkillData skillData) {
@@ -177,10 +177,10 @@ public class Chronomancer {
         }, "TimeForward");
     }
 
-    private double BackMaskingHealth = 0;
-    private double BackMaskingMana = 0;
-    private Location BackMaskingLocation = null;
-    private MapData BackMaskingMapData = null;
+    public double BackMaskingHealth = 0;
+    public double BackMaskingMana = 0;
+    public Location BackMaskingLocation = null;
+    public MapData BackMaskingMapData = null;
 
     public void BackMasking(SkillData skillData) {
         MultiThread.TaskRun(() -> {
@@ -193,13 +193,15 @@ public class Chronomancer {
                 }
 
                 MultiThread.TaskRunSynchronized(() -> {
-                    playerData.setHealth(BackMaskingHealth);
-                    playerData.setMana(BackMaskingMana);
-                    player.teleportAsync(BackMaskingLocation);
-                    BackMaskingMapData.enter(player);
-                    player.sendMessage("§a情報を巻き戻しました");
-                    playSound(player, SoundList.Warp);
-                    BackMaskingReset();
+                    if (player != null) {
+                        playerData.setHealth(BackMaskingHealth);
+                        playerData.setMana(BackMaskingMana);
+                        player.teleportAsync(BackMaskingLocation);
+                        BackMaskingMapData.enter(player);
+                        player.sendMessage("§a情報を巻き戻しました");
+                        playSound(player, SoundList.Warp);
+                        BackMaskingReset();
+                    }
                 });
             } else {
                 BackMaskingSet();

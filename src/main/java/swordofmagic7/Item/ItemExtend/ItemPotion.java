@@ -42,7 +42,8 @@ public class ItemPotion implements Cloneable {
                     playSound(player, SoundList.Nope);
                 }
             }
-            if (PotionType.isMana()) {
+            boolean isSprinkleManaPotion = playerData.Skill.hasSkill("SprinkleManaPotion");
+            if (PotionType.isMana() || isSprinkleManaPotion) {
                 if (playerData.Status.Mana < playerData.Status.MaxMana) {
                     double value;
                     if (PotionType.isElixir()) {
@@ -51,8 +52,8 @@ public class ItemPotion implements Cloneable {
                         value = Value[0]*multiply;
                     }
                     playerData.changeMana(value);
-                    if (playerData.Skill.hasSkill("SprinkleSPPotion")) {
-                        for (Player target : PlayerList.getNearNonDead(player.getLocation(), DataBase.getSkillData("SprinkleSPPotion").ParameterValue(0))) {
+                    if (isSprinkleManaPotion) {
+                        for (Player target : PlayerList.getNearNonDead(player.getLocation(), DataBase.getSkillData("SprinkleManaPotion").ParameterValue(0))) {
                             if (playerData.Skill.SkillProcess.isAllies(target)) {
                                 PlayerData.playerData(target).changeMana(value);
                             }

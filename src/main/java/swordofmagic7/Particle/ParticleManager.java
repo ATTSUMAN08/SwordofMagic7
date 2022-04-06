@@ -12,7 +12,7 @@ import swordofmagic7.RayTrace.RayTrace;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public final class ParticleManager {
 
@@ -107,7 +107,10 @@ public final class ParticleManager {
         if (particleData.vector != ParticleData.RandomVector) vector = particleData.vector;
         else vector = new Vector(random.nextFloat()*2-1, random.nextFloat()*2-1, random.nextFloat()*2-1);
         if (!particleData.randomOffset) offset = new Vector(0, 0.15, 0);
-        else offset = new Vector(random.nextFloat()*particleData.randomOffsetMultiply, random.nextFloat()*particleData.randomOffsetMultiply, random.nextFloat()*particleData.randomOffsetMultiply);
+        else {
+            float rom = particleData.randomOffsetMultiply;
+            offset = new Vector(random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2));
+        }
         Set<Player> Players = PlayerList.getNear(location, 96);
         if (particleData.particle != Particle.REDSTONE) {
             for (Player player : Players) {

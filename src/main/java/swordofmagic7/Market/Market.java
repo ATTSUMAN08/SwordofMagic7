@@ -1,5 +1,8 @@
 package swordofmagic7.Market;
 
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -9,10 +12,12 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -56,6 +61,16 @@ public class Market {
                 return;
             }
             if (args.length >= 2) {
+                if (type.equalsIgnoreCase("price")) {
+                    File file = new File(DataBasePath, "Market/" + MarketPriceYml);
+                    FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                    if (ItemList.containsKey(args[1])) {
+                        sendMessage(player, "§7・§e" + args[1] + "§7: §a" + (data.isSet(args[1]) ? data.getInt(args[1]) + "メル" : "§7過去取引無し"));
+                    } else {
+                        sendMessage(player, "§a存在しない§eアイテム§aです", SoundList.Nope);
+                    }
+                    return;
+                }
                 try {
                     int index = Integer.parseInt(args[1]);
                     if (index > -1 && type.equalsIgnoreCase("sell") && playerData.ItemInventory.getList().size() > index) {
@@ -138,6 +153,7 @@ public class Market {
         player.sendMessage(Function.decoLore("/market cancel <index>"));
         player.sendMessage(Function.decoLore("/market info <index>"));
         player.sendMessage(Function.decoLore("/market collect [confirm]"));
+        player.sendMessage(Function.decoLore("/market price <ItemId>"));
     }
 
     private final Player player;
@@ -153,13 +169,30 @@ public class Market {
     }
 
     public String MarketMenuDisplay = "マーケットメニュー";
+    public String MarketBuyConfirmDisplay = "マーケット購入確認";
+
+    public ItemStack buyConfirm = new ItemStackData(Material.EMERALD_BLOCK, "§e購入する").view();
+    public ItemStack Cancel = new ItemStackData(Material.REDSTONE_BLOCK, "§eキャンセル").view();
 
     public void MarketMenuView() {
         Inventory inv = decoInv(MarketMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunLater(() -> MarketMenuView(0), 1, "MarketMenuView: " + player.getName());
+        MultiThread.TaskRunLater(() -> MarketMenuView(0), 1, "MarketMenuView");
     }
+
+    public void MarketBuyConfirmView() {
+        Inventory inv = decoInv(MarketBuyConfirmDisplay, 1);
+        inv.setItem(4, marketCache.marketData.itemParameterStack.itemParameter.viewItem(BuyAmount, playerData.ViewFormat()));
+        for (int i = 0; i < 3; i++) {
+            inv.setItem(i, buyConfirm);
+            inv.setItem(i+6, Cancel);
+        }
+        player.openInventory(inv);
+        playSound(player, SoundList.MenuOpen);
+    }
+
+    public static final String MarketPriceYml = "MarketPrice.yml";
 
     public void MarketMenuView(int page) {
         if (equalInv(player.getOpenInventory(), MarketMenuDisplay)) {
@@ -167,11 +200,13 @@ public class Market {
             ItemStack[] itemStacks = new ItemStack[54];
             List<MarketCache> marketList = new ArrayList<>();
             for (File file : DataBase.dumpFile(new File(DataBasePath, "Market/"))) {
-                UUID uuid = UUID.fromString(file.getName().replace(".yml", ""));
-                if (!player.getUniqueId().toString().equals(uuid.toString())) {
-                    for (int i = 0; i < MarketContainer.getMarket(uuid).marketData.size(); i++) {
-                        MarketData marketData = MarketContainer.getMarket(uuid).marketData.get(i);
-                        marketList.add(new MarketCache(marketData, i));
+                if (!file.getName().equals(MarketPriceYml)) {
+                    UUID uuid = UUID.fromString(file.getName().replace(".yml", ""));
+                    if (!player.getUniqueId().toString().equals(uuid.toString())) {
+                        for (int i = 0; i < MarketContainer.getMarket(uuid).marketData.size(); i++) {
+                            MarketData marketData = MarketContainer.getMarket(uuid).marketData.get(i);
+                            marketList.add(new MarketCache(marketData, i));
+                        }
                     }
                 }
             }
@@ -203,20 +238,22 @@ public class Market {
         }
     }
 
+    public MarketCache marketCache;
     public void MarketMenuClick(InventoryView view, ItemStack currentItem, int Slot) {
-        if (equalInv(view, MarketMenuDisplay)) {
-            if (Slot < 45) {
-                if (currentItem != null) {
-                    if (MarketArray[Slot] != null) {
-                        MarketContainer market = MarketContainer.getMarket(MarketArray[Slot].marketData.Owner);
-                        int index = MarketArray[Slot].index;
+        if (equalInv(view, MarketBuyConfirmDisplay)) {
+            if (currentItem != null) {
+                if (equalItem(currentItem, buyConfirm)) {
+                    if (marketCache != null) {
+                        MarketContainer market = MarketContainer.getMarket(marketCache.marketData.Owner);
+                        int index = marketCache.index;
                         MarketData marketData = market.marketData.get(index);
-                        if (!MarketArray[Slot].marketData.uuid.toString().equals(marketData.uuid.toString())) {
+                        if (!marketCache.marketData.uuid.toString().equals(marketData.uuid.toString())) {
                             Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.Nope);
                             return;
                         }
                         int amount = BuyAmount;
-                        if (amount > marketData.itemParameterStack.Amount) amount = marketData.itemParameterStack.Amount;
+                        if (amount > marketData.itemParameterStack.Amount)
+                            amount = marketData.itemParameterStack.Amount;
                         if (playerData.Mel >= marketData.Mel * amount) {
                             ItemParameter itemParameter = marketData.itemParameterStack.itemParameter.clone();
                             playerData.ItemInventory.addItemParameter(itemParameter, amount);
@@ -232,10 +269,34 @@ public class Market {
                             market.save();
                             MarketMenuView(page);
                             playSound(player, SoundList.LevelUp);
+                            File file = new File(DataBasePath, "Market/" + MarketPriceYml);
+                            FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                            String id = marketData.itemParameterStack.itemParameter.Id;
+                            int price = Math.round((data.getInt(id, marketData.Mel)+marketData.Mel)/2f);
+                            data.set(id, price);
+                            try {
+                                data.save(file);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            MarketMenuView();
                         } else {
-                            player.sendMessage("§eメル§aが足りません");
-                            playSound(player, SoundList.Nope);
+                            sendMessage(player, "§eメル§aが足りません", SoundList.Nope);
                         }
+                    } else {
+                        Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.Nope);
+                    }
+                } else if (equalItem(currentItem, Cancel)) {
+                    marketCache = null;
+                    MarketMenuView(page);
+                }
+            }
+        } else if (equalInv(view, MarketMenuDisplay)) {
+            if (Slot < 45) {
+                if (currentItem != null) {
+                    if (MarketArray[Slot] != null) {
+                        marketCache = MarketArray[Slot];
+                        MarketBuyConfirmView();
                     } else MarketMenuView(page);
                 }
             } else {

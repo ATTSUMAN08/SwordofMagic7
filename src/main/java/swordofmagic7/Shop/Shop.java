@@ -191,6 +191,17 @@ public class Shop {
             } else if (ClickInventory == player.getInventory() && index > -1) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
                 ItemParameter item = stack.itemParameter;
+                if (clickType.isRightClick()) {
+                    if (item.Category.isEquipment()) {
+                        if (item.itemEquipmentData.Plus >= 10) {
+                            sendMessage(player, "§e装備§aの§c強化値§aが§b+10§a以上です", SoundList.Nope);
+                            return;
+                        } else if (item.itemEquipmentData.Rune.size() > 0) {
+                            sendMessage(player, "§e装備§aに§eルーン§aが§e装着§aされています", SoundList.Nope);
+                            return;
+                        }
+                    }
+                }
                 int Amount = clickType.isShiftClick() ? stack.Amount : Math.min(SellAmount, stack.Amount);
                 SellInventory.addItemParameter(item, Amount);
                 playerData.ItemInventory.removeItemParameter(item, Amount);

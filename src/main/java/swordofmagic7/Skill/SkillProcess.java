@@ -64,10 +64,7 @@ public class SkillProcess {
             return false;
         } else if (enemy instanceof Player target) {
             return isAlive(target) && !isPlayerAllies(target);
-        } else if (MobManager.isEnemy(enemy)) {
-            MobManager.EnemyTable(enemy.getUniqueId()).updateEntity();
-            return true;
-        } else return false;
+        } else return MobManager.isEnemy(enemy);
     }
 
     public boolean isAllies(Player target) {

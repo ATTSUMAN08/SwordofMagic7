@@ -4,22 +4,21 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Client;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Effect.EffectManager;
-import swordofmagic7.Effect.EffectOwnerType;
-import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Effect.*;
 import swordofmagic7.Function;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
@@ -32,6 +31,7 @@ import swordofmagic7.Quest.QuestData;
 import swordofmagic7.Quest.QuestProcess;
 import swordofmagic7.Quest.QuestReqContentKey;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
 
 import java.util.*;
@@ -39,8 +39,8 @@ import java.util.*;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.SomCore.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.*;
 
 public class EnemyData {
     public UUID uuid;
@@ -58,15 +58,14 @@ public class EnemyData {
     public double Exp;
     public double ClassExp;
 
+    public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
+    public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
+    public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
+    public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
+
     public final EnemySkillManager skillManager = new EnemySkillManager(this);
     public final EffectManager effectManager;
     public int HitCount = 0;
-
-    public void updateEntity() {
-        MultiThread.TaskRunSynchronized(() -> {
-            entity = (LivingEntity) Bukkit.getEntity(uuid);
-        }, "UpdateEntity: " + uuid);
-    }
 
     private final Set<Player> Involved = new HashSet<>();
     private final HashMap<LivingEntity, Double> Priority = new HashMap<>();
@@ -120,19 +119,59 @@ public class EnemyData {
         double multiply = StatusMultiply(Level);
         double multiply2 = Level >= 30 ? Math.pow(multiply, 1.1) : multiply;
         double multiply3 = Level >= 30 ? Math.pow(multiply, 1.04) : multiply;
-        MaxHealth = mobData.Health * multiply2;
-        ATK = mobData.ATK * multiply;
-        DEF = mobData.DEF * multiply3;
-        ACC = mobData.ACC * multiply;
-        EVA = mobData.EVA * multiply;
-        CriticalRate = mobData.CriticalRate * multiply;
-        CriticalResist = mobData.CriticalResist * multiply3;
+
+        HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
+        HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
+        for (StatusParameter param : StatusParameter.values()) {
+            MultiplyStatus.put(param, 1d);
+            FixedStatus.put(param, 0d);
+            multiplyStatusRev.put(param, 1d);
+            baseMultiplyStatusRev.put(param, 1d);
+        }
+        for (DamageCause cause : DamageCause.values()) {
+            DamageCauseMultiply.put(cause, 1d);
+            DamageCauseResistance.put(cause, 1d);
+        }
+        if (effectManager.Effect.size() > 0) {
+            for (Map.Entry<EffectType, EffectData> data : effectManager.Effect.entrySet()) {
+                EffectType effectType = data.getKey();
+                EffectData effectData = data.getValue();
+                for (StatusParameter param : StatusParameter.values()) {
+                    double multiplyStatusAdd = EffectDataBase.EffectStatus(effectType).MultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
+                    double baseMultiplyStatusAdd = EffectDataBase.EffectStatus(effectType).BaseMultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
+                    if (multiplyStatusAdd >= 0) MultiplyStatus.merge(param, multiplyStatusAdd, Double::sum);
+                    else {
+                        multiplyStatusRev.put(param, multiplyStatusRev.get(param) * Math.pow(1 + multiplyStatusAdd, effectData.stack));
+                    }
+                    if (baseMultiplyStatusAdd >= 0) MultiplyStatus.merge(param, baseMultiplyStatusAdd, Double::sum);
+                    else {
+                        baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
+                    }
+                }
+                for (DamageCause cause : DamageCause.values()) {
+                    DamageCauseMultiply.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
+                    DamageCauseResistance.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
+                }
+            }
+            for (StatusParameter param : StatusParameter.values()) {
+                MultiplyStatus.put(param, MultiplyStatus.get(param) * multiplyStatusRev.get(param));
+                MultiplyStatus.put(param, MultiplyStatus.get(param) * baseMultiplyStatusRev.get(param));
+            }
+        }
+
+        MaxHealth = mobData.Health * multiply2 * statusMultiply(StatusParameter.MaxHealth);
+        ATK = mobData.ATK * multiply * statusMultiply(StatusParameter.ATK);
+        DEF = mobData.DEF * multiply3 * statusMultiply(StatusParameter.DEF);
+        ACC = mobData.ACC * multiply * statusMultiply(StatusParameter.ACC);
+        EVA = mobData.EVA * multiply * statusMultiply(StatusParameter.EVA);
+        CriticalRate = mobData.CriticalRate * multiply * statusMultiply(StatusParameter.CriticalRate);
+        CriticalResist = mobData.CriticalResist * multiply3 * statusMultiply(StatusParameter.CriticalResist);
         Exp = mobData.Exp * multiply;
         ClassExp = mobData.Exp;
+    }
 
-        if (effectManager.hasEffect(EffectType.Monstrance)) {
-            EVA *= 1-getSkillData("Monstrance").ParameterValue(0)/100;
-        }
+    private double statusMultiply(StatusParameter status) {
+        return MultiplyStatus.getOrDefault(status, 1d);
     }
 
     public String getDecoDisplay() {
@@ -145,6 +184,8 @@ public class EnemyData {
 
     void stopAI() {
         runAITask = false;
+        if (asyncAITask != null) asyncAITask.cancel();
+        if (syncAITask != null) syncAITask.cancel();
     }
 
     public boolean isRunnableAI() {
@@ -152,56 +193,72 @@ public class EnemyData {
     }
 
     public Location LastLocation;
+    private Location NextLocation;
+    public BukkitTask asyncAITask;
+    public BukkitTask syncAITask;
     void runAI() {
         stopAI();
         SpawnLocation = entity.getLocation();
         LastLocation = SpawnLocation;
         if (entity instanceof Mob mob) {
-            MultiThread.TaskRun(() ->{
-                runAITask = true;
-                if (DefenseAI != null) {
-                    while (isRunnableAI()) {
-                        mob.lookAt(DefenseAI);
-                        Pathfinder pathfinder = mob.getPathfinder();
-                        MultiThread.TaskRunSynchronized(() -> pathfinder.moveTo(DefenseAI, mobData.Mov));
+            Pathfinder pathfinder = mob.getPathfinder();
+            runAITask = true;
+            syncAITask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!isRunnableAI()) this.cancel();
+                    if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
+                        mob.lookAt(NextLocation);
+                        pathfinder.moveTo(NextLocation, mobData.Mov);
                         LastLocation = entity.getLocation();
-                        MultiThread.sleepTick(20);
                     }
-                } else {
-                    while (isRunnableAI()) {
+                }
+            }.runTaskTimer(plugin, 0, 20);
+            if (DefenseAI != null) {
+                NextLocation = DefenseAI;
+            } else {
+                asyncAITask = new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!isRunnableAI()) this.cancel();
                         Location targetLocation = null;
-                        if (overrideTargetLocation != null) targetLocation = overrideTargetLocation;
-                        else if (target != null) targetLocation = target.getLocation();
-                        else if (nonTargetLocation != null) targetLocation = nonTargetLocation;
+                        if (overrideTargetLocation != null) {
+                            targetLocation = overrideTargetLocation;
+                        } else if (target != null) {
+                            targetLocation = target.getLocation();
+                        } else if (nonTargetLocation != null) {
+                            targetLocation = nonTargetLocation;
+                        }
                         if (targetLocation != null) {
-                            Location finalTargetLocation = targetLocation;
-                            MultiThread.TaskRunSynchronized(() -> {
-                                mob.lookAt(finalTargetLocation);
-                                Pathfinder pathfinder = mob.getPathfinder();
-                                pathfinder.moveTo(finalTargetLocation, mobData.Mov);
-                            }, "PathFindMove: " + uuid);
+                            NextLocation = targetLocation;
                         }
 
                         double topPriority = 0;
-                        Priority.entrySet().removeIf(entry -> (entry.getKey() instanceof Player player && !Function.isAlive(player))
+                        Priority.entrySet().removeIf(entry -> (
+                                entry.getKey() instanceof Player player && !Function.isAlive(player))
                                 || entry.getKey().getLocation().distance(entity.getLocation()) > mobData.Search
                                 || entry.getKey().isDead());
                         for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
-                            double Priority = priority.getValue();
+                            double priorityValue = priority.getValue();
                             LivingEntity priorityTarget = priority.getKey();
                             if (priorityTarget instanceof Player player) {
                                 PlayerData targetData = playerData(player);
                                 if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
-                                    Priority = 0;
-                                    this.Priority.put(priority.getKey(), 0d);
-                                } else if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
-                                    Priority = 0;
+                                    priorityValue = 0;
+                                    Priority.put(priority.getKey(), 0d);
+                                }
+                                if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
+                                    priorityValue = 0;
                                     if (target == player) target = null;
                                 }
+                                if (targetData.EffectManager.hasEffect(EffectType.HatePriority)) {
+                                    target = player;
+                                    break;
+                                }
                             }
-                            if (topPriority < Priority) {
+                            if (topPriority < priorityValue) {
                                 target = priorityTarget;
-                                topPriority = Priority;
+                                topPriority = priorityValue;
                             }
                         }
 
@@ -238,11 +295,14 @@ public class EnemyData {
                                 }
                             }
                         }
-                        if (!isDefenseBattle && SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) entity.teleportAsync(SpawnLocation);
-                        MultiThread.sleepTick(20);
+                        if (!isDefenseBattle) {
+                            if (PlayerList.getNear(entity.getLocation(), 48).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                                delete();
+                            }
+                        }
                     }
-                }
-            }, "EnemyAI: " + uuid);
+                }.runTaskTimerAsynchronously(plugin, 0, 20);
+            }
         }
     }
 
@@ -259,13 +319,11 @@ public class EnemyData {
     public void delete() {
         isDead = true;
         stopAI();
+        if (entity != null) MobManager.EnemyTable.remove(entity.getUniqueId().toString());
         MultiThread.TaskRunSynchronized(() -> {
-            if (entity != null) {
-                MobManager.getEnemyTable().remove(entity.getUniqueId());
-                entity.setHealth(0);
-                entity.remove();
-            }
-        }, "EnemyDelete: " + uuid);
+            entity.setHealth(0);
+            entity.remove();
+        }, "EnemyDelete");
     }
 
     public static int decayExp(int exp, int playerLevel, int mobLevel) {
@@ -281,19 +339,12 @@ public class EnemyData {
 
     public synchronized void dead() {
         if (isDead) return;
-        isDead = true;
-        stopAI();
         if (entity != null) {
-            MobManager.getEnemyTable().remove(entity.getUniqueId());
             ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORKS_SPARK, 0.22f), entity.getLocation(), 100);
             playSound(entity.getLocation(), SoundList.Death);
             Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
-
-            MultiThread.TaskRunSynchronized(() -> {
-                entity.setHealth(0);
-                entity.remove();
-            }, "EnemyDead: " + uuid);
         }
+        delete();
 
         if (mobData.enemyType.isBoss()) {
             List<Map.Entry<LivingEntity, Double>> entries = new ArrayList<>(TotalDamageTable.entrySet());
@@ -400,7 +451,7 @@ public class EnemyData {
                             if (random.nextDouble() <= 0.0005) {
                                 PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
                                 playerData.PetInventory.addPetParameter(pet);
-                                TextView text = new TextView("§e[" + mobData.Id + "]§aを§b懐柔§aしました");
+                                TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
                                 text.setSound(SoundList.Tick);
                                 Client.BroadCast(text);
                             }
@@ -412,19 +463,19 @@ public class EnemyData {
                             }
                         }
                     }
+                    Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
+                    MultiThread.TaskRunSynchronized(() -> {
+                        Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
+                        VisibilityManager visibilityManager = hologram.getVisibilityManager();
+                        visibilityManager.setVisibleByDefault(false);
+                        visibilityManager.showTo(player);
+                        for (String holo : Holo) {
+                            hologram.appendTextLine(holo);
+                        }
+                        MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
+                        playerData.viewUpdate();
+                    }, "EnemyKillRewardHolo");
                 }
-                Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-                MultiThread.TaskRunSynchronized(() -> {
-                    Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
-                    VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                    visibilityManager.setVisibleByDefault(false);
-                    visibilityManager.showTo(player);
-                    for (String holo : Holo) {
-                        hologram.appendTextLine(holo);
-                    }
-                    MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete: " + uuid + "/" + player.getName());
-                    playerData.viewUpdate();
-                }, "EnemyKillRewardHolo" + uuid);
             }
         }
     }

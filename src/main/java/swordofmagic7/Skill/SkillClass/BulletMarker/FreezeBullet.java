@@ -48,6 +48,6 @@ public class FreezeBullet {
             }
             playSound(player, GunAttack);
             skillProcess.SkillRigid(skillData);
-        }, "FreezeBullet: " + player.getName());
+        }, "FreezeBullet");
     }
 }

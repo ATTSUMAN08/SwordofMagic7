@@ -27,8 +27,8 @@ import static swordofmagic7.Dungeon.Dungeon.Message;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
-import static swordofmagic7.System.plugin;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.SomCore.random;
 
 public class DefenseBattle {
     private static final Location location = new Location(world, 2234.5,139,2345.5);
@@ -73,7 +73,7 @@ public class DefenseBattle {
                 case "14:00", "19:00", "22:00", "00:00" -> {
                     if (!isStart) {
                         startWave(1);
-                        isStart = false;
+                        isStart = true;
                     }
                 }
                 default -> {

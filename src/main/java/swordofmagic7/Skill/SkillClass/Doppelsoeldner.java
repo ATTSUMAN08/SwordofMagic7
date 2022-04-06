@@ -47,7 +47,7 @@ public class Doppelsoeldner {
             ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Howl);
             skillProcess.SkillRigid(skillData);
-        }, "DeedsOfValor: " + player.getName());
+        }, "DeedsOfValor");
     }
 
     public void Cyclone(SkillData skillData) {
@@ -76,7 +76,7 @@ public class Doppelsoeldner {
             }
 
             skillProcess.SkillRigid(skillData);
-        }, "Cyclone: " + player.getName());
+        }, "Cyclone");
     }
 
     public void ComboSkill(SkillData skillData, double radius, double angle, int count, EffectType reqEffect, EffectType addEffect) {
@@ -98,6 +98,6 @@ public class Doppelsoeldner {
                 playSound(player, SoundList.Nope);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Cyclone: " + player.getName());
+        }, "Cyclone");
     }
 }

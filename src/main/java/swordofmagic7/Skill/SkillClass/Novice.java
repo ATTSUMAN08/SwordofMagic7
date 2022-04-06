@@ -57,7 +57,7 @@ public class Novice {
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
             ShapedParticle(new ParticleData(Particle.SWEEP_ATTACK), player.getLocation(), radius, angle, angle/2, 1, true);
             skillProcess.SkillRigid(skillData);
-        }, "Slash: " + player.getName());
+        }, skillData.Id);
     }
 
     public void Vertical(SkillData skillData, double length, double width) {
@@ -73,7 +73,7 @@ public class Novice {
             Set<LivingEntity> victims = RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
             skillProcess.SkillRigid(skillData);
-        }, "Vertical: " + player.getName());
+        }, "Vertical");
     }
 
     public void Rain(SkillData skillData, double radius) {
@@ -97,7 +97,7 @@ public class Novice {
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1);
                 MultiThread.sleepTick(2);
             }
-        }, "Rain: " + player.getName());
+        }, "Rain");
     }
 
     public void TriggerShot(SkillData skillData, int count) {
@@ -111,7 +111,7 @@ public class Novice {
             if (ray.isHitEntity()) Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0)/100, count);
             playSound(player, GunAttack, count, 2);
             skillProcess.SkillRigid(skillData);
-        }, "TriggerShot: " + player.getName());
+        }, "TriggerShot");
     }
 
     public void Smite(SkillData skillData, double radius) {
@@ -129,7 +129,7 @@ public class Novice {
             Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
             skillProcess.SkillRigid(skillData);
-        }, "Smite: " + player.getName());
+        }, "Smite");
     }
 
     public void FireBall(SkillData skillData) {
@@ -146,6 +146,6 @@ public class Novice {
             Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
             playSound(player, SoundList.Fire);
             skillProcess.SkillRigid(skillData);
-        }, "FireBall: " + player.getName());
+        }, "FireBall");
     }
 }

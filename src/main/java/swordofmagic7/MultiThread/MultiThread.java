@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Function.Log;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class MultiThread extends Thread {
     public static List<Thread> MultiThreads = new ArrayList<>();
@@ -40,9 +40,12 @@ public class MultiThread extends Thread {
         MultiThreads.clear();
     }
 
+    private static final boolean log = true;
+
     public static Thread TaskRun(MultiThreadRunnable runnable, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
+                if (log) Log("TaskRun -> " + ThreadTag);
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -59,6 +62,7 @@ public class MultiThread extends Thread {
     public static void TaskRunSynchronized(MultiThreadRunnable runnable, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
+                if (log) Log("TaskRunSynchronized -> " + ThreadTag);
                 Bukkit.getScheduler().runTask(plugin, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -70,6 +74,7 @@ public class MultiThread extends Thread {
     public static BukkitTask TaskRunLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
+                if (log) Log("TaskRunLater -> " + ThreadTag);
                 return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -87,9 +92,15 @@ public class MultiThread extends Thread {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, tick);
     }
 
+    public static void TaskRunSynchronizedTimer(MultiThreadRunnable runnable, int tick, String ThreadTag) {
+        if (log) Log("TaskRunSynchronizedTimer -> " + ThreadTag);
+        Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0, tick);
+    }
+
     public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
+                if (log) Log("TaskRunSynchronizedLater -> " + ThreadTag);
                 Bukkit.getScheduler().runTaskLater(plugin, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();

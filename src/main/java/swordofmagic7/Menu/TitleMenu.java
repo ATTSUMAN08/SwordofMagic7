@@ -36,7 +36,7 @@ public class TitleMenu {
         Inventory inv = decoInv(TitleMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunSynchronizedLater(() -> TitleMenuView(0), 1, "TitleMenuView: " + player.getName());
+        MultiThread.TaskRunSynchronizedLater(() -> TitleMenuView(0), 1, "TitleMenuView");
     }
 
     public void TitleMenuView(int scroll) {

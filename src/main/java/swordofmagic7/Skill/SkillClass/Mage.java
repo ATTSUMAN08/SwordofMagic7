@@ -47,17 +47,12 @@ public class Mage {
     public void Teleportation(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            double length = skillData.ParameterValue(0);
             playerData.EffectManager.addEffect(EffectType.Invincible, skillData.ParameterValueInt(1) * 20);
             playerData.EffectManager.addEffect(EffectType.Teleportation, skillData.ParameterValueInt(2) * 20);
             Location origin;
-            Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), 32, false);
-            if (ray.isHitBlock()) {
-                Location loc = ray.HitPosition;
-                loc.setPitch(90);
-                origin = RayTrace.rayLocationBlock(loc, 32, false).HitPosition;;
-            } else {
-                origin = ray.HitPosition;
-            }
+            Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), length, false);
+            origin = ray.HitPosition;
             origin.add(player.getEyeLocation().getDirection().multiply(-1));
             origin.add(0, 0.2, 0);
             final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
@@ -75,7 +70,7 @@ public class Mage {
             MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
             playSound(player, SoundList.Warp);
             skillProcess.SkillRigid(skillData);
-        }, "Teleportation: " + player.getName());
+        }, "Teleportation");
     }
 
     public void MagicMissile(SkillData skillData) {
@@ -98,11 +93,12 @@ public class Mage {
                 playSound(player, SoundList.RodAttack);
                 MultiThread.sleepTick(2);
             }
-        }, "MagicMissile: " + player.getName());
+        }, skillData.Id);
     }
 
-    public void Infall(SkillData skillData, double radius) {
+    public void Infall(SkillData skillData) {
         MultiThread.TaskRun(() -> {
+            double radius = skillData.ParameterValue(1);
             skill.setCastReady(false);
             final Location origin = player.getLocation().clone();
             ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
@@ -123,6 +119,6 @@ public class Mage {
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1);
                 MultiThread.sleepTick(2);
             }
-        }, "Infall: " + player.getName());
+        }, "Infall");
     }
 }

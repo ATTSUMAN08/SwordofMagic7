@@ -25,13 +25,14 @@ public final class PlayerList {
     }
 
     public static Set<Player> get() {
+        PlayerList.removeIf(player -> !player.isOnline());
         return PlayerList;
     }
 
     public static Set<Player> getNear(Location loc, double radius) {
         Set<Player> List = new HashSet<>();
         try {
-            for (Player player : PlayerList) {
+            for (Player player : get()) {
                 if (player.isOnline()) {
                     if (player.getLocation().distance(loc) <= radius) List.add(player);
                 }
@@ -44,7 +45,7 @@ public final class PlayerList {
 
     public static Set<Player> getNearNonDead(Location loc, double radius) {
         Set<Player> List = new HashSet<>();
-        for (Player player : PlayerList) {
+        for (Player player : get()) {
             if (player.isOnline() && player.getGameMode() != GameMode.SPECTATOR) {
                 if (player.getLocation().distance(loc) <= radius) List.add(player);
             }
@@ -54,7 +55,7 @@ public final class PlayerList {
 
     public static Set<LivingEntity> getNearLivingEntity(Location loc, double radius) {
         Set<LivingEntity> List = new HashSet<>();
-        for (Player player : PlayerList) {
+        for (Player player : get()) {
             if (Function.isAlive(player)) {
                 if (player.getLocation().distance(loc) <= radius) List.add(player);
                 for (PetParameter pet : playerData(player).PetSummon) {

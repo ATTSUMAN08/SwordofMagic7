@@ -17,7 +17,7 @@ import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class ViewBar {
 
@@ -88,20 +88,26 @@ public class ViewBar {
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
         team.addEntry(player.getName());
         team.setCanSeeFriendlyInvisibles(true);
+        int period = 5;
+        double regen = 200d/period;
         MultiThread.TaskRun(() -> {
             if (status.Health < 0) status.Health = status.MaxHealth;
             if (status.Mana < 0) status.Mana = status.MaxMana;
             while (player.isOnline() && plugin.isEnabled()) {
                 try {
                     if (playerData.PlayMode && playerData.isLoaded) {
+                        if (playerData.HealthRegenDelay > 0) {
+                            playerData.HealthRegenDelay -= period;
+                        } else {
+                            status.Health += status.HealthRegen / regen;
+                            status.Mana += status.ManaRegen / regen;
+                        }
                         int Level = playerData.Level;
                         int Exp = playerData.Exp;
                         int ReqExp = Classes.ReqExp(Level);
                         float ExpPercent = (float) Exp / ReqExp;
                         if (Float.isNaN(ExpPercent)) ExpPercent = 0.999f;
                         ExpPercent = Math.min(0.001f, Math.max(0.999f, ExpPercent));
-                        status.Health += status.HealthRegen / 40;
-                        status.Mana += status.ManaRegen / 40;
                         status.Health = Math.min(Math.max(status.Health, 0), status.MaxHealth);
                         status.Mana = Math.min(Math.max(status.Mana, 0), status.MaxMana);
                         HealthPercent = status.Health / status.MaxHealth;
@@ -118,36 +124,35 @@ public class ViewBar {
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );
 
-                        MultiThread.TaskRunSynchronized(() -> {
-                            player.setAbsorptionAmount(0);
-                            player.setMaxHealth(20);
-                            player.setHealth(Math.min(Math.max(Math.floor(status.Health / status.MaxHealth * 20), 0.5), 20));
-                            player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));
-                        });
-
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
                             playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] §f" + player.getName() + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
 
-                            if (isAlive(player) && !player.isSneaking()) {
-                                if (!playerData.visibilityManager.isVisibleByDefault()) {
-                                    playerData.visibilityManager.setVisibleByDefault(true);
+                            if (!isAlive(player) || player.isSneaking() || playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
+                                if (playerData.visibilityManager.isVisibleByDefault()) {
+                                    playerData.visibilityManager.setVisibleByDefault(false);
                                 }
-                            } else if (playerData.visibilityManager.isVisibleByDefault()) {
-                                playerData.visibilityManager.setVisibleByDefault(false);
+                            } else if (!playerData.visibilityManager.isVisibleByDefault()) {
+                                playerData.visibilityManager.setVisibleByDefault(true);
                             }
                         }
 
                         ViewSideBar();
                         playerData.HotBar.UpdateHotBar();
-                        MultiThread.sleepTick(5);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                MultiThread.sleepTick(period);
             }
-        }, "StatusUpdate: " + player.getName());
+        }, "TickUpdate");
+        MultiThread.TaskRunSynchronizedTimer(() -> {
+            player.setAbsorptionAmount(0);
+            player.setMaxHealth(20);
+            player.setHealth(Math.min(Math.max(Math.floor(status.Health / status.MaxHealth * 20), 0.5), 20));
+            player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));
+        }, 20, "TickUpdateTimer");
     }
 
     public void ViewSideBar() {

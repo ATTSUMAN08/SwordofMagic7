@@ -54,8 +54,8 @@ import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
-import static swordofmagic7.System.spawnPlayer;
+import static swordofmagic7.SomCore.random;
+import static swordofmagic7.SomCore.spawnPlayer;
 
 public class Events implements Listener {
 
@@ -67,13 +67,13 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
+    public void onLogin(AsyncPlayerPreLoginEvent event) {
         if (!ServerId.equalsIgnoreCase("Dev")) {
             List<String> ignoreList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
-            if (!ignoreList.contains(event.getPlayer().getUniqueId().toString())) {
+            if (!ignoreList.contains(event.getUniqueId().toString())) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
-                        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
                         return;
                     }
                 }
@@ -284,7 +284,7 @@ public class Events implements Listener {
                 if (NpcList.containsKey(npc.getId())) {
                     MultiThread.TaskRun(() -> {
                         NpcMessage.ShowMessage(player, npc);
-                    }, "ShowMessage: " + player.getName());
+                    }, "ShowMessage");
                 }
             }
         }
@@ -311,7 +311,7 @@ public class Events implements Listener {
                             MultiThread.sleepTick(1);
                         }
                         player.setGravity(true);
-                    }, "PressurePlate:" + player.getName());
+                    }, "PressurePlate");
                     playSound(player, SoundList.Shoot);
 
                 } else if (Under1 == Material.EMERALD_BLOCK || Under2 == Material.EMERALD_BLOCK) {
@@ -573,22 +573,16 @@ public class Events implements Listener {
 
     @EventHandler
     void onChunkLoad(ChunkLoadEvent event) {
-        MultiThread.TaskRunSynchronizedLater(() -> {
-            for (Entity entity : event.getChunk().getEntities()) {
-                if (isEnemy(entity)) {
-                    EnemyTable(entity.getUniqueId()).updateEntity();
-                } else if (entity.getName().contains("§c§l《")) {
-                    entity.remove();
-                }
-            }
-        }, 5);
+
     }
 
     @EventHandler
     void onEntitiesUnload(EntitiesUnloadEvent event) {
         for (Entity entity : event.getEntities()) {
-            if (MobManager.isEnemy(entity)) {
-                EnemyTable(entity.getUniqueId()).delete();
+            if (entity.hasMetadata("SomEntity")) {
+                entity.remove();
+            } else if (MobManager.isEnemy(entity)) {
+                EnemyTable.remove(entity.getUniqueId().toString());
                 entity.remove();
             } else if (entity.getName().contains("§c§l《")) {
                 entity.remove();

@@ -56,7 +56,7 @@ public class Pardoner {
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "Indulgendia: " + player.getName());
+        }, "Indulgendia");
     }
 
     public void DiscernEvil(SkillData skillData) {
@@ -88,7 +88,7 @@ public class Pardoner {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "DiscernEvil: " + player.getName());
+        }, "DiscernEvil");
     }
 
     public void Forgiveness(SkillData skillData, double length) {
@@ -133,7 +133,7 @@ public class Pardoner {
                 playSound(target, SoundList.Heal);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Forgiveness: " + player.getName());
+        }, "Forgiveness");
     }
 
     public void Indulgence(SkillData skillData) {
@@ -155,6 +155,6 @@ public class Pardoner {
             EffectManager.addEffect(target, EffectType.Indulgence, time, stack, player);
             playSound(target, RodAttack);
             skillProcess.SkillRigid(skillData);
-        }, "Indulgence: " + player.getName());
+        }, "Indulgence");
     }
 }

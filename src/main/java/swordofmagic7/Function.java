@@ -37,8 +37,8 @@ import java.util.function.Predicate;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.SomCore.random;
 
 public final class Function {
 
@@ -247,9 +247,15 @@ public final class Function {
         return RayTrace.rayLocationBlock(player.getEyeLocation(), length, true).HitPosition;
     }
 
+    public static Location playerHipsLocation(Player player) {
+        Location location = player.getLocation().clone();
+        location.add(0, 1,0);
+        return location;
+    }
+
     public static void CloseInventory(Player player) {
         if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
-            MultiThread.TaskRunSynchronized(player::closeInventory, "CloseInventory: " + player.getName());
+            MultiThread.TaskRunSynchronized(player::closeInventory, "CloseInventory");
         }
     }
 

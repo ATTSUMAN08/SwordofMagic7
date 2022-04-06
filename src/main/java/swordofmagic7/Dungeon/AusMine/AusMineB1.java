@@ -19,8 +19,8 @@ import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
-import static swordofmagic7.System.plugin;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.SomCore.random;
 
 public class AusMineB1 {
     private static boolean Able = false;

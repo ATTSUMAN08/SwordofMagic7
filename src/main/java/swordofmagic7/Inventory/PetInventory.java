@@ -13,7 +13,7 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class PetInventory extends BasicInventory {
     public final int MaxSlot = 300;
@@ -44,7 +44,7 @@ public class PetInventory extends BasicInventory {
                 }
                 MultiThread.sleepTick(20);
             }
-        }, "PetInventory: " + player.getName());
+        }, "PetInventory");
     }
 
     public List<PetParameter> getList() {

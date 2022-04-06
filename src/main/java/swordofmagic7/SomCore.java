@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -49,16 +50,17 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Data.PlayerData.playerDataList;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Mob.MobManager.getEnemyTable;
 import static swordofmagic7.Party.PartyManager.partyCommand;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public final class System extends JavaPlugin implements PluginMessageListener {
+public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
     public static Plugin plugin;
+    public static JavaPlugin javaPlugin;
     public static final Random random = new Random();
     public static final Set<Hologram> HologramSet = new HashSet<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
+    public static final HashMap<Player, Integer> PlayerKickAFK = new HashMap<>();
 
     public static Hologram createHologram(String key, Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
@@ -72,20 +74,20 @@ public final class System extends JavaPlugin implements PluginMessageListener {
         return hologram;
     }
 
-    private static HashMap<UUID, EnemyData> EnemyTable = new HashMap<>();
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         reloadConfig();
         plugin = this;
-        EnemyTable = getEnemyTable();
+        javaPlugin = this;
         ServerId = getConfig().getString("ServerId");
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 
         Client.Host = getConfig().getString("Host", "localhost");
         Client.connect();
+        //FileClient.connect();
 
         Tutorial.onLoad();
 
@@ -127,28 +129,37 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                 Player player = playerData.player;
                 if (player.isOnline()) {
                     playerData.saveCloseInventory();
-                    if (ServerId.equalsIgnoreCase("Event")) {
-                        if (PlayerLastLocation.containsKey(player)) {
-                            Location location = PlayerLastLocation.get(player);
-                            if (location.getBlockX() == player.getLocation().getBlockX()) {
-                                if (location.getBlockY() == player.getLocation().getBlockY()) {
-                                    if (location.getBlockZ() == player.getLocation().getBlockZ()) {
-                                        teleportServer(player, "Lobby");
-                                    }
-                                }
-                            }
-                        } else {
-                            PlayerLastLocation.put(player, player.getLocation());
-                        }
-                    }
                 } else {
                     playerData.remove();
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
             HologramSet.removeIf(Hologram::isDeleted);
-            PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
         }, 200, 6000), "AutoSave");
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                PlayerData playerData = PlayerData.playerData(player);
+                if (!playerData.Map.Safe && !player.isOp()) {
+                    if (PlayerLastLocation.containsKey(player)) {
+                        Location location = PlayerLastLocation.get(player);
+                        if (location.distance(player.getLocation()) < 1) {
+                            PlayerKickAFK.merge(player, 1, Integer::sum);
+                            if (PlayerKickAFK.get(player) > 10) {
+                                teleportServer(player, "Lobby");
+                            }
+                        } else {
+                            PlayerLastLocation.put(player, player.getLocation().clone());
+                            PlayerKickAFK.put(player, 0);
+                        }
+                    } else {
+                        PlayerLastLocation.put(player, player.getLocation().clone());
+                        PlayerKickAFK.put(player, 0);
+                    }
+                }
+            }
+            PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
+        }, 0, 60*20);
 
         ParticleManager.onLoad();
 
@@ -179,7 +190,7 @@ public final class System extends JavaPlugin implements PluginMessageListener {
         }
 
         int count = 0;
-        for (EnemyData enemyData : EnemyTable.values()) {
+        for (EnemyData enemyData : MobManager.getEnemyList()) {
             if (enemyData.entity != null) enemyData.entity.remove();
             count++;
         }
@@ -253,8 +264,12 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                     if (args.length >= 1) {
                         if (getMobList().containsKey(args[0])) {
                             int level = 1;
+                            int perSpawn = 1;
                             if (args.length == 2) level = Integer.parseInt(args[1]);
-                            MobManager.mobSpawn(getMobData(args[0]), level, player.getLocation());
+                            if (args.length == 3) perSpawn = Integer.parseInt(args[2]);
+                            for (int i = 0; i < perSpawn; i++){
+                                MobManager.mobSpawn(getMobData(args[0]), level, player.getLocation());
+                            }
                             return true;
                         }
                     }
@@ -284,24 +299,37 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                         player.sendMessage("§c無効なプレイヤーです");
                     }
                     return true;
+                } else if (cmd.getName().equalsIgnoreCase("loadFromFileServer")) {
+                    Player target = player;
+                    if (args.length == 1) {
+                        target = Bukkit.getPlayer(args[0]);
+                    }
+                    if (target.isOnline()) {
+                        FileClient.requestPlayerData(playerData);
+                    } else {
+                        player.sendMessage("§c無効なプレイヤーです");
+                    }
+                    return true;
                 } else if (cmd.getName().equalsIgnoreCase("bukkitTasks")) {
-                    player.sendMessage("TaggedTasks: ");
-                    HashMap<String, Integer> TagCount = new HashMap<>();
+                    HashMap<String, Integer> sync = new HashMap<>();
+                    HashMap<String, Integer> async = new HashMap<>();
                     if (BukkitTaskTag != null) {
-                        HashMap<BukkitTask, String> tasks = (HashMap<BukkitTask, String>) BukkitTaskTag.clone();
-                        for (Map.Entry<BukkitTask, String> task : tasks.entrySet()) {
-                            if (!task.getKey().isCancelled()) {
-                                String[] split = task.getValue().split(":");
-                                TagCount.put(split[0], TagCount.getOrDefault(split[0], 0) + 1);
-                            } else {
-                                BukkitTaskTag.remove(task.getKey());
-                            }
+                        BukkitTaskTag.keySet().removeIf(BukkitTask::isCancelled);
+                        for (Map.Entry<BukkitTask, String> task : BukkitTaskTag.entrySet()) {
+                            String[] split = task.getValue().split(":");
+                            if (task.getKey().isSync()) sync.merge(task.getValue(), 1, Integer::sum);
+                            else async.merge(task.getValue(), 1, Integer::sum);
                         }
                     }
                     player.sendMessage("PendingTask: " + Bukkit.getScheduler().getPendingTasks().size());
                     player.sendMessage("TaggedTask: " + BukkitTaskTag.size());
-                    for (Map.Entry<String, Integer> tagCount : TagCount.entrySet()) {
-                        player.sendMessage(tagCount.getKey() + ": " + tagCount.getValue());
+                    player.sendMessage("AsyncTask: " + async.size());
+                    for (Map.Entry<String, Integer> tagCount : async.entrySet()) {
+                        player.sendMessage("・" + tagCount.getKey() + ": " + tagCount.getValue());
+                    }
+                    player.sendMessage("SyncTask: " + sync.size());
+                    for (Map.Entry<String, Integer> tagCount : sync.entrySet()) {
+                        player.sendMessage("・" + tagCount.getKey() + ": " + tagCount.getValue());
                     }
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("loadedPlayer")) {
@@ -649,9 +677,12 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                             for (String str : effectType.Lore) {
                                 player.sendMessage("§a" + str);
                             }
+                            return true;
                         }
                     }
                 }
+                sendMessage(player, "§e/effectInfo <効果名>");
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("sideBarToDo")) {
                 playerData.SideBarToDo.SideBarToDoCommand(args);
                 return true;
@@ -701,6 +732,20 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                     } else player.sendMessage("§a存在しない§eアイテム§aです");
                 } else {
                     player.sendMessage("§e/itemInfo <ItemID>");
+                }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("runeInfo")) {
+                if (args.length == 1) {
+                    if (RuneList.containsKey(args[0])) {
+                        RuneParameter rune = getRuneParameter(args[0]);
+                        ItemStack itemStack = rune.viewRune(playerData.ViewFormat());
+                        List<String> list = new ArrayList<>();
+                        list.add(itemStack.getItemMeta().getDisplayName());
+                        list.addAll(itemStack.getLore());
+                        sendMessage(player, list);
+                    } else player.sendMessage("§a存在しない§eルーン§aです");
+                } else {
+                    player.sendMessage("§e/runeInfo <RuneID>");
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("serverInfo")) {
@@ -770,6 +815,9 @@ public final class System extends JavaPlugin implements PluginMessageListener {
                     }
                 } catch (Exception ignored) {}
                 sendMessage(player, "§e/runeFilter Quality <0~100>");
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("entities")) {
+                sendMessage(player, "EntityCount: " + player.getWorld().getEntityCount());
                 return true;
             }
         }

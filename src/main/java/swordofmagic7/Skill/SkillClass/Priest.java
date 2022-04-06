@@ -15,7 +15,6 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static swordofmagic7.Damage.Damage.makeHeal;
@@ -53,7 +52,7 @@ public class Priest {
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "MassHeal: " + player.getName());
+        }, "MassHeal");
     }
 
     public void HolyBuff(SkillData skillData, ParticleData particleData, EffectType effectType) {
@@ -66,14 +65,14 @@ public class Priest {
             ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 30);
             Set<Player> Targets = PlayerList.getNearNonDead(player.getLocation(), radius);
             if (playerData.Party != null) Targets.addAll(playerData.Party.Members);
-            for (Player target : new HashSet<>(Targets)) {
+            for (Player target : Targets) {
                 if (skillProcess.isAllies(target) || target == player) {
                     EffectManager.addEffect(target, effectType, skillData.ParameterValueInt(0)*20, player);
                     playSound(target, SoundList.Heal);
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "HolyBuff: " + player.getName());
+        }, "HolyBuff");
     }
 
     public void Monstrance(SkillData skillData) {
@@ -93,6 +92,6 @@ public class Priest {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Monstrance: " + player.getName());
+        }, "Monstrance");
     }
 }

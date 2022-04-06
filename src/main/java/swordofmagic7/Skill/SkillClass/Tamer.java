@@ -10,12 +10,12 @@ import swordofmagic7.Effect.EffectType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import static swordofmagic7.Pet.PetManager.ReqPetSelect;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.Heal;
 
@@ -39,15 +39,17 @@ public class Tamer {
 
             MultiThread.sleepMillis(skillData.CastTime);
 
-            LivingEntity target = playerData.PetSelect.target;
-            LivingEntity pet = playerData.PetSelect.entity;
-            if (pet != null && target != null && pet.getLocation().distance(target.getLocation()) <= skillData.Parameter.get(1).Value) {
-                ParticleManager.RandomVectorParticle(new ParticleData(Particle.CRIT), target.getLocation(), 30);
-                Damage.makeDamage(pet, target, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
-                playSound(target.getLocation(), SoundList.AttackWeak);
+            PetParameter pet = playerData.getPetSelectCheckTarget();
+            if (pet != null) {
+                LivingEntity target = pet.target;
+                if (pet.entity.getLocation().distance(target.getLocation()) <= skillData.Parameter.get(1).Value) {
+                    ParticleManager.RandomVectorParticle(new ParticleData(Particle.CRIT), target.getLocation(), 30);
+                    Damage.makeDamage(pet.entity, target, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
+                    playSound(target.getLocation(), SoundList.AttackWeak);
+                }
             }
             skillProcess.SkillRigid(skillData);
-        }, "PetAttack: " + player.getName());
+        }, "PetAttack");
     }
 
     public void PetHeal(SkillData skillData) {
@@ -56,33 +58,30 @@ public class Tamer {
 
             MultiThread.sleepMillis(skillData.CastTime);
 
-            if (playerData.PetSelect != null && playerData.PetSelect.entity != null) {
-                playerData.PetSelect.changeHealth((int) Math.round(playerData.Status.HLP*skillData.Parameter.get(0).Value/100));
-                ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), playerData.PetSelect.entity.getLocation(), 1, 2, 3, 3);
+            PetParameter pet = playerData.getPetSelect();
+            if (pet != null) {
+                pet.changeHealth((int) Math.round(playerData.Status.HLP * skillData.Parameter.get(0).Value / 100));
+                ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
-            } else {
-                player.sendMessage(ReqPetSelect);
-                playSound(player, SoundList.Nope);
             }
             skillProcess.SkillRigid(skillData);
-        }, "PetHeal: " + player.getName());
+        }, "PetHeal");
     }
 
     public void PetBoost(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            int time = skillData.ParameterValueInt(0)*20;
 
             MultiThread.sleepMillis(skillData.CastTime);
 
-            if (playerData.PetSelect != null && playerData.PetSelect.entity != null) {
-                playerData.PetSelect.effectManager.addEffect(EffectType.PetBoost, (int) skillData.Parameter.get(0).Value * 20);
-                ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), playerData.PetSelect.entity.getLocation(), 1, 2, 3, 3);
+            PetParameter pet = playerData.getPetSelect();
+            if (pet != null) {
+                pet.effectManager.addEffect(EffectType.PetBoost, time);
+                ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
-            } else {
-                player.sendMessage(ReqPetSelect);
-                playSound(player, SoundList.Nope);
             }
             skillProcess.SkillRigid(skillData);
-        }, "PetHeal: " + player.getName());
+        }, "PetBoost");
     }
 }

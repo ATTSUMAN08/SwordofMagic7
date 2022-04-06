@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class TarnetEnter {
 

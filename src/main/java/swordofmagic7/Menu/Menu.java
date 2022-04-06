@@ -37,7 +37,7 @@ import static swordofmagic7.Shop.PetShop.*;
 import static swordofmagic7.Shop.RuneShop.RuneEquipDisplay;
 import static swordofmagic7.Shop.Shop.ShopSellDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.spawnPlayer;
+import static swordofmagic7.SomCore.spawnPlayer;
 
 public class Menu {
 
@@ -334,7 +334,7 @@ public class Menu {
                     }
                 }
             }
-        }, "MenuClose: " + player.getName());
+        }, "MenuClose");
         if (!playerData.CastMode.isHold()) {
             player.getInventory().setHeldItemSlot(8);
         }

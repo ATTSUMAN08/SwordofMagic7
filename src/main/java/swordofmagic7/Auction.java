@@ -54,7 +54,7 @@ public class Auction {
                             Owner = playerData;
                             Auctioning = true;
                             MultiThread.TaskRun(() -> {
-                                TextView text = new TextView("§bCH-" + ServerId + "§aで" + Owner.getNick() + "§aさんが");
+                                TextView text = new TextView("§b[" + ServerId + "] " + Owner.getNick() + "§aさんが");
                                 text.addView(stack.itemParameter.getTextView(stack.Amount, Owner.ViewFormat()));
                                 text.addText("§aを§eオークション§aに§e" + Mel + "メル§aから§b出品§aしました");
                                 Client.BroadCast(text);

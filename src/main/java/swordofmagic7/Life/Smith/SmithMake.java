@@ -20,7 +20,7 @@ import static swordofmagic7.Data.DataLoader.MaxMakeSlot;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class SmithMake {
     private final Player player;
@@ -41,7 +41,7 @@ public class SmithMake {
         Inventory inv = decoInv(MakeMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunLater(() -> MakeMenuView(0), 1, "MakeMenuView: " + player.getName());
+        MultiThread.TaskRunLater(() -> MakeMenuView(0), 1, "MakeMenuView");
     }
 
     public void MakeMenuView(int scroll) {

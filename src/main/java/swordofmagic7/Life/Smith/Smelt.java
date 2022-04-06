@@ -40,7 +40,7 @@ public class Smelt {
         Inventory inv = decoInv(SmeltMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunLater(() -> SmeltMenuView(0), 1, "SmithMenuView: " + player.getName());
+        MultiThread.TaskRunLater(() -> SmeltMenuView(0), 1, "SmithMenuView");
     }
 
     public int MaxPage() {

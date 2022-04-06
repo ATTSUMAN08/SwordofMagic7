@@ -1,6 +1,6 @@
 name: Swordofmagic7
 version: '${project.version}'
-main: swordofmagic7.System
+main: swordofmagic7.SomCore
 api-version: 1.18
 authors: [ MomiNeko ]
 description: Swordofmagic7
@@ -45,6 +45,10 @@ commands:
     description: description
     usage: /<command>
   load:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  loadFromFileServer:
     permission: som7.developer
     description: description
     usage: /<command>
@@ -217,7 +221,7 @@ commands:
     description: description
     usage: /<command>
   effectInfo:
-    aliases: efInfo
+    aliases: ei
     description: description
     usage: /<command>
   sideBarToDo:
@@ -249,6 +253,7 @@ commands:
     description: description
     usage: /<command>
   auction:
+    aliases: auc
     description: description
     usage: /<command>
   market:
@@ -269,6 +274,10 @@ commands:
     aliases: ii
     description: description
     usage: /<command>
+  runeInfo:
+    aliases: ri
+    description: description
+    usage: /<command>
   ch:
     aliases: channel
     description: description
@@ -282,5 +291,8 @@ commands:
     usage: /<command>
   runeFilter:
     aliases: rf
+    description: description
+    usage: /<command>
+  entities:
     description: description
     usage: /<command>

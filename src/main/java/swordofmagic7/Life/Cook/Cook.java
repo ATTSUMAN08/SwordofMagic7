@@ -19,7 +19,7 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class Cook {
 
@@ -42,7 +42,7 @@ public class Cook {
         Inventory inv = decoInv(CookMenuDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunLater(() -> CookMenuView(0), 1, "CookMenuView: " + player.getName());
+        MultiThread.TaskRunLater(() -> CookMenuView(0), 1, "CookMenuView");
     }
 
     public int MaxPage() {

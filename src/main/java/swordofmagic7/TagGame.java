@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class TagGame {
     public static final String Prefix = "§c[鬼ごっこ]§r ";

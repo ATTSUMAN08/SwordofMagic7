@@ -144,13 +144,19 @@ public class PetShop {
                     }
                     playSound(player, SoundList.Click);
                 } else if (Slot == AnvilUISlot[2] && PetSyntheticCache[2] != null) {
-                    playerData.PetInventory.addPetParameter(PetSyntheticCache[2]);
-                    PetSyntheticCache[2] = null;
-                    for (int i = 0; i < 2; i++) {
-                        PetSyntheticCache[i] = null;
+                    int mel = (int) Math.round(PetSyntheticCache[2].Level*PetSyntheticCache[2].GrowthRate*5+100);
+                    if (playerData.Mel >= mel) {
+                        playerData.Mel -= mel;
+                        playerData.PetInventory.addPetParameter(PetSyntheticCache[2]);
+                        PetSyntheticCache[2] = null;
+                        for (int i = 0; i < 2; i++) {
+                            PetSyntheticCache[i] = null;
+                        }
+                        player.sendMessage("§e[ペット]§aを§b配合§aしました §c[-" + mel + "メル]");
+                        playSound(player, SoundList.LevelUp);
+                    } else {
+                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
                     }
-                    player.sendMessage("§e[ペット]§aを§b配合§aしました");
-                    playSound(player, SoundList.LevelUp);
                 }
             } else if (index > -1) {
                 PetParameter pet = playerData.PetInventory.getPetParameter(index).clone();

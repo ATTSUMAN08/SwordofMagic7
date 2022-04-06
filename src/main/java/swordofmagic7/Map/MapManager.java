@@ -79,7 +79,13 @@ public class MapManager {
     public void TeleportGateMenuClick(InventoryView view, int Slot) {
         if (equalInv(view, TeleportGateMenuDisplay)) {
             if (TeleportGateMenuCache.containsKey(Slot)) {
-                TeleportGateUse(TeleportGateMenuCache.get(Slot));
+                TeleportGateParameter gate = TeleportGateMenuCache.get(Slot);
+                if (playerData.Mel >= gate.Mel) {
+                    playerData.Mel -= gate.Mel;
+                    TeleportGateUse(gate);
+                } else {
+                    sendMessage(player, "§eメル§aが足りません §c[" + gate.Mel + "メル]", SoundList.Nope);
+                }
             }
         }
     }

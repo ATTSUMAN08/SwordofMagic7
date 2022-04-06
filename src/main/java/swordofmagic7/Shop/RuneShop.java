@@ -106,6 +106,10 @@ public class RuneShop {
         player.openInventory(inv);
     }
 
+    public int runeCost(RuneParameter rune) {
+        return (int) Math.round(rune.Level*rune.Quality*3+100);
+    }
+
     public ItemParameter RuneCache;
     public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     public final ItemParameter RunePowder = getItemParameter("ルーンの粉");
@@ -228,13 +232,16 @@ public class RuneShop {
                     }
                     playSound(player, SoundList.Click);
                 } else if (Slot == AnvilUISlot[2] && RuneUpgradeCache[2] != null) {
-                    playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
-                    RuneUpgradeCache[2] = null;
-                    for (int i = 0; i < 2; i++) {
-                        RuneUpgradeCache[i] = null;
+                    int mel = runeCost(RuneUpgradeCache[2]);
+                    if (playerData.Mel >= mel) {
+                        playerData.Mel -= mel;
+                        RuneUpgradeCache[0] = RuneUpgradeCache[2];
+                        RuneUpgradeCache[1] = null;
+                        RuneUpgradeCache[2] = null;
+                        sendMessage(player, "§e[ルーン]§aを§b合成§aしました §c[-" + mel + "メル]", SoundList.LevelUp);
+                    } else {
+                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
                     }
-                    player.sendMessage("§e[ルーン]§aを§b合成§aしました");
-                    playSound(player, SoundList.LevelUp);
                 }
             } else if (index > -1) {
                 if (RuneUpgradeCache[0] == null) {
@@ -277,18 +284,23 @@ public class RuneShop {
             if (ClickInventory == inv) {
                 if (Slot == AnvilUISlot[2]) {
                     if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
-                        if (RuneUpgradeCache[2].Quality < maxQuality) {
-                            RuneUpgradeCache[0] = RuneUpgradeCache[2];
+                        int mel = runeCost(RuneUpgradeCache[2]);
+                        if (playerData.Mel >= mel) {
+                            playerData.Mel -= mel;
+                            if (RuneUpgradeCache[2].Quality < maxQuality) {
+                                RuneUpgradeCache[0] = RuneUpgradeCache[2];
+                            } else {
+                                playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
+                                RuneUpgradeCache[0] = null;
+                            }
+                            playerData.ItemInventory.removeItemParameter(RunePowder, 1);
+                            player.sendMessage("§e[ルーン]§aを§b研磨§aしました §c[-" + mel + "メル]");
+                            playSound(player, SoundList.LevelUp);
                         } else {
-                            playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
-                            RuneUpgradeCache[0] = null;
+                            sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
                         }
-                        playerData.ItemInventory.removeItemParameter(RunePowder, 1);
-                        player.sendMessage("§e[ルーン]§aを§b研磨§aしました");
-                        playSound(player, SoundList.LevelUp);
                     } else {
-                        player.sendMessage("§e[" + RunePowder.Display + "]§aが足りません");
-                        playSound(player, SoundList.Nope);
+                        sendMessage(player, "§e[" + RunePowder.Display + "]§aが足りません", SoundList.Nope);
                     }
                 } else if (RuneUpgradeCache[0] != null) {
                     playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
@@ -303,8 +315,7 @@ public class RuneShop {
                     playSound(player, SoundList.Click);
                 } else {
                     RuneUpgradeCache[0] = null;
-                    player.sendMessage("§e[品質]§aが§e[" + String.format("%.0f", maxQuality*100) + "%以上]§aです");
-                    playSound(player, SoundList.Nope);
+                    sendMessage(player, "§e[品質]§aが§e[" + String.format("%.0f", maxQuality*100) + "%以上]§aです", SoundList.Nope);
                 }
             }
             if (RuneUpgradeCache[0] != null) {

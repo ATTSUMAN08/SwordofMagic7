@@ -29,4 +29,5 @@ public class MobData {
     public List<DropRuneData> DropRuneTable = new ArrayList<>();
     public List<Double> HPStop = new ArrayList<>();
     public EnemyType enemyType = EnemyType.Normal;
+    public int Size;
 }

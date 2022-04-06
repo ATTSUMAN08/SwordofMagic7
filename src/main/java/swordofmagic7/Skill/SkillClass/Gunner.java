@@ -37,7 +37,7 @@ public class Gunner {
             ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "Aiming: " + player.getName());
+        }, skillData.Id);
     }
 
     public void Rolling(SkillData skillData) {
@@ -51,6 +51,6 @@ public class Gunner {
             playSound(player, SoundList.Heal);
             player.setVelocity(player.getLocation().getDirection().clone().setY(0.5).normalize().multiply(-1));
             skillProcess.SkillRigid(skillData);
-        }, "Rolling: " + player.getName());
+        }, "Rolling");
     }
 }

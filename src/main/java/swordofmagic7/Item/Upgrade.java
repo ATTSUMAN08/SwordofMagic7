@@ -19,7 +19,7 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.UpgradeDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class Upgrade {
 
@@ -37,17 +37,17 @@ public class Upgrade {
         player.openInventory(inv);
     }
 
-    private int UpgradeCost(ItemParameter item) {
+    public int UpgradeCost(ItemParameter item) {
         double cost = item.itemEquipmentData.UpgradeCost * (1+item.itemEquipmentData.Plus/10f);
         return (int) Math.round(cost);
     }
 
-    private int UpgradeMinCost(ItemParameter item) {
+    public int UpgradeMinCost(ItemParameter item) {
         return Math.round(UpgradeCost(item)/2f * (1/(1+playerData.LifeStatus.getLevel(LifeType.Smith)/30f)));
     }
 
-    private int UpgradeMel(ItemParameter item) {
-        return UpgradeMinCost(item)*33;
+    public int UpgradeMel(ItemParameter item) {
+        return UpgradeMinCost(item)*50;
     }
 
     public double UpgradePercent(int plus) {
@@ -59,7 +59,7 @@ public class Upgrade {
     }
 
     public final ItemParameter[] UpgradeCache = new ItemParameter[2];
-    private final ItemParameter UpgradeStone = getItemParameter("強化石");
+    public static final ItemParameter UpgradeStone = getItemParameter("強化石");
     public void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
         if (equalInv(view, UpgradeDisplay)) {
             if (view.getTopInventory() == ClickInventory) {
@@ -85,10 +85,8 @@ public class Upgrade {
                                     if (plus >= 15) {
                                         playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                                         UpgradeCache[0] = null;
-                                    } else {
-                                        player.sendMessage(itemText + suffix);
                                     }
-                                    playSound(player, SoundList.LevelUp);
+                                    sendMessage(player, itemText + suffix, SoundList.LevelUp);
                                     for (int i = 15; i < 25; i++) {
                                         if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
                                     }
@@ -104,7 +102,7 @@ public class Upgrade {
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
 
-                                if (UpgradeCache[1].itemEquipmentData.Plus >= 15) {
+                                if (UpgradeCache[1].itemEquipmentData.Plus >= 18) {
                                     TextView text = new TextView(playerData.getNick() + "§aさんが");
                                     text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
                                     text.addText(suffix);
@@ -127,7 +125,7 @@ public class Upgrade {
             } else if (index > -1) {
                 ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(index);
                 if (itemParameter.Category == ItemCategory.Equipment) {
-                    if (itemParameter.itemEquipmentData.Plus < 25) {
+                    if (itemParameter.itemEquipmentData.Plus <= 25) {
                         if (UpgradeCache[0] != null) {
                             playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                         }
@@ -148,7 +146,7 @@ public class Upgrade {
                 int minCost = UpgradeMinCost(UpgradeCache[0]);
                 Lore.add(decoLore("必要強化石") + cost + "個");
                 Lore.add(decoLore("必要メル") + UpgradeMel(UpgradeCache[0]));
-                Lore.add(decoLore("消費強化石") + minCost + "～" + cost + "個");
+                Lore.add(decoLore("消費強化石") + minCost + "～" + cost + "個 §7(" + playerData.ItemInventory.getItemParameterStack(UpgradeStone).Amount + ")");
                 Lore.add(decoLore("強化成功率") + String.format("%.0f", UpgradePercent(UpgradeCache[0].itemEquipmentData.Plus)*100) + "%");
                 ItemStack viewCost = new ItemStackData(Material.AMETHYST_SHARD, decoText("強化コスト"), Lore).view();
                 inv.setItem(AnvilUISlot[1], viewCost);

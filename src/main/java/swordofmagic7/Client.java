@@ -13,9 +13,11 @@ import java.net.Socket;
 
 import static swordofmagic7.Data.DataBase.DataBasePath;
 import static swordofmagic7.Function.Log;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class Client {
+
+    private static final int BufferSize = 1048576;
 
     public static String Host;
     public static Socket socket;

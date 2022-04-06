@@ -61,9 +61,9 @@ public class PetManager {
         if (PetManager.isPet(entity)) {
             PetParameter pet = PetManager.PetParameter(entity);
             if (pet.player == player) {
-                playerData.PetSelect = pet;
-                playerData.PetSelect.entity = entity;
-                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました", SoundList.Click);
+                playerData.setPetSelect(pet);
+                playerData.getPetSelect().entity = entity;
+                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました§b[" + pet.SummonId + "]", SoundList.Click);
             }
         } else {
             sendMessage(player, ReqPetSelect, SoundList.Nope);
@@ -81,8 +81,8 @@ public class PetManager {
 
     public void PetAISelect() {
         PlayerData playerData = playerData(player);
-        if (playerData.PetSelect != null && PetManager.isPet(playerData.PetSelect.entity)) {
-            PetParameter pet = playerData.PetSelect;
+        PetParameter pet = playerData.getPetSelect();
+        if (pet != null && PetManager.isPet(pet.entity)) {
             switch (pet.AIState) {
                 case Follow -> {
                     pet.AIState = PetAIState.Attack;
@@ -96,7 +96,7 @@ public class PetManager {
                     pet.target = null;
                 }
             }
-            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました", SoundList.Click);
+            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.SummonId + "]", SoundList.Click);
         } else {
             sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
         }
@@ -104,8 +104,9 @@ public class PetManager {
 
     public void PetAITarget() {
         PlayerData playerData = playerData(player);
-        if (playerData.PetSelect != null) {
-            if (playerData.PetSelect.AIState == PetAIState.Attack) {
+        PetParameter pet = playerData.getPetSelect();
+        if (pet != null) {
+            if (pet.AIState == PetAIState.Attack) {
                 Ray ray = RayTrace.rayLocationEntity(player.getEyeLocation(), 24, 1, playerData.Skill.SkillProcess.Predicate());
                 if (ray.isHitEntity()) {
                     String Display = null;
@@ -116,16 +117,15 @@ public class PetManager {
                     } else if (PetManager.isPet(ray.HitEntity)) {
                         Display = PetManager.PetParameter(ray.HitEntity).petData.Display;
                     } else {
-                        player.sendMessage("§c[攻撃対象]§aを選択してください");
-                        playSound(player, SoundList.Nope);
+                        sendMessage(player, ReqAttackTarget, SoundList.Nope);
                     }
                     if (Display != null) {
-                        playerData.PetSelect.target = ray.HitEntity;
-                        player.sendMessage("§c[" + Display + "]§aを§c[攻撃対象]§aにしました");
+                        pet.target = ray.HitEntity;
+                        player.sendMessage("§c[" + Display + "]§aを§c[攻撃対象]§aにしました§b[" + pet.SummonId + "]");
                         playSound(player, SoundList.Click);
                     }
                 } else {
-                    sendMessage(player, "§c[攻撃対象]§aを選択してください", SoundList.Nope);
+                    sendMessage(player, ReqAttackTarget, SoundList.Nope);
                 }
             }
         } else {

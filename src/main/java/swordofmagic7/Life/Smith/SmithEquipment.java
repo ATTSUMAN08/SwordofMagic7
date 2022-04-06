@@ -10,6 +10,7 @@ import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.Upgrade;
 import swordofmagic7.Sound.SoundList;
 
 import static swordofmagic7.Data.DataBase.*;
@@ -58,6 +59,15 @@ public class SmithEquipment {
                 } else if (Slot == AnvilUISlot[2] && MaterializationCache[0] != null && MaterializationCache[1] != null) {
                     playerData.ItemInventory.addItemParameter(MaterializationCache[1], MaterializationCache[0].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1);
                     Function.sendMessage(player, "§e[" + MaterializationCache[0].Display + "]§aを素材化しました", SoundList.LevelUp);
+                    if (MaterializationCache[0].Category.isEquipment()) {
+                        int plus = MaterializationCache[0].itemEquipmentData.Plus;
+                        if (plus >= 10) {
+                            int upgradeCost = MaterializationCache[0].itemEquipmentData.UpgradeCost;
+                            int returnCost = Math.round(upgradeCost/2f * plus);
+                            if (returnCost > 0) playerData.ItemInventory.addItemParameter(Upgrade.UpgradeStone, returnCost);
+                            ItemGetLog(player, Upgrade.UpgradeStone, returnCost);
+                        }
+                    }
                     MaterializationCache[0] = null;
                     MaterializationCache[1] = null;
                 }

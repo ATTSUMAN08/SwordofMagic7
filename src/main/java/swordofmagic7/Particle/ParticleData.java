@@ -1,6 +1,7 @@
 package swordofmagic7.Particle;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
@@ -52,6 +53,21 @@ public class ParticleData implements Cloneable {
         this.particle = particle;
         this.speed = speed;
         this.vector = vector;
+    }
+
+    public ParticleData setRandomOffset() {
+        randomOffset = true;
+        return this;
+    }
+
+    public ParticleData setRandomOffset(float multiply) {
+        randomOffset = true;
+        randomOffsetMultiply = multiply;
+        return this;
+    }
+
+    public void spawn(Location location) {
+        ParticleManager.spawnParticle(this, location);
     }
 
     @Override

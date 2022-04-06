@@ -21,7 +21,7 @@ import java.util.Set;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class Griffia {
     private final EnemySkillManager Manager;

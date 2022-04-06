@@ -634,6 +634,7 @@ public class DataLoader {
                 mobData.Reach = data.getDouble("Reach", 1.5);
                 mobData.Search = data.getDouble("Search", 32);
                 mobData.Hostile = data.getBoolean("Hostile", false);
+                mobData.Size = data.getInt("Size", 0);
                 if (data.isSet("EnemyType")) mobData.enemyType = EnemyType.valueOf(data.getString("EnemyType"));
                 if (data.isSet("Skill")) {
                     List<MobSkillData> SkillList = new ArrayList<>();

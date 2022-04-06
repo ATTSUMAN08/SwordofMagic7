@@ -10,7 +10,7 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.VectorDown;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class MobSpawnerData {
     public MobData mobData;

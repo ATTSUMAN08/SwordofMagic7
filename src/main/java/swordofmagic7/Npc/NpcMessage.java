@@ -26,6 +26,6 @@ public class NpcMessage {
                 player.sendMessage("§aNPCの話を聞いています");
                 playSound(player, SoundList.Nope);
             }
-        }, "ShowMessage: " + player.getName());
+        }, "ShowMessage");
     }
 }

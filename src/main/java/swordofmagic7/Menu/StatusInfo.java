@@ -9,6 +9,7 @@ import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.DamageCause;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemStackData;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
-import static swordofmagic7.Data.DataBase.getClassList;
+import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.StatusInfoDisplay;
@@ -52,7 +53,7 @@ public class StatusInfo {
                 statusLore.add(decoLore("所持メル") + playerData.Mel + "メル");
                 statusLore.add(decoLore("所持称号数") + playerData.titleManager.TitleList.size() + "個");
                 statusLore.add(decoLore("レベル") + playerData.Level + "/" + PlayerData.MaxLevel);
-                statusLore.add(decoLore("経験値") + playerData.viewExpPercent());
+                statusLore.add(decoLore("経験値") + playerData.viewExpPercent() + "%");
                 statusLore.add(decoLore("戦闘力") + String.format(format, playerData.Status.getCombatPower()));
                 statusLore.add(decoText("§3§l基本ステータス"));
                 statusLore.add(decoLore(StatusParameter.MaxHealth.Display) + String.format(format, status.Health) + "/" + String.format(format, status.MaxHealth) + " (" + String.format(format, status.BaseStatus(StatusParameter.MaxHealth)) + ")");
@@ -66,6 +67,7 @@ public class StatusInfo {
                 statusLore.add(StatusParameter.EVA.DecoDisplay + String.format(format, status.EVA) + " (" + String.format(format, status.BaseStatus(StatusParameter.EVA)) + ")");
                 statusLore.add(StatusParameter.CriticalRate.DecoDisplay + String.format(format, status.CriticalRate) + " (" + String.format(format, status.BaseStatus(StatusParameter.CriticalRate)) + ")");
                 statusLore.add(StatusParameter.CriticalResist.DecoDisplay + String.format(format, status.CriticalResist) + " (" + String.format(format, status.BaseStatus(StatusParameter.CriticalResist)) + ")");
+                statusLore.add(decoLore("移動速度") + String.format(format, status.Movement*100));
                 statusLore.add(decoText("§3§l倍率系ステータス"));
                 statusLore.add(StatusParameter.SkillCastTime.DecoDisplay + String.format(format, status.SkillCastTime*100) + " (" + String.format(format, 100/status.SkillCastTime) + "%)");
                 statusLore.add(StatusParameter.SkillRigidTime.DecoDisplay + String.format(format, status.SkillRigidTime*100) + " (" + String.format(format, 100/status.SkillRigidTime) + "%)");
@@ -87,8 +89,9 @@ public class StatusInfo {
                     }
                 }
                 classLore.add(decoText("§e§lクラス情報"));
-                for (ClassData classData : getClassList().values()) {
-                    classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + Classes.MaxLevel + " §a§l" + playerData.Classes.viewExpPercent(classData));
+                for (String str : DataBase.ClassDataMap.values()) {
+                    ClassData classData = getClassData(str);
+                    if (classData != null) classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + Classes.MaxLevel + " §a§l" + playerData.Classes.viewExpPercent(classData));
                 }
                 List<String> lifeLore = new ArrayList<>();
                 for (LifeType type : LifeType.values()) {
@@ -118,6 +121,6 @@ public class StatusInfo {
                 MultiThread.TaskRunSynchronized(() -> Viewer.getOpenInventory().getTopInventory().setContents(inv.getStorageContents()));
                 MultiThread.sleepTick(20);
             }
-        }, "StatusInfoView" + player.getName());
+        }, "StatusInfoView");
     }
 }

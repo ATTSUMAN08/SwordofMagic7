@@ -18,6 +18,7 @@ import swordofmagic7.Life.Mine.MineData;
 import swordofmagic7.Life.Mine.MineItemData;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.ItemGetLog;
 import static swordofmagic7.Function.isAlive;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.plugin;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.SomCore.random;
 
 public class Gathering {
     private final Player player;
@@ -269,9 +270,10 @@ public class Gathering {
                         double timePerSecond = requestFishingCommand.length / (time * 0.01);
                         if (FishingUseCombo) FishingComboBoost++;
                         player.sendMessage("§e[" + hitData.itemParameter.Display + "§ax" + amount + "§e]§aを釣りあげました！ §b[" + combo + "Combo] §e[" + String.format("%.2f", time * 0.01) + "秒] §c[" + String.format("%.2f", timePerSecond) + "/秒] §7[" + FishingMissCount + "Miss] §b[+" + (int) ((multiply - 1) * 100) + "%]");
+                        SomCore.PlayerLastLocation.remove(player);
                         MultiThread.TaskRunLater(() -> {
                             if (!hook.isDead()) FishingHit(hook);
-                        }, 60, "FishingHookHit: " + player.getName());
+                        }, 60, "FishingHookHit");
                         playSound(player, SoundList.LevelUp);
 
                         if (playerData.statistics.MaxFishingCombo < FishingComboBoost) {
@@ -312,7 +314,7 @@ public class Gathering {
                     playSound(player, SoundList.Tick);
                     MultiThread.TaskRunSynchronized(hook::remove);
                 }
-            }, "Fishing: " + player.getName());
+            }, "Fishing");
         }
     }
 

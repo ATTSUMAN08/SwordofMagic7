@@ -55,7 +55,18 @@ public class HotBarData implements Cloneable {
         String format = playerData.ViewFormat();
         switch (category) {
             case Skill -> {
+                if (!SkillDataList.containsKey(Icon)) {
+                    playerData.HotBar.setHotBar(slot, new HotBarData());
+                    item = FlameItem(slot).clone();
+                    amount = slot;
+                    break;
+                }
                 SkillData skillData = getSkillData(Icon);
+                if (Icon.equals("BackMasking")) {
+                    if (playerData.Skill.chronomancer.BackMaskingLocation != null) {
+                        glow = true;
+                    }
+                }
                 item = skillData.view(playerData).clone();
                 if (playerData.Skill.SkillStack(skillData) > 0) {
                     amount = playerData.Skill.SkillStack(skillData);

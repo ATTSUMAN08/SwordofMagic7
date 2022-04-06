@@ -57,7 +57,7 @@ public class Peltast {
                 Function.Push(entity, vector);
             }
             skillProcess.SkillRigid(skillData);
-        }, "ShieldBash: " + player.getName());
+        }, "ShieldBash");
     }
 
     public void HighGuard(SkillData skillData) {
@@ -71,7 +71,7 @@ public class Peltast {
             ParticleManager.CylinderParticle(new ParticleData(Particle.SMOKE_NORMAL), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "HighGuard: " + player.getName());
+        }, "HighGuard");
     }
 
     public void SwashBaring(SkillData skillData) {
@@ -81,9 +81,10 @@ public class Peltast {
             MultiThread.sleepMillis(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.SwashBaring, (int) skillData.Parameter.get(0).Value*20);
+            playerData.EffectManager.addEffect(EffectType.HatePriority, 200);
             ParticleManager.CylinderParticle(new ParticleData(Particle.REDSTONE), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "SwashBaring: " + player.getName());
+        }, "SwashBaring");
     }
 }

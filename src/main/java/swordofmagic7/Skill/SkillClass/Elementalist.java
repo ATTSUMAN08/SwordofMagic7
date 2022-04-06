@@ -15,7 +15,6 @@ import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
-import swordofmagic7.Skill.MagicCircleData;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
@@ -30,9 +29,9 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
+import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.RodAttack;
-import static swordofmagic7.System.random;
 
 public class Elementalist {
     private final SkillProcess skillProcess;
@@ -57,7 +56,7 @@ public class Elementalist {
             ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT_MAGIC), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "ElementalBurst: " + player.getName());
+        }, "ElementalBurst");
     }
 
     public void Heil(SkillData skillData) {
@@ -82,7 +81,7 @@ public class Elementalist {
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
             int time = (int) Math.round(skillData.ParameterValue(1)*20);
             double freezePercent = skillData.ParameterValue(3)/100;
-            new MagicCircleData(origin, MultiThread.TaskRun(() -> {
+            MultiThread.TaskRun(() -> {
                 int i = 0;
                 while (i < time) {
                     ParticleManager.CircleParticle(particleData, origin.clone().add(0, 6, 0), radius / 2, 10);
@@ -96,12 +95,12 @@ public class Elementalist {
                             }
                             MultiThread.sleepTick(2);
                         }
-                    }, "MagicCircleDataHeilTick: " + player.getName());
+                    }, "MagicCircleDataHeilTick");
                     i += hitRate;
                     MultiThread.sleepTick(hitRate);
                 }
-            }, "MagicCircleDataHeil: " + player.getName()), skillData);
-        }, "Heil: " + player.getName());
+            }, "MagicCircleDataHeil");
+        }, "Heil");
     }
 
     public void FireClaw(SkillData skillData) {
@@ -139,7 +138,7 @@ public class Elementalist {
             }
             playSound(player, SoundList.Fire, 6, 1);
             skillProcess.SkillRigid(skillData);
-        }, "FireClaw: " + player.getName());
+        }, "FireClaw");
     }
 
     public void Electrocute(SkillData skillData) {
@@ -173,7 +172,7 @@ public class Elementalist {
                 playSound(player, RodAttack);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Electrocute: " + player.getName());
+        }, "Electrocute");
     }
 
     public void StormDust(SkillData skillData) {
@@ -196,7 +195,7 @@ public class Elementalist {
 
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
             final int time = (int) Math.round(skillData.ParameterValue(1)*20);
-            new MagicCircleData(origin, MultiThread.TaskRun(() -> {
+            MultiThread.TaskRun(() -> {
                 int i = 0;
                 while (i < time) {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 10);
@@ -205,8 +204,8 @@ public class Elementalist {
                     i += hitRate;
                     MultiThread.sleepTick(hitRate);
                 }
-            }, "MagicCircleStormDust: " + player.getName()), skillData);
+            }, "MagicCircleStormDust");
             skillProcess.SkillRigid(skillData);
-        }, "StormDust: " + player.getName());
+        }, "StormDust");
     }
 }

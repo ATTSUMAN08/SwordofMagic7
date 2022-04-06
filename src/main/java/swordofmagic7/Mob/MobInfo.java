@@ -38,7 +38,7 @@ public class MobInfo {
         Inventory inv = decoInv(MobInfoDisplay, 6);
         player.openInventory(inv);
         playSound(player, SoundList.MenuOpen);
-        MultiThread.TaskRunSynchronizedLater(() -> MobInfoView(0), 1, "MobInfoView: " + player.getName());
+        MultiThread.TaskRunSynchronizedLater(() -> MobInfoView(0), 1, "MobInfoView");
     }
 
     public void MobInfoView(int scroll) {

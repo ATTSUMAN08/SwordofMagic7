@@ -36,7 +36,7 @@ public class CustomSound {
                 playSound(player, player.getLocation(), sound);
                 MultiThread.sleepTick(wait);
             }
-        }, "playSound: " + player.getName());
+        }, "playSound");
     }
 
     public static void playSound(Location location, SoundList sound, int count, int wait) {
@@ -45,6 +45,6 @@ public class CustomSound {
                 playSound(location, sound);
                 MultiThread.sleepTick(wait);
             }
-        }, "playSound: " + location.getWorld().getName());
+        }, "playSound");
     }
 }

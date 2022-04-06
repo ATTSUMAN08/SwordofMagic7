@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class HotBar {
@@ -32,6 +34,10 @@ public class HotBar {
 
     public void use(int index) {
         if (playerData.Skill.isCastReady()) {
+            if (playerData.EffectManager.hasEffect(EffectType.Confusion) && random.nextDouble() < 0.5) {
+                index = random.nextInt(8);
+                sendMessage(player, "§c[" + EffectType.Confusion.Display + "]§aの§e効果§aにより§b使用スロット§aが§b[" + (index+1) + "]§aに変更されました");
+            }
             switch (HotBarData[index].category) {
                 case Skill -> {
                     if (playerData.Skill.isCastReady()) {

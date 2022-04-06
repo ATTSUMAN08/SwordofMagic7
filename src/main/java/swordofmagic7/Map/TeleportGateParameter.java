@@ -9,10 +9,12 @@ import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 
-import static swordofmagic7.Function.VectorUp;
-import static swordofmagic7.Function.decoText;
+import java.util.ArrayList;
+import java.util.List;
+
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.plugin;
 
 public class TeleportGateParameter {
     public String Id;
@@ -23,9 +25,14 @@ public class TeleportGateParameter {
     public Location Location;
     public boolean DefaultActive;
     public MapData Map;
+    public int Mel = 0;
 
     public ItemStack view() {
-        return new ItemStackData(Icon, decoText(Display)).view();
+        List<String> lore = new ArrayList<>();
+        lore.add(decoLore("転移費") + Mel + "メル");
+        lore.add(decoLore("転移先レベル") + Map.Level);
+        lore.add(decoLore("転移先マップ") + Map.Display);
+        return new ItemStackData(Icon, decoText(Display), lore).view();
     }
 
     private World world;
@@ -47,6 +54,6 @@ public class TeleportGateParameter {
                 spawnParticle(particleData, nLoc2);
                 MultiThread.sleepMillis(25);
             }
-        },"TeleportGate:" + Id);
+        }, "TeleportGate");
     }
 }

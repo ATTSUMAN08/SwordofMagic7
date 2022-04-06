@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import static swordofmagic7.PlayerList.getNearLivingEntity;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class EnemySkillManager {
     public final EnemyData enemyData;
@@ -34,28 +34,21 @@ public class EnemySkillManager {
     }
 
     void tickSkillTrigger() {
-        for (MobSkillData skill : enemyData.mobData.SkillList) {
-            if (skill.maxHealth >= enemyData.Health / enemyData.MaxHealth) {
-                if (enemyData.Health / enemyData.MaxHealth >= skill.minHealth) {
-                    if (skill.Available == -1 || Available.getOrDefault(skill.Skill, 0) < skill.Available) {
-                        if (!CoolTime.containsKey(skill.Skill) && random.nextDouble() < skill.Percent) {
-                            if (SkillReady) {
-                                mobSkillCast(skill);
+        MultiThread.TaskRun(() -> {
+            for (MobSkillData skill : enemyData.mobData.SkillList) {
+                if (skill.maxHealth >= enemyData.Health / enemyData.MaxHealth) {
+                    if (enemyData.Health / enemyData.MaxHealth >= skill.minHealth) {
+                        if (skill.Available == -1 || Available.getOrDefault(skill.Skill, 0) < skill.Available) {
+                            if (!CoolTime.containsKey(skill.Skill) && random.nextDouble() < skill.Percent) {
+                                if (SkillReady) {
+                                    mobSkillCast(skill);
+                                }
                             }
-                        /*
-                        if (skill.Interrupt && !SkillReady) {
-                            setCancel = true;
-                            mobSkillCast(skill);
-                        } else if (SkillReady) {
-                            mobSkillCast(skill);
-                        }
-                         */
                         }
                     }
-                }
+                } else break;
             }
-            else break;
-        }
+        }, "tickSkillTrigger");
     }
 
     Symmore symmore = new Symmore(this);
@@ -107,7 +100,7 @@ public class EnemySkillManager {
             } else {
                 CoolTime.put(mobSkillData.Skill, mobSkillData.CoolTime);
             }
-        }, "MobSkillCoolTime: " + enemyData.mobData.Display);
+        }, "MobSkillCoolTime");
     }
 
     public int getCoolTime(String key) {
@@ -148,7 +141,7 @@ public class EnemySkillManager {
                 }
                 MultiThread.sleepTick(10);
                 CastSkill(false);
-            }, "PullUpper: " + enemyData.mobData.Display);
+            }, "PullUpper");
         }
     }
 }

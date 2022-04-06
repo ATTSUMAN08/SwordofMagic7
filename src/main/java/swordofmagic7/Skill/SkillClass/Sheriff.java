@@ -54,7 +54,7 @@ public class Sheriff {
             ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "HeadShot: " + player.getName());
+        }, "HeadShot");
     }
 
     public void Redemption(SkillData skillData) {
@@ -74,7 +74,7 @@ public class Sheriff {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Redemption: " + player.getName());
+        }, "Redemption");
     }
 
     public void Fanning(SkillData skillData) {
@@ -102,7 +102,7 @@ public class Sheriff {
                 MultiThread.sleepTick(hitRate);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Fanning: " + player.getName());
+        }, "Fanning");
     }
 
     public void PeaceMaker(SkillData skillData) {
@@ -128,6 +128,6 @@ public class Sheriff {
             }
             playSound(player, GunAttack);
             skillProcess.SkillRigid(skillData);
-        }, "PeaceMaker: " + player.getName());
+        }, "PeaceMaker");
     }
 }

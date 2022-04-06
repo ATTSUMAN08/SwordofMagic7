@@ -50,7 +50,7 @@ public class Alchemist {
             Inventory inv = decoInv(AlchemyShopDisplay, 6);
             player.openInventory(inv);
             playSound(player, SoundList.MenuOpen);
-            MultiThread.TaskRunSynchronizedLater(() -> AlchemyView(0), 1, "AlchemyView: " + player.getName());
+            MultiThread.TaskRunSynchronizedLater(() -> AlchemyView(0), 1, "AlchemyView");
         });
     }
 

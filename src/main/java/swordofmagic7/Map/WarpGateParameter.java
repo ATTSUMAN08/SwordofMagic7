@@ -18,8 +18,8 @@ import swordofmagic7.Sound.SoundList;
 import static swordofmagic7.Data.DataBase.WarpGateList;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.createHologram;
-import static swordofmagic7.System.plugin;
+import static swordofmagic7.SomCore.createHologram;
+import static swordofmagic7.SomCore.plugin;
 
 public class WarpGateParameter {
     public String Id;
@@ -45,7 +45,7 @@ public class WarpGateParameter {
         MultiThread.TaskRun(() -> {
             MultiThread.sleepTick(1);
             playSound(player, SoundList.Warp);
-        }, "WarpGateTeleport: " + player.getName());
+        }, "WarpGateTeleport");
     }
 
     public void Active() {
@@ -89,6 +89,6 @@ public class WarpGateParameter {
                 i++;
                 MultiThread.sleepMillis(10);
             }
-        }, "WarpGate: " + Id);
+        }, "WarpGate");
     }
 }

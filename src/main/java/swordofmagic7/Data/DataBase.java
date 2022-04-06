@@ -234,6 +234,7 @@ public final class DataBase {
                         teleport.Location = loc;
                         teleport.DefaultActive = data.getBoolean("DefaultActive");
                         teleport.Map = getMapData(data.getString("Map"));
+                        teleport.Mel = data.getInt("Mel", 0);
                         TeleportGateList.put(fileName, teleport);
                         teleport.start();
                     } else {

@@ -68,9 +68,9 @@ import static swordofmagic7.Classes.Classes.MaxSlot;
 import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.SomCore.createHologram;
+import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.createHologram;
-import static swordofmagic7.System.plugin;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
@@ -139,7 +139,7 @@ public class PlayerData {
     public List<String> ActiveTeleportGate = new ArrayList<>();
     public HashMap<ItemPotionType, Integer> PotionCoolTime = new HashMap<>();
     public int useCookCoolTime = 0;
-    public PetParameter PetSelect;
+    private PetParameter PetSelect;
     public boolean isDead = false;
     public boolean RevivalReady = false;
     public boolean FishingDisplayNum = false;
@@ -153,6 +153,7 @@ public class PlayerData {
     public boolean NaturalMessage = true;
     public Location logoutLocation = null;
     public double RuneQualityFilter = 0d;
+    public double HealthRegenDelay = 0d;
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -202,7 +203,7 @@ public class PlayerData {
                 PotionCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
                 MultiThread.sleepTick(20);
             }
-        }, "CoolTimeTask: " + player.getName());
+        }, "CoolTimeTask");
     }
 
     public Hologram hologram;
@@ -242,7 +243,7 @@ public class PlayerData {
                     }
                     MultiThread.sleepTick(1);
                 }
-            }, "PlayerHolo: " + player.getName());
+            }, "PlayerHolo");
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -255,7 +256,7 @@ public class PlayerData {
                     }
                 }
             }.runTaskTimer(plugin, 0, 1);
-        }, "HologramInitialize: " + player.getName());
+        }, "HologramInitialize");
     }
 
     public void InitializeBossBar() {
@@ -274,7 +275,7 @@ public class PlayerData {
                 MultiThread.sleepTick(10);
             }
             bossBar.removeAll();
-        }, "PlayerBossBar: " + player.getName());
+        }, "PlayerBossBar");
     }
 
     public Location playerHoloLocation() {
@@ -510,15 +511,31 @@ public class PlayerData {
             return;
         }
 
-        if (Menu.SmithEquipment.MaterializationCache[0] != null) ItemInventory.addItemParameter(Menu.SmithEquipment.MaterializationCache[0], 1);
-        if (Upgrade.UpgradeCache[0] != null) ItemInventory.addItemParameter(Upgrade.UpgradeCache[0], 1);
-        if (RuneShop.RuneCache != null) ItemInventory.addItemParameter(RuneShop.RuneCache, 1);
-        if (RuneShop.RuneUpgradeCache[0] != null) RuneInventory.addRuneParameter(RuneShop.RuneUpgradeCache[0]);
-        if (RuneShop.RuneUpgradeCache[1] != null) RuneInventory.addRuneParameter(RuneShop.RuneUpgradeCache[1]);
-        if (PetShop.PetSyntheticCache[0] != null) PetInventory.addPetParameter(PetShop.PetSyntheticCache[0]);
-        if (PetShop.PetSyntheticCache[1] != null) PetInventory.addPetParameter(PetShop.PetSyntheticCache[1]);
+        if (Menu.SmithEquipment.MaterializationCache[0] != null) {
+            ItemInventory.addItemParameter(Menu.SmithEquipment.MaterializationCache[0], 1);
+            Menu.SmithEquipment.MaterializationCache[0] = null;
+        }
+        if (Upgrade.UpgradeCache[0] != null) {
+            ItemInventory.addItemParameter(Upgrade.UpgradeCache[0], 1);
+            Upgrade.UpgradeCache[0] = null;
+        }
+        if (RuneShop.RuneCache != null) {
+            ItemInventory.addItemParameter(RuneShop.RuneCache, 1);
+            RuneShop.RuneCache = null;
+        }
+        for (int i = 0; i < 1; i++) {
+            if (RuneShop.RuneUpgradeCache[i] != null) {
+                RuneInventory.addRuneParameter(RuneShop.RuneUpgradeCache[i]);
+                RuneShop.RuneUpgradeCache[i] = null;
+            }
+            if (PetShop.PetSyntheticCache[i] != null) {
+                PetInventory.addPetParameter(PetShop.PetSyntheticCache[i]);
+                PetShop.PetSyntheticCache[i] = null;
+            }
+        }
 
-        Location lastLocation = logoutLocation != null ? logoutLocation : player.getLocation();
+        Location lastLocation = logoutLocation != null ? logoutLocation : player.getLocation().clone();
+        lastLocation.add(0, 0.5, 0);
         data.set("Location.x", lastLocation.getX());
         data.set("Location.y", lastLocation.getY());
         data.set("Location.z", lastLocation.getZ());
@@ -790,7 +807,7 @@ public class PlayerData {
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
                 Tutorial.tutorialTrigger(player, 0);
-            }, 10, "TutorialTrigger: " + player.getName());
+            }, 10, "TutorialTrigger");
         }
         Status.StatusUpdate();
         ViewBar.tickUpdate();
@@ -900,7 +917,7 @@ public class PlayerData {
                 RightClickHold = false;
                 if (CastMode.isRenewed()) HotBar.UpdateHotBar();
             }
-        }, 5);
+        }, 10);
     }
 
     public boolean isRightClickHold() {
@@ -923,7 +940,31 @@ public class PlayerData {
                 DPS -= dps/4;
                 MultiThread.sleepTick(5);
             }
-        }, "DPS: " + player.getName());
+        }, "DPS");
+    }
+
+    public void setPetSelect(PetParameter pet) {
+        PetSelect = pet;
+    }
+
+    public PetParameter getPetSelect() {
+        if (PetSelect != null) {
+            if (PetSelect.entity == null) {
+                PetSelect = null;
+            }
+            return PetSelect;
+        }
+        return null;
+    }
+
+    public PetParameter getPetSelectCheckTarget() {
+        if (getPetSelect() == null) {
+            return null;
+        } else if (PetSelect.target == null) {
+            return null;
+        } else {
+            return PetSelect;
+        }
     }
 
     private BukkitTask TargetEntityTask;
@@ -932,7 +973,7 @@ public class PlayerData {
         if (TargetEntityTask != null) TargetEntityTask.cancel();
         TargetEntityTask = MultiThread.TaskRunLater(() -> {
             targetEntity = null;
-        }, 100, "TargetEntityTask: " + player.getName());
+        }, 100, "TargetEntityTask");
     }
 
     public void revival() {
@@ -946,6 +987,7 @@ public class PlayerData {
         final Location LastDeadLocation = player.getLocation();
         MultiThread.TaskRunSynchronized(() -> {
             if (!isDead) {
+                statistics.DownCount++;
                 logoutLocation = player.getWorld().getSpawnLocation();
                 isDead = true;
                 player.setGameMode(GameMode.SPECTATOR);
@@ -971,6 +1013,7 @@ public class PlayerData {
                             player.resetTitle();
                             Map = getMapData("Alden");
                             hologram.delete();
+                            statistics.DownCount++;
                         } else if (RevivalReady) {
                             this.cancel();
                             logoutLocation = null;
@@ -981,6 +1024,7 @@ public class PlayerData {
                             Status.Health = Status.MaxHealth / 2;
                             player.resetTitle();
                             hologram.delete();
+                            statistics.RevivalCount++;
                         } else {
                             LastDeadLocation.setPitch(player.getLocation().getPitch());
                             LastDeadLocation.setYaw(player.getLocation().getYaw());
@@ -990,6 +1034,6 @@ public class PlayerData {
                     }
                 }.runTaskTimer(plugin, 0, 15);
             }
-        }, "PlayerDead: " + player.getName());
+        }, "PlayerDead");
     }
 }

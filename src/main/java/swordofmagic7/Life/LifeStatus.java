@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import static swordofmagic7.Function.BroadCast;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class LifeStatus {
     public final static int MaxLifeLevel = 30;

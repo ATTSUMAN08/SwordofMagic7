@@ -22,7 +22,8 @@ import swordofmagic7.Pet.PetParameter;
 import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.System.*;
+import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.SomCore.*;
 
 public final class Damage {
 
@@ -32,6 +33,10 @@ public final class Damage {
     public static void makeHeal(Player healer, Player victim, double healMultiply) {
         PlayerData healerData = playerData(healer);
         PlayerData victimData = playerData(victim);
+        if (victimData.EffectManager.hasEffect(EffectType.RecoveryInhibition)) {
+            sendMessage(victimData.player, "§c[回復阻害]§aにより§e回復効果§aが§c無効化§aされました");
+            return;
+        }
         double heal = healerData.Status.HLP * healMultiply;
         if (playerData(victim).PvPMode) heal /= PvPDecay;
         victimData.changeHealth(heal);
@@ -66,7 +71,7 @@ public final class Damage {
                 makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, 0, invariably);
                 MultiThread.sleepTick(wait);
             }
-        }, "MakeDamage: " + attacker.getName());
+        }, "MakeDamage");
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
@@ -214,7 +219,13 @@ public final class Damage {
 
         boolean victimDead = false;
         if (victim instanceof Player player) {
+            if (victimEffectManager.hasEffect(EffectType.CrossGuard)) {
+                int time = victimEffectManager.getData(EffectType.CrossGuard).getInt(0);
+                victimEffectManager.addEffect(EffectType.CrossGuardCounter, time);
+                victimEffectManager.removeEffect(EffectType.CrossGuard);
+            }
             PlayerData playerData = playerData(player);
+            playerData.HealthRegenDelay = 40;
             if (playerData.Status.Health - damage > 0) {
                 playerData.Status.Health -= damage;
             } else if (playerData.EffectManager.hasEffect(EffectType.Revive)) {
@@ -261,7 +272,8 @@ public final class Damage {
             } else {
                 enemyData.Health -= damage;
             }
-            enemyData.addPriority(attacker, damage);
+            double priority = attackerEffectManager.hasEffect(EffectType.HatePriority) ? damage*2 : damage;
+            enemyData.addPriority(attacker, priority);
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);
             } else {

@@ -12,7 +12,7 @@ import static swordofmagic7.Data.DataBase.RewardBoxList;
 import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.System.random;
+import static swordofmagic7.SomCore.random;
 
 public class ItemUse {
 
