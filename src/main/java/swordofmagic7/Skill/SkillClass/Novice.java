@@ -47,7 +47,7 @@ public class Novice {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.FanShapedParticle(particleCasting, player.getLocation(), radius, angle, 3);
                 MultiThread.sleepMillis(millis);
             }
@@ -64,7 +64,7 @@ public class Novice {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.RectangleParticle(particleCasting, player.getLocation(), length, width, 3);
                 MultiThread.sleepMillis(millis);
             }
@@ -83,7 +83,7 @@ public class Novice {
             loc.setPitch(90);
             final Location origin = RayTrace.rayLocationBlock(loc, 32, false).HitPosition;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);
             }
@@ -119,7 +119,7 @@ public class Novice {
             skill.setCastReady(false);
             Location origin = null;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 origin = player.getLocation().clone().add(player.getLocation().getDirection().setY(0).normalize().multiply(radius));
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);

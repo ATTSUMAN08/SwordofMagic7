@@ -87,18 +87,16 @@ public class Sheriff {
             double angle = 120;
             ParticleData particleData = new ParticleData(Particle.CRIT);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.FanShapedParticle(particleCasting, player.getLocation(), radius, angle, 3);
                 MultiThread.sleepMillis(millis);
             }
 
-            int i = 0;
-            while (i < time) {
+            for (int i = 0; i < time/hitRate; i++) {
                 Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
                 Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, count, 1);
                 ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);
                 playSound(player, GunAttack, 5, 1);
-                i += hitRate;
                 MultiThread.sleepTick(hitRate);
             }
             skillProcess.SkillRigid(skillData);

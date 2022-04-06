@@ -54,7 +54,7 @@ public class Chronomancer {
             int time = skillData.ParameterValueInt(0) * 20;
             Location origin = player.getLocation().clone().add(player.getLocation().getDirection().multiply(radius));
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);
             }
@@ -129,7 +129,7 @@ public class Chronomancer {
             int time = skillData.ParameterValueInt(0)*20;
             Location origin = RayTrace.rayLocationBlock(player.getEyeLocation(), 20, true).HitPosition;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);
             }
@@ -187,7 +187,7 @@ public class Chronomancer {
             skill.setCastReady(false);
             if (BackMaskingHealth > 0) {
                 ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, Function.VectorUp);
-                while (skill.SkillCastProgress < 1) {
+                for (int i = 0; i < skillData.CastTime; i++) {
                     ParticleManager.CircleParticle(particleData, player.getLocation().clone().add(0, skill.SkillCastProgress*2, 0), 1, 10);
                     MultiThread.sleepMillis(millis);
                 }

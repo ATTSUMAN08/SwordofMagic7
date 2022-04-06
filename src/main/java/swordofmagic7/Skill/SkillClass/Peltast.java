@@ -42,7 +42,7 @@ public class Peltast {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.RectangleParticle(particleCasting, player.getLocation(), length, width, 3);
                 MultiThread.sleepMillis(millis);
             }

@@ -66,6 +66,6 @@ public class MobSpawnerData {
                     loc.add(VectorDown);
                 }
             }
-        });
+        }, "EnemySpawn");
     }
 }

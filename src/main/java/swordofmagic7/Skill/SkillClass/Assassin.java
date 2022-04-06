@@ -85,7 +85,7 @@ public class Assassin {
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.5f;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 10);
                 MultiThread.sleepMillis(millis);
             }

@@ -256,7 +256,7 @@ public class Skill {
                                         }
                                         MultiThread.TaskRun(() -> {
                                             if (skillData.CastTime > 0) {
-                                                while (SkillCastProgress < 1) {
+                                                for (int i = 0; i < skillData.CastTime; i++) {
                                                     SkillCastProgress = (float) SkillProcess.SkillCastTime / skillData.CastTime;
                                                     player.sendTitle(" ", "§e" + String.format("%.0f", SkillCastProgress * 100) + "%", 0, 10, 0);
                                                     SkillProcess.SkillCastTime++;

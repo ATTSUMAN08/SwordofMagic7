@@ -49,7 +49,7 @@ public class Highlander {
             int time = skillData.ParameterValueInt(2)*20;
             ParticleData particleData = new ParticleData(Particle.CRIT).setRandomOffset(1.5f);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -71,7 +71,7 @@ public class Highlander {
             double angle = 70;
             ParticleData particleData = new ParticleData(Particle.SWEEP_ATTACK);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.FanShapedParticle(particleCasting, player.getLocation(), radius, angle, 3);
                 MultiThread.sleepMillis(millis);
             }
@@ -108,7 +108,7 @@ public class Highlander {
             double length = 6;
             double width = 1;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.RectangleParticle(particleCasting, player.getLocation(), length, width, 3);
                 MultiThread.sleepMillis(millis);
             }

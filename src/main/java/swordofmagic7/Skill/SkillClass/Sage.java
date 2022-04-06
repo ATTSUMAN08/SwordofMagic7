@@ -50,7 +50,7 @@ public class Sage {
             double radius = skillData.ParameterValue(1);
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, Function.VectorUp);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -85,7 +85,7 @@ public class Sage {
             Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false);
             Location origin = ray.HitPosition;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -116,7 +116,7 @@ public class Sage {
             Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false);
             Location origin = ray.HitPosition;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -143,7 +143,7 @@ public class Sage {
             Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false);
             Location origin = ray.HitPosition;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }

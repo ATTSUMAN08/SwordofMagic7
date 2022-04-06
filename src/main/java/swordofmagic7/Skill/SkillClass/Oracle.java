@@ -66,7 +66,7 @@ public class Oracle {
             double angle = radius*20;
             int time = skillData.ParameterValueInt(1)*20;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.FanShapedParticle(particleCasting, player.getLocation(), radius, angle, 3);
                 MultiThread.sleepMillis(millis);
             }
@@ -85,7 +85,7 @@ public class Oracle {
             double radius = skillData.ParameterValue(1);
             int time = skillData.ParameterValueInt(0);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 10);
                 MultiThread.sleepMillis(millis);
             }

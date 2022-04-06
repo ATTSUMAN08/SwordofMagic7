@@ -58,7 +58,7 @@ public class Mage {
             final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
 
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
                 ParticleManager.CircleParticle(particleData, origin, 1, 10);
                 MultiThread.sleepMillis(millis);
@@ -104,7 +104,7 @@ public class Mage {
             ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
             ParticleData particleData1 = new ParticleData(Particle.FIREWORKS_SPARK, 0.5f, VectorDown);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);
             }

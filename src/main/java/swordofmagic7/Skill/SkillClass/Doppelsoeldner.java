@@ -60,18 +60,16 @@ public class Doppelsoeldner {
             particleData.randomOffset = true;
             particleData.randomOffsetMultiply = (float) (radius/2);
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 15);
                 MultiThread.sleepMillis(millis);
             }
 
-            int i = 0;
-            while (i < time) {
+            for (int i = 0; i < time/hitRate; i++) {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius/2, 15);
                 Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
                 Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 2);
                 playSound(player, SoundList.AttackWeak);
-                i += hitRate;
                 MultiThread.sleepTick(hitRate);
             }
 
@@ -83,7 +81,7 @@ public class Doppelsoeldner {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             if (reqEffect == null || playerData.EffectManager.hasEffect(reqEffect)) {
-                while (skill.SkillCastProgress < 1) {
+                for (int i = 0; i < skillData.CastTime; i++) {
                     ParticleManager.FanShapedParticle(particleCasting, player.getLocation(), radius, angle, 3);
                     MultiThread.sleepMillis(millis);
                 }

@@ -72,7 +72,7 @@ public class Elementalist {
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.8f;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -82,8 +82,7 @@ public class Elementalist {
             int time = (int) Math.round(skillData.ParameterValue(1)*20);
             double freezePercent = skillData.ParameterValue(3)/100;
             MultiThread.TaskRun(() -> {
-                int i = 0;
-                while (i < time) {
+                for (int i = 0; i < time/hitRate; i++) {
                     ParticleManager.CircleParticle(particleData, origin.clone().add(0, 6, 0), radius / 2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     MultiThread.TaskRun(() -> {
@@ -96,7 +95,6 @@ public class Elementalist {
                             MultiThread.sleepTick(2);
                         }
                     }, "MagicCircleDataHeilTick");
-                    i += hitRate;
                     MultiThread.sleepTick(hitRate);
                 }
             }, "MagicCircleDataHeil");
@@ -114,8 +112,8 @@ public class Elementalist {
             final Location origin = RayTrace.rayLocationBlock(loc, distance, false).HitPosition;
             origin.setPitch(0);
 
-            while (skill.SkillCastProgress < 1) {
-                for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < skillData.CastTime; i++) {
+                for (int i2 = 0; i2 < 3; i2++) {
                     origin.setYaw(origin.getYaw() + 60);
                     Location pivot = origin.clone().add(origin.getDirection().multiply(-length));
                     ParticleManager.RectangleParticle(particleCasting, pivot, length * 2, width, 3);
@@ -188,7 +186,7 @@ public class Elementalist {
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.5f;
 
-            while (skill.SkillCastProgress < 1) {
+            for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }
@@ -196,12 +194,10 @@ public class Elementalist {
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
             final int time = (int) Math.round(skillData.ParameterValue(1)*20);
             MultiThread.TaskRun(() -> {
-                int i = 0;
-                while (i < time) {
+                for (int i = 0; i < time/hitRate; i++) {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 2);
-                    i += hitRate;
                     MultiThread.sleepTick(hitRate);
                 }
             }, "MagicCircleStormDust");

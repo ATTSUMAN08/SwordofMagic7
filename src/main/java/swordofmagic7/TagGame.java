@@ -25,14 +25,16 @@ public class TagGame {
     TagGame() {
         MultiThread.TaskRun(() -> {
             while (plugin.isEnabled()) {
-                if (Tag != null) tagTime++;
-                if (tagTime >= 120) {
-                    for (Player temp : Players) {
-                        temp.sendMessage(Prefix + Tag.getDisplayName() + "§aさんが§c脱落§aしました");
+                if (Tag != null) {
+                    tagTime++;
+                    if (tagTime >= 120) {
+                        for (Player temp : Players) {
+                            temp.sendMessage(Prefix + Tag.getDisplayName() + "§aさんが§c脱落§aしました");
+                        }
+                        Players.remove(Tag);
+                        Tag = null;
+                        tagCheck();
                     }
-                    Players.remove(Tag);
-                    Tag = null;
-                    tagCheck();
                 }
                 MultiThread.sleepTick(20);
             }
