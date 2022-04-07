@@ -15,12 +15,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.*;
+import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
-    public final int MaxSlot = 500;
+    public final int MaxSlot = 1000;
     private final List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Category;
@@ -147,21 +147,21 @@ public class ItemInventory extends BasicInventory {
 
     public void addItemParameter(ItemParameter param, int addAmount) {
         if (List.size() < MaxSlot) {
-            ItemParameterStack stack = getItemParameterStack(param);
-            if (stack.Amount > 0) {
-                stack.Amount += addAmount;
-            } else {
-                ItemParameterStack newStack = new ItemParameterStack();
-                newStack.itemParameter = param.clone();
-                newStack.Amount = addAmount;
-                List.add(newStack);
-            }
-            if (List.size() >= MaxSlot-5) {
-                player.sendMessage("§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです");
+            if (List.size() >= MaxSlot-10) {
+                sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
             }
         } else {
-            player.sendMessage("§e[アイテムインベントリ]§aが§c満杯§aです");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§e[アイテムインベントリ]§aが§c満杯§aです", SoundList.Nope);
+            spawnPlayer(player);
+        }
+        ItemParameterStack stack = getItemParameterStack(param);
+        if (stack.Amount > 0) {
+            stack.Amount += addAmount;
+        } else {
+            ItemParameterStack newStack = new ItemParameterStack();
+            newStack.itemParameter = param.clone();
+            newStack.Amount = addAmount;
+            List.add(newStack);
         }
     }
 

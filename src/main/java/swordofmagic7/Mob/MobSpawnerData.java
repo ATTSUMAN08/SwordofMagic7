@@ -29,7 +29,7 @@ public class MobSpawnerData {
         if (!Started && !ServerId.equalsIgnoreCase("Event")) {
             Started = true;
             MultiThread.TaskRunTimer(() -> {
-                if (PlayerList.getNear(location, Radius + mobData.Search).size() > 0) {
+                if (PlayerList.getNear(location, Radius + 16 + mobData.Search).size() > 0) {
                     for (EnemyData data : SpawnedList) {
                         if (data.entity == null || data.entity.isDead() || data.isDead()) {
                             data.delete();
@@ -40,9 +40,11 @@ public class MobSpawnerData {
                     }
                     SpawnedList.removeIf(data -> data.entity == null || data.entity.isDead() || data.isDead());
                     if (SpawnedList.size() < MaxMob) {
-                        for (int i = 0; i < PerSpawn; i++) {
-                            spawn();
-                        }
+                        MultiThread.TaskRunSynchronized(() -> {
+                            for (int i = 0; i < PerSpawn; i++) {
+                                spawn();
+                            }
+                        }, "EnemySpawnerSpawn");
                     }
                 }
             }, 30);
@@ -50,22 +52,20 @@ public class MobSpawnerData {
     }
 
     public void spawn() {
-        MultiThread.TaskRunSynchronized(() -> {
-            for (int i = 0; i < 4; i++) {
-                double x = location.getX() + (2 * random.nextDouble() * Radius) - Radius;
-                double z = location.getZ() + (2 * random.nextDouble() * Radius) - Radius;
-                double y = location.getY() + RadiusY;
-                Location origin = new Location(location.getWorld(), x, y, z, 0, 90);
-                Location loc = origin.clone();
-                for (int i2 = 0; i2 < RadiusY * 2; i2++) {
-                    boolean spawnAble = !loc.getBlock().getType().isSolid() && loc.clone().add(VectorDown).getBlock().getType().isSolid();
-                    if (spawnAble) {
-                        SpawnedList.add(MobManager.mobSpawn(mobData, Level, loc));
-                        return;
-                    }
-                    loc.add(VectorDown);
+        for (int i = 0; i < 4; i++) {
+            double x = location.getX() + (2 * random.nextDouble() * Radius) - Radius;
+            double z = location.getZ() + (2 * random.nextDouble() * Radius) - Radius;
+            double y = location.getY() + RadiusY;
+            Location origin = new Location(location.getWorld(), x, y, z, 0, 90);
+            Location loc = origin.clone();
+            for (int i2 = 0; i2 < RadiusY * 2; i2++) {
+                boolean spawnAble = !loc.getBlock().getType().isSolid() && loc.clone().add(VectorDown).getBlock().getType().isSolid();
+                if (spawnAble) {
+                    SpawnedList.add(MobManager.mobSpawn(mobData, Level, loc));
+                    return;
                 }
+                loc.add(VectorDown);
             }
-        }, "EnemySpawn");
+        }
     }
 }

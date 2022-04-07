@@ -7,7 +7,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Data.TitleData;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Sound.SoundList;
@@ -82,7 +84,10 @@ public class Attribute {
             Parameter.put(attr, 0);
         }
         AttributePoint = (playerData.Level-1)*5;
-        AttributePoint += playerData.titleManager.TitleList.size();
+        for (String data : playerData.titleManager.TitleList) {
+            TitleData titleData = DataBase.TitleDataList.get(data);
+            AttributePoint += titleData.attributePoint;
+        }
     }
 
     public ItemStack attributeView(AttributeType type) {

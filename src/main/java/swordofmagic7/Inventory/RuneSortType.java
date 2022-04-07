@@ -31,7 +31,9 @@ public enum RuneSortType {
 
 class RuneSortName implements Comparator<RuneParameter> {
     public int compare(RuneParameter rune1, RuneParameter rune2) {
-        return rune1.Id.compareTo(rune2.Id);
+        if (rune1.Id.equals(rune2.Id)) {
+            return Double.compare(rune1.Quality, rune2.Quality);
+        } else return rune1.Id.compareTo(rune2.Id);
     }
 }
 

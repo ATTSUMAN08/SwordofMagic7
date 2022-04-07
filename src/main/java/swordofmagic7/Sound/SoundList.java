@@ -28,6 +28,7 @@ public enum SoundList {
     Rock(Sound.ENTITY_IRON_GOLEM_HURT, 1.5f, SoundCategory.PLAYERS),
     Eat(Sound.ENTITY_HORSE_EAT, 1, SoundCategory.PLAYERS),
     Shun(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, SoundCategory.PLAYERS),
+    Counter(Sound.BLOCK_ANVIL_FALL, 2, SoundCategory.PLAYERS),
     ;
 
     Object data;

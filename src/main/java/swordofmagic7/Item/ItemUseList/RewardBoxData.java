@@ -1,6 +1,6 @@
-package swordofmagic7.Item;
+package swordofmagic7.Item.ItemUseList;
 
-public class RewardBox {
+public class RewardBoxData {
     public String id;
     public int amount;
     public double percent;

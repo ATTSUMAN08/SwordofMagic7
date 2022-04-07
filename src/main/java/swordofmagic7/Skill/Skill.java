@@ -64,6 +64,7 @@ public class Skill {
     public final Assassin assassin;
     public final Sage sage;
     public final Highlander highlander;
+    public final Oracle oracle;
 
     public Alchemist getAlchemist() {
         return alchemist;
@@ -93,6 +94,7 @@ public class Skill {
         assassin = new Assassin(SkillProcess);
         sage = new Sage(SkillProcess);
         highlander = new Highlander(SkillProcess);
+        oracle = new Oracle(SkillProcess);
 
         alchemist = new Alchemist(SkillProcess);
 
@@ -144,6 +146,7 @@ public class Skill {
                                             return;
                                         }
                                     }
+                                    if (playerData.EffectManager.hasEffect(EffectType.ArcaneEnergy)) skillData.Mana = 0;
                                     if (hasSkill("MagicEfficiently")) {
                                         SkillData MagicEfficiently = getSkillData("MagicEfficiently");
                                         skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100) * (1+playerData.Level/100f));
@@ -253,6 +256,12 @@ public class Skill {
                                             case "Crown" -> highlander.Crown(skillData);
                                             case "WagonWheel" -> highlander.WagonWheel(skillData);
                                             case "CrossGuard" -> highlander.CrossGuard(skillData);
+                                            //オラクル
+                                            case "CounterSpell" -> oracle.CounterSpell(skillData);
+                                            case "ArcaneEnergy" -> oracle.ArcaneEnergy(skillData);
+                                            case "DeathVerdict" -> oracle.DeathVerdict(skillData);
+                                            case "Foretell" -> oracle.Foretell(skillData);
+                                            case "DivineMight" -> oracle.DivineMight(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
                                             if (skillData.CastTime > 0) {

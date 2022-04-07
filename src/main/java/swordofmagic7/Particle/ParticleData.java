@@ -66,6 +66,11 @@ public class ParticleData implements Cloneable {
         return this;
     }
 
+    public ParticleData setVector(Vector vector) {
+        this.vector = vector;
+        return this;
+    }
+
     public void spawn(Location location) {
         ParticleManager.spawnParticle(this, location);
     }

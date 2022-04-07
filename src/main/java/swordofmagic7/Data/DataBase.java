@@ -9,7 +9,7 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
-import swordofmagic7.Item.RewardBox;
+import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
 import swordofmagic7.Life.Cook.CookData;
@@ -95,7 +95,7 @@ public final class DataBase {
     public static final HashMap<Integer, String> AlchemyShopMap = new HashMap<>();
     public static final HashMap<String, List<String>> MaterializationMap = new HashMap<>();
     public static final HashMap<String, List<String>> ItemInfoData = new HashMap<>();
-    public static final HashMap<String, List<RewardBox>> RewardBoxList = new HashMap<>();
+    public static final HashMap<String, List<RewardBoxData>> RewardBoxList = new HashMap<>();
 
     public static ItemStack ItemStackPlayerHead(OfflinePlayer player) {
         return ItemStackPlayerHead(player, null, null);

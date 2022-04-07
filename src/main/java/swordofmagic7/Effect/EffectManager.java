@@ -26,6 +26,7 @@ public class EffectManager {
     public PlayerData playerData;
     public PetParameter petParameter;
     public EnemyData enemyData;
+    public boolean isRunnable = true;
 
     public HashMap<EffectType, EffectData> Effect = new HashMap<>();
 
@@ -38,7 +39,9 @@ public class EffectManager {
             case Enemy -> enemyData = (EnemyData) ownerData;
         }
         MultiThread.TaskRun(() -> {
-            while (plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline()) || (ownerType.isEnemy() && enemyData.isAlive()) || ownerType.isPet())) {
+            while (isRunnable && plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
+                    || (ownerType.isEnemy() && enemyData.isAlive())
+                    || (ownerType.isPet() && petParameter.player.isOnline()))) {
                 if (Effect.size() > 0) {
                     for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
                         effect.getValue().time -= 2;
@@ -56,35 +59,39 @@ public class EffectManager {
                         }
                     }
                 }
+                if (entity != null) {
+                    MultiThread.TaskRunSynchronized(() -> {
+                        boolean isCrowdControl = false;
+                        boolean isSlow = false;
+                        boolean isBlind = false;
+                        for (EffectType effectType : Effect.keySet()) {
+                            if (effectType.isCrowdControl()) isCrowdControl = true;
+                            if (effectType.isSlow()) isSlow = true;
+                            if (effectType.isBlind()) isBlind = true;
+                        }
+                        if (isCrowdControl) {
+                            if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return;
+                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                                entity.removePotionEffect(PotionEffectType.SLOW);
+                                entity.removePotionEffect(PotionEffectType.JUMP);
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 255, false, false, false));
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20, 250, false, false, false));
+                                entity.setVelocity(Function.VectorDown);
+                            }
+                        }
+                        if (isSlow) {
+                            entity.removePotionEffect(PotionEffectType.SLOW);
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, false, false));
+                        }
+                        if (isBlind) {
+                            entity.removePotionEffect(PotionEffectType.SLOW);
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0, false, false));
+                        }
+                    }, "EffectManagerTimer");
+                }
                 MultiThread.sleepTick(2);
             }
         }, "EffectManager");
-        MultiThread.TaskRunSynchronizedTimer(() -> {
-            if (entity != null) {
-                boolean isCrowdControl = false;
-                boolean isSlow = false;
-                boolean isBlind = false;
-                for (EffectType effectType : Effect.keySet()) {
-                    if (effectType.isCrowdControl()) isCrowdControl = true;
-                    if (effectType.isSlow()) isSlow = true;
-                    if (effectType.isBlind()) isBlind = true;
-                }
-                if (isCrowdControl) {
-                    if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                        entity.removePotionEffect(PotionEffectType.SLOW);
-                        entity.removePotionEffect(PotionEffectType.JUMP);
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 255, false, false, false));
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20, 250, false, false, false));
-                    }
-                } else if (isSlow) {
-                    entity.removePotionEffect(PotionEffectType.SLOW);
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, false, false));
-                } else if (isBlind) {
-                    entity.removePotionEffect(PotionEffectType.SLOW);
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0, false, false));
-                }
-            }
-        }, 10, "EffectManagerTimer");
     }
 
     public void stunVelocity(LivingEntity entity, EffectType effectType) {
@@ -122,7 +129,7 @@ public class EffectManager {
         EffectData effectData;
         if (Effect.containsKey(effectType)) {
             effectData = Effect.get(effectType);
-            effectData.time = time;
+            effectData.time = Math.max(effectData.time, time);
             if (effectData.stack+stack >= effectType.MaxStack) {
                 effectData.stack = effectType.MaxStack;
             } else effectData.stack += stack;
@@ -182,7 +189,7 @@ public class EffectManager {
         } else if (MobManager.isEnemy(entity)) {
             return MobManager.EnemyTable(entity.getUniqueId()).effectManager;
         } else if (PetManager.isPet(entity)) {
-            return PetManager.PetParameter(entity).effectManager;
+            return PetManager.PetParameter(entity).getEffectManager();
         }
         return null;
     }

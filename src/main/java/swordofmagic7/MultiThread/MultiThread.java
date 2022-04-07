@@ -40,7 +40,7 @@ public class MultiThread extends Thread {
         MultiThreads.clear();
     }
 
-    private static final boolean log = true;
+    private static final boolean log = false;
 
     public static Thread TaskRun(MultiThreadRunnable runnable, String ThreadTag) {
         if (plugin.isEnabled()) {
@@ -62,7 +62,6 @@ public class MultiThread extends Thread {
     public static void TaskRunSynchronized(MultiThreadRunnable runnable, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
-                if (log) Log("TaskRunSynchronized -> " + ThreadTag);
                 Bukkit.getScheduler().runTask(plugin, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -100,7 +99,6 @@ public class MultiThread extends Thread {
     public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
-                if (log) Log("TaskRunSynchronizedLater -> " + ThreadTag);
                 Bukkit.getScheduler().runTaskLater(plugin, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();

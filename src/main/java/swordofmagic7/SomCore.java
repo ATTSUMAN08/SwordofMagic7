@@ -137,6 +137,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             HologramSet.removeIf(Hologram::isDeleted);
         }, 200, 6000), "AutoSave");
 
+        /*
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 PlayerData playerData = PlayerData.playerData(player);
@@ -145,7 +146,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         Location location = PlayerLastLocation.get(player);
                         if (location.distance(player.getLocation()) < 1) {
                             PlayerKickAFK.merge(player, 1, Integer::sum);
-                            if (PlayerKickAFK.get(player) > 10) {
+                            if (PlayerKickAFK.get(player) > 5) {
                                 teleportServer(player, "Lobby");
                             }
                         } else {
@@ -159,7 +160,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 }
             }
             PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
-        }, 0, 60*20);
+        }, 0, 300*20);
+         */
 
         ParticleManager.onLoad();
 

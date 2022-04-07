@@ -63,7 +63,7 @@ public class PetManager {
             if (pet.player == player) {
                 playerData.setPetSelect(pet);
                 playerData.getPetSelect().entity = entity;
-                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました§b[" + pet.SummonId + "]", SoundList.Click);
+                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました§b[" + pet.getSummonId() + "]", SoundList.Click);
             }
         } else {
             sendMessage(player, ReqPetSelect, SoundList.Nope);
@@ -96,7 +96,7 @@ public class PetManager {
                     pet.target = null;
                 }
             }
-            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.SummonId + "]", SoundList.Click);
+            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.getSummonId() + "]", SoundList.Click);
         } else {
             sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
         }
@@ -121,7 +121,7 @@ public class PetManager {
                     }
                     if (Display != null) {
                         pet.target = ray.HitEntity;
-                        player.sendMessage("§c[" + Display + "]§aを§c[攻撃対象]§aにしました§b[" + pet.SummonId + "]");
+                        player.sendMessage("§c[" + Display + "]§aを§c[攻撃対象]§aにしました§b[" + pet.getSummonId() + "]");
                         playSound(player, SoundList.Click);
                     }
                 } else {

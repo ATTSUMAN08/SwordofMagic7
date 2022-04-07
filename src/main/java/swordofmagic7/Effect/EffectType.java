@@ -6,10 +6,10 @@ public enum EffectType {
     Stun("スタン", false, "移動できなくなります"),
     Silence("沈黙", false, "スキルが使えなくなります"),
     Freeze("氷結", false, "[スタン]と[沈黙]を合わせた効果です"),
-    Rigidity("硬直", EffectRank.Impossible, false, false, "様々なアクションが実行できなくなります"),
+    Rigidity("硬直", EffectRank.Impossible, false, false, "様々なアクションが実行できなくなります", true),
     Monstrance("モンストランス", false, "回避が減少します", true),
     Slow("スロー", false, "移動速度が低下します"),
-    Stop("ストップ", false, "[氷結]と同じ状態になります\nバフ・デバフ・ダメージを受け無くなります"),
+    Stop("ストップ", false, "[氷結]と同じ状態になります\nバフ・デバフ・ダメージを受け無くなります", false, true),
     TimeTravelSequelae("タイムトラベル後遺症", EffectRank.Impossible, false, "[パス]の効果を受け無くなります"),
     PeaceMaker("ピースメーカー", false, "[氷結]と同じ状態になり攻撃力が減少します", true),
     Glory("栄光", false, "被ダメージが2倍になります"),
@@ -20,11 +20,11 @@ public enum EffectType {
     Confusion("混乱", false, "50%の確率で発動するスキルスロットが変更されます"),
     SequelaeReducedDistortion("縮小歪曲後遺症", false, "効果はありません"),
     Concussion("脳震盪", false, "[氷結]と同じ効果です"),
-    DeathVerdict("デスヴァーディクト", false, "[氷結]と同じ効果です"),
+    DeathVerdict("デスヴァーディクト", false, "[氷結]と同じ効果です", true),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動職度が上昇します", true),
-    Invincible("無敵", EffectRank.Impossible, true, "ダメージを受け無くなります"),
+    Invincible("無敵", EffectRank.Impossible, true, "ダメージを受け無くなります", false, true),
     Teleportation("テレポーテーション", true, "ヘイト値がリセットされます"),
     PetBoost("ペトブースト", true, "攻撃力と防御力上昇します", true),
     ExtraAttack("エクストラアタック", true, "攻撃力が上昇します", true),
@@ -49,14 +49,14 @@ public enum EffectType {
     HeadShot("ヘッドショット", true, "[クリティカル発生]が上昇します", true),
     RedemptionAble("リデンプション発動可能", true, "[リデンプション]を使用できます"),
     Redemption("リデンプション", true, "回避が上昇します", true),
-    TimeForward("タイムフォーワンド免疫", true, "[タイムフォーワンド]の効果を受け無くなります"),
+    TimeForward("タイムフォーワンド免疫", true, "[タイムフォーワンド]の効果を受け無くなります", false, true),
     Seiko("聖光", true, "被ダメージが1/3倍になります"),
     Reflection("反射", true, "被ダメージの10%を反射します"),
     MissileHole("ミサイルホール", true, "魔法被ダメージ耐性が上昇します", true),
-    CrossGuard("クロスガード", true, "効果中にダメージを受けた場合自分に[クロスガード:カウンター]バフが付与されます", true),
+    CrossGuard("クロスガード", true, "効果中にダメージを受けた場合自分に[クロスガード:カウンター]バフが付与されます", false),
     CrossGuardCounter("クロスガード:カウンター", true, "[物理与ダメージ]が上昇します", true),
     ArcaneEnergy("アーケインエナジー", true, "スキルのマナ消費が0になります", false),
-    Foretell("フォアテル", true, "被ダメージ耐性増加が上昇します", false),
+    Foretell("フォアテル", true, "被ダメージ耐性増加が上昇します", true),
     ;
 
     public String Display;
@@ -66,6 +66,7 @@ public enum EffectType {
     public int MaxStack = 1;
     public boolean view = true;
     public boolean isUpdateStatus = false;
+    public boolean isStatic = false;
 
     EffectType(String Display, boolean Buff, String Lore) {
         this.Display = Display;
@@ -87,6 +88,14 @@ public enum EffectType {
         this.Lore = List.of(Lore.split("\n"));
     }
 
+    EffectType(String Display, boolean Buff, String Lore, boolean isUpdateStatus, boolean isStatic) {
+        this.Display = Display;
+        this.Buff = Buff;
+        this.Lore = List.of(Lore.split("\n"));
+        this.isUpdateStatus = isUpdateStatus;
+        this.isStatic = isStatic;
+    }
+
     EffectType(String Display, EffectRank effectRank, boolean Buff, String Lore, boolean isUpdateStatus) {
         this.Display = Display;
         this.effectRank = effectRank;
@@ -95,12 +104,30 @@ public enum EffectType {
         this.isUpdateStatus = isUpdateStatus;
     }
 
+    EffectType(String Display, EffectRank effectRank, boolean Buff, String Lore, boolean isUpdateStatus, boolean isStatic) {
+        this.Display = Display;
+        this.effectRank = effectRank;
+        this.Buff = Buff;
+        this.Lore = List.of(Lore.split("\n"));
+        this.isUpdateStatus = isUpdateStatus;
+        this.isStatic = isStatic;
+    }
+
     EffectType(String Display, EffectRank effectRank, boolean Buff, boolean view, String Lore) {
         this.Display = Display;
         this.effectRank = effectRank;
         this.Buff = Buff;
         this.view = view;
         this.Lore = List.of(Lore.split("\n"));
+    }
+
+    EffectType(String Display, EffectRank effectRank, boolean Buff, boolean view, String Lore, boolean isStatic) {
+        this.Display = Display;
+        this.effectRank = effectRank;
+        this.Buff = Buff;
+        this.view = view;
+        this.Lore = List.of(Lore.split("\n"));
+        this.isStatic = isStatic;
     }
 
     EffectType(String Display, int MaxStack, boolean Buff, String Lore) {

@@ -42,7 +42,7 @@ public class SkillData implements Cloneable {
         Lore.add(decoText("§3§lスキル情報"));
         Lore.add(decoLore("スキルタイプ") + SkillType.Display);
         if (SkillType.isActive()) {
-            Lore.add(decoLore("消費マナ") + Mana * (1+playerData.Level/100f));
+            Lore.add(decoLore("消費マナ") + String.format(playerData.ViewFormat(), Mana * (1+playerData.Level/100f)));
             Lore.add(decoLore("詠唱時間") + (double) CastTime / 20 + "秒");
             Lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
             Lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");

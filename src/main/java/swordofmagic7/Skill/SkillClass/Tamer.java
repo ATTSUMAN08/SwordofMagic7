@@ -77,7 +77,7 @@ public class Tamer {
 
             PetParameter pet = playerData.getPetSelect();
             if (pet != null) {
-                pet.effectManager.addEffect(EffectType.PetBoost, time);
+                pet.getEffectManager().addEffect(EffectType.PetBoost, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
             }

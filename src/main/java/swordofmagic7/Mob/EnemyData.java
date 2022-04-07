@@ -175,7 +175,7 @@ public class EnemyData {
     }
 
     public String getDecoDisplay() {
-        return "§c§l《" + mobData.Display + " Lv" + Level + "》";
+        return (mobData.Hostile ? "§c§l" : "§6§l") + "《" + mobData.Display + " Lv" + Level + "》";
     }
 
     private final java.util.function.Predicate<LivingEntity> Predicate = entity -> entity.getType() == EntityType.PLAYER;
@@ -295,7 +295,7 @@ public class EnemyData {
                                 }
                             }
                         }
-                        if (!isDefenseBattle) {
+                        if (!isDefenseBattle && !mobData.enemyType.isBoss()) {
                             if (PlayerList.getNear(entity.getLocation(), 48).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                                 delete();
                             }

@@ -99,9 +99,9 @@ public class Status {
         combatPower += HealthRegen*5;
         combatPower += MaxMana/8;
         combatPower += ManaRegen*5;
-        combatPower += ATK;
-        combatPower += DEF;
-        combatPower += HLP;
+        combatPower += ATK*1.5;
+        combatPower += DEF*1.5;
+        combatPower += HLP*1.5;
         combatPower += ACC*3;
         combatPower += EVA*3;
         combatPower += CriticalRate*2;
@@ -110,11 +110,11 @@ public class Status {
         combatPower += SkillCastTime;
         combatPower += SkillRigidTime;
         for (DamageCause damageCause : DamageCause.values()) {
-            combatPower += DamageCauseMultiply.getOrDefault(damageCause,0d);
-            combatPower += DamageCauseResistance.getOrDefault(damageCause,0d);
+            combatPower += DamageCauseMultiply.getOrDefault(damageCause,1d)*100;
+            combatPower += DamageCauseResistance.getOrDefault(damageCause,1d)*100;
         }
         for (AttributeType attr : AttributeType.values()) {
-            combatPower += playerData.Attribute.getAttribute(attr)*7.5;
+            combatPower += playerData.Attribute.getAttribute(attr)*5;
         }
         CombatPower = combatPower/10;
     }
@@ -150,155 +150,146 @@ public class Status {
         MultiplyStatus.put(statusParameter, MultiplyStatus.get(statusParameter)+add);
     }
 
-    public boolean nextStatus = false;
     public synchronized void StatusUpdate() {
-        if (!nextStatus) {
-            nextStatus = true;
-            MultiThread.TaskRunLater(() -> {
-                synchronized (this) {
-                    HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
-                    HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
-                    for (StatusParameter param : StatusParameter.values()) {
-                        EquipStatus.put(param, 0d);
-                        BaseMultiplyStatus.put(param, 1d);
-                        MultiplyStatus.put(param, 1d);
-                        FixedStatus.put(param, 0d);
-                        multiplyStatusRev.put(param, 1d);
-                        baseMultiplyStatusRev.put(param, 1d);
-                    }
-                    for (DamageCause cause : DamageCause.values()) {
-                        DamageCauseMultiply.put(cause, 1d);
-                        DamageCauseResistance.put(cause, 1d);
-                    }
-                    for (EquipmentSlot slot : EquipmentSlot.values()) {
-                        for (StatusParameter param : StatusParameter.values()) {
-                            EquipStatus.put(param, EquipStatus(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter().get(param));
-                        }
-                    }
-                    for (AttributeType attr : AttributeType.values()) {
-                        Attribute.put(attr, playerData.Attribute.getAttribute(attr));
-                    }
-                    for (SkillData skillData : playerData.Classes.getPassiveSkillList()) {
-                        if (playerData.Skill.CategoryCheck(skillData)) {
-                            for (SkillParameter param : skillData.Parameter) {
-                                for (StatusParameter statusParam : StatusParameter.values()) {
-                                    if (param.Display.equalsIgnoreCase("基礎" + statusParam.Display)) {
-                                        BaseMultiplyStatusAdd(statusParam, param.Value / 100);
-                                    } else if (param.Display.equalsIgnoreCase(statusParam.Display)) {
-                                        MultiplyStatusAdd(statusParam, param.Value / 100);
-                                    }
-                                }
-                                if (param.Display.equalsIgnoreCase("物理与ダメージ")) {
-                                    DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100);
-                                } else if (param.Display.equalsIgnoreCase("魔法与ダメージ")) {
-                                    DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100);
-                                } else if (param.Display.equalsIgnoreCase("物理被ダメージ耐性")) {
-                                    DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100);
-                                } else if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性")) {
-                                    DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
-                                }
-                            }
-                        }
-                    }
-
-                    if (playerData.EffectManager.Effect.size() > 0) {
-                        for (Map.Entry<EffectType, EffectData> data : playerData.EffectManager.Effect.entrySet()) {
-                            EffectType effectType = data.getKey();
-                            EffectData effectData = data.getValue();
-                            for (StatusParameter param : StatusParameter.values()) {
-                                double multiplyStatusAdd = EffectDataBase.EffectStatus(effectType).MultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
-                                double baseMultiplyStatusAdd = EffectDataBase.EffectStatus(effectType).BaseMultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
-                                if (multiplyStatusAdd >= 0) MultiplyStatusAdd(param, multiplyStatusAdd);
-                                else {
-                                    multiplyStatusRev.put(param, multiplyStatusRev.get(param) * Math.pow(1 + multiplyStatusAdd, effectData.stack));
-                                }
-                                if (baseMultiplyStatusAdd >= 0) BaseMultiplyStatusAdd(param, baseMultiplyStatusAdd);
-                                else {
-                                    baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
-                                }
-                            }
-                            for (DamageCause cause : DamageCause.values()) {
-                                DamageCauseMultiplyAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack);
-                                DamageCauseResistanceAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack);
-                            }
-                        }
-                        for (StatusParameter param : StatusParameter.values()) {
-                            MultiplyStatus.put(param, MultiplyStatus(param) * multiplyStatusRev.get(param));
-                            BaseMultiplyStatus.put(param, BaseMultiplyStatus(param) * baseMultiplyStatusRev.get(param));
-                        }
-                    }
-
-                    if (playerData.instantBuff.InstantBuffs.size() > 0) {
-                        HashMap<StatusParameter, Double> multiply = playerData.instantBuff.getMultiply();
-                        HashMap<StatusParameter, Double> fixed = playerData.instantBuff.getFixed();
-                        for (StatusParameter param : StatusParameter.values()) {
-                            MultiplyStatus.put(param, MultiplyStatus.get(param) + multiply.get(param));
-                            FixedStatus.put(param, FixedStatus(param) + fixed.get(param));
-                        }
-                    }
-
-                    CriticalMultiply = 1.2;
-                    CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
-                    DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(STR) * 0.005);
-                    DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(INT) * 0.004);
-                    DamageCauseResistanceAdd(DamageCause.ATK, Attribute(VIT) * 0.003);
-                    DamageCauseResistanceAdd(DamageCause.MAT, (Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
-
-                    double M = LevelMultiply();
-                    BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * (1 + Attribute(VIT) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxHealth));
-                    BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * (1 + Attribute(VIT) * 0.002) * BaseMultiplyStatus(StatusParameter.HealthRegen));
-                    BaseStatus.put(StatusParameter.MaxMana, (M * 100) * (1 + Attribute(SPI) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxMana));
-                    BaseStatus.put(StatusParameter.ManaRegen, (M * 5) * (1 + Attribute(SPI) * 0.0005) * BaseMultiplyStatus(StatusParameter.ManaRegen));
-                    BaseStatus.put(StatusParameter.ATK, (M * 10) * (1 + Attribute(STR) * 0.005 + Attribute(INT) * 0.005) * BaseMultiplyStatus(StatusParameter.ATK));
-                    BaseStatus.put(StatusParameter.DEF, (M * 5) * (1 + Attribute(VIT) * 0.005) * BaseMultiplyStatus(StatusParameter.DEF));
-                    BaseStatus.put(StatusParameter.HLP, (M * 5) * (1 + Attribute(SPI) * 0.005) * BaseMultiplyStatus(StatusParameter.HLP));
-                    BaseStatus.put(StatusParameter.ACC, (M * 10) * (1 + Attribute(TEC) * 0.008) * BaseMultiplyStatus(StatusParameter.ACC));
-                    BaseStatus.put(StatusParameter.EVA, (M * 5) * (1 + Attribute(DEX) * 0.008) * BaseMultiplyStatus(StatusParameter.EVA));
-                    BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * (1 + Attribute(TEC) * 0.01) * BaseMultiplyStatus(StatusParameter.CriticalRate));
-                    BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * (1 + Attribute(SPI) * 0.02) * BaseMultiplyStatus(StatusParameter.CriticalResist));
-                    BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
-                    BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
-                    BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
-
-                    MaxHealth = finalStatus(StatusParameter.MaxHealth);
-                    HealthRegen = finalStatus(StatusParameter.HealthRegen);
-                    MaxMana = finalStatus(StatusParameter.MaxMana);
-                    ManaRegen = finalStatus(StatusParameter.ManaRegen);
-                    ATK = finalStatus(StatusParameter.ATK);
-                    DEF = finalStatus(StatusParameter.DEF);
-                    HLP = finalStatus(StatusParameter.HLP);
-                    ACC = finalStatus(StatusParameter.ACC);
-                    EVA = finalStatus(StatusParameter.EVA);
-                    CriticalRate = finalStatus(StatusParameter.CriticalRate);
-                    CriticalResist = finalStatus(StatusParameter.CriticalResist);
-                    SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
-                    SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
-                    SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
-
-                    if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK *= 0.1f;
-
-                    String color = "§f";
-                    if (playerData.PvPMode) color = "§c";
-                    StringBuilder classText = new StringBuilder();
-                    for (ClassData classData : playerData.Classes.classSlot) {
-                        classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
-                    }
-                    player.setPlayerListName(classText + "§e| " + color + playerData.Nick);
-                    player.setDisplayName(playerData.Nick);
-
-                    setCombatPower();
-                    Movement = 0.24f;
-                    if (playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
-                        Movement *= 1 + DataBase.getSkillData("Cloaking").ParameterValue(1) / 100;
-                    }
-                    MultiThread.TaskRunSynchronized(() -> {
-                        player.setWalkSpeed(Movement);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
-                    });
-                    nextStatus = false;
-                }
-            }, 2, "StatusUpdate");
+        HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
+        HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
+        for (StatusParameter param : StatusParameter.values()) {
+            EquipStatus.put(param, 0d);
+            BaseMultiplyStatus.put(param, 1d);
+            MultiplyStatus.put(param, 1d);
+            FixedStatus.put(param, 0d);
+            multiplyStatusRev.put(param, 1d);
+            baseMultiplyStatusRev.put(param, 1d);
         }
+        for (DamageCause cause : DamageCause.values()) {
+            DamageCauseMultiply.put(cause, 1d);
+            DamageCauseResistance.put(cause, 1d);
+        }
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            for (StatusParameter param : StatusParameter.values()) {
+                EquipStatus.put(param, EquipStatus(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter().get(param));
+            }
+        }
+        for (AttributeType attr : AttributeType.values()) {
+            Attribute.put(attr, playerData.Attribute.getAttribute(attr));
+        }
+        for (SkillData skillData : playerData.Classes.getPassiveSkillList()) {
+            if (playerData.Skill.CategoryCheck(skillData)) {
+                for (SkillParameter param : skillData.Parameter) {
+                    for (StatusParameter statusParam : StatusParameter.values()) {
+                        if (param.Display.equalsIgnoreCase("基礎" + statusParam.Display)) {
+                            BaseMultiplyStatusAdd(statusParam, param.Value / 100);
+                        } else if (param.Display.equalsIgnoreCase(statusParam.Display)) {
+                            MultiplyStatusAdd(statusParam, param.Value / 100);
+                        }
+                    }
+                    if (param.Display.equalsIgnoreCase("物理与ダメージ")) {
+                        DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100);
+                    } else if (param.Display.equalsIgnoreCase("魔法与ダメージ")) {
+                        DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100);
+                    } else if (param.Display.equalsIgnoreCase("物理被ダメージ耐性")) {
+                        DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100);
+                    } else if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性")) {
+                        DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
+                    }
+                }
+            }
+        }
+
+        if (playerData.EffectManager.Effect.size() > 0) {
+            for (Map.Entry<EffectType, EffectData> data : playerData.EffectManager.Effect.entrySet()) {
+                EffectType effectType = data.getKey();
+                EffectData effectData = data.getValue();
+                for (StatusParameter param : StatusParameter.values()) {
+                    double multiplyStatusAdd = EffectDataBase.EffectStatus(effectType).MultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
+                    double baseMultiplyStatusAdd = EffectDataBase.EffectStatus(effectType).BaseMultiplyStatus.getOrDefault(param, 0d) * effectData.stack;
+                    if (multiplyStatusAdd >= 0) MultiplyStatusAdd(param, multiplyStatusAdd);
+                    else {
+                        multiplyStatusRev.put(param, multiplyStatusRev.get(param) * Math.pow(1 + multiplyStatusAdd, effectData.stack));
+                    }
+                    if (baseMultiplyStatusAdd >= 0) BaseMultiplyStatusAdd(param, baseMultiplyStatusAdd);
+                    else {
+                        baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
+                    }
+                }
+                for (DamageCause cause : DamageCause.values()) {
+                    DamageCauseMultiplyAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack);
+                    DamageCauseResistanceAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack);
+                }
+            }
+            for (StatusParameter param : StatusParameter.values()) {
+                MultiplyStatus.put(param, MultiplyStatus(param) * multiplyStatusRev.get(param));
+                BaseMultiplyStatus.put(param, BaseMultiplyStatus(param) * baseMultiplyStatusRev.get(param));
+            }
+        }
+
+        if (playerData.instantBuff.InstantBuffs.size() > 0) {
+            HashMap<StatusParameter, Double> multiply = playerData.instantBuff.getMultiply();
+            HashMap<StatusParameter, Double> fixed = playerData.instantBuff.getFixed();
+            for (StatusParameter param : StatusParameter.values()) {
+                MultiplyStatus.put(param, MultiplyStatus.get(param) + multiply.get(param));
+                FixedStatus.put(param, FixedStatus(param) + fixed.get(param));
+            }
+        }
+
+        CriticalMultiply = 1.2;
+        CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
+        DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(STR) * 0.005);
+        DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(INT) * 0.004);
+        DamageCauseResistanceAdd(DamageCause.ATK, Attribute(VIT) * 0.003);
+        DamageCauseResistanceAdd(DamageCause.MAT, (Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
+
+        double M = LevelMultiply();
+        BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * (1 + Attribute(VIT) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxHealth));
+        BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * (1 + Attribute(VIT) * 0.002) * BaseMultiplyStatus(StatusParameter.HealthRegen));
+        BaseStatus.put(StatusParameter.MaxMana, (M * 100) * (1 + Attribute(SPI) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxMana));
+        BaseStatus.put(StatusParameter.ManaRegen, (M * 5) * (1 + Attribute(SPI) * 0.0005) * BaseMultiplyStatus(StatusParameter.ManaRegen));
+        BaseStatus.put(StatusParameter.ATK, (M * 10) * (1 + Attribute(STR) * 0.005 + Attribute(INT) * 0.005) * BaseMultiplyStatus(StatusParameter.ATK));
+        BaseStatus.put(StatusParameter.DEF, (M * 5) * (1 + Attribute(VIT) * 0.005) * BaseMultiplyStatus(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.HLP, (M * 5) * (1 + Attribute(SPI) * 0.005) * BaseMultiplyStatus(StatusParameter.HLP));
+        BaseStatus.put(StatusParameter.ACC, (M * 10) * (1 + Attribute(TEC) * 0.008) * BaseMultiplyStatus(StatusParameter.ACC));
+        BaseStatus.put(StatusParameter.EVA, (M * 5) * (1 + Attribute(DEX) * 0.008) * BaseMultiplyStatus(StatusParameter.EVA));
+        BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * (1 + Attribute(TEC) * 0.01) * BaseMultiplyStatus(StatusParameter.CriticalRate));
+        BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * (1 + Attribute(SPI) * 0.02) * BaseMultiplyStatus(StatusParameter.CriticalResist));
+        BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
+        BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
+        BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
+
+        MaxHealth = finalStatus(StatusParameter.MaxHealth);
+        HealthRegen = finalStatus(StatusParameter.HealthRegen);
+        MaxMana = finalStatus(StatusParameter.MaxMana);
+        ManaRegen = finalStatus(StatusParameter.ManaRegen);
+        ATK = finalStatus(StatusParameter.ATK);
+        DEF = finalStatus(StatusParameter.DEF);
+        HLP = finalStatus(StatusParameter.HLP);
+        ACC = finalStatus(StatusParameter.ACC);
+        EVA = finalStatus(StatusParameter.EVA);
+        CriticalRate = finalStatus(StatusParameter.CriticalRate);
+        CriticalResist = finalStatus(StatusParameter.CriticalResist);
+        SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
+        SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
+        SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
+
+        if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK *= 0.1f;
+
+        String color = "§f";
+        if (playerData.PvPMode) color = "§c";
+        StringBuilder classText = new StringBuilder();
+        for (ClassData classData : playerData.Classes.classSlot) {
+            classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
+        }
+        player.setPlayerListName(classText + "§e| " + color + playerData.Nick);
+        player.setDisplayName(playerData.Nick);
+
+        setCombatPower();
+        Movement = 0.24f;
+        if (playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
+            Movement *= 1 + DataBase.getSkillData("Cloaking").ParameterValue(1) / 100;
+        }
+        MultiThread.TaskRunSynchronized(() -> {
+            player.setWalkSpeed(Movement);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
+        });
     }
 
     public double finalStatus(StatusParameter param) {

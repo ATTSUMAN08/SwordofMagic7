@@ -505,9 +505,10 @@ public class PlayerData {
 
 
         if (statistics.playTime < data.getInt("Statistics.PlayTime")) {
-            player.sendMessage("§eロールバック§aを検知したため§e前回セーブ§aから§bロード§aしました");
+            player.sendMessage("§eロールバック§aを検知したため§eデータ保護§aのため§bロビ－§aに転送しました");
             Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId());
-            if (player.isOnline()) load();
+            isNonSave = true;
+            if (player.isOnline()) teleportServer(player, "Lobby");
             return;
         }
 
@@ -1013,7 +1014,7 @@ public class PlayerData {
                             player.resetTitle();
                             Map = getMapData("Alden");
                             hologram.delete();
-                            statistics.DownCount++;
+                            statistics.DeathCount++;
                         } else if (RevivalReady) {
                             this.cancel();
                             logoutLocation = null;

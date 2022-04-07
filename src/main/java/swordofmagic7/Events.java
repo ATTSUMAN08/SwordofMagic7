@@ -68,7 +68,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onLogin(AsyncPlayerPreLoginEvent event) {
-        if (!ServerId.equalsIgnoreCase("Dev")) {
+        if (ServerId.equalsIgnoreCase("Event")) {
             List<String> ignoreList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
             if (!ignoreList.contains(event.getUniqueId().toString())) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -583,8 +583,6 @@ public class Events implements Listener {
                 entity.remove();
             } else if (MobManager.isEnemy(entity)) {
                 EnemyTable.remove(entity.getUniqueId().toString());
-                entity.remove();
-            } else if (entity.getName().contains("§c§l《")) {
                 entity.remove();
             } else if (PetManager.isPet(entity)) {
                 PetManager.PetParameter(entity).cage();

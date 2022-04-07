@@ -5,6 +5,7 @@ public class EffectData {
     public int time;
     public int stack = 1;
     public double[] doubleData;
+    public boolean flags = false;
 
     public double getDouble(int i) {
         return doubleData[i];

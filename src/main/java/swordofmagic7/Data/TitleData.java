@@ -11,6 +11,7 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoLore;
 
 public class TitleData {
     public final String Id;
@@ -20,6 +21,7 @@ public class TitleData {
     public final List<String> Lore;
     public final int[] waitTick;
     public final int flame;
+    public int attributePoint = 1;
 
     TitleData(String Id, Material icon, int amount, List<String> Data, List<String> Lore) {
         this.Id = Id;
@@ -43,6 +45,10 @@ public class TitleData {
             List<String> lore = new ArrayList<>();
             for (String str : Lore) {
                 lore.add("§a§l" + str);
+            }
+            if (attributePoint > 0) {
+                lore.add(Function.decoText("獲得ボーナス"));
+                lore.add(decoLore("アトリビュートポイント") + attributePoint);
             }
             lore.add(Function.decoText("プレビュー"));
             lore.addAll(List.of(Display));

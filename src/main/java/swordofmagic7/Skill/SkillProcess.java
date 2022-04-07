@@ -50,6 +50,10 @@ public class SkillProcess {
         return entity -> entity != player && entity instanceof Player target && isAllies(target);
     }
 
+    public Predicate<LivingEntity> PredicateA_ME() {
+        return entity -> entity == player || entity instanceof Player target && isAllies(target);
+    }
+
     public Predicate<LivingEntity> PredicateA2() {
         return entity -> entity != player && entity instanceof Player target && isRevivalAble(target);
     }

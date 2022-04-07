@@ -73,10 +73,9 @@ public class PetParameter implements Cloneable {
     public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
     public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
     public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
-    public EffectManager effectManager = new EffectManager(entity, EffectOwnerType.Pet, this);
+    private EffectManager effectManager;
 
     public boolean Summoned = false;
-    public int SummonId = -1;
 
     public LivingEntity target;
 
@@ -105,7 +104,7 @@ public class PetParameter implements Cloneable {
                 Exp -= ReqExp();
                 Level++;
                 updateStatus();
-                sendMessage(player,"§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました§b[" + SummonId + "]", SoundList.LevelUp);
+                sendMessage(player,"§e[" + petData.Display + "§e]§aが§eLv" + Level + "§aになりました§b[" + getSummonId() + "]", SoundList.LevelUp);
                 if (MaxLevel <= Level) Exp = 0;
             }
 
@@ -137,10 +136,23 @@ public class PetParameter implements Cloneable {
         return MultiplyStatus.get(param);
     }
 
+    public int getSummonId() {
+        int i = 1;
+        for (PetParameter pet : playerData.PetSummon) {
+            if (pet == this) return i;
+            i++;
+        }
+        return -1;
+    }
+
     void MultiplyStatusAdd(StatusParameter param, double add) {
         if (MultiplyStatus.containsKey(param)) {
             MultiplyStatus.put(param, MultiplyStatus.getOrDefault(param, 0d) + add);
         }
+    }
+
+    public EffectManager getEffectManager() {
+        return effectManager;
     }
 
     public void updateStatus() {
@@ -157,7 +169,7 @@ public class PetParameter implements Cloneable {
             DamageCauseMultiply.put(cause, 1d);
             DamageCauseResistance.put(cause, 1d);
         }
-        if (effectManager.Effect.size() > 0) {
+        if (effectManager != null && effectManager.Effect.size() > 0) {
             for (Map.Entry<EffectType, EffectData> data : effectManager.Effect.entrySet()) {
                 EffectType effectType = data.getKey();
                 EffectData effectData = data.getValue();
@@ -218,7 +230,7 @@ public class PetParameter implements Cloneable {
         if (Summoned) {
             cage();
         } else if (playerData.PetSummon.size() < maxSpawn) {
-            spawn(player.getLocation(), playerData.PetSummon.size()+1);
+            spawn(player.getLocation());
         } else {
             sendMessage(player, "§c召喚上限§aです", SoundList.Nope);
         }
@@ -236,12 +248,12 @@ public class PetParameter implements Cloneable {
     }
 
     public String getDisplayName() {
-        return "§b[" + SummonId + "]" + "§e" + petData.Display + "Lv" + Level;
+        return "§b[" + getSummonId() + "]" + "§e" + petData.Display + "Lv" + Level;
     }
 
     private boolean spawnCooltime = false;
 
-    public void spawn(Location location, int id) {
+    public void spawn(Location location) {
         if (spawnCooltime) {
             sendMessage(player, "§a時間をおいてから§b召喚§aしてください", SoundList.Nope);
             return;
@@ -250,7 +262,6 @@ public class PetParameter implements Cloneable {
         MultiThread.TaskRunLater(() -> {
             spawnCooltime = false;
         }, 40, "spawnCoolTime");
-        SummonId = id;
         target = null;
         List<String> cancel = new ArrayList<>();
         if (playerData.Level < MaxLevel - 30) {
@@ -269,6 +280,7 @@ public class PetParameter implements Cloneable {
             return;
         }
         entity = (LivingEntity) location.getWorld().spawnEntity(location, petData.entityType);
+        if (effectManager == null) effectManager = new EffectManager(entity, EffectOwnerType.Pet, this);
         uuid = entity.getUniqueId();
         if (petData.disguise != null) {
             Disguise disguise = petData.disguise.clone();
@@ -286,8 +298,11 @@ public class PetParameter implements Cloneable {
         playerData.PetSummon.add(this);
         PetManager.PetSummonedList.put(entity.getUniqueId(), this);
         effectManager.entity = entity;
-        player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました§b[" + SummonId + "]");
+        player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました§b[" + getSummonId() + "]");
         playSound(player, SoundList.Click);
+        for (PetParameter pet : playerData.PetSummon) {
+            pet.updateStatus();
+        }
         runAI();
     }
 
@@ -322,7 +337,7 @@ public class PetParameter implements Cloneable {
         Lore.add(decoLore(StatusParameter.EVA.Display) + String.format(format, EVA));
         Lore.add(decoLore(StatusParameter.CriticalRate.Display) + String.format(format, CriticalRate));
         Lore.add(decoLore(StatusParameter.CriticalResist.Display) + String.format(format, CriticalResist));
-        if (effectManager.Effect.size() > 0) {
+        if (effectManager != null && effectManager.Effect.size() > 0) {
             Lore.add(decoText("バフ・デバフ"));
             for (Map.Entry<EffectType, EffectData> effect : effectManager.Effect.entrySet()) {
                 Lore.add(decoLore(effect.getKey().Display) + String.format(playerData.ViewFormat(), effect.getValue().time/20f) + "秒");
@@ -413,6 +428,9 @@ public class PetParameter implements Cloneable {
     }
 
     private void delete() {
+        for (PetParameter pet : playerData.PetSummon) {
+            pet.updateStatus();
+        }
         MultiThread.TaskRunSynchronized(() -> {
             if (entity != null) {
                 entity.remove();
@@ -423,12 +441,11 @@ public class PetParameter implements Cloneable {
 
     public void cage() {
         stopAI();
-        delete();
         Summoned = false;
-        player.sendMessage("§e[" + petData.Display + "]§aを§eケージ§aに戻しました§b[" + SummonId + "]");
+        sendMessage(player, "§e[" + petData.Display + "]§aを§eケージ§aに戻しました§b[" + getSummonId() + "]", SoundList.Click);
         playerData.PetSummon.remove(this);
         PetManager.PetSummonedList.remove(entity.getUniqueId());
-        playSound(player, SoundList.Click);
+        delete();
     }
 
     public void dead() {
@@ -436,10 +453,10 @@ public class PetParameter implements Cloneable {
         delete();
         Summoned = false;
         Stamina = 0;
-        player.sendMessage("§e[" + petData.Display + "]§aが§eケージ§aに戻りました§b[" + SummonId + "]");
+        sendMessage(player, "§e[" + petData.Display + "]§aを§eケージ§aに戻りました§b[" + getSummonId() + "]", SoundList.Click);
         playerData.PetSummon.remove(this);
         PetManager.PetSummonedList.remove(entity.getUniqueId());
-        playSound(player, SoundList.Death);
+        delete();
     }
 
     public PetParameter(Player player, PlayerData playerData, String data) {

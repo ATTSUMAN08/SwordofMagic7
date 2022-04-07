@@ -13,10 +13,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class RuneInventory extends BasicInventory {
-    public final int MaxSlot = 500;
+    public final int MaxSlot = 1000;
     private final java.util.List<RuneParameter> List = new ArrayList<>();
 
     public RuneInventory(Player player, PlayerData playerData) {
@@ -36,15 +38,14 @@ public class RuneInventory extends BasicInventory {
 
     public void addRuneParameter(RuneParameter runeParameter) {
         if (List.size() < MaxSlot) {
-            List.add(runeParameter.clone());
-            if (List.size() >= MaxSlot-5) {
-                player.sendMessage("§e[ルーンインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです");
+            if (List.size() >= MaxSlot-10) {
+                sendMessage(player, "§e[ルーンインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
             }
         } else {
-            player.sendMessage("§e[ルーンインベントリ]§aが§c満杯§aです");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§e[ルーンインベントリ]§aが§c満杯§aです", SoundList.Nope);
+            spawnPlayer(player);
         }
-
+        List.add(runeParameter.clone());
     }
     public RuneParameter getRuneParameter(int i) {
         if (i < List.size()) {

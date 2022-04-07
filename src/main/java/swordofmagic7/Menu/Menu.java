@@ -121,7 +121,7 @@ public class Menu {
                 );
     }
 
-    public void MenuClick(InventoryClickEvent event) {
+    public synchronized void MenuClick(InventoryClickEvent event) {
         final InventoryView view = event.getView();
         final ItemStack currentItem = event.getCurrentItem();
         final InventoryAction action = event.getAction();
@@ -129,6 +129,7 @@ public class Menu {
         final Inventory ClickInventory = event.getClickedInventory();
         final int Slot = event.getSlot();
         event.setCancelled(true);
+        if (clickType.isKeyboardClick()) return;
 
         int index = -1;
         try {

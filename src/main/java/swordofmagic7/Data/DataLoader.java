@@ -18,7 +18,7 @@ import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Item.RewardBox;
+import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
 import swordofmagic7.Life.Angler.AnglerItemData;
@@ -786,6 +786,7 @@ public class DataLoader {
                     Material icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
                     int amount = data.getInt("Amount", 1);
                     TitleData titleData = new TitleData(fileName, icon, amount, data.getStringList("Display"), data.getStringList("Lore"));
+                    titleData.attributePoint = data.getInt("AttributePoint", 1);
                     TitleDataList.put(fileName, titleData);
                 } else {
                     int slot = 0;
@@ -897,14 +898,14 @@ public class DataLoader {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                List<RewardBox> list = new ArrayList<>();
+                List<RewardBoxData> list = new ArrayList<>();
                 for (String str : data.getStringList("RewardBox")) {
                     String[] split = str.split(",");
-                    RewardBox rewardBox = new RewardBox();
-                    rewardBox.id = split[0];
-                    rewardBox.amount = Integer.parseInt(split[1]);
-                    rewardBox.percent = Double.parseDouble(split[2]);
-                    list.add(rewardBox);
+                    RewardBoxData rewardBoxData = new RewardBoxData();
+                    rewardBoxData.id = split[0];
+                    rewardBoxData.amount = Integer.parseInt(split[1]);
+                    rewardBoxData.percent = Double.parseDouble(split[2]);
+                    list.add(rewardBoxData);
                 }
                 RewardBoxList.put(fileName, list);
             } catch (Exception e) {

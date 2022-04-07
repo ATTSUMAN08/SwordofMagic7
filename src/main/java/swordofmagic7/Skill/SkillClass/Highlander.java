@@ -59,7 +59,7 @@ public class Highlander {
                 ParticleManager.RandomVectorParticle(particleData, victim.getEyeLocation(), 30);
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, value, 1);
             }
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.Explosion);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -68,7 +68,7 @@ public class Highlander {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double radius = 5;
-            double angle = 70;
+            double angle = 100;
             ParticleData particleData = new ParticleData(Particle.SWEEP_ATTACK);
 
             for (int i = 0; i < skillData.CastTime; i++) {
@@ -80,6 +80,7 @@ public class Highlander {
             Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 2, 1);
             ShapedParticle(particleData, player.getLocation(), radius, angle, angle/2, 1, true);
+            playSound(player, SoundList.AttackSweep);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -98,6 +99,7 @@ public class Highlander {
                 Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0) / 100, 5);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Concussion, time, player);
             }
+            playSound(player, SoundList.AttackSweep);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -106,7 +108,7 @@ public class Highlander {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double length = 6;
-            double width = 1;
+            double width = 3;
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.RectangleParticle(particleCasting, player.getLocation(), length, width, 3);
@@ -114,11 +116,12 @@ public class Highlander {
             }
 
             ParticleManager.RectangleParticle(particleActivate, player.getLocation(), length, width, 3);
-            Vector vector = player.getLocation().getDirection().clone().setY(0.7).normalize();
+            Vector vector = player.getLocation().getDirection().clone().setY(1).normalize();
             for (LivingEntity victim : RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false)) {
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                 victim.setVelocity(vector);
             }
+            playSound(player, SoundList.AttackSweep);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -134,6 +137,7 @@ public class Highlander {
             ParticleManager.CylinderParticle(particleActivate, player.getLocation(), 1, 2, 3, 3);
             playerData.EffectManager.addEffect(EffectType.CrossGuard, time, time2);
 
+            playSound(player, SoundList.Rock);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

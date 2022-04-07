@@ -87,7 +87,7 @@ public class Upgrade {
                                         UpgradeCache[0] = null;
                                     }
                                     sendMessage(player, itemText + suffix, SoundList.LevelUp);
-                                    for (int i = 15; i < 25; i++) {
+                                    for (int i = 15; i <= 25; i++) {
                                         if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
                                     }
                                 } else {
@@ -125,7 +125,7 @@ public class Upgrade {
             } else if (index > -1) {
                 ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(index);
                 if (itemParameter.Category == ItemCategory.Equipment) {
-                    if (itemParameter.itemEquipmentData.Plus <= 25) {
+                    if (itemParameter.itemEquipmentData.Plus < 25) {
                         if (UpgradeCache[0] != null) {
                             playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                         }

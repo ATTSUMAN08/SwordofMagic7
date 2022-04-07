@@ -201,6 +201,17 @@ public final class ParticleManager {
         }
     }
 
+    public static void CirclePointLineParticle(ParticleData particleData, Location location, double radius, int point, double width, double density) {
+        Location lastLocation = null;
+        for (double i = 0; i <= 2 * Math.PI ; i += 2*Math.PI/point) {
+            double x = Math.cos(i) * radius;
+            double z = Math.sin(i) * radius;
+            Location loc = location.clone().add(x, 0 ,z);
+            if (lastLocation != null) LineParticle(particleData, lastLocation, loc, width, density);
+            lastLocation = loc.clone();
+        }
+    }
+
     public static void CircleFillAnimParticle(ParticleData particleData, Location location, double radius, double density, double Anim) {
         CircleParticle(particleData, location, radius, density);
         double gap = 90/(density * radius);

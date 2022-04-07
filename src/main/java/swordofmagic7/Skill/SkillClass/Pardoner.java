@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.playerHandLocation;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.RodAttack;
@@ -72,15 +73,16 @@ public class Pardoner {
                 ParticleManager.LineParticle(new ParticleData(Particle.SPELL_WITCH), playerHandLocation(player), 20, 0, 10);
                 LivingEntity target = ray.HitEntity;
                 for (Map.Entry<EffectType, EffectData> data : EffectManager.getEffectManager(target).Effect.entrySet()) {
-                    if (!data.getKey().Buff) {
+                    if (!data.getKey().Buff && !data.getKey().isStatic && !data.getValue().flags) {
                         if (data.getValue().time > min) {
                             data.getValue().time *= multiply;
                         } else {
                             data.getValue().time += min;
                         }
+                        data.getValue().flags = true;
+                        sendMessage(player, "§c[" + data.getKey().Display + "]§aを延長しました");
                     }
                 }
-                EffectManager.addEffectMessage(player, target, skillData.Display, "§c");
                 playSound(player, RodAttack);
             } else {
                 player.sendMessage("§e対象§aがいません");

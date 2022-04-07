@@ -18,12 +18,16 @@ import swordofmagic7.Mob.MobSkillData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.*;
+import static swordofmagic7.SomCore.createHologram;
+import static swordofmagic7.SomCore.random;
 
 public final class Damage {
 
@@ -123,6 +127,7 @@ public final class Damage {
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
+            Multiply = enemyData.DamageCauseMultiply.get(damageCause);
             attackerLevel = enemyData.Level;
             attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
@@ -130,9 +135,10 @@ public final class Damage {
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
+            Multiply = petParameter.DamageCauseMultiply.get(damageCause);
             attackerLevel = petParameter.Level;
             petParameter.DecreaseStamina(1, 1);
-            attackerEffectManager = petParameter.effectManager;
+            attackerEffectManager = petParameter.getEffectManager();
         } else return;
         if (victim instanceof Player player) {
             HoloView.add(player);
@@ -149,6 +155,7 @@ public final class Damage {
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
+            Resistance = enemyData.DamageCauseResistance.get(damageCause);
             victimLevel = enemyData.Level;
             victimEffectManager = enemyData.effectManager;
             enemyData.HitCount++;
@@ -157,9 +164,10 @@ public final class Damage {
             DEF = petParameter.DEF;
             EVA = petParameter.EVA;
             CriticalResist = petParameter.CriticalResist;
+            Resistance = petParameter.DamageCauseResistance.get(damageCause);
             victimLevel = petParameter.Level;
             petParameter.DecreaseStamina(3, 1);
-            victimEffectManager = petParameter.effectManager;
+            victimEffectManager = petParameter.getEffectManager();
         } else return;
 
         victim.playEffect(EntityEffect.HURT);
@@ -223,6 +231,7 @@ public final class Damage {
                 int time = victimEffectManager.getData(EffectType.CrossGuard).getInt(0);
                 victimEffectManager.addEffect(EffectType.CrossGuardCounter, time);
                 victimEffectManager.removeEffect(EffectType.CrossGuard);
+                sendMessage(player,"§e[" + EffectType.CrossGuardCounter.Display + "]§aが発動しました", SoundList.Counter);
             }
             PlayerData playerData = playerData(player);
             playerData.HealthRegenDelay = 40;

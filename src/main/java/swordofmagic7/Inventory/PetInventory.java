@@ -12,11 +12,13 @@ import swordofmagic7.Sound.SoundList;
 import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.SomCore.spawnPlayer;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetInventory extends BasicInventory {
-    public final int MaxSlot = 300;
+    public final int MaxSlot = 500;
     private final List<PetParameter> List = new ArrayList<>();
     private final HashMap<UUID, PetParameter> HashMap = new HashMap<>();
     public PetInventory(Player player, PlayerData playerData) {
@@ -61,16 +63,15 @@ public class PetInventory extends BasicInventory {
 
     public void addPetParameter(PetParameter pet) {
         if (List.size() < MaxSlot) {
-            HashMap.put(pet.petUUID, pet);
-            List.add(pet);
-            if (List.size() >= MaxSlot-5) {
-                player.sendMessage("§e[ペットケージ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです");
+            if (List.size() >= MaxSlot-10) {
+                sendMessage(player, "§e[ペットケージ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
             }
         } else {
-            player.sendMessage("§e[ペットケージ]§aが§c満杯§aです");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§e[ペットケージ]§aが§c満杯§aです", SoundList.Nope);
+            spawnPlayer(player);
         }
-
+        HashMap.put(pet.petUUID, pet);
+        List.add(pet);
     }
     public PetParameter getPetParameter(int i) {
         if (i < List.size()) {
