@@ -20,8 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.MapList;
-import static swordofmagic7.Data.DataBase.ServerId;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Dungeon.Dungeon.Message;
 import static swordofmagic7.Dungeon.Dungeon.world;
@@ -46,7 +45,7 @@ public class DefenseBattle {
     private static final String sidebarId = "DefenseBattle";
     public static boolean last = false;
     static boolean isStart = false;
-    static boolean isAlarm = true;
+    static boolean isAlarm = false;
 
     public static void onLoad() {
         spawnLocation[0] = new Location(world, 2279.5,66,2274.5);
@@ -65,7 +64,7 @@ public class DefenseBattle {
             String display = format.format(time);
             switch (display) {
                 case "13:55", "18:55", "21:55", "23:55" -> {
-                    if (isAlarm) {
+                    if (!isAlarm) {
                         Client.BroadCast(new TextView("§aまもなく§c防衛戦§aが開始されます"));
                         isAlarm = true;
                     }
@@ -89,6 +88,7 @@ public class DefenseBattle {
         MapList.get("DefenseBattle").enter(player);
     }
 
+    private static final Location bossLocation = new Location(world, 2232, 72, 2379);
     public static void startWave(int i) {
         if (i == 1) time = startTime;
         Client.BroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
@@ -98,6 +98,9 @@ public class DefenseBattle {
             EnemyCount = 50 + wave*5;
             Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DungeonTrigger);
             Set<Player> Players = new HashSet<>();
+            MultiThread.TaskRunSynchronized(() -> {
+                EnemyList.add(MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, bossLocation));
+            });
             while (plugin.isEnabled() && Health > 0 && time > 0) {
                 Players = PlayerList.getNear(targetLocation, Radius);
                 MultiThread.TaskRunSynchronized(() -> {
@@ -107,7 +110,7 @@ public class DefenseBattle {
                             Location location = spawnLocation[random.nextInt(spawnLocation.length - 1)];
                             EnemyData enemyData = MobManager.mobSpawn(mobData, wave * 5, location);
                             if (random.nextDouble() < 0.5) {
-                                enemyData.DefenseAI = targetLocation;
+                                enemyData.overrideTargetLocation = targetLocation;
                             } else {
                                 enemyData.nonTargetLocation = targetLocation;
                             }
@@ -140,7 +143,7 @@ public class DefenseBattle {
                 ViewBar.setSideBar(Players, sidebarId, textData);
                 Set<Player> finalPlayers = Players;
                 MultiThread.TaskRunSynchronized(() -> {
-                    Collection<LivingEntity> inList = targetLocation.getNearbyLivingEntities(Radius, entity -> entity.getName().contains("§c"));
+                    Collection<LivingEntity> inList = targetLocation.getNearbyLivingEntities(Radius, entity -> entity.getName().contains("§c") || entity.getName().contains("§6"));
                     if (inList.size()+EnemyCount < 10) {
                         if (!last) {
                             last = true;

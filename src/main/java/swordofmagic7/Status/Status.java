@@ -95,28 +95,28 @@ public class Status {
 
     public void setCombatPower() {
         double combatPower = 0;
-        combatPower += MaxHealth/8;
-        combatPower += HealthRegen*5;
-        combatPower += MaxMana/8;
-        combatPower += ManaRegen*5;
-        combatPower += ATK*1.5;
-        combatPower += DEF*1.5;
-        combatPower += HLP*1.5;
-        combatPower += ACC*3;
-        combatPower += EVA*3;
-        combatPower += CriticalRate*2;
-        combatPower += CriticalResist*4;
+        combatPower += MaxHealth/3;
+        combatPower += HealthRegen*3;
+        combatPower += MaxMana/3;
+        combatPower += ManaRegen*3;
+        combatPower += ATK;
+        combatPower += DEF;
+        combatPower += HLP;
+        combatPower += ACC;
+        combatPower += EVA;
+        combatPower += CriticalRate;
+        combatPower += CriticalResist;
         combatPower += SkillCooltime;
         combatPower += SkillCastTime;
         combatPower += SkillRigidTime;
         for (DamageCause damageCause : DamageCause.values()) {
             combatPower += DamageCauseMultiply.getOrDefault(damageCause,1d)*100;
-            combatPower += DamageCauseResistance.getOrDefault(damageCause,1d)*100;
+            combatPower += DamageCauseResistance.getOrDefault(damageCause,1d*100);
         }
         for (AttributeType attr : AttributeType.values()) {
-            combatPower += playerData.Attribute.getAttribute(attr)*5;
+            combatPower += playerData.Attribute.getAttribute(attr)*1.5;
         }
-        CombatPower = combatPower/10;
+        CombatPower = combatPower/6;
     }
 
     public int totalLevel() {
@@ -232,7 +232,7 @@ public class Status {
             }
         }
 
-        CriticalMultiply = 1.2;
+        CriticalMultiply = 1.3;
         CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
         DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(STR) * 0.005);
         DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(INT) * 0.004);
@@ -241,16 +241,16 @@ public class Status {
 
         double M = LevelMultiply();
         BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * (1 + Attribute(VIT) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxHealth));
-        BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * (1 + Attribute(VIT) * 0.002) * BaseMultiplyStatus(StatusParameter.HealthRegen));
+        BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * BaseMultiplyStatus(StatusParameter.HealthRegen));
         BaseStatus.put(StatusParameter.MaxMana, (M * 100) * (1 + Attribute(SPI) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxMana));
         BaseStatus.put(StatusParameter.ManaRegen, (M * 5) * (1 + Attribute(SPI) * 0.0005) * BaseMultiplyStatus(StatusParameter.ManaRegen));
-        BaseStatus.put(StatusParameter.ATK, (M * 10) * (1 + Attribute(STR) * 0.005 + Attribute(INT) * 0.005) * BaseMultiplyStatus(StatusParameter.ATK));
-        BaseStatus.put(StatusParameter.DEF, (M * 5) * (1 + Attribute(VIT) * 0.005) * BaseMultiplyStatus(StatusParameter.DEF));
-        BaseStatus.put(StatusParameter.HLP, (M * 5) * (1 + Attribute(SPI) * 0.005) * BaseMultiplyStatus(StatusParameter.HLP));
-        BaseStatus.put(StatusParameter.ACC, (M * 10) * (1 + Attribute(TEC) * 0.008) * BaseMultiplyStatus(StatusParameter.ACC));
-        BaseStatus.put(StatusParameter.EVA, (M * 5) * (1 + Attribute(DEX) * 0.008) * BaseMultiplyStatus(StatusParameter.EVA));
-        BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * (1 + Attribute(TEC) * 0.01) * BaseMultiplyStatus(StatusParameter.CriticalRate));
-        BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * (1 + Attribute(SPI) * 0.02) * BaseMultiplyStatus(StatusParameter.CriticalResist));
+        BaseStatus.put(StatusParameter.ATK, (M * 10) * (1 + Attribute(STR) * 0.025 + Attribute(INT) * 0.025) * BaseMultiplyStatus(StatusParameter.ATK));
+        BaseStatus.put(StatusParameter.DEF, (M * 5) * (1 + Attribute(VIT) * 0.025) * BaseMultiplyStatus(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.HLP, (M * 5) * (1 + Attribute(SPI) * 0.025) * BaseMultiplyStatus(StatusParameter.HLP));
+        BaseStatus.put(StatusParameter.ACC, (M * 10) * (1 + Attribute(TEC) * 0.042) * BaseMultiplyStatus(StatusParameter.ACC));
+        BaseStatus.put(StatusParameter.EVA, (M * 5) * (1 + Attribute(DEX) * 0.042) * BaseMultiplyStatus(StatusParameter.EVA));
+        BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * (1 + Attribute(TEC) * 0.042) * BaseMultiplyStatus(StatusParameter.CriticalRate));
+        BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * (1 + Attribute(VIT) * 0.038) * BaseMultiplyStatus(StatusParameter.CriticalResist));
         BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
         BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
         BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
@@ -269,8 +269,6 @@ public class Status {
         SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
-
-        if (playerData.EffectManager.hasEffect(EffectType.InsufficientFilling)) ATK *= 0.1f;
 
         String color = "§f";
         if (playerData.PvPMode) color = "§c";

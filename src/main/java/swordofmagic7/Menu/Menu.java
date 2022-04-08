@@ -253,13 +253,13 @@ public class Menu {
                 playerData.Classes.ClassSelectClick(view, Slot);
                 playerData.Attribute.AttributeMenuClick(view, clickType, currentItem);
                 playerData.Skill.SkillMenuClick(view, Slot);
-                playerData.Shop.ShopClick(view, currentItem, Slot, index);
+                playerData.Shop.ShopClick(view, currentItem, clickType, Slot, index);
                 playerData.MapManager.TeleportGateMenuClick(view, Slot);
                 Setting.SettingMenuClick(view, currentItem);
                 Trigger.TriggerMenuClick(view, currentItem, Slot);
                 Smith.SmithMenuClick(view, currentItem);
                 TitleMenu.TitleMenuClick(view, currentItem, Slot);
-                Cook.CookMenuClick(view, currentItem, Slot);
+                Cook.CookMenuClick(view, currentItem, clickType, Slot);
                 Smelt.SmeltMenuClick(view, currentItem, Slot);
                 Market.MarketMenuClick(view, currentItem, Slot);
                 smithMake.MakeMenuClick(view, currentItem, Slot);

@@ -73,7 +73,6 @@ public class EnemyData {
     public LivingEntity target;
     public Location overrideTargetLocation;
     public Location nonTargetLocation;
-    public Location DefenseAI;
     public boolean isDefenseBattle = false;
     private boolean isDead = false;
 
@@ -114,11 +113,17 @@ public class EnemyData {
     public static double StatusMultiply(int level) {
         return Math.pow(0.74+(level/3f), 1.45);
     }
+    public static double StatusMultiply2(int level) {
+        return level >= 30 ? Math.pow(StatusMultiply(level), 1.1) : StatusMultiply(level);
+    }
+    public static double StatusMultiply3(int level) {
+        return level >= 30 ? Math.pow(StatusMultiply(level), 1.04) : StatusMultiply(level);
+    }
 
     public void statusUpdate() {
         double multiply = StatusMultiply(Level);
-        double multiply2 = Level >= 30 ? Math.pow(multiply, 1.1) : multiply;
-        double multiply3 = Level >= 30 ? Math.pow(multiply, 1.04) : multiply;
+        double multiply2 = StatusMultiply2(Level);
+        double multiply3 = StatusMultiply3(Level);
 
         HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
         HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
@@ -170,6 +175,25 @@ public class EnemyData {
         ClassExp = mobData.Exp;
     }
 
+    public static List<String> enemyLore(MobData mobData, int Level) {
+        double multiply = StatusMultiply(Level);
+        double multiply2 = StatusMultiply2(Level);
+        double multiply3 = StatusMultiply3(Level);
+        String format = "%.0f";
+        List<String> lore = new ArrayList<>();
+        lore.add(decoText("§3§lステータス"));
+        lore.add(decoLore("体力") + String.format(format, mobData.Health*multiply2));
+        lore.add(decoLore("攻撃力") + String.format(format, mobData.ATK * multiply));
+        lore.add(decoLore("防御力") + String.format(format, mobData.DEF * multiply3));
+        lore.add(decoLore("命中") + String.format(format, mobData.ACC * multiply));
+        lore.add(decoLore("回避") + String.format(format, mobData.EVA * multiply));
+        lore.add(decoLore("クリティカル発生") + String.format(format, mobData.CriticalRate * multiply));
+        lore.add(decoLore("クリティカル耐性") + String.format(format, mobData.CriticalResist * multiply3));
+        lore.add(decoLore("キャラ経験値") + String.format(format, mobData.Exp * multiply));
+        lore.add(decoLore("クラス経験値") + String.format(format, mobData.Exp));
+        return lore;
+    }
+
     private double statusMultiply(StatusParameter status) {
         return MultiplyStatus.getOrDefault(status, 1d);
     }
@@ -185,7 +209,6 @@ public class EnemyData {
     void stopAI() {
         runAITask = false;
         if (asyncAITask != null) asyncAITask.cancel();
-        if (syncAITask != null) syncAITask.cancel();
     }
 
     public boolean isRunnableAI() {
@@ -195,7 +218,6 @@ public class EnemyData {
     public Location LastLocation;
     private Location NextLocation;
     public BukkitTask asyncAITask;
-    public BukkitTask syncAITask;
     void runAI() {
         stopAI();
         SpawnLocation = entity.getLocation();
@@ -203,106 +225,100 @@ public class EnemyData {
         if (entity instanceof Mob mob) {
             Pathfinder pathfinder = mob.getPathfinder();
             runAITask = true;
-            syncAITask = new BukkitRunnable() {
+            asyncAITask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (!isRunnableAI()) this.cancel();
-                    if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
-                        mob.lookAt(NextLocation);
-                        pathfinder.moveTo(NextLocation, mobData.Mov);
-                        LastLocation = entity.getLocation();
+
+                    Location targetLocation = null;
+                    if (overrideTargetLocation != null) {
+                        targetLocation = overrideTargetLocation;
+                    } else if (target != null) {
+                        targetLocation = target.getLocation();
+                    } else if (nonTargetLocation != null) {
+                        targetLocation = nonTargetLocation;
+                    }
+                    if (targetLocation != null) {
+                        NextLocation = targetLocation;
+                        MultiThread.TaskRunSynchronized(() -> {
+                            if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
+                                mob.lookAt(NextLocation, 90f, -90f);
+                                if (target != null) mob.setTarget(target);
+                                pathfinder.moveTo(NextLocation, mobData.Mov);
+                                LastLocation = entity.getLocation();
+                            }
+                        });
+                    }
+
+                    double topPriority = 0;
+                    Priority.entrySet().removeIf(entry -> (
+                            entry.getKey() instanceof Player player && !Function.isAlive(player))
+                            || entry.getKey().getLocation().distance(entity.getLocation()) > mobData.Search
+                            || entry.getKey().isDead());
+                    for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
+                        double priorityValue = priority.getValue();
+                        LivingEntity priorityTarget = priority.getKey();
+                        if (priorityTarget instanceof Player player) {
+                            PlayerData targetData = playerData(player);
+                            if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
+                                priorityValue = 0;
+                                Priority.put(priority.getKey(), 0d);
+                            }
+                            if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
+                                priorityValue = 0;
+                                if (target == player) target = null;
+                            }
+                            if (targetData.EffectManager.hasEffect(EffectType.HatePriority)) {
+                                target = player;
+                                break;
+                            }
+                        }
+                        if (topPriority < priorityValue) {
+                            target = priorityTarget;
+                            topPriority = priorityValue;
+                        }
+                    }
+
+                    if (target == null && mobData.Hostile) {
+                        Set<Player> Targets = PlayerList.getNear(entity.getLocation(), mobData.Search);
+                        int topLevel = 0;
+                        LivingEntity target = null;
+                        for (Player player : Targets) {
+                            PlayerData playerData = playerData(player);
+                            if (playerData.Level > topLevel) {
+                                topLevel = playerData.Level;
+                                target = player;
+                            }
+                        }
+                        if (target != null) Priority.put(target, 1d);
+                    }
+
+                    if (target != null) {
+                        if (target instanceof Player player && !Function.isAlive(player)) {
+                            Priority.remove(target);
+                            target = null;
+                        } else {
+                            skillManager.tickSkillTrigger();
+                            final Location TargetLocation = target.getLocation();
+                            final Location EntityLocation = entity.getLocation();
+                            double x1 = EntityLocation.getX();
+                            double y1 = EntityLocation.getY();
+                            double z1 = EntityLocation.getZ();
+                            double x2 = TargetLocation.getX();
+                            double y2 = TargetLocation.getY();
+                            double z2 = TargetLocation.getZ();
+                            if (Math.abs(x1 - x2) <= mobData.Reach && Math.abs(z1 - z2) <= mobData.Reach && Math.abs(y1 - y2) < 16) {
+                                Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
+                            }
+                        }
+                    }
+                    if (!isDefenseBattle && !mobData.enemyType.isBoss()) {
+                        if (PlayerList.getNear(entity.getLocation(), 48).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                            delete();
+                        }
                     }
                 }
-            }.runTaskTimer(plugin, 0, 20);
-            if (DefenseAI != null) {
-                NextLocation = DefenseAI;
-            } else {
-                asyncAITask = new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!isRunnableAI()) this.cancel();
-                        Location targetLocation = null;
-                        if (overrideTargetLocation != null) {
-                            targetLocation = overrideTargetLocation;
-                        } else if (target != null) {
-                            targetLocation = target.getLocation();
-                        } else if (nonTargetLocation != null) {
-                            targetLocation = nonTargetLocation;
-                        }
-                        if (targetLocation != null) {
-                            NextLocation = targetLocation;
-                        }
-
-                        double topPriority = 0;
-                        Priority.entrySet().removeIf(entry -> (
-                                entry.getKey() instanceof Player player && !Function.isAlive(player))
-                                || entry.getKey().getLocation().distance(entity.getLocation()) > mobData.Search
-                                || entry.getKey().isDead());
-                        for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
-                            double priorityValue = priority.getValue();
-                            LivingEntity priorityTarget = priority.getKey();
-                            if (priorityTarget instanceof Player player) {
-                                PlayerData targetData = playerData(player);
-                                if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
-                                    priorityValue = 0;
-                                    Priority.put(priority.getKey(), 0d);
-                                }
-                                if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
-                                    priorityValue = 0;
-                                    if (target == player) target = null;
-                                }
-                                if (targetData.EffectManager.hasEffect(EffectType.HatePriority)) {
-                                    target = player;
-                                    break;
-                                }
-                            }
-                            if (topPriority < priorityValue) {
-                                target = priorityTarget;
-                                topPriority = priorityValue;
-                            }
-                        }
-
-                        if (target == null && mobData.Hostile) {
-                            Set<Player> Targets = PlayerList.getNear(entity.getLocation(), mobData.Search);
-                            int topLevel = 0;
-                            LivingEntity target = null;
-                            for (Player player : Targets) {
-                                PlayerData playerData = playerData(player);
-                                if (playerData.Level > topLevel) {
-                                    topLevel = playerData.Level;
-                                    target = player;
-                                }
-                            }
-                            if (target != null) Priority.put(target, 1d);
-                        }
-
-                        if (target != null) {
-                            if (target instanceof Player player && !Function.isAlive(player)) {
-                                Priority.remove(target);
-                                target = null;
-                            } else {
-                                skillManager.tickSkillTrigger();
-                                final Location TargetLocation = target.getLocation();
-                                final Location EntityLocation = entity.getLocation();
-                                double x1 = EntityLocation.getX();
-                                double y1 = EntityLocation.getY();
-                                double z1 = EntityLocation.getZ();
-                                double x2 = TargetLocation.getX();
-                                double y2 = TargetLocation.getY();
-                                double z2 = TargetLocation.getZ();
-                                if (Math.abs(x1 - x2) <= mobData.Reach && Math.abs(z1 - z2) <= mobData.Reach && Math.abs(y1 - y2) < 16) {
-                                    Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
-                                }
-                            }
-                        }
-                        if (!isDefenseBattle && !mobData.enemyType.isBoss()) {
-                            if (PlayerList.getNear(entity.getLocation(), 48).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
-                                delete();
-                            }
-                        }
-                    }
-                }.runTaskTimerAsynchronously(plugin, 0, 20);
-            }
+            }.runTaskTimerAsynchronously(plugin, 0, 20);
         }
     }
 
@@ -339,144 +355,145 @@ public class EnemyData {
 
     public synchronized void dead() {
         if (isDead) return;
-        if (entity != null) {
-            ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORKS_SPARK, 0.22f), entity.getLocation(), 100);
-            playSound(entity.getLocation(), SoundList.Death);
-            Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
-        }
-        delete();
-
-        if (mobData.enemyType.isBoss()) {
-            List<Map.Entry<LivingEntity, Double>> entries = new ArrayList<>(TotalDamageTable.entrySet());
-            entries.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
-            List<String> message = new ArrayList<>();
-            message.add(decoText("ダメージランキング"));
-            int i = 1;
-            for (Map.Entry<LivingEntity, Double> entry : entries) {
-                message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
-                i++;
-                if (i > 5) break;
+        isDead = true;
+        MultiThread.TaskRun(() -> {
+            if (entity != null) {
+                ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORKS_SPARK, 0.22f), entity.getLocation(), 50);
+                playSound(entity.getLocation(), SoundList.Death);
+                Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
             }
-            for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
-                if (player.isOnline()) {
-                    sendMessage(player, message, SoundList.Tick);
+            delete();
+            if (mobData.DamageRanking) {
+                List<Map.Entry<LivingEntity, Double>> entries = new ArrayList<>(TotalDamageTable.entrySet());
+                entries.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
+                List<String> message = new ArrayList<>();
+                message.add(decoText("ダメージランキング"));
+                int i = 1;
+                for (Map.Entry<LivingEntity, Double> entry : entries) {
+                    message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
+                    i++;
                 }
-            }
-        }
-
-        int exp = (int) Math.floor(Exp);
-        int classExp = (int) Math.floor(ClassExp);
-        List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
-        DropItemTable.add(new DropItemData(getItemParameter("生命の雫"), 0.0001));
-        DropItemTable.add(new DropItemData(getItemParameter("強化石"), 0.05));
-        for (Player player : Involved) {
-            if (player.isOnline()) {
-                PlayerData playerData = playerData(player);
-                playerData.statistics.enemyKill(mobData);
-                Classes classes = playerData.Classes;
-                List<ClassData> classList = new ArrayList<>();
-                for (ClassData classData : classes.classSlot) {
-                    if (classData != null && !classData.ProductionClass) {
-                        classList.add(classData);
+                for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
+                    if (player.isOnline()) {
+                        sendMessage(player, message, SoundList.Tick);
                     }
                 }
-                playerData.addPlayerExp(decayExp(exp, playerData.Level, Level));
-                for (ClassData classData : classList) {
-                    classes.addClassExp(classData, classExp);
-                }
-                for (PetParameter pet : playerData.PetSummon) {
-                    pet.addExp(decayExp(exp, pet.Level, Level));
-                }
-                List<String> Holo = new ArrayList<>();
-                Holo.add("§e§lEXP §a§l+" + exp);
-                if (!isDefenseBattle) {
-                    for (DropItemData dropData : DropItemTable) {
-                        if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                            if (random.nextDouble() <= dropData.Percent) {
-                                int amount;
-                                if (dropData.MaxAmount != dropData.MinAmount) {
-                                    amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
-                                } else {
-                                    amount = dropData.MinAmount;
+            }
+
+            int exp = (int) Math.floor(Exp);
+            int classExp = (int) Math.floor(ClassExp);
+            List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
+            DropItemTable.add(new DropItemData(getItemParameter("生命の雫"), 0.0001));
+            DropItemTable.add(new DropItemData(getItemParameter("強化石"), 0.05));
+            for (Player player : Involved) {
+                if (player.isOnline()) {
+                    PlayerData playerData = playerData(player);
+                    playerData.statistics.enemyKill(mobData);
+                    Classes classes = playerData.Classes;
+                    List<ClassData> classList = new ArrayList<>();
+                    for (ClassData classData : classes.classSlot) {
+                        if (classData != null && !classData.ProductionClass) {
+                            classList.add(classData);
+                        }
+                    }
+                    playerData.addPlayerExp(decayExp(exp, playerData.Level, Level));
+                    for (ClassData classData : classList) {
+                        classes.addClassExp(classData, classExp);
+                    }
+                    for (PetParameter pet : playerData.PetSummon) {
+                        pet.addExp(decayExp(exp, pet.Level, Level));
+                    }
+                    List<String> Holo = new ArrayList<>();
+                    Holo.add("§e§lEXP §a§l+" + exp);
+                    if (!isDefenseBattle) {
+                        for (DropItemData dropData : DropItemTable) {
+                            if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                                if (random.nextDouble() <= dropData.Percent) {
+                                    int amount;
+                                    if (dropData.MaxAmount != dropData.MinAmount) {
+                                        amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
+                                    } else {
+                                        amount = dropData.MinAmount;
+                                    }
+                                    playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
+                                    Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
+                                    if (playerData.DropLog.isItem()) ItemGetLog(player, dropData.itemParameter, amount);
+                                    if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
+                                        TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                        text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
+                                        text.addText("§aを§e獲得§aしました");
+                                        text.setSound(SoundList.Tick);
+                                        Client.BroadCast(text);
+                                    }
                                 }
-                                playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
-                                Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                                if (playerData.DropLog.isItem()) ItemGetLog(player, dropData.itemParameter, amount);
-                                if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
-                                    TextView text = new TextView(playerData.getNick() + "§aさんが");
-                                    text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
-                                    text.addText("§aを§e獲得§aしました");
+                            }
+                        }
+                        for (DropRuneData dropData : mobData.DropRuneTable) {
+                            if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                                if (random.nextDouble() <= dropData.Percent) {
+                                    RuneParameter runeParameter = dropData.runeParameter.clone();
+                                    runeParameter.Quality = random.nextDouble();
+                                    runeParameter.Level = Level;
+                                    if (mobData.enemyType.isBoss() || playerData.RuneQualityFilter <= runeParameter.Quality) {
+                                        playerData.RuneInventory.addRuneParameter(runeParameter);
+                                        Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                                        if (playerData.DropLog.isRune()) {
+                                            player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                        }
+                                    } else {
+                                        playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
+                                        Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
+                                        if (playerData.DropLog.isItem()) {
+                                            ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
+                            QuestData questData = data.getKey();
+                            if (questData.type.isEnemy()) {
+                                for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
+                                    QuestReqContentKey key = reqContent.getKey();
+                                    if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
+                                        playerData.QuestManager.processQuest(questData, key, 1);
+                                    }
+                                }
+                            }
+                        }
+                        if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
+                            PetData petData = getPetData(mobData.Id);
+                            if (petData.BossPet) {
+                                if (random.nextDouble() <= 0.0005) {
+                                    PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
+                                    playerData.PetInventory.addPetParameter(pet);
+                                    TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
                                     text.setSound(SoundList.Tick);
                                     Client.BroadCast(text);
                                 }
-                            }
-                        }
-                    }
-                    for (DropRuneData dropData : mobData.DropRuneTable) {
-                        if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                            if (random.nextDouble() <= dropData.Percent) {
-                                RuneParameter runeParameter = dropData.runeParameter.clone();
-                                runeParameter.Quality = random.nextDouble();
-                                runeParameter.Level = Level;
-                                if (playerData.RuneQualityFilter <= runeParameter.Quality) {
-                                    playerData.RuneInventory.addRuneParameter(runeParameter);
-                                    Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                                    if (playerData.DropLog.isRune()) {
-                                        player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
-                                    }
-                                } else {
-                                    playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
-                                    Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
-                                    if (playerData.DropLog.isItem()) {
-                                        ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
-                                    }
+                            } else {
+                                if (random.nextDouble() <= 0.01) {
+                                    PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
+                                    playerData.PetInventory.addPetParameter(pet);
+                                    Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
                                 }
                             }
                         }
-                    }
-                    for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
-                        QuestData questData = data.getKey();
-                        if (questData.type.isEnemy()) {
-                            for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
-                                QuestReqContentKey key = reqContent.getKey();
-                                if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
-                                    playerData.QuestManager.processQuest(questData, key, 1);
-                                }
+                        Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
+                        MultiThread.TaskRunSynchronized(() -> {
+                            Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
+                            VisibilityManager visibilityManager = hologram.getVisibilityManager();
+                            visibilityManager.setVisibleByDefault(false);
+                            visibilityManager.showTo(player);
+                            for (String holo : Holo) {
+                                hologram.appendTextLine(holo);
                             }
-                        }
+                            MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
+                            playerData.viewUpdate();
+                        }, "EnemyKillRewardHolo");
                     }
-                    if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
-                        PetData petData = getPetData(mobData.Id);
-                        if (petData.BossPet) {
-                            if (random.nextDouble() <= 0.0005) {
-                                PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
-                                playerData.PetInventory.addPetParameter(pet);
-                                TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
-                                text.setSound(SoundList.Tick);
-                                Client.BroadCast(text);
-                            }
-                        } else {
-                            if (random.nextDouble() <= 0.01) {
-                                PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
-                                playerData.PetInventory.addPetParameter(pet);
-                                Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
-                            }
-                        }
-                    }
-                    Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-                    MultiThread.TaskRunSynchronized(() -> {
-                        Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
-                        VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                        visibilityManager.setVisibleByDefault(false);
-                        visibilityManager.showTo(player);
-                        for (String holo : Holo) {
-                            hologram.appendTextLine(holo);
-                        }
-                        MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
-                        playerData.viewUpdate();
-                    }, "EnemyKillRewardHolo");
                 }
             }
-        }
+        }, "EnemyDead");
     }
 }

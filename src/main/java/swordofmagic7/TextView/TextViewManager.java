@@ -25,7 +25,7 @@ public class TextViewManager {
             String type = args[0];
             PlayerData playerData = PlayerData.playerData(player);
             ItemStack itemView = null;
-            int Amount = 1;
+            int amount = 1;
             if (type.equalsIgnoreCase("MainHand")) {
                 itemView = player.getInventory().getItemInMainHand();
             } else if (type.equalsIgnoreCase("OffHand")) {
@@ -35,13 +35,14 @@ public class TextViewManager {
             } else if (index > -1 && type.equalsIgnoreCase("Item") && playerData.ItemInventory.getList().size() > index) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
                 itemView = stack.viewItem(playerData.ViewFormat());
-                itemView.setAmount(stack.Amount);
+                amount = stack.Amount;
             } else if (index > -1 && type.equalsIgnoreCase("Rune") && playerData.RuneInventory.getList().size() > index) {
                 itemView = playerData.RuneInventory.getRuneParameter(index).viewRune(playerData.ViewFormat());
             } else if (index > -1 && type.equalsIgnoreCase("Pet") && playerData.PetInventory.getList().size() > index) {
                 itemView = playerData.PetInventory.getPetParameter(index).viewPet(playerData.ViewFormat());
             }
             if (itemView != null) {
+                itemView.setAmount(amount);
                 player.chat(itemDecoString(itemView));
                 return;
             }

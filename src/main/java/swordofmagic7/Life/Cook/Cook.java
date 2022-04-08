@@ -1,6 +1,7 @@
 package swordofmagic7.Life.Cook;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -10,6 +11,7 @@ import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Shop.Shop;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.*;
@@ -80,7 +82,7 @@ public class Cook {
         }
     }
 
-    public void CookMenuClick(InventoryView view, ItemStack currentItem, int Slot) {
+    public void CookMenuClick(InventoryView view, ItemStack currentItem, ClickType clickType, int Slot) {
         if (equalInv(view, CookMenuDisplay)) {
             if (Slot < 45) {
                 if (currentItem != null) {
@@ -144,16 +146,19 @@ public class Cook {
                     page++;
                     CookMenuView(page);
                 } else {
+                    int cookAmount = 0;
                     switch (Slot) {
-                        case 46 -> CookAmount -= 100;
-                        case 47 -> CookAmount -= 10;
-                        case 48 -> CookAmount--;
-                        case 50 -> CookAmount++;
-                        case 51 -> CookAmount += 10;
-                        case 52 -> CookAmount += 100;
+                        case 46 -> cookAmount -= 100;
+                        case 47 -> cookAmount -= 10;
+                        case 48 -> cookAmount--;
+                        case 50 -> cookAmount++;
+                        case 51 -> cookAmount += 10;
+                        case 52 -> cookAmount += 100;
                     }
+                    if (clickType.isShiftClick()) cookAmount *= 1000;
+                    if (cookAmount != 0) CookAmount += cookAmount;
                     if (CookAmount < 1) CookAmount = 1;
-                    if (CookAmount > 10000) CookAmount = 10000;
+                    if (CookAmount > Shop.MaxSelectAmount) CookAmount = Shop.MaxSelectAmount;
                     playSound(player, SoundList.Click);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(CookPrefix, CookAmount));

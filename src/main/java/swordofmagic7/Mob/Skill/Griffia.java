@@ -28,10 +28,10 @@ public class Griffia {
     final Location[] Candle = new Location[4];
     public Griffia(EnemySkillManager manager) {
         this.Manager = manager;
-        Candle[0] = new Location(world, 649.5, 119, 2031.5);
-        Candle[1] = new Location(world, 652.5, 119, 1923.5);
-        Candle[2] = new Location(world, 760.5, 119, 1927.5);
-        Candle[3] = new Location(world, 756.5, 119, 2035.5);
+        Candle[0] = new Location(world, 649.5, 129, 2031.5);
+        Candle[1] = new Location(world, 652.5, 129, 1923.5);
+        Candle[2] = new Location(world, 760.5, 129, 1927.5);
+        Candle[3] = new Location(world, 756.5, 129, 2035.5);
     }
 
     public void SingleFlameCircle(int CastTime) {
@@ -184,7 +184,7 @@ public class Griffia {
             Manager.CastSkill(true);
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
             final Location TargetCandle = Candle[random.nextInt(Candle.length)];
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.5f, Function.VectorUp);
+            ParticleData particleData = new ParticleData(Particle.END_ROD);
             ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                 player.sendMessage("§c強力な攻撃§aの準備をしています！");
@@ -194,7 +194,7 @@ public class Griffia {
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i < CastTime) {
-                    ParticleManager.CircleParticle(particleData, TargetCandle, 12, 15);
+                    ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), TargetCandle, 2, 3);
                 } else {
                     ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 30);
                     final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 64);

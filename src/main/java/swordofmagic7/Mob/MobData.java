@@ -24,6 +24,7 @@ public class MobData {
     public double Reach;
     public double Search;
     public boolean Hostile = false;
+    public boolean DamageRanking = false;
     public List<MobSkillData> SkillList = new ArrayList<>();
     public List<DropItemData> DropItemTable = new ArrayList<>();
     public List<DropRuneData> DropRuneTable = new ArrayList<>();

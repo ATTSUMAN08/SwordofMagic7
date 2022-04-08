@@ -99,27 +99,26 @@ public class Attribute {
         final String format = "%.1f";
         if (type == AttributeType.STR) {
             Lore.add(decoLore("物理与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
-            Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
+            Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 2.5) + "%");
         } else if (type == AttributeType.INT) {
             Lore.add(decoLore("魔法与ダメージ") + "+" + String.format(format, Parameter.get(type) * 0.4) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
-            Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
+            Lore.add(decoLore("攻撃力") + "+" + String.format(format, Parameter.get(type) * 2.5) + "%");
         } else if (type == AttributeType.DEX) {
-            Lore.add(decoLore("回避") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
+            Lore.add(decoLore("回避") + "+" + String.format(format, Parameter.get(type) * 4.2) + "%");
             Lore.add(decoLore("クリティカルダメージ") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
         } else if (type == AttributeType.TEC) {
-            Lore.add(decoLore("命中") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
-            Lore.add(decoLore("クリティカル発生") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
+            Lore.add(decoLore("命中") + "+" + String.format(format, Parameter.get(type) * 4.2) + "%");
+            Lore.add(decoLore("クリティカル発生") + "+" + String.format(format, Parameter.get(type) * 4.2) + "%");
         } else if (type == AttributeType.SPI) {
             Lore.add(decoLore("最大マナ") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
             Lore.add(decoLore("マナ自動回復") + "+" + String.format(format, Parameter.get(type) * 0.05) + "%");
-            Lore.add(decoLore("治癒力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
-            Lore.add(decoLore("クリティカル耐性") + "+" + String.format(format, Parameter.get(type) * 0.2) + "%");
+            Lore.add(decoLore("治癒力") + "+" + String.format(format, Parameter.get(type) * 2.5) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
         } else if (type == AttributeType.VIT) {
             Lore.add(decoLore("最大体力") + "+" + String.format(format, Parameter.get(type) * 0.8) + "%");
-            Lore.add(decoLore("体力自動回復") + "+" + String.format(format, Parameter.get(type) * 0.2) + "%");
-            Lore.add(decoLore("防御力") + "+" + String.format(format, Parameter.get(type) * 0.5) + "%");
+            Lore.add(decoLore("防御力") + "+" + String.format(format, Parameter.get(type) * 2.5) + "%");
+            Lore.add(decoLore("クリティカル耐性") + "+" + String.format(format, Parameter.get(type) * 3.8) + "%");
             Lore.add(decoLore("物理被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.3) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
         }

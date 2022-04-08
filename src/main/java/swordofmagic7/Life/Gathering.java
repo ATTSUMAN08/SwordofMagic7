@@ -73,84 +73,86 @@ public class Gathering {
     }
 
     public void BlockBreak(PlayerData playerData, Block block) {
-        if (!ChangeBlock(player).checkLocation(block.getLocation())) {
-            MapData mapData = playerData.Map;
-            LifeStatus lifeStatus = playerData.LifeStatus;
-            Material playerTool = player.getInventory().getItemInMainHand().getType();
-            String keyText = block.getType().toString();
-            String key = mapData.GatheringData.get(keyText);
-            int CoolTime = 0;
-            Material material = null;
-            if (playerTool == Material.IRON_PICKAXE && MineDataList.containsKey(key)) {
-                MineData data = MineDataList.get(key);
-                playerData.Equipment.setToolEquipment(data.ReqLevel);
-                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Mine)) {
-                    CoolTime = data.CoolTime;
-                    if (block.getType().toString().contains(Material.DEEPSLATE.toString())) {
-                        material = Material.DEEPSLATE;
+        MultiThread.TaskRun(() ->{
+            if (!ChangeBlock(player).checkLocation(block.getLocation())) {
+                MapData mapData = playerData.Map;
+                LifeStatus lifeStatus = playerData.LifeStatus;
+                Material playerTool = player.getInventory().getItemInMainHand().getType();
+                String keyText = block.getType().toString();
+                String key = mapData.GatheringData.get(keyText);
+                int CoolTime = 0;
+                Material material = null;
+                if (playerTool == Material.IRON_PICKAXE && MineDataList.containsKey(key)) {
+                    MineData data = MineDataList.get(key);
+                    playerData.Equipment.setToolEquipment(data.ReqLevel);
+                    if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Mine)) {
+                        CoolTime = data.CoolTime;
+                        if (block.getType().toString().contains(Material.DEEPSLATE.toString())) {
+                            material = Material.DEEPSLATE;
+                        } else {
+                            material = Material.COBBLESTONE;
+                        }
+                        lifeStatus.addLifeExp(LifeType.Mine, data.Exp);
+                        playerData.statistics.MineCount++;
+                        for (MineItemData itemData : data.itemData) {
+                            if (random.nextDouble() <= itemData.Percent) {
+                                int amount = lifeStatus.getMultiplyAmount(LifeType.Mine);
+                                playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                                if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
+                            }
+                        }
+                        if (random.nextDouble() <= 0.05) {
+                            playerData.ItemInventory.addItemParameter(getItemParameter("強化石"), 1);
+                            if (playerData.DropLog.isItem()) ItemGetLog(player, getItemParameter("強化石"), 1);
+                        }
                     } else {
-                        material = Material.COBBLESTONE;
+                        player.sendMessage("§e[採掘レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
+                        playSound(player, SoundList.Nope);
                     }
-                    lifeStatus.addLifeExp(LifeType.Mine, data.Exp);
-                    playerData.statistics.MineCount++;
-                    for (MineItemData itemData : data.itemData) {
-                        if (random.nextDouble() <= itemData.Percent) {
-                            int amount = lifeStatus.getMultiplyAmount(LifeType.Mine);
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
-                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
+                } else if (playerTool == Material.IRON_AXE && LumberDataList.containsKey(key)) {
+                    LumberData data = LumberDataList.get(key);
+                    playerData.Equipment.setToolEquipment(data.ReqLevel);
+                    if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Lumber)) {
+                        CoolTime = data.CoolTime;
+                        material = Material.STRIPPED_OAK_WOOD;
+                        lifeStatus.addLifeExp(LifeType.Lumber, data.Exp);
+                        playerData.statistics.LumberCount++;
+                        for (LumberItemData itemData : data.itemData) {
+                            if (random.nextDouble() <= itemData.Percent) {
+                                int amount = lifeStatus.getMultiplyAmount(LifeType.Lumber);
+                                playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                                if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
+                            }
                         }
+                    } else {
+                        player.sendMessage("§e[伐採レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
+                        playSound(player, SoundList.Nope);
                     }
-                    if (random.nextDouble() <= 0.05) {
-                        playerData.ItemInventory.addItemParameter(getItemParameter("強化石"), 1);
-                        if (playerData.DropLog.isItem()) ItemGetLog(player, getItemParameter("強化石"), 1);
+                } else if (playerTool == Material.SHEARS && HarvestDataList.containsKey(key)) {
+                    HarvestData data = HarvestDataList.get(key);
+                    if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Harvest)) {
+                        CoolTime = data.CoolTime;
+                        material = Material.VOID_AIR;
+                        lifeStatus.addLifeExp(LifeType.Harvest, data.Exp);
+                        playerData.statistics.HarvestCount++;
+                        for (HarvestItemData itemData : data.itemData) {
+                            if (random.nextDouble() <= itemData.Percent) {
+                                int amount = lifeStatus.getMultiplyAmount(LifeType.Harvest);
+                                playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
+                                if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
+                            }
+                        }
+                    } else {
+                        player.sendMessage("§e[採取レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
+                        playSound(player, SoundList.Nope);
                     }
-                } else {
-                    player.sendMessage("§e[採掘レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                    playSound(player, SoundList.Nope);
                 }
-            } else if (playerTool == Material.IRON_AXE && LumberDataList.containsKey(key)) {
-                LumberData data = LumberDataList.get(key);
-                playerData.Equipment.setToolEquipment(data.ReqLevel);
-                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Lumber)) {
-                    CoolTime = data.CoolTime;
-                    material = Material.STRIPPED_OAK_WOOD;
-                    lifeStatus.addLifeExp(LifeType.Lumber, data.Exp);
-                    playerData.statistics.LumberCount++;
-                    for (LumberItemData itemData : data.itemData) {
-                        if (random.nextDouble() <= itemData.Percent) {
-                            int amount = lifeStatus.getMultiplyAmount(LifeType.Lumber);
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
-                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
-                        }
-                    }
-                } else {
-                    player.sendMessage("§e[伐採レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                    playSound(player, SoundList.Nope);
-                }
-            } else if (playerTool == Material.SHEARS && HarvestDataList.containsKey(key)) {
-                HarvestData data = HarvestDataList.get(key);
-                if (data.ReqLevel <= lifeStatus.getLevel(LifeType.Harvest)) {
-                    CoolTime = data.CoolTime;
-                    material = Material.VOID_AIR;
-                    lifeStatus.addLifeExp(LifeType.Harvest, data.Exp);
-                    playerData.statistics.HarvestCount++;
-                    for (HarvestItemData itemData : data.itemData) {
-                        if (random.nextDouble() <= itemData.Percent) {
-                            int amount = lifeStatus.getMultiplyAmount(LifeType.Harvest);
-                            playerData.ItemInventory.addItemParameter(itemData.itemParameter, amount);
-                            if (playerData.DropLog.isItem()) ItemGetLog(player, itemData.itemParameter, amount);
-                        }
-                    }
-                } else {
-                    player.sendMessage("§e[採取レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                    playSound(player, SoundList.Nope);
+                if (material != null) {
+                    ChangeBlock(player, block, material, CoolTime);
+                    playerData.viewUpdate();
                 }
             }
-            if (material != null) {
-                ChangeBlock(player, block, material, CoolTime);
-                playerData.viewUpdate();
-            }
-        }
+        }, "BlockBreak");
     }
 
     public static final int MaxWaitTime = 10;

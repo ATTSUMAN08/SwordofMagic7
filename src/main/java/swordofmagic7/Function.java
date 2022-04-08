@@ -278,22 +278,34 @@ public final class Function {
         }
     }
 
+    public static Set<LivingEntity> NearEntityByEnemy(Location location, double radius) {
+        Set<LivingEntity> entities = new HashSet<>(PlayerList.getNearNonDead(location, radius));
+        try {
+            for (PetParameter petParameter : PetManager.PetSummonedList.values()) {
+                if (petParameter.entity != null && location.distance(petParameter.entity.getLocation()) < radius) {
+                    entities.add(petParameter.entity);
+                }
+            }
+        } catch (Exception ignored) {}
+        return entities;
+    }
+
     public static Set<LivingEntity> NearLivingEntity(Location location, double radius, Predicate<LivingEntity> predicate) {
         Set<LivingEntity> entities = new HashSet<>();
         for (Player player : PlayerList.PlayerList) {
-            if (location.distance(player.getLocation()) < radius && predicate.test(player)) {
+            if (predicate.test(player) && location.distance(player.getLocation()) < radius) {
                 entities.add(player);
             }
         }
         try {
             for (EnemyData enemyData : MobManager.getEnemyList()) {
-                if (enemyData.entity != null && location.distance(enemyData.entity.getLocation()) < radius && predicate.test(enemyData.entity)) {
+                if (enemyData.entity != null && predicate.test(enemyData.entity) && location.distance(enemyData.entity.getLocation()) < radius) {
                     entities.add(enemyData.entity);
                 }
             }
         } catch (Exception ignored) {}
         for (PetParameter petParameter : PetManager.PetSummonedList.values()) {
-            if (petParameter.entity != null && location.distance(petParameter.entity.getLocation()) < radius && predicate.test(petParameter.entity)) {
+            if (petParameter.entity != null && predicate.test(petParameter.entity) && location.distance(petParameter.entity.getLocation()) < radius) {
                 entities.add(petParameter.entity);
             }
         }

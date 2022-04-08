@@ -21,7 +21,6 @@ import swordofmagic7.Effect.*;
 import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
@@ -226,7 +225,7 @@ public class PetParameter implements Cloneable {
     }
 
     public void spawn() {
-        int maxSpawn = playerData.Skill.hasSkill("DualStar") ? 2 : 1;
+        int maxSpawn = playerData.Skill.hasSkill("DualStar") ? 100 : 1;
         if (Summoned) {
             cage();
         } else if (playerData.PetSummon.size() < maxSpawn) {
@@ -265,7 +264,7 @@ public class PetParameter implements Cloneable {
         target = null;
         List<String> cancel = new ArrayList<>();
         if (playerData.Level < MaxLevel - 30) {
-            cancel.add("レベルが足りないため召喚出来ません");
+            cancel.add("§aレベルが足りないため召喚出来ません");
         }
         if (cancel.size() > 0) {
             for (String str : cancel) {
@@ -358,39 +357,30 @@ public class PetParameter implements Cloneable {
     void stopAI() {
         runAITask = false;
         if (asyncAITask != null) asyncAITask.cancel();
-        if (syncAITask != null) syncAITask.cancel();
     }
 
     public boolean isRunnableAI() {
         return runAITask && entity != null && plugin.isEnabled();
     }
 
-    public Location LastLocation;
     public BukkitTask asyncAITask;
-    public BukkitTask syncAITask;
     void runAI() {
         stopAI();
-        LastLocation = entity.getLocation();
         if (entity instanceof Mob mob) {
             runAITask = true;
-            syncAITask = new BukkitRunnable() {
-                final Pathfinder pathfinder = mob.getPathfinder();
-                @Override
-                public void run() {
-                    if (!isRunnableAI()) this.cancel();
-                    Location location = target != null && AIState.isAttack() ? target.getLocation() : player.getLocation();
-                    if (entity != null && location.distance(entity.getLocation()) > 1) {
-                        pathfinder.moveTo(location, 1.5d);
-                        LastLocation = entity.getLocation();
-                        mob.lookAt(location);
-                        pathfinder.moveTo(location, 1.5d);
-                    }
-                }
-            }.runTaskTimer(plugin, 0, 10);
+            final Pathfinder pathfinder = mob.getPathfinder();
             asyncAITask = new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (!isRunnableAI()) this.cancel();
+                    MultiThread.TaskRunSynchronized(() -> {
+                        Location location = target != null && AIState.isAttack() ? target.getLocation() : player.getLocation();
+                        if (entity != null && location.distance(entity.getLocation()) > 1.5) {
+                            pathfinder.moveTo(location, 1.5d);
+                            mob.lookAt(location);
+                            pathfinder.moveTo(location, 1.5d);
+                        }
+                    });
                     try {
                         if (target == null && AIState.isAttack()) {
                             double radius = 24;
@@ -398,12 +388,9 @@ public class PetParameter implements Cloneable {
                             if (targets.size() > 0) target = targets.get(0);
                         }
                         if (target != null) {
-                            if (target.isDead()) target = null;
-                            else if (target.getLocation().distance(entity.getLocation()) > 32) target = null;
-                            else if (MobManager.isEnemy(target) && MobManager.EnemyTable(target.getUniqueId()).isDead())
+                            if (target.getLocation().distance(entity.getLocation()) > 32 || target.isDead()) {
                                 target = null;
-                            else if (target instanceof Player player && !Function.isAlive(player)) target = null;
-                            else if (target.getLocation().distance(entity.getLocation()) < 2) {
+                            } else if (target.getLocation().distance(entity.getLocation()) < 2) {
                                 Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
                             }
                         }
@@ -411,10 +398,11 @@ public class PetParameter implements Cloneable {
                             entity.teleportAsync(player.getLocation());
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                         cage();
                     }
                 }
-            }.runTaskTimerAsynchronously(plugin, 0, 10);
+            }.runTaskTimerAsynchronously(plugin, 0, 20);
         }
     }
 

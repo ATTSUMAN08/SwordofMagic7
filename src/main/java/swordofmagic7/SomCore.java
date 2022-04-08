@@ -43,7 +43,9 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
 
-import java.io.File;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
@@ -715,6 +717,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         List<String> message = new ArrayList<>();
                         message.add(decoText(mobData.Display));
                         message.addAll(playerData.Menu.mobInfo.toStringList(mobData));
+                        if (args.length == 2) {
+                            message.addAll(EnemyData.enemyLore(mobData, Integer.parseInt(args[1])));
+                        }
                         sendMessage(player, message, SoundList.Nope);
                     } else {
                         sendMessage(player, "§a存在しない§cエネミー§aです", SoundList.Nope);
@@ -737,9 +742,13 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("runeInfo")) {
-                if (args.length == 1) {
+                if (args.length >= 1) {
                     if (RuneList.containsKey(args[0])) {
                         RuneParameter rune = getRuneParameter(args[0]);
+                        try {
+                            if (args[1] != null) rune.Level = Math.min(Math.max(Integer.parseInt(args[1]), 1), PlayerData.MaxLevel);
+                            if (args[2] != null) rune.Quality = Math.min(Math.max(Double.parseDouble(args[2])/100f, 0), 200);
+                        } catch (Exception ignore) {}
                         ItemStack itemStack = rune.viewRune(playerData.ViewFormat());
                         List<String> list = new ArrayList<>();
                         list.add(itemStack.getItemMeta().getDisplayName());
@@ -747,7 +756,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         sendMessage(player, list);
                     } else player.sendMessage("§a存在しない§eルーン§aです");
                 } else {
-                    player.sendMessage("§e/runeInfo <RuneID>");
+                    player.sendMessage("§e/runeInfo <RuneID> [<Level>] [<0~200>]");
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("serverInfo")) {
@@ -821,16 +830,53 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             } else if (cmd.getName().equalsIgnoreCase("entities")) {
                 sendMessage(player, "EntityCount: " + player.getWorld().getEntityCount());
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("loadOnLiveServer")) {
+                MultiThread.TaskRun(() -> {
+                    if (ServerId.equalsIgnoreCase("Dev")) {
+                        try {
+                            URL url = new URL("http://192.168.0.18:81/PlayerData/" + player.getUniqueId() + ".yml");
+                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                            conn.setAllowUserInteraction(false);
+                            conn.setInstanceFollowRedirects(true);
+                            conn.setRequestMethod("GET");
+                            conn.connect();
+                            int httpStatusCode = conn.getResponseCode();
+                            if (httpStatusCode != HttpURLConnection.HTTP_OK) {
+                                throw new Exception("HTTP Status " + httpStatusCode);
+                            }
+                            String contentType = conn.getContentType();
+                            System.out.println("Content-Type: " + contentType);
+                            DataInputStream dataInStream = new DataInputStream(conn.getInputStream());
+                            DataOutputStream dataOutStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(DataBasePath + "PlayerData\\" + player.getUniqueId() + ".yml")));
+                            byte[] b = new byte[4096];
+                            int readByte;
+                            while (-1 != (readByte = dataInStream.read(b))) {
+                                dataOutStream.write(b, 0, readByte);
+                            }
+                            dataInStream.close();
+                            dataOutStream.close();
+                            MultiThread.TaskRunSynchronizedLater(playerData::load, 5);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            sendMessage(player, "§cデータのダウンロードに失敗しました");
+                        }
+                    } else {
+                        sendMessage(player, "§b開発鯖§a以外では利用できません");
+                    }
+                }, "loadOnLiveServer");
+                return true;
             }
         }
         return false;
     }
 
     public static void spawnPlayer(Player player) {
-        MapList.get("Alden").enter(player);
-        player.setFlying(false);
-        player.setGravity(true);
-        player.teleportAsync(SpawnLocation);
+        MultiThread.TaskRunSynchronized(() -> {
+            MapList.get("Alden").enter(player);
+            player.setFlying(false);
+            player.setGravity(true);
+            player.teleportAsync(SpawnLocation);
+        }, "spawnPlayer");
     }
 
     public static HashMap<BukkitTask, String> BukkitTaskTag = new HashMap<>();

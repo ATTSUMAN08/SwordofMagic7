@@ -220,14 +220,14 @@ public class Market {
                     index++;
                 } else break;
             }
-            itemStacks[45] = page > 1 ? PreviousPageItem : ShopFlame;
+            itemStacks[45] = page > 0 ? PreviousPageItem : ShopFlame;
             itemStacks[46] = ItemFlame(-100);
             itemStacks[47] = ItemFlame(-10);
             itemStacks[48] = ItemFlame(-1);
             itemStacks[50] = ItemFlame(1);
             itemStacks[51] = ItemFlame(10);
             itemStacks[52] = ItemFlame(100);
-            itemStacks[53] = page < Math.ceil(marketList.size()/45f) ? NextPageItem : ShopFlame;
+            itemStacks[53] = page < Math.floor(marketList.size()/45f) ? NextPageItem : ShopFlame;
             itemStacks[49] = ItemFlameAmount(MarketPrefix, BuyAmount);
             int i = 0;
             for (ItemStack itemStack : itemStacks) {

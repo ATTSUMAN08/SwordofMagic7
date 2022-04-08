@@ -23,6 +23,7 @@ import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Shop {
+    public static final int MaxSelectAmount = 100000;
     private final Player player;
     private final PlayerData playerData;
     public boolean AmountReset = true;
@@ -84,7 +85,7 @@ public class Shop {
     }
 
     private int BuyAmount = 1;
-    public void ShopClick(InventoryView view, ItemStack currentItem, int Slot, int index) {
+    public void ShopClick(InventoryView view, ItemStack currentItem, ClickType clickType, int Slot, int index) {
         if (ShopDataCache != null && equalInv(view, "§l" + ShopDataCache.Display) && playerData.ViewInventory.isItem()) {
             if (Slot < 45) {
                 if (ShopDataCache.Data.containsKey(index)) {
@@ -138,16 +139,19 @@ public class Shop {
                     view.getTopInventory().setContents(ShopDataCache.view(currentPage, playerData.ViewFormat()).getStorageContents());
                     playSound(player, SoundList.Click);
                 } else {
+                    int buyAmount = 0;
                     switch (Slot) {
-                        case 46 -> BuyAmount -= 100;
-                        case 47 -> BuyAmount -= 10;
-                        case 48 -> BuyAmount--;
-                        case 50 -> BuyAmount++;
-                        case 51 -> BuyAmount += 10;
-                        case 52 -> BuyAmount += 100;
+                        case 46 -> buyAmount -= 100;
+                        case 47 -> buyAmount -= 10;
+                        case 48 -> buyAmount--;
+                        case 50 -> buyAmount++;
+                        case 51 -> buyAmount += 10;
+                        case 52 -> buyAmount += 100;
                     }
+                    if (clickType.isShiftClick()) buyAmount *= 1000;
+                    if (buyAmount != 0) SellAmount += buyAmount;
                     if (BuyAmount < 1) BuyAmount = 1;
-                    if (BuyAmount > 10000) BuyAmount = 10000;
+                    if (BuyAmount > MaxSelectAmount) BuyAmount = MaxSelectAmount;
                     playSound(player, SoundList.Click);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
@@ -176,16 +180,19 @@ public class Shop {
                         }
                     }
                 } else {
+                    int sellAmount = 0;
                     switch (Slot) {
-                        case 46 -> SellAmount-=100;
-                        case 47 -> SellAmount-=10;
-                        case 48 -> SellAmount--;
-                        case 50 -> SellAmount++;
-                        case 51 -> SellAmount+=10;
-                        case 52 -> SellAmount+=100;
+                        case 46 -> sellAmount-=100;
+                        case 47 -> sellAmount-=10;
+                        case 48 -> sellAmount--;
+                        case 50 -> sellAmount++;
+                        case 51 -> sellAmount+=10;
+                        case 52 -> sellAmount+=100;
                     }
+                    if (clickType.isShiftClick()) sellAmount *= 1000;
+                    if (sellAmount != 0) SellAmount += sellAmount;
                     if (SellAmount < 1) SellAmount = 1;
-                    if (SellAmount > 10000) SellAmount = 10000;
+                    if (SellAmount > MaxSelectAmount) SellAmount = MaxSelectAmount;
                     playSound(player, SoundList.Click);
                 }
             } else if (ClickInventory == player.getInventory() && index > -1) {

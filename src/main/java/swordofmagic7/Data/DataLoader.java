@@ -618,7 +618,7 @@ public class DataLoader {
                     mobData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
                     if (mobData.disguise.getType() == DisguiseType.SLIME) {
                         SlimeWatcher slimeWatcher = new SlimeWatcher(mobData.disguise);
-                        slimeWatcher.setSize(data.getInt("Disguise.Size"));
+                        slimeWatcher.setSize(data.getInt("Disguise.Size", 2));
                         mobData.disguise.setWatcher(slimeWatcher);
                     }
                 }
@@ -636,6 +636,7 @@ public class DataLoader {
                 mobData.Hostile = data.getBoolean("Hostile", false);
                 mobData.Size = data.getInt("Size", 0);
                 if (data.isSet("EnemyType")) mobData.enemyType = EnemyType.valueOf(data.getString("EnemyType"));
+                mobData.DamageRanking = data.getBoolean("DamageRanking", mobData.enemyType.isBoss());
                 if (data.isSet("Skill")) {
                     List<MobSkillData> SkillList = new ArrayList<>();
                     for (String str : data.getStringList("Skill")) {

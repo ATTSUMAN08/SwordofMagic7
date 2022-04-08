@@ -296,3 +296,6 @@ commands:
   entities:
     description: description
     usage: /<command>
+  loadOnLiveServer:
+    description: description
+    usage: /<command>

@@ -68,7 +68,10 @@ public class WarpGateParameter {
 
     private World world;
     private ParticleData particleData = new ParticleData(Particle.SPELL_WITCH);
+    private boolean isStarted = false;
     public void start() {
+        if (isStarted) return;
+        isStarted = true;
         Hologram hologram = createHologram("WarpGateHologram:" + Id, Location.clone().add(0, 4, 0));
         hologram.appendTextLine(NextMap.Color + "§l《" + NextMap.Display + "》");
         hologram.appendTextLine("");

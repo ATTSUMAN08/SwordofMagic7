@@ -43,8 +43,8 @@ public class ItemPotion implements Cloneable {
                 }
             }
             boolean isSprinkleManaPotion = playerData.Skill.hasSkill("SprinkleManaPotion");
-            if (PotionType.isMana() || isSprinkleManaPotion) {
-                if (playerData.Status.Mana < playerData.Status.MaxMana) {
+            if (PotionType.isMana()) {
+                if (playerData.Status.Mana < playerData.Status.MaxMana || isSprinkleManaPotion) {
                     double value;
                     if (PotionType.isElixir()) {
                         value = playerData.Status.MaxMana * Value[0]/100f*multiply;

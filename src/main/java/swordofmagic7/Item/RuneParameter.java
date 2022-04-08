@@ -43,7 +43,9 @@ public class RuneParameter implements Cloneable {
         for (StatusParameter param : StatusParameter.values()) {
             if (isZero(Parameter.get(param))) Lore.add(param.DecoDisplay +  String.format(format, Parameter(param)));
         }
-        return new ItemStackData(Icon, decoText(Display), Lore).view();
+        ItemStack item = new ItemStackData(Icon, decoText(Display), Lore).view();
+        item.setAmount(Math.min(DataBase.MaxStackAmount, Level));
+        return item;
     }
 
     @Override

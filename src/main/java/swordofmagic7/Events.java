@@ -53,9 +53,9 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.random;
 import static swordofmagic7.SomCore.spawnPlayer;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
 
@@ -67,7 +67,7 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onLogin(AsyncPlayerPreLoginEvent event) {
+    public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         if (ServerId.equalsIgnoreCase("Event")) {
             List<String> ignoreList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
             if (!ignoreList.contains(event.getUniqueId().toString())) {
@@ -77,6 +77,16 @@ public class Events implements Listener {
                         return;
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        if (Bukkit.getOnlinePlayers().size() >= 40) {
+            if (!player.hasPermission("som7.OverLogin")) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e別CH§aをお試しください");
             }
         }
     }
@@ -356,10 +366,10 @@ public class Events implements Listener {
     @EventHandler
     void onDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
+        event.setCancelled(true);
         switch (event.getCause()) {
             case FALL, HOT_FLOOR, FIRE_TICK -> {
                 victim.setFireTicks(0);
-                event.setCancelled(true);
                 return;
             }
             case LAVA, DROWNING -> {
@@ -374,16 +384,12 @@ public class Events implements Listener {
                 }
             }
         }
-        if (victim instanceof Player) {
-            event.setDamage(0.01);
-        } else if (isEnemy(victim)) {
+        if (isEnemy(victim)) {
             if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
                 if (MobManager.isEnemy(victim)) {
                     MobManager.EnemyTable(victim.getUniqueId()).delete();
-                    return;
                 }
             }
-            event.setDamage(0.01);
         }
     }
 

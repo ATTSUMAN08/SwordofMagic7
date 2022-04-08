@@ -16,9 +16,13 @@ import static swordofmagic7.SomCore.random;
 
 public final class ParticleManager {
 
+    private static final int maxParticle = 15000;
+    private static final int decParticle = Math.round(maxParticle/20f);
     public static void onLoad() {
         MultiThread.TaskRunTimer(() -> {
-            particleCount = particleCount < 0 ? 0 : particleCount -500;
+            if (particleCount > 0) {
+                particleCount -= decParticle;
+            }
         }, 1);
     }
 
@@ -97,7 +101,7 @@ public final class ParticleManager {
 
     private static int particleCount = 0;
     public static void spawnParticle(ParticleData particleData, Location location) {
-        if (particleCount > 10000) return;
+        if (particleCount > maxParticle) return;
         particleCount++;
         float speed;
         Vector vector;

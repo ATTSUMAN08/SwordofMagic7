@@ -1,0 +1,44 @@
+package swordofmagic7.Mob.Skill;
+
+import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import swordofmagic7.Damage.Damage;
+import swordofmagic7.Damage.DamageCause;
+import swordofmagic7.Function;
+import swordofmagic7.Mob.EnemySkillManager;
+import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Sound.SoundList;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static swordofmagic7.SomCore.random;
+import static swordofmagic7.Sound.CustomSound.playSound;
+
+public class BasicEnemySkills {
+
+    private final EnemySkillManager Manager;
+    public BasicEnemySkills(EnemySkillManager manager) {
+        this.Manager = manager;
+    }
+
+    public void SkillLaser() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            LivingEntity entity = Manager.enemyData.entity;
+            List<LivingEntity> targets = new ArrayList<>(Function.NearEntityByEnemy(entity.getLocation(), 48));
+            if (targets.size() > 0) {
+                LivingEntity target = targets.get(random.nextInt(targets.size()));
+                ParticleData particleData = new ParticleData(Particle.SLIME);
+                ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
+                Damage.makeDamage(entity, target, DamageCause.ATK, "Laser", 3, 1);
+                if (target instanceof Player player) playSound(player, SoundList.Slime);
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "Laser");
+    }
+}

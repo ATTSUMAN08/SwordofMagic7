@@ -61,6 +61,11 @@ public class EffectDataBase {
                     DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
                 }
             }
+        } else {
+            switch (effectType) {
+                case InsufficientFilling -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.9);
+                case Adhesive -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.5);
+            }
         }
     }
 }

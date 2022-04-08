@@ -34,11 +34,11 @@ public class TradeManager {
                     try {
                         PlayerData targetData = PlayerData.playerData(target);
                         int index = Integer.parseInt(args[2]);
-                        if (args.length == 4) {
-                            if (args[1].equalsIgnoreCase("sendItem") || args[1].equalsIgnoreCase("sI")) {
-                                int Amount = Integer.parseInt(args[3]);
-                                if (Amount > 0 && playerData.ItemInventory.getList().size() > index) {
-                                    ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
+                        if (args[1].equalsIgnoreCase("sendItem") || args[1].equalsIgnoreCase("sI")) {
+                            if (playerData.ItemInventory.getList().size() > index) {
+                                ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
+                                int Amount = args.length == 4 ? Integer.parseInt(args[3]) : stack.Amount;
+                                if (Amount > 0 ) {
                                     ItemParameter item = stack.itemParameter;
                                     if (stack.Amount >= Amount) {
                                         targetData.ItemInventory.addItemParameter(item, Amount);
@@ -57,6 +57,9 @@ public class TradeManager {
                                     player.sendMessage("§c不正§aな§eスロット§aです");
                                     playSound(player, SoundList.Nope);
                                 }
+                            } else {
+                                player.sendMessage("§c不正§aな§eスロット§aです");
+                                playSound(player, SoundList.Nope);
                             }
                             return;
                         } else if (args[1].equalsIgnoreCase("sendRune") || args[1].equalsIgnoreCase("sR")) {
@@ -126,7 +129,7 @@ public class TradeManager {
                 }
             }
         }
-        player.sendMessage(decoLore("/trade <Player> sendItem <SlotID> <Amount>") + "アイテムを送ります");
+        player.sendMessage(decoLore("/trade <Player> sendItem <SlotID> [<Amount>]") + "アイテムを送ります");
         player.sendMessage(decoLore("/trade <Player> sendRune <SlotID>") + "ルーンを送ります");
         player.sendMessage(decoLore("/trade <Player> sendPet <SlotID>") + "ペットを送ります");
         player.sendMessage(decoLore("/trade <Player> sendMel <Mel>") + "メルを送ります");

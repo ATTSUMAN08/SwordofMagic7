@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.createHologram;
 import static swordofmagic7.SomCore.random;
@@ -196,7 +197,13 @@ public final class Damage {
         if (!invariably) {
             hitRate = Math.min(1, Math.pow(ACC, 1.6) / Math.pow(EVA, 1.6));
         } else hitRate = 1;
-        criRate = (Math.pow(CriticalRate, 2) / (CriticalRate + CriticalResist/3)) / CriticalRate;
+        if (CriticalRate > CriticalResist) {
+            criRate = (CriticalRate-CriticalResist/2)/((CriticalRate*2+CriticalResist)/3);
+        } else {
+            criRate = 1-(CriticalResist-CriticalRate/2)/((CriticalResist*2+CriticalRate)/3);
+        }
+        criRate = Math.min(Math.max(criRate, 0.01), 0.95);
+        Log(CriticalRate + ", " + CriticalResist + ", " + criRate);
         Attack = ATK;
         Defence = DEF;
 
@@ -263,6 +270,7 @@ public final class Damage {
             }
 
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
+
             boolean isStop = false;
             for (double HPStop : enemyData.mobData.HPStop) {
                 if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
