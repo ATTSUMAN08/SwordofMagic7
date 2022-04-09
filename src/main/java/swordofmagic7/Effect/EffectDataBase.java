@@ -38,9 +38,6 @@ public class EffectDataBase {
     }
 
     public EffectDataBase(EffectType effectType) {
-        if (effectType.equals(EffectType.CrossGuardCounter)) {
-            DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
-        }
         String skillText = effectType.toString();
         if (DataBase.getSkillList().containsKey(skillText)) {
             for (SkillParameter param : DataBase.getSkillData(skillText).Parameter) {
@@ -63,6 +60,7 @@ public class EffectDataBase {
             }
         } else {
             switch (effectType) {
+                case CrossGuardCounter -> DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
                 case InsufficientFilling -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.9);
                 case Adhesive -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.5);
             }

@@ -9,6 +9,7 @@ import swordofmagic7.Client;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Life.LifeType;
+import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
 
@@ -18,8 +19,9 @@ import java.util.List;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.UpgradeDisplay;
-import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.SomCore.isDevServer;
 import static swordofmagic7.SomCore.random;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Upgrade {
 
@@ -58,11 +60,16 @@ public class Upgrade {
         return percent;
     }
 
+    private boolean isClickTick = false;
     public final ItemParameter[] UpgradeCache = new ItemParameter[2];
     public static final ItemParameter UpgradeStone = getItemParameter("強化石");
-    public void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
+    public int fastUpgrade = 15;
+    public synchronized void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
         if (equalInv(view, UpgradeDisplay)) {
             if (view.getTopInventory() == ClickInventory) {
+                if (isClickTick) return;
+                isClickTick = true;
+                MultiThread.TaskRunSynchronizedLater(() -> isClickTick = false, 2);
                 if (Slot == AnvilUISlot[2]) {
                     if (UpgradeCache[0] != null) {
                         int cost = UpgradeCost(UpgradeCache[0]);
@@ -82,7 +89,7 @@ public class Upgrade {
                                 if (random.nextDouble() < percent) {
                                     UpgradeCache[0] = UpgradeCache[1].clone();
                                     suffix = "§aの強化に§b成功§aしました " + perText;
-                                    if (plus >= 15) {
+                                    if (plus >= fastUpgrade) {
                                         playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                                         UpgradeCache[0] = null;
                                     }
@@ -102,11 +109,13 @@ public class Upgrade {
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
 
-                                if (UpgradeCache[1].itemEquipmentData.Plus >= 18) {
-                                    TextView text = new TextView(playerData.getNick() + "§aさんが");
-                                    text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
-                                    text.addText(suffix);
-                                    Client.BroadCast(text);
+                                if (!isDevServer()) {
+                                    if (UpgradeCache[1].itemEquipmentData.Plus >= 20) {
+                                        TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                        text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
+                                        text.addText(suffix);
+                                        Client.BroadCast(text);
+                                    }
                                 }
                             } else {
                                 player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");

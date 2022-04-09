@@ -21,6 +21,7 @@ import swordofmagic7.Mob.MobInfo;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TagGame;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Tutorial;
 
@@ -296,6 +297,8 @@ public class Menu {
                     } else if (equalItem(currentItem, UserMenu_TitleMenuIcon)) {
                         TitleMenu.TitleMenuView();
                     } else if (equalItem(currentItem, UserMenu_SpawnIcon)) {
+                        if (TagGame.isTagPlayerNonMessage(player)) return;
+                        if (playerData.isPvPModeNonMessage()) return;
                         if (Tutorial.TutorialProcess.containsKey(player)) {
                             player.sendMessage("§eチュートリアル中§aは使用できません");
                             playSound(player, SoundList.Nope);

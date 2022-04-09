@@ -5,6 +5,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import swordofmagic7.Classes.Classes;
+import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectType;
@@ -17,6 +18,7 @@ import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.SomCore.AFKTimePeriod;
 import static swordofmagic7.SomCore.plugin;
 
 public class ViewBar {
@@ -99,8 +101,10 @@ public class ViewBar {
                         if (playerData.HealthRegenDelay > 0) {
                             playerData.HealthRegenDelay -= period;
                         } else {
-                            status.Health += status.HealthRegen / regen;
-                            status.Mana += status.ManaRegen / regen;
+                            double regenTick = regen;
+                            if (playerData.PvPMode) regenTick *= Damage.PvPHealDecay;
+                            status.Health += status.HealthRegen / regenTick;
+                            status.Mana += status.ManaRegen / regenTick;
                         }
                         int Level = playerData.Level;
                         int Exp = playerData.Exp;
@@ -124,9 +128,11 @@ public class ViewBar {
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );
 
+                        if (playerData.isAFK()) player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "§cAFK中はPvPModeが有効になります", 0, AFKTimePeriod*20+1, 0);
+
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
-                            playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] §f" + player.getName() + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+                            playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] " + (playerData.PvPMode ? "§c" : "§f") + player.getName() + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
 
                             if (!isAlive(player) || player.isSneaking() || playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
@@ -149,10 +155,10 @@ public class ViewBar {
         }, "TickUpdate");
         MultiThread.TaskRunSynchronizedTimer(() -> {
             player.setAbsorptionAmount(0);
-            player.setMaxHealth(20);
-            player.setHealth(Math.min(Math.max(Math.floor(status.Health / status.MaxHealth * 20), 0.5), 20));
+            player.setMaxHealth(status.MaxHealth);
+            player.setHealth(Math.min(Math.max(status.Health, 0.5), status.MaxHealth));
             player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));
-        }, 20, "TickUpdateTimer");
+        }, 10, "TickUpdateTimer");
     }
 
     public void ViewSideBar() {

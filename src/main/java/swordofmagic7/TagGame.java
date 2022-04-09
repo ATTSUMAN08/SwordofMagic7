@@ -7,20 +7,27 @@ import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.MultiThread.MultiThread;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.plugin;
 
 public class TagGame {
     public static final String Prefix = "§c[鬼ごっこ]§r ";
     public static Player Tag;
     public static int tagTime = 0;
-    public static List<Player> Players = new ArrayList<>();
-    public static HashMap<Player, Boolean> Stun = new HashMap<>();
+    public static Set<Player> Players = new HashSet<>();
+    public static String PlayingTagGameNonMessage = "§c鬼ごっこ§a中は使用できません";
+
+    public static boolean isTagPlayerNonMessage(Player player) {
+        if (Players.contains(player)) {
+            sendMessage(player, PlayingTagGameNonMessage);
+        }
+        return !Players.contains(player);
+    }
 
     TagGame() {
         MultiThread.TaskRun(() -> {
@@ -76,7 +83,10 @@ public class TagGame {
             if (Players.size() > 2) {
                 i = new Random().nextInt(Players.size() - 1);
             }
-            tagChange(null, Players.get(i));
+            for (Player player : Players) {
+                tagChange(null, player);
+                break;
+            }
         }
     }
 

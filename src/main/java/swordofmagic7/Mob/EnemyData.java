@@ -77,11 +77,11 @@ public class EnemyData {
     private boolean isDead = false;
 
     public boolean isDead() {
-        return isDead || entity == null;
+        return isDead || entity == null || entity.isDead();
     }
 
     public boolean isAlive() {
-        return !isDead && entity != null;
+        return !isDead();
     }
 
     public EnemyData(LivingEntity entity, MobData baseData, int level) {
@@ -313,7 +313,7 @@ public class EnemyData {
                         }
                     }
                     if (!isDefenseBattle && !mobData.enemyType.isBoss()) {
-                        if (PlayerList.getNear(entity.getLocation(), 48).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                        if (PlayerList.getNear(entity.getLocation(), 64).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                             delete();
                         }
                     }
@@ -385,8 +385,12 @@ public class EnemyData {
             List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
             DropItemTable.add(new DropItemData(getItemParameter("生命の雫"), 0.0001));
             DropItemTable.add(new DropItemData(getItemParameter("強化石"), 0.05));
+            Set<String> IPCheck = new HashSet<>();
             for (Player player : Involved) {
                 if (player.isOnline()) {
+                    String ip = player.getAddress().toString();
+                    if (IPCheck.contains(ip)) return;
+                    if (!IgnoreIPList.contains(player.getUniqueId().toString())) IPCheck.add(ip);
                     PlayerData playerData = playerData(player);
                     playerData.statistics.enemyKill(mobData);
                     Classes classes = playerData.Classes;
@@ -479,6 +483,7 @@ public class EnemyData {
                                 }
                             }
                         }
+                        playerData.viewUpdate();
                         Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
                         MultiThread.TaskRunSynchronized(() -> {
                             Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
@@ -489,7 +494,6 @@ public class EnemyData {
                                 hologram.appendTextLine(holo);
                             }
                             MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
-                            playerData.viewUpdate();
                         }, "EnemyKillRewardHolo");
                     }
                 }

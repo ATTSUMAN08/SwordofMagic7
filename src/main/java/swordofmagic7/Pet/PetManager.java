@@ -79,24 +79,28 @@ public class PetManager {
         return false;
     }
 
+    public void PetAISelect(PetParameter pet, PetAIState aiState) {
+        pet.AIState = aiState;
+        sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.getSummonId() + "]", SoundList.Click);
+    }
+
     public void PetAISelect() {
         PlayerData playerData = playerData(player);
         PetParameter pet = playerData.getPetSelect();
         if (pet != null && PetManager.isPet(pet.entity)) {
             switch (pet.AIState) {
                 case Follow -> {
-                    pet.AIState = PetAIState.Attack;
+                    PetAISelect(pet, PetAIState.Attack);
                 }
                 case Attack -> {
-                    pet.AIState = PetAIState.Support;
+                    PetAISelect(pet, PetAIState.Support);
                     pet.target = null;
                 }
                 case Support -> {
-                    pet.AIState = PetAIState.Follow;
+                    PetAISelect(pet, PetAIState.Follow);
                     pet.target = null;
                 }
             }
-            sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.getSummonId() + "]", SoundList.Click);
         } else {
             sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
         }

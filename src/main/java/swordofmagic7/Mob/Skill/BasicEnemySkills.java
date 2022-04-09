@@ -32,13 +32,13 @@ public class BasicEnemySkills {
             List<LivingEntity> targets = new ArrayList<>(Function.NearEntityByEnemy(entity.getLocation(), 48));
             if (targets.size() > 0) {
                 LivingEntity target = targets.get(random.nextInt(targets.size()));
-                ParticleData particleData = new ParticleData(Particle.SLIME);
+                ParticleData particleData = new ParticleData(Particle.LANDING_LAVA);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
-                Damage.makeDamage(entity, target, DamageCause.ATK, "Laser", 3, 1);
-                if (target instanceof Player player) playSound(player, SoundList.Slime);
+                Damage.makeDamage(entity, target, DamageCause.ATK, "SkillLaser", 1, 1);
+                if (target instanceof Player player) playSound(player, SoundList.Rock);
             }
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
-        }, "Laser");
+        }, "SkillLaser");
     }
 }

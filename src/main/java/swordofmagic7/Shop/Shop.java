@@ -149,7 +149,7 @@ public class Shop {
                         case 52 -> buyAmount += 100;
                     }
                     if (clickType.isShiftClick()) buyAmount *= 1000;
-                    if (buyAmount != 0) SellAmount += buyAmount;
+                    if (buyAmount != 0) BuyAmount += buyAmount;
                     if (BuyAmount < 1) BuyAmount = 1;
                     if (BuyAmount > MaxSelectAmount) BuyAmount = MaxSelectAmount;
                     playSound(player, SoundList.Click);

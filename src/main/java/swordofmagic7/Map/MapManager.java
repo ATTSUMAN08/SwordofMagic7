@@ -28,6 +28,7 @@ public class MapManager {
     }
 
     public void WarpGateSelector() {
+        if (TagGame.isTagPlayerNonMessage(player)) return;
         Location pLoc = player.getLocation();
         for (Map.Entry<String, WarpGateParameter> entry : WarpGateList.entrySet()) {
             if (entry.getValue().Location.distance(pLoc) < 2) {
@@ -41,6 +42,8 @@ public class MapManager {
     }
 
     public void TeleportGateSelector() {
+        if (TagGame.isTagPlayerNonMessage(player)) return;
+        if (playerData.isPvPModeNonMessage()) return;
         Location pLoc = player.getLocation();
         for (Map.Entry<String, TeleportGateParameter> entry : TeleportGateList.entrySet()) {
             TeleportGateParameter teleport = entry.getValue();
@@ -51,14 +54,7 @@ public class MapManager {
                     playSound(player, SoundList.LevelUp);
                 }
                 lastTeleportGate = teleport.Id;
-                if (playerData.PvPMode) {
-                    player.sendMessage("§c[PvP中]§aは使用できません");
-                    playSound(player, SoundList.Nope);
-                } else if (TagGame.isPlayer(player)) {
-
-                } else {
-                    TeleportGateMenuView();
-                }
+                TeleportGateMenuView();
             }
         }
     }

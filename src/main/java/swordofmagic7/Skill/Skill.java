@@ -178,10 +178,10 @@ public class Skill {
                                             case "Teleportation" -> mage.Teleportation(skillData);
                                             case "MagicMissile" -> mage.MagicMissile(skillData);
                                             //クレシック
-                                            case "Heal" -> cleric.Heal(skillData, 20);
-                                            case "Cure" -> cleric.Cure(skillData, 20);
+                                            case "Heal" -> cleric.Heal(skillData, 30);
+                                            case "Cure" -> cleric.Cure(skillData, 30);
                                             case "Fade" -> cleric.Fade(skillData);
-                                            case "Resurrection" -> cleric.Resurrection(skillData, 20);
+                                            case "Resurrection" -> cleric.Resurrection(skillData, 30);
                                             //テイマー
                                             case "PetAttack" -> tamer.PetAttack(skillData);
                                             case "PetHeal" -> tamer.PetHeal(skillData);
@@ -242,6 +242,7 @@ public class Skill {
                                             case "Annihilation" -> assassin.Annihilation(skillData);
                                             //デュアルスター
                                             case "ExtraAttack" -> dualStar.ExtraAttack(skillData);
+                                            case "AttackOrder" -> dualStar.AttackOrder(skillData);
                                             //レンジャー
                                             case "ChainAttack" -> ranger.ChainAttack(skillData);
                                             //セージ

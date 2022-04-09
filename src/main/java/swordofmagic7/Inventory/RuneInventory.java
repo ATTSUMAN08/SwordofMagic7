@@ -84,12 +84,16 @@ public class RuneInventory extends BasicInventory {
         playerData.ViewInventory = ViewInventoryType.RuneInventory;
         int index = ScrollTick*8;
         int slot = 9;
-        if (List.size() > 0) switch (Sort) {
-            case Name -> List.sort(new RuneSortName());
-            case Level -> List.sort(new RuneSortLevel());
-            case Quality -> List.sort(new RuneSortQuality());
+        try {
+            if (List.size() > 0) switch (Sort) {
+                case Name -> List.sort(new RuneSortName());
+                case Level -> List.sort(new RuneSortLevel());
+                case Quality -> List.sort(new RuneSortQuality());
+            }
+            if (SortReverse) Collections.reverse(List);
+        } catch (Exception e) {
+            sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
         }
-        if (SortReverse) Collections.reverse(List);
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {
                 ItemStack item = List.get(i).viewRune(playerData.ViewFormat());

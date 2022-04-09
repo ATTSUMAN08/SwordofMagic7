@@ -6,10 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Mob.Skill.Griffia;
-import swordofmagic7.Mob.Skill.LeeLai;
-import swordofmagic7.Mob.Skill.Symmore;
-import swordofmagic7.Mob.Skill.Synosas;
+import swordofmagic7.Mob.Skill.*;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -51,15 +48,19 @@ public class EnemySkillManager {
         }, "tickSkillTrigger");
     }
 
+    BasicEnemySkills basicSkills = new BasicEnemySkills(this);
     Symmore symmore = new Symmore(this);
     Griffia griffia = new Griffia(this);
     LeeLai leeLai = new LeeLai(this);
     Synosas synosas = new Synosas(this);
+    KingSlime kingSlime = new KingSlime(this);
 
     public void mobSkillCast(MobSkillData mobSkillData) {
         switch (mobSkillData.Skill) {
             case "PullUpper" -> PullUpper(8, 90, 20);
             case "PileUpper" -> PullUpper(13, 160, 40);
+
+            case "SkillLaser" -> basicSkills.SkillLaser();
 
             case "PileOut" -> symmore.PileOut(30);
             case "Howl" -> symmore.Howl(80);
@@ -87,6 +88,13 @@ public class EnemySkillManager {
             case "SynosasEffect" -> synosas.Effect(100);
             case "Quiet" -> synosas.Quiet(20);
             case "Distrust" -> synosas.Distrust(0);
+
+            case "SlimeLaser" -> kingSlime.SlimeLaser();
+            case "Crush" -> kingSlime.Crush(50);
+            case "Adhesive" -> kingSlime.Adhesive(50);
+            case "SummonFamiliar" -> kingSlime.SummonFamiliar();
+            case "InsaneRush" -> kingSlime.InsaneRush(100);
+
         }
         if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
         MultiThread.TaskRun(() -> {

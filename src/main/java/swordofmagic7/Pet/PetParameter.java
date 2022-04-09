@@ -225,7 +225,7 @@ public class PetParameter implements Cloneable {
     }
 
     public void spawn() {
-        int maxSpawn = playerData.Skill.hasSkill("DualStar") ? 100 : 1;
+        int maxSpawn = playerData.Skill.hasSkill("DualStar") ? 2 : 1;
         if (Summoned) {
             cage();
         } else if (playerData.PetSummon.size() < maxSpawn) {
@@ -376,7 +376,6 @@ public class PetParameter implements Cloneable {
                     MultiThread.TaskRunSynchronized(() -> {
                         Location location = target != null && AIState.isAttack() ? target.getLocation() : player.getLocation();
                         if (entity != null && location.distance(entity.getLocation()) > 1.5) {
-                            pathfinder.moveTo(location, 1.5d);
                             mob.lookAt(location);
                             pathfinder.moveTo(location, 1.5d);
                         }
@@ -391,6 +390,13 @@ public class PetParameter implements Cloneable {
                             if (target.getLocation().distance(entity.getLocation()) > 32 || target.isDead()) {
                                 target = null;
                             } else if (target.getLocation().distance(entity.getLocation()) < 2) {
+                                if (target instanceof Player player) {
+                                    PlayerData playerData = PlayerData.playerData(player);
+                                    if (!playerData.PvPMode || playerData.isDead) {
+                                        target = null;
+                                        return;
+                                    }
+                                }
                                 Damage.makeDamage(entity, target, DamageCause.ATK, "attack", 1, 1);
                             }
                         }

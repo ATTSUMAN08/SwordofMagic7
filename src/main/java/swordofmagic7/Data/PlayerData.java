@@ -54,6 +54,7 @@ import swordofmagic7.Shop.RuneShop;
 import swordofmagic7.Shop.Shop;
 import swordofmagic7.Skill.CastType;
 import swordofmagic7.Skill.Skill;
+import swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Title.TitleManager;
@@ -154,6 +155,11 @@ public class PlayerData {
     public Location logoutLocation = null;
     public double RuneQualityFilter = 0d;
     public double HealthRegenDelay = 0d;
+    public int AFKTime = 0;
+
+    public boolean isAFK() {
+        return AFKTime > SomCore.AFKTime; //18000;
+    }
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
 
@@ -346,6 +352,7 @@ public class PlayerData {
     void PvPMode(boolean bool) {
         PvPMode = bool;
         String msg = "§e[PvPモード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        Status.StatusUpdate();
         sendMessage(player, msg, SoundList.Click);
     }
 
@@ -442,6 +449,11 @@ public class PlayerData {
 
     public void remove() {
         playerData.remove(player.getUniqueId());
+    }
+
+    public boolean isPvPModeNonMessage() {
+        sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.Nope);
+        return PvPMode;
     }
 
     public void saveCloseInventory() {
@@ -928,7 +940,7 @@ public class PlayerData {
     private double DPS = 0;
     public int getDPS() {
         DPS = Math.max(0, DPS);
-        return (int) Math.floor(DPS/5);
+        return (int) Math.floor(DPS/10);
     }
     public void addDPS(double dps) {
         MultiThread.TaskRun(() -> {
@@ -936,7 +948,7 @@ public class PlayerData {
                 DPS += dps/4;
                 MultiThread.sleepTick(5);
             }
-            MultiThread.sleepTick(80);
+            MultiThread.sleepTick(180);
             for (int i = 0 ; i < 4; i++) {
                 DPS -= dps/4;
                 MultiThread.sleepTick(5);

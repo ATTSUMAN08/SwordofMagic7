@@ -8,6 +8,7 @@ import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TagGame;
 
 import java.util.UUID;
 
@@ -33,6 +34,7 @@ public class HotBar {
     }
 
     public void use(int index) {
+        if (TagGame.isTagPlayerNonMessage(player)) return;
         if (playerData.Skill.isCastReady()) {
             if (playerData.EffectManager.hasEffect(EffectType.Confusion) && random.nextDouble() < 0.5) {
                 index = random.nextInt(8);

@@ -36,14 +36,14 @@ public class FreezeBullet {
 
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-
+            double value = skillData.ParameterValue(0)/100*DoubleGunStance.multiply(playerData);
             MultiThread.sleepTick(skillData.CastTime);
 
             ParticleManager.LineParticle(particleData1, playerHandLocation(player), 20, 0, 10);
             ParticleManager.LineParticle(particleData, playerHandLocation(player), 20, 0, 10);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
-                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100*DoubleGunStance.multiply(playerData), 1);
+                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, 1);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, 50, player);
             }
             playSound(player, GunAttack);

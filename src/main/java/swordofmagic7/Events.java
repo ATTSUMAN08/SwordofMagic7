@@ -53,8 +53,7 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.*;
-import static swordofmagic7.SomCore.random;
-import static swordofmagic7.SomCore.spawnPlayer;
+import static swordofmagic7.SomCore.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
@@ -68,9 +67,9 @@ public class Events implements Listener {
 
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        if (ServerId.equalsIgnoreCase("Event")) {
-            List<String> ignoreList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
-            if (!ignoreList.contains(event.getUniqueId().toString())) {
+        if (SomCore.isEventServer()) {
+            IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
+            if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
                         event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
@@ -84,7 +83,7 @@ public class Events implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (Bukkit.getOnlinePlayers().size() >= 40) {
+        if (Bukkit.getOnlinePlayers().size() >= 50 && !isEventServer()) {
             if (!player.hasPermission("som7.OverLogin")) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e別CH§aをお試しください");
             }

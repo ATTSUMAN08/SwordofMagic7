@@ -210,7 +210,11 @@ public class Market {
                     }
                 }
             }
-            marketList.sort(new MarketSort());
+            try {
+                marketList.sort(new MarketSort());
+            } catch (Exception e) {
+                sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
+            }
             int index = page * 45;
             for (int i = 0; i < 45; i++) {
                 if (marketList.size() > index) {
@@ -288,7 +292,7 @@ public class Market {
                     }
                 } else if (equalItem(currentItem, Cancel)) {
                     marketCache = null;
-                    MarketMenuView(page);
+                    MarketMenuView();
                 }
             }
         } else if (equalInv(view, MarketMenuDisplay)) {
@@ -337,6 +341,12 @@ class MarketCache {
 
 class MarketSort implements Comparator<MarketCache> {
     public int compare(MarketCache market, MarketCache market2) {
-        return Math.toIntExact(market.marketData.timeStamp - market2.marketData.timeStamp);
+        ItemParameter item = market.marketData.itemParameterStack.itemParameter;
+        ItemParameter item2 = market2.marketData.itemParameterStack.itemParameter;
+        if (item.Category == item2.Category) {
+            return item.Id.compareTo(item2.Id);
+        } else {
+            return item.Category.compareTo(item2.Category);
+        }
     }
 }

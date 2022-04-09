@@ -72,9 +72,11 @@ public class ItemInventory extends BasicInventory {
                 case Category -> comparator = new ItemSortCategory();
                 case Amount -> comparator = new ItemSortAmount();
             }
-        } catch (Exception ignored) {}
-        if (comparator != null) List.sort(comparator);
-        if (SortReverse) Collections.reverse(List);
+            if (comparator != null) List.sort(comparator);
+            if (SortReverse) Collections.reverse(List);
+        } catch (Exception e) {
+            sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
+        }
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {
                 ItemParameterStack stack = List.get(i);

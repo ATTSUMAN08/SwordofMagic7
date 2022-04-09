@@ -146,10 +146,10 @@ public class SkillProcess {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 Set<LivingEntity> victims = new HashSet<>();
                 switch (category) {
-                    case Blade -> victims = RectangleCollider(player.getLocation(), 4, 0.75, Predicate(), true);
+                    case Blade -> victims = RectangleCollider(player.getLocation(), 6.5, 1.5, Predicate(), true);
                     case Mace -> victims = RectangleCollider(player.getLocation(), 6, 1.25, Predicate(), true);
                     case Rod, ActGun -> {
-                        Ray ray = rayLocationEntity(player.getEyeLocation(), 15, 0.5, Predicate());
+                        Ray ray = rayLocationEntity(player.getEyeLocation(), 25, 0.75, Predicate());
                         if (ray.isHitEntity()) {
                             victims.add(ray.HitEntity);
                         }
@@ -160,28 +160,43 @@ public class SkillProcess {
         }
     }
 
+    public void normalAttackParticle(LivingEntity victim, Particle particle, double length) {
+        if (victim != null) {
+            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), victim.getEyeLocation(), 1, 10);
+        } else {
+            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), playerEyeLocation(player, length), 1, 10);
+        }
+    }
+
     public void normalAttack(Set<LivingEntity> victims) {
         final String damageSource = "attack";
         if (playerData.Equipment.isWeaponEquip()) {
             if (0 >= normalAttackCoolTime) {
+                LivingEntity victim = null;
+                for (LivingEntity entity : victims) {
+                    victim = entity;
+                }
+                if (victim == null) return;
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 switch (category) {
                     case Blade -> {
+                        normalAttackParticle(victim, Particle.SWEEP_ATTACK, 6.5);
                         Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
-                        normalAttackCoolTime = 12;
+                        normalAttackCoolTime = 7;
                     }
                     case Mace -> {
+                        normalAttackParticle(victim, Particle.CRIT, 6);
                         Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
                         normalAttackCoolTime = 15;
                     }
                     case Rod -> {
-                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), playerHandLocation(player), playerEyeLocation(player, 15), 0, 10);
+                        normalAttackParticle(victim, Particle.CRIT_MAGIC, 25);
                         Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
                         playSound(player, SoundList.RodAttack);
                         normalAttackCoolTime = 12;
                     }
                     case ActGun -> {
-                        ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), playerEyeLocation(player, 15), 0, 10);
+                        normalAttackParticle(victim, Particle.CRIT, 25);
                         Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
                         playSound(player, GunAttack);
                         normalAttackCoolTime = 10;

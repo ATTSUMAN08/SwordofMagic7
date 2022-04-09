@@ -62,7 +62,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public static final Random random = new Random();
     public static final Set<Hologram> HologramSet = new HashSet<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
-    public static final HashMap<Player, Integer> PlayerKickAFK = new HashMap<>();
+    public static final int AFKTimePeriod = 2;
+    public static final int AFKTime = 72000;
 
     public static Hologram createHologram(String key, Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
@@ -76,6 +77,17 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         return hologram;
     }
 
+    public static boolean isEventServer() {
+        return ServerId.equalsIgnoreCase("Event");
+    }
+
+    public static boolean isDevServer() {
+        return ServerId.equalsIgnoreCase("Dev");
+    }
+
+    public static boolean isDevEventServer() {
+        return isEventServer() || isDevServer();
+    }
 
     @Override
     public void onEnable() {
@@ -140,29 +152,26 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         }, 200, 6000), "AutoSave");
 
         /*
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        MultiThread.TaskRunTimer(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 PlayerData playerData = PlayerData.playerData(player);
                 if (!playerData.Map.Safe && !player.isOp()) {
                     if (PlayerLastLocation.containsKey(player)) {
                         Location location = PlayerLastLocation.get(player);
                         if (location.distance(player.getLocation()) < 1) {
-                            PlayerKickAFK.merge(player, 1, Integer::sum);
-                            if (PlayerKickAFK.get(player) > 5) {
-                                teleportServer(player, "Lobby");
-                            }
+                            playerData.AFKTime += AFKTimePeriod;
                         } else {
                             PlayerLastLocation.put(player, player.getLocation().clone());
-                            PlayerKickAFK.put(player, 0);
+                            playerData.AFKTime = 0;
                         }
                     } else {
                         PlayerLastLocation.put(player, player.getLocation().clone());
-                        PlayerKickAFK.put(player, 0);
+                        playerData.AFKTime = 0;
                     }
                 }
             }
             PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
-        }, 0, 300*20);
+        }, AFKTimePeriod*20);
          */
 
         ParticleManager.onLoad();
@@ -543,6 +552,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 playerData.HoloSelfView();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("spawn")) {
+                if (TagGame.isTagPlayerNonMessage(player)) return true;
+                if (playerData.isPvPModeNonMessage()) return true;
                 spawnPlayer(player);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("info")) {
@@ -864,6 +875,14 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         sendMessage(player, "§b開発鯖§a以外では利用できません");
                     }
                 }, "loadOnLiveServer");
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("setFastUpgrade")) {
+                try {
+                    playerData.Upgrade.fastUpgrade = Math.min(Math.max(Integer.parseInt(args[0]), 1), 25);
+                    sendMessage(player, "§aFastUpgrade: " + playerData.Upgrade.fastUpgrade);
+                } catch (Exception e) {
+                    sendMessage(player, "§e/setFastUpgrade <1~25>");
+                }
                 return true;
             }
         }

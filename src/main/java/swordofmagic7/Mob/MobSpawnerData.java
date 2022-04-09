@@ -8,8 +8,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.VectorDown;
+import static swordofmagic7.SomCore.isEventServer;
 import static swordofmagic7.SomCore.random;
 
 public class MobSpawnerData {
@@ -26,7 +26,7 @@ public class MobSpawnerData {
     private final List<EnemyData> SpawnedList = new ArrayList<>();
 
     public void start() {
-        if (!Started && !ServerId.equalsIgnoreCase("Event")) {
+        if (!Started && !isEventServer()) {
             Started = true;
             MultiThread.TaskRunTimer(() -> {
                 if (PlayerList.getNear(location, Radius + 16 + mobData.Search).size() > 0) {

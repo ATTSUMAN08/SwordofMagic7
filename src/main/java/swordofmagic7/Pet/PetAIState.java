@@ -1,6 +1,6 @@
 package swordofmagic7.Pet;
 
-enum PetAIState {
+public enum PetAIState {
     Attack("攻撃"),
     Follow("追従"),
     Support("サポート"),

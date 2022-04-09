@@ -7,6 +7,7 @@ import swordofmagic7.Effect.EffectType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Pet.PetAIState;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
@@ -40,6 +41,17 @@ public class DualStar {
                 pet.getEffectManager().addEffect(EffectType.ExtraAttack, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
+            }
+            skillProcess.SkillRigid(skillData);
+        }, skillData.Id);
+    }
+
+    public void AttackOrder(SkillData skillData) {
+        MultiThread.TaskRun(() -> {
+            skill.setCastReady(false);
+            for (PetParameter pet : playerData.PetSummon) {
+                playerData.PetManager.PetAISelect(pet, PetAIState.Attack);
+                MultiThread.sleepTick(1);
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

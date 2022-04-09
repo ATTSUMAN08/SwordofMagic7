@@ -18,8 +18,7 @@ import java.util.Set;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.SomCore.plugin;
 
 public class AusMineB4 {
@@ -61,10 +60,10 @@ public class AusMineB4 {
                     }
                     ViewBar.resetSideBar(Players, "AusMineB4");
                     if (Enemy.isDead()) {
-                        MessageTeleport(Players, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").Location);
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").Location);
                     } else {
                         Enemy.delete();
-                        Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        Message(list, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
                     }
                     Players.clear();
                     Start = false;

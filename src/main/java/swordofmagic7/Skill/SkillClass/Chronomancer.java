@@ -200,7 +200,7 @@ public class Chronomancer {
                         BackMaskingMapData.enter(player);
                         player.sendMessage("§a情報を巻き戻しました");
                         playSound(player, SoundList.Warp);
-                        BackMaskingReset();
+                        MultiThread.TaskRunSynchronizedLater(this::BackMaskingReset, 1);
                     }
                 });
             } else {

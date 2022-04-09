@@ -41,6 +41,7 @@ import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.decoText;
 
 public final class DataBase {
+    public static List<String> IgnoreIPList = new ArrayList<>();
     public static final String DataBasePath = "M:\\Minecraft\\Server\\SwordofMagic7\\DataBase\\";
     public static final String format = "%.3f";
     public static final int MaxStackAmount = 100;

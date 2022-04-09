@@ -12,6 +12,7 @@ import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
+import swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
 import swordofmagic7.ViewBar.ViewBar;
@@ -58,7 +59,7 @@ public class DefenseBattle {
         spawnLocation[7] = new Location(world, 2300.5,64,2407.5);
         spawnLocation[8] = new Location(world, 2314.5,64,2370.5);
 
-        if (ServerId.equals("Event")) MultiThread.TaskRunTimer(() -> {
+        if (SomCore.isEventServer()) MultiThread.TaskRunTimer(() -> {
             LocalDateTime time = LocalDateTime.now();
             DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
             String display = format.format(time);

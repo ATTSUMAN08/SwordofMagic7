@@ -16,6 +16,7 @@ import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
@@ -26,11 +27,18 @@ import java.util.List;
 import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class BigAusSlime {
+public class KingSlime {
 
     private final EnemySkillManager Manager;
-    public BigAusSlime(EnemySkillManager manager) {
+    public KingSlime(EnemySkillManager manager) {
         this.Manager = manager;
+    }
+
+    private void radiusMessage(String message) {
+        for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 48)) {
+            Function.sendMessage(player, message);
+            playSound(player, SoundList.DungeonTrigger);
+        }
     }
 
     public void SlimeLaser() {
@@ -42,23 +50,34 @@ public class BigAusSlime {
                 LivingEntity target = targets.get(random.nextInt(targets.size()));
                 ParticleData particleData = new ParticleData(Particle.SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
-                Damage.makeDamage(entity, target, DamageCause.ATK, "Laser", 3, 1);
+                Damage.makeDamage(entity, target, DamageCause.ATK, "SlimeLaser", 1.5, 1);
                 if (target instanceof Player player) playSound(player, SoundList.Slime);
             }
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
-        }, "Laser");
+        }, "SlimeLaser");
     }
 
-    public void Crush() {
+    public void Crush(int CastTime) {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
             LivingEntity target = Manager.enemyData.target;
             LivingEntity entity = Manager.enemyData.entity;
-            if (target != null && target.getLocation().distance(Manager.enemyData.entity.getLocation()) < 10) {
+            Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
+            double radius = 12;
+
+            int i = 0;
+            while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
+                ParticleManager.CircleParticle(Manager.particleCasting, entity.getLocation(), radius, 48);
+                i += Manager.period;
+                MultiThread.sleepTick(Manager.period);
+            }
+
+            if (target != null && target.getLocation().distance(entity.getLocation()) < radius) {
                 ParticleData particleData = new ParticleData(Particle.SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
-                Damage.makeDamage(entity, target, DamageCause.ATK, "Crush", 3, 1);
+                Damage.makeDamage(entity, target, DamageCause.ATK, "Crush", 4, 1);
+                target.setVelocity(entity.getLocation().getDirection().setY(1));
                 if (target instanceof Player player) playSound(player, SoundList.Slime);
             }
             MultiThread.sleepTick(10);
@@ -70,15 +89,21 @@ public class BigAusSlime {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             LivingEntity entity = Manager.enemyData.entity;
-            ParticleData particleData = new ParticleData(Particle.SLIME, 0.05f);
+            ParticleData particleData = new ParticleData(Particle.SWEEP_ATTACK, 0.05f);
+            double radius = 15;
+            Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
+
+            radiusMessage("§cキングスライムが何かを飛ばそうとしています！");
+
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
-                ParticleManager.CircleParticle(particleData, entity.getLocation(), 10, 24);
+                ParticleManager.CircleParticle(Manager.particleCasting, entity.getLocation(), radius, 48);
+                ParticleManager.CircleParticle(particleData, entity.getLocation(), radius, 24);
                 i += Manager.period;
                 MultiThread.sleepTick(Manager.period);
             }
 
-            for (LivingEntity victim : Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), 32)) {
+            for (LivingEntity victim : Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), radius)) {
                 EffectManager.addEffect(victim, EffectType.Adhesive, 600, null);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), victim.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "Adhesive", 2, 1);
@@ -94,6 +119,10 @@ public class BigAusSlime {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
             LivingEntity entity = Manager.enemyData.entity;
+            Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 50);
+
+            radiusMessage("§cキングスライムがナイトスライムを召喚し始めました！");
+
             MobData mobData = DataBase.getMobData("ナイトスライム");
             int i = 0;
             Familiar.removeIf(EnemyData::isDead);
@@ -114,6 +143,10 @@ public class BigAusSlime {
             double length = 20;
             double angle = 130;
             ParticleData particleData = new ParticleData(Particle.SLIME, 0.05f);
+            Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
+
+            radiusMessage("§cキングスライムが強力な攻撃を使用としてます！避けてください！");
+
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
                 ParticleManager.FanShapedParticle(particleData, entity.getLocation(), length, angle, 24);

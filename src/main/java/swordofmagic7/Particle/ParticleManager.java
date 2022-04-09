@@ -16,12 +16,13 @@ import static swordofmagic7.SomCore.random;
 
 public final class ParticleManager {
 
-    private static final int maxParticle = 15000;
+    private static final int maxParticle = 5000;
     private static final int decParticle = Math.round(maxParticle/20f);
     public static void onLoad() {
         MultiThread.TaskRunTimer(() -> {
             if (particleCount > 0) {
                 particleCount -= decParticle;
+                particleDecay = Math.round((float) maxParticle/particleCount);
             }
         }, 1);
     }
@@ -100,8 +101,16 @@ public final class ParticleManager {
     }
 
     private static int particleCount = 0;
+    private static int particleCountTick = 0;
+    private static int particleDecay = 1;
     public static void spawnParticle(ParticleData particleData, Location location) {
-        if (particleCount > maxParticle) return;
+        if (particleCount > maxParticle) {
+            particleCountTick++;
+            if (particleDecay <= particleCountTick) {
+                particleCountTick = 0;
+                return;
+            }
+        }
         particleCount++;
         float speed;
         Vector vector;
@@ -115,7 +124,7 @@ public final class ParticleManager {
             float rom = particleData.randomOffsetMultiply;
             offset = new Vector(random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2));
         }
-        Set<Player> Players = PlayerList.getNear(location, 96);
+        Set<Player> Players = PlayerList.getNear(location, 64);
         if (particleData.particle != Particle.REDSTONE) {
             for (Player player : Players) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);

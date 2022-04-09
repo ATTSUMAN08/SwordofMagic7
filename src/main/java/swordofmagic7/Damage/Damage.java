@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.createHologram;
 import static swordofmagic7.SomCore.random;
@@ -33,7 +32,8 @@ import static swordofmagic7.SomCore.random;
 public final class Damage {
 
     public static int OutrageResetTime;
-    public static float PvPDecay = 5;
+    public static double PvPDecay = 100;
+    public static double PvPHealDecay = 10;
 
     public static void makeHeal(Player healer, Player victim, double healMultiply) {
         PlayerData healerData = playerData(healer);
@@ -43,7 +43,7 @@ public final class Damage {
             return;
         }
         double heal = healerData.Status.HLP * healMultiply;
-        if (playerData(victim).PvPMode) heal /= PvPDecay;
+        if (playerData(victim).PvPMode) heal /= PvPHealDecay;
         victimData.changeHealth(heal);
         String Text = "§b≫§e" + String.format("%.1f", heal);
         String M = " §f[M:" + String.format("%.0f", healMultiply*100) + "%]";
@@ -125,6 +125,7 @@ public final class Damage {
             playerData.setTargetEntity(victim);
         } else if (MobManager.isEnemy(attacker)) {
             EnemyData enemyData = MobManager.EnemyTable(attacker.getUniqueId());
+            if (enemyData == null) return;
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
@@ -153,6 +154,7 @@ public final class Damage {
             victimEffectManager = playerData.EffectManager;
         } else if (MobManager.isEnemy(victim)) {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
+            if (enemyData == null) return;
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
@@ -203,11 +205,10 @@ public final class Damage {
             criRate = 1-(CriticalResist-CriticalRate/2)/((CriticalResist*2+CriticalRate)/3);
         }
         criRate = Math.min(Math.max(criRate, 0.01), 0.95);
-        Log(CriticalRate + ", " + CriticalResist + ", " + criRate);
         Attack = ATK;
         Defence = DEF;
 
-        if ((attacker instanceof Player || PetManager.isPet(victim)) && victim instanceof Player) {
+        if ((attacker instanceof Player || PetManager.isPet(attacker)) && (victim instanceof Player || PetManager.isPet(victim))) {
             baseDamage /= PvPDecay;
         }
 

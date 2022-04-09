@@ -2,7 +2,7 @@ package swordofmagic7.Item;
 
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemUseList.BigAusSlime;
+import swordofmagic7.Item.ItemUseList.KingSlime;
 import swordofmagic7.Item.ItemUseList.RewardBox;
 import swordofmagic7.Sound.SoundList;
 
@@ -16,7 +16,7 @@ public class ItemUse {
         if (RewardBoxList.containsKey(item.Id)) {
             RewardBox.rewardBoxOpen(playerData, item);
         } else if (item.Id.equalsIgnoreCase("スライムの王冠")) {
-            BigAusSlime.trigger(playerData, item);
+            KingSlime.trigger(playerData, item);
         } else {
             sendMessage(playerData.player, "§a使用できない§eアイテム§aです", SoundList.Nope);
         }

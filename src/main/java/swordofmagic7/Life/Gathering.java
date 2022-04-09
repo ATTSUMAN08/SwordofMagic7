@@ -230,15 +230,15 @@ public class Gathering {
                     preview.append(title);
                     String subTitle = "§7MissLeft " + (MissLeft - FishingMissCount);
                     if (!FishingUseCombo) {
-                        if (time > 18000) {
+                        if (time > 3600 + combo*10) {
                             inputProgress = requestFishingCommand.length;
                             break;
                         }
-                        subTitle = "                      " + subTitle + "    §eTime" + String.format("%.2f", time * 0.01) + "秒";
+                        subTitle = "                      " + subTitle + "    §eTime" + String.format("%.2f", time * 0.05) + "秒";
                     }
                     player.sendTitle(preview.toString(), subTitle, 0, 5, 0);
                     time++;
-                    MultiThread.sleepMillis(10);
+                    MultiThread.sleepTick(1);
                 }
                 if (!plugin.isEnabled()) {
                     return;
@@ -266,12 +266,18 @@ public class Gathering {
                             }
                         }
                         int amount = playerData.LifeStatus.getMultiplyAmount(LifeType.Angler);
+                        double percent = combo/30f;
+                        while (percent >= 1) {
+                            percent--;
+                            amount++;
+                        }
+                        if (random.nextDouble() < percent) amount++;
                         playerData.ItemInventory.addItemParameter(hitData.itemParameter, amount);
                         playerData.LifeStatus.addLifeExp(LifeType.Angler, (int) Math.round(data.Exp * hitData.expMultiply * multiply));
                         playerData.statistics.FishingCount++;
-                        double timePerSecond = requestFishingCommand.length / (time * 0.01);
+                        double timePerSecond = requestFishingCommand.length / (time * 0.05);
                         if (FishingUseCombo) FishingComboBoost++;
-                        player.sendMessage("§e[" + hitData.itemParameter.Display + "§ax" + amount + "§e]§aを釣りあげました！ §b[" + combo + "Combo] §e[" + String.format("%.2f", time * 0.01) + "秒] §c[" + String.format("%.2f", timePerSecond) + "/秒] §7[" + FishingMissCount + "Miss] §b[+" + (int) ((multiply - 1) * 100) + "%]");
+                        player.sendMessage("§e[" + hitData.itemParameter.Display + "§ax" + amount + "§e]§aを釣りあげました！ §b[" + combo + "Combo] §e[" + String.format("%.2f", time * 0.05) + "秒] §c[" + String.format("%.2f", timePerSecond) + "/秒] §7[" + FishingMissCount + "Miss] §b[+" + (int) ((multiply - 1) * 100) + "%]");
                         SomCore.PlayerLastLocation.remove(player);
                         MultiThread.TaskRunLater(() -> {
                             if (!hook.isDead()) FishingHit(hook);

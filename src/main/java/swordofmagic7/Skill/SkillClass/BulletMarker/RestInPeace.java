@@ -26,6 +26,7 @@ public class RestInPeace extends SkillBase {
 
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            double value = skillData.ParameterValue(0)/100*DoubleGunStance.multiply(playerData);
             int count = (int) skillData.ParameterValue(1);
             int length = 20;
 
@@ -34,7 +35,7 @@ public class RestInPeace extends SkillBase {
             Ray ray = rayLocationEntity(player.getEyeLocation(), length, 0.5, skillProcess.Predicate());
             Location loc;
             if (ray.isHitEntity()) {
-                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100*DoubleGunStance.multiply(playerData), count);
+                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, count);
                 loc = ray.HitPosition;
             } else {
                 loc = player.getEyeLocation().clone().add(player.getEyeLocation().getDirection().multiply(length));

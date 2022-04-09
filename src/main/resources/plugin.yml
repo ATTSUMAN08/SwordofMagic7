@@ -299,3 +299,6 @@ commands:
   loadOnLiveServer:
     description: description
     usage: /<command>
+  setFastUpgrade:
+    description: description
+    usage: /<command>
