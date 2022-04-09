@@ -2,6 +2,7 @@ package swordofmagic7.Shop;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class RuneShop {
     private static final ItemStack RuneShopMenu_RunePolish = new ItemStackData(Material.GRINDSTONE, decoText("ルーン研磨"), "§a§lルーンの粉末を使用して\n§a§lルーンの品質を上げます\n§a§l品質は最大の70%まで上がります").view();
     private final Player player;
     private final PlayerData playerData;
-    private double maxQuality = 0.7;
+    private final double maxQuality = 0.7;
 
     public RuneShop(Player player, PlayerData playerData) {
         this.player = player;
@@ -73,13 +74,15 @@ public class RuneShop {
     }
 
     public Inventory RuneCrashInv() {
-        Inventory inv = decoInv(RuneCrashDisplay, 5);
+        Inventory inv = decoInv(RuneCrashDisplay, 6);
         playerData.setView(ViewInventoryType.RuneInventory, false);
         int slot = 0;
         for (RuneParameter rune : RuneCrashed) {
             inv.setItem(slot, rune.viewRune(playerData.ViewFormat()));
             slot++;
+            if (slot > 53) break;
         }
+        inv.setItem(53, new ItemStackData(Material.GUNPOWDER, decoText("§c一括粉砕"), "§e品質" + maxQuality*100 + "%§a以下の§bルーン§aをすべて粉砕します").view());
         return inv;
     }
 
@@ -113,7 +116,7 @@ public class RuneShop {
     public ItemParameter RuneCache;
     public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     public final ItemParameter RunePowder = getItemParameter("ルーンの粉");
-    public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ItemStack currentItem, int index, int Slot) {
+    public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ClickType clickType, ItemStack currentItem, int index, int Slot) {
         String format = playerData.ViewFormat();
         if (equalInv(view, RuneShopMenuDisplay)) {
             if (equalItem(currentItem, RuneShopMenu_RuneCrash)) {
@@ -128,27 +131,71 @@ public class RuneShop {
             playSound(player, SoundList.Click);
         } else if (equalInv(view, RuneCrashDisplay) && playerData.ViewInventory.isRune()) {
             if (ClickInventory == view.getTopInventory()) {
-                if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
-                    RuneParameter rune = RuneCrashed.get(Slot).clone();
-                    RuneCrashed.remove(Slot);
-                    playerData.RuneInventory.addRuneParameter(rune);
-                    playerData.ItemInventory.removeItemParameter(RunePowder, 1);
-                    player.sendMessage("§e[ルーン]§aを§b復元§aしました");
-                    playSound(player, SoundList.LevelUp);
+                if (Slot == 53) {
+                    int runeIndex = 0;
+                    int runePower = 0;
+                    for (int i = 0; i < playerData.RuneInventory.getList().size(); i++) {
+                        RuneParameter rune = playerData.RuneInventory.getRuneParameter(runeIndex).clone();
+                        if (rune.Quality < maxQuality) {
+                            RuneCrashed.add(0, rune);
+                            if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+                            playerData.RuneInventory.removeRuneParameter(runeIndex);
+                            runePower++;
+                        } else {
+                            runeIndex++;
+                        }
+                    }
+                    if (runePower > 0) {
+                        playerData.ItemInventory.addItemParameter(RunePowder, runePower);
+                        sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LevelUp);
+                    } else {
+                        sendMessage(player, "§e品質" + maxQuality*100 + "%§a以下の§bルーン§aがありません", SoundList.Nope);
+                    }
                 } else {
-                    player.sendMessage("§e[ルーンの粉]§aが必要です");
-                    playSound(player, SoundList.Nope);
+                    if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
+                        RuneParameter rune = RuneCrashed.get(Slot).clone();
+                        RuneCrashed.remove(Slot);
+                        playerData.RuneInventory.addRuneParameter(rune);
+                        playerData.ItemInventory.removeItemParameter(RunePowder, 1);
+                        player.sendMessage("§e[ルーン]§aを§b復元§aしました");
+                        playSound(player, SoundList.LevelUp);
+                    } else {
+                        player.sendMessage("§e[ルーンの粉]§aが必要です");
+                        playSound(player, SoundList.Nope);
+                    }
                 }
             } else if (index > -1) {
-                RuneParameter rune = playerData.RuneInventory.getRuneParameter(index).clone();
-                RuneCrashed.add(rune);
-                playerData.RuneInventory.removeRuneParameter(index);
-                playerData.ItemInventory.addItemParameter(RunePowder, 1);
-                if (RuneCrashed.size() > 45) {
-                    RuneCrashed.remove(0);
+                if (clickType.isShiftClick()) {
+                    int runePower = 0;
+                    RuneParameter lastRune = null;
+                    while (playerData.RuneInventory.getList().size() > index) {
+                        RuneParameter rune = playerData.RuneInventory.getRuneParameter(index).clone();
+                        if (lastRune != null) {
+                            if (!rune.Id.equals(lastRune.Id) || rune.Quality >= maxQuality) {
+                                break;
+                            }
+                        }
+                        RuneCrashed.add(0, rune);
+                        if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+                        playerData.RuneInventory.removeRuneParameter(index);
+                        lastRune = rune.clone();
+                        runePower++;
+                    }
+                    playerData.ItemInventory.addItemParameter(RunePowder, runePower);
+                    sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LevelUp);
+                } else {
+                    RuneParameter rune = playerData.RuneInventory.getRuneParameter(index).clone();
+                    if (clickType.isRightClick() && rune.Quality >= maxQuality) {
+                        sendMessage(player, "§e品質§aが§e" + (maxQuality*100) + "%§a以上です", SoundList.Nope);
+                    } else {
+                        RuneCrashed.add(0, rune);
+                        if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+                        playerData.RuneInventory.removeRuneParameter(index);
+                        playerData.ItemInventory.addItemParameter(RunePowder, 1);
+                        player.sendMessage("§e[ルーン]§aを§c粉砕§aしました");
+                        playSound(player, SoundList.LevelUp);
+                    }
                 }
-                player.sendMessage("§e[ルーン]§aを§c粉砕§aしました");
-                playSound(player, SoundList.LevelUp);
             }
             view.getTopInventory().setContents(RuneCrashInv().getStorageContents());
         } else if (equalInv(view, RuneEquipDisplay)) {

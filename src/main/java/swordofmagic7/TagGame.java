@@ -23,10 +23,8 @@ public class TagGame {
     public static String PlayingTagGameNonMessage = "§c鬼ごっこ§a中は使用できません";
 
     public static boolean isTagPlayerNonMessage(Player player) {
-        if (Players.contains(player)) {
-            sendMessage(player, PlayingTagGameNonMessage);
-        }
-        return !Players.contains(player);
+        if (Players.contains(player)) sendMessage(player, PlayingTagGameNonMessage);
+        return Players.contains(player);
     }
 
     TagGame() {

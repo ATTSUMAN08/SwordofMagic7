@@ -335,7 +335,8 @@ public class PlayerData {
             case None -> DropLog(DropLogType.All);
             case All -> DropLog(DropLogType.Item);
             case Item -> DropLog(DropLogType.Rune);
-            case Rune -> DropLog(DropLogType.None);
+            case Rune -> DropLog(DropLogType.Rare);
+            case Rare -> DropLog(DropLogType.None);
         }
     }
 
@@ -452,7 +453,7 @@ public class PlayerData {
     }
 
     public boolean isPvPModeNonMessage() {
-        sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.Nope);
+        if (PvPMode) sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.Nope);
         return PvPMode;
     }
 
@@ -855,20 +856,26 @@ public class PlayerData {
         return new ItemStackData(Material.BOOK, decoText("§e§lユーザーメニュー"), Lore).view();
     }
 
-    public void viewUpdate() {
-        if (PlayMode) {
-            switch (ViewInventory) {
-                case ItemInventory -> ItemInventory.viewInventory();
-                case RuneInventory -> RuneInventory.viewRune();
-                case PetInventory -> PetInventory.viewPet();
-                case HotBar -> HotBar.viewTop();
+    private boolean isNextViewUpdate = false;
+    public synchronized void viewUpdate() {
+        if (isNextViewUpdate) return;
+        isNextViewUpdate = true;
+        MultiThread.TaskRunLater(() -> {
+            if (PlayMode) {
+                switch (ViewInventory) {
+                    case ItemInventory -> ItemInventory.viewInventory();
+                    case RuneInventory -> RuneInventory.viewRune();
+                    case PetInventory -> PetInventory.viewPet();
+                    case HotBar -> HotBar.viewTop();
+                }
+                HotBar.viewBottom();
+                Equipment.viewEquip();
+                player.getInventory().setItem(26, UserMenuIcon());
+                player.getInventory().setItem(17, UpScrollItem);
+                player.getInventory().setItem(35, DownScrollItem);
             }
-            HotBar.viewBottom();
-            Equipment.viewEquip();
-            player.getInventory().setItem(26, UserMenuIcon());
-            player.getInventory().setItem(17, UpScrollItem);
-            player.getInventory().setItem(35, DownScrollItem);
-        }
+            isNextViewUpdate = false;
+        }, 1, "NextViewUpdate");
     }
 
     public void setView(ViewInventoryType ViewInventory) {

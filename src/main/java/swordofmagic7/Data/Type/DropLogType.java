@@ -5,6 +5,7 @@ public enum DropLogType {
     All("すべて表示"),
     Item("アイテムのみ"),
     Rune("ルーンのみ"),
+    Rare("レアドロのみ"),
     ;
 
     public String Display;
@@ -19,6 +20,10 @@ public enum DropLogType {
 
     public boolean isRune() {
         return this == Rune || this == All;
+    }
+
+    public boolean isRare() {
+        return this == Rare || this == All;
     }
 
     public static DropLogType fromString(String str) {

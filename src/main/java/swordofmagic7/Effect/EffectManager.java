@@ -201,8 +201,9 @@ public class EffectManager {
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player) {
         EffectManager manager = getEffectManager(entity);
         if (manager != null) {
+            boolean isSendMessage = !manager.hasEffect(effectType);
             if (manager.addEffect(effectType, time, null, stack)) {
-                if (player != null) addEffectMessage(player, entity, effectType);
+                if (player != null && isSendMessage) addEffectMessage(player, entity, effectType);
             } else {
                 if (player != null) player.sendMessage(effectType.color() + "[" + effectType.Display + "]§aが無効化されました");
             }

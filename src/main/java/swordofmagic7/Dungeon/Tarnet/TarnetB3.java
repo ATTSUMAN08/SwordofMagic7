@@ -103,10 +103,10 @@ public class TarnetB3 {
                     }
                     ViewBar.resetSideBar(Players, sidebarId);
                     if (Enemy.isDead()) {
-                        MessageTeleport(Players, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").Location);
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").Location);
                     } else {
                         Enemy.delete();
-                        Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("TarnetB2_to_TarnetB3BOSS").Location);
                     }
 
                     Players.clear();

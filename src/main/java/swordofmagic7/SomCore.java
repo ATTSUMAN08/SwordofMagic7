@@ -216,7 +216,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         Log("CleanEnemy: " + count);
     }
 
-    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("SomReload")) {
             for (Player player : Bukkit.getOnlinePlayers()) {

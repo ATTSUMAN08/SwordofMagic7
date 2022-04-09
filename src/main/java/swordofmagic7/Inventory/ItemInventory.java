@@ -11,7 +11,6 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
@@ -21,7 +20,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
     public final int MaxSlot = 1000;
-    private final List<ItemParameterStack> List = new ArrayList<>();
+    private List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Category;
     public boolean SortReverse = false;
@@ -60,22 +59,20 @@ public class ItemInventory extends BasicInventory {
         playerData.viewUpdate();
     }
 
-    public void viewInventory() {
+    public synchronized void viewInventory() {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
         int slot = 9;
         List.removeIf(stack -> stack.Amount <= 0);
-        Comparator<ItemParameterStack> comparator = null;
         try {
             if (List.size() > 0) switch (Sort) {
-                case Name -> comparator = new ItemSortName();
-                case Category -> comparator = new ItemSortCategory();
-                case Amount -> comparator = new ItemSortAmount();
+                case Name -> List.sort(new ItemSortName());
+                case Category -> List.sort(new ItemSortCategory());
+                case Amount -> List.sort(new ItemSortAmount());
             }
-            if (comparator != null) List.sort(comparator);
             if (SortReverse) Collections.reverse(List);
         } catch (Exception e) {
-            sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
+            sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました" + e.getMessage());
         }
         for (int i = index; i < index+24; i++) {
             if (i < List.size()) {
@@ -86,7 +83,7 @@ public class ItemInventory extends BasicInventory {
                 Lore.add(itemStack);
                 Lore.add(decoLore("個数") + stack.Amount);
                 Lore.add(decoLore("売値") + stack.itemParameter.Sell * stack.Amount);
-                Lore.add("§8" + i);
+                Lore.add("§8SlotID:" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 player.getInventory().setItem(slot, item);

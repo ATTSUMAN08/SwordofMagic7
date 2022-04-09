@@ -138,7 +138,7 @@ public class Menu {
                 ItemMeta meta = currentItem.getItemMeta();
                 if (meta.hasLore()) {
                     List<String> Lore = meta.getLore();
-                    index = Integer.parseInt(Lore.get(Lore.size() - 1).replace("§8", ""));
+                    index = Integer.parseInt(Lore.get(Lore.size() - 1).replace("§8SlotID:", ""));
                 }
             }
         } catch (Exception ignored) {}
@@ -244,7 +244,7 @@ public class Menu {
         }
 
         if (currentItem != null) {
-            playerData.RuneShop.RuneMenuClick(view, ClickInventory, currentItem, index, Slot);
+            playerData.RuneShop.RuneMenuClick(view, ClickInventory, clickType, currentItem, index, Slot);
             playerData.PetShop.PetShopClick(view, ClickInventory, currentItem, index, Slot);
             playerData.PetEvolution.PetEvolutionClick(view, ClickInventory, index, Slot);
             playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);

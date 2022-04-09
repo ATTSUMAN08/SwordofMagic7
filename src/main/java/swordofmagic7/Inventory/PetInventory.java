@@ -115,18 +115,16 @@ public class PetInventory extends BasicInventory {
         playerData.viewUpdate();
     }
 
-    public void viewPet() {
+    public synchronized void viewPet() {
         playerData.ViewInventory = ViewInventoryType.PetInventory;
         int index = ScrollTick*8;
         int slot = 9;
-        Comparator<PetParameter> comparator = null;
         try {
             if (List.size() > 0) switch (Sort) {
-                case Name -> comparator = new PetSortName();
-                case Level -> comparator = new PetSortLevel();
-                case GrowthRate -> comparator = new PetSortGrowthRate();
+                case Name -> List.sort(new PetSortName());
+                case Level -> List.sort(new PetSortLevel());
+                case GrowthRate -> List.sort(new PetSortGrowthRate());
             }
-            if (comparator != null) List.sort(comparator);
             if (SortReverse) Collections.reverse(List);
         } catch (Exception e) {
             sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
@@ -136,7 +134,7 @@ public class PetInventory extends BasicInventory {
                 ItemStack item = List.get(i).viewPet(playerData.ViewFormat());
                 ItemMeta meta = item.getItemMeta();
                 List<String> Lore = new ArrayList<>(meta.getLore());
-                Lore.add("§8" + i);
+                Lore.add("§8SlotID:" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 player.getInventory().setItem(slot, item);

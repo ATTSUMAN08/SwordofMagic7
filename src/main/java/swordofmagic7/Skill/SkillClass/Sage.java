@@ -96,7 +96,7 @@ public class Sage {
                     ParticleManager.CircleParticle(particleData, origin, radius, 36);
                     ParticleManager.RandomVectorParticle(particleData, top, 36);
                     for (LivingEntity entity : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
-                        Vector vector = origin.toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.5);
+                        Vector vector = origin.toVector().subtract(entity.getLocation().toVector()).multiply(0.5);
                         entity.setVelocity(entity.getVelocity().add(vector));
                         ParticleManager.LineParticle(particleData2, entity.getEyeLocation(), top, 0.5, 5);
                     }

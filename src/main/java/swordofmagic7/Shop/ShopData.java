@@ -34,7 +34,7 @@ public class ShopData implements Cloneable {
                         Lore.add(decoLore(stack.itemParameter.Id) + stack.Amount + "個");
                     }
                 }
-                Lore.add("§8" + i);
+                Lore.add("§8SlotID:" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 inv.setItem(slot, item);

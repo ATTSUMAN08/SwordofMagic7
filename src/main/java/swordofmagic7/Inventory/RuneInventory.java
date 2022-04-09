@@ -80,7 +80,7 @@ public class RuneInventory extends BasicInventory {
         playerData.viewUpdate();
     }
 
-    public void viewRune() {
+    public synchronized void viewRune() {
         playerData.ViewInventory = ViewInventoryType.RuneInventory;
         int index = ScrollTick*8;
         int slot = 9;
@@ -99,7 +99,7 @@ public class RuneInventory extends BasicInventory {
                 ItemStack item = List.get(i).viewRune(playerData.ViewFormat());
                 ItemMeta meta = item.getItemMeta();
                 List<String> Lore = new ArrayList<>(meta.getLore());
-                Lore.add("§8" + i);
+                Lore.add("§8SlotID:" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 player.getInventory().setItem(slot, item);

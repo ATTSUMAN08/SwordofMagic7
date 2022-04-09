@@ -421,7 +421,7 @@ public class EnemyData {
                                     }
                                     playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
                                     Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                                    if (playerData.DropLog.isItem()) ItemGetLog(player, dropData.itemParameter, amount);
+                                    if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) ItemGetLog(player, dropData.itemParameter, amount);
                                     if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
                                         TextView text = new TextView(playerData.getNick() + "§aさんが");
                                         text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
@@ -441,7 +441,7 @@ public class EnemyData {
                                     if (mobData.enemyType.isBoss() || playerData.RuneQualityFilter <= runeParameter.Quality) {
                                         playerData.RuneInventory.addRuneParameter(runeParameter);
                                         Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                                        if (playerData.DropLog.isRune()) {
+                                        if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
                                             player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
                                         }
                                     } else {

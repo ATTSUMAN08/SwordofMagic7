@@ -63,7 +63,7 @@ public class AusMineB4 {
                         MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").Location);
                     } else {
                         Enemy.delete();
-                        Message(list, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AusMineB4_to_AusMineB4Boss").Location);
                     }
                     Players.clear();
                     Start = false;

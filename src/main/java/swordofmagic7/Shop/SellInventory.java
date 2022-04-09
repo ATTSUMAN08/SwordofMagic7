@@ -44,7 +44,7 @@ public class SellInventory extends BasicInventory {
                 List<String> Lore = new ArrayList<>(meta.getLore());
                 Lore.add(itemStack);
                 Lore.add(decoLore("個数") + stack.Amount);
-                Lore.add("§8" + i);
+                Lore.add("§8SlotID:" + i);
                 meta.setLore(Lore);
                 item.setItemMeta(meta);
                 inv.setItem(i, item);

@@ -16,8 +16,6 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Skill.SkillClass.Alchemist.Alchemist;
 import swordofmagic7.Skill.SkillClass.*;
-import swordofmagic7.Skill.SkillClass.BulletMarker.FreezeBullet;
-import swordofmagic7.Skill.SkillClass.BulletMarker.RestInPeace;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
@@ -53,6 +51,7 @@ public class Skill {
     public final Tamer tamer;
     public final Priest priest;
     public final Peltast peltast;
+    public final BulletMarker bulletMarker;
     public final Elementalist elementalist;
     public final Doppelsoeldner doppelsoeldner;
     public final Pardoner pardoner;
@@ -84,6 +83,7 @@ public class Skill {
         tamer = new Tamer(SkillProcess);
         priest = new Priest(SkillProcess);
         peltast = new Peltast(SkillProcess);
+        bulletMarker = new BulletMarker(SkillProcess);
         elementalist = new Elementalist(SkillProcess);
         doppelsoeldner = new Doppelsoeldner(SkillProcess);
         pardoner = new Pardoner(SkillProcess);
@@ -206,8 +206,8 @@ public class Skill {
                                             //バレットマーカー
                                             case "TracerBullet" -> SkillProcess.BuffApply(skillData, EffectType.TracerBullet, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
                                             case "DoubleGunStance" -> SkillProcess.BuffApply(skillData, EffectType.DoubleGunStance, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
-                                            case "FreezeBullet" -> new FreezeBullet(skillData, SkillProcess);
-                                            case "RestInPeace" -> new RestInPeace(skillData, SkillProcess);
+                                            case "FreezeBullet" -> bulletMarker.FreezeBullet(skillData, SkillProcess);
+                                            case "RestInPeace" -> bulletMarker.RestInPeace(skillData, SkillProcess);
                                             //ドッペルゾルドナー
                                             case "DeedsOfValor" -> doppelsoeldner.DeedsOfValor(skillData);
                                             case "Cyclone" -> doppelsoeldner.Cyclone(skillData);

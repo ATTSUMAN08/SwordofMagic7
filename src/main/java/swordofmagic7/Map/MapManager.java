@@ -28,10 +28,10 @@ public class MapManager {
     }
 
     public void WarpGateSelector() {
-        if (TagGame.isTagPlayerNonMessage(player)) return;
         Location pLoc = player.getLocation();
         for (Map.Entry<String, WarpGateParameter> entry : WarpGateList.entrySet()) {
             if (entry.getValue().Location.distance(pLoc) < 2) {
+                if (TagGame.isTagPlayerNonMessage(player)) return;
                 if (WarpGateList.containsKey(entry.getValue().Target) || entry.getValue().TargetLocation != null) {
                     entry.getValue().usePlayer(player);
                 } else {
@@ -42,12 +42,12 @@ public class MapManager {
     }
 
     public void TeleportGateSelector() {
-        if (TagGame.isTagPlayerNonMessage(player)) return;
-        if (playerData.isPvPModeNonMessage()) return;
         Location pLoc = player.getLocation();
         for (Map.Entry<String, TeleportGateParameter> entry : TeleportGateList.entrySet()) {
             TeleportGateParameter teleport = entry.getValue();
             if (teleport.Location.distance(pLoc) < 2) {
+                if (TagGame.isTagPlayerNonMessage(player)) return;
+                if (playerData.isPvPModeNonMessage()) return;
                 if (!teleport.DefaultActive && !playerData.ActiveTeleportGate.contains(teleport.Id)) {
                     playerData.ActiveTeleportGate.add(teleport.Id);
                     player.sendMessage("§e[" + teleport.Display + "]§aを§b[有効化]§aしました");

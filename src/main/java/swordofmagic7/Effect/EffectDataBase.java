@@ -61,8 +61,8 @@ public class EffectDataBase {
         } else {
             switch (effectType) {
                 case CrossGuardCounter -> DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
-                case InsufficientFilling -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.9);
-                case Adhesive -> DamageCauseMultiplyAdd(DamageCause.ATK, -0.5);
+                case InsufficientFilling -> MultiplyStatusAdd(StatusParameter.ATK, -0.9);
+                case Adhesive -> MultiplyStatusAdd(StatusParameter.ATK, -0.5);
             }
         }
     }
