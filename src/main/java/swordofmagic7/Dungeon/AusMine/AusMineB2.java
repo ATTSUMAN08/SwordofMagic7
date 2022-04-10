@@ -53,7 +53,7 @@ public class AusMineB2 {
                         Time--;
                         List<String> textData = new ArrayList<>();
                         textData.add(decoText("§c§lダンジョンクエスト"));
-                        textData.add(decoLore("ボス体力") + String.format("%.0f", Enemy.Health));
+                        textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
                         textData.add(decoLore("残り時間") + Time + "秒");
                         ViewBar.setSideBar(Players, "AusMineB2", textData);
                         MultiThread.sleepTick(20);

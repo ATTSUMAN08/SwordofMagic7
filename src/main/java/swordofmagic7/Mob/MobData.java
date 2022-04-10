@@ -1,6 +1,7 @@
 package swordofmagic7.Mob;
 
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
@@ -12,6 +13,11 @@ public class MobData {
     public String Display;
     public EntityType entityType;
     public MobDisguise disguise;
+    public Material Icon;
+    public double ColliderSize;
+    public boolean Glowing;
+    public boolean Invisible = false;
+    public boolean NoAI = false;
     public double Health;
     public double ATK;
     public double DEF;

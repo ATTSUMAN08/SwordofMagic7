@@ -261,48 +261,50 @@ public class PetParameter implements Cloneable {
         MultiThread.TaskRunLater(() -> {
             spawnCooltime = false;
         }, 40, "spawnCoolTime");
-        target = null;
-        List<String> cancel = new ArrayList<>();
-        if (playerData.Level < MaxLevel - 30) {
-            cancel.add("§aレベルが足りないため召喚出来ません");
-        }
-        if (cancel.size() > 0) {
-            for (String str : cancel) {
-                player.sendMessage(str);
+        MultiThread.TaskRunSynchronized(() -> {
+            target = null;
+            List<String> cancel = new ArrayList<>();
+            if (playerData.Level < MaxLevel - 30) {
+                cancel.add("§aレベルが足りないため召喚出来ません");
             }
-            playSound(player, SoundList.Nope);
-            return;
-        }
-        if (Stamina / MaxStamina < 0.05) {
-            player.sendMessage("§e[スタミナ]§aが§e[5%]§a未満のため召喚できません");
-            playSound(player, SoundList.Nope);
-            return;
-        }
-        entity = (LivingEntity) location.getWorld().spawnEntity(location, petData.entityType);
-        if (effectManager == null) effectManager = new EffectManager(entity, EffectOwnerType.Pet, this);
-        uuid = entity.getUniqueId();
-        if (petData.disguise != null) {
-            Disguise disguise = petData.disguise.clone();
-            disguise.setEntity(entity);
-            disguise.setDisguiseName(getDisplayName());
-            disguise.setDynamicName(true);
-            disguise.setCustomDisguiseName(true);
-            disguise.startDisguise();
-        }
+            if (cancel.size() > 0) {
+                for (String str : cancel) {
+                    player.sendMessage(str);
+                }
+                playSound(player, SoundList.Nope);
+                return;
+            }
+            if (Stamina / MaxStamina < 0.05) {
+                player.sendMessage("§e[スタミナ]§aが§e[5%]§a未満のため召喚できません");
+                playSound(player, SoundList.Nope);
+                return;
+            }
+            entity = (LivingEntity) location.getWorld().spawnEntity(location, petData.entityType);
+            if (effectManager == null) effectManager = new EffectManager(entity, EffectOwnerType.Pet, this);
+            uuid = entity.getUniqueId();
+            if (petData.disguise != null) {
+                Disguise disguise = petData.disguise.clone();
+                disguise.setEntity(entity);
+                disguise.setDisguiseName(getDisplayName());
+                disguise.setDynamicName(true);
+                disguise.setCustomDisguiseName(true);
+                disguise.startDisguise();
+            }
 
-        entity.setCustomName(getDisplayName());
-        entity.setCustomNameVisible(true);
+            entity.setCustomName(getDisplayName());
+            entity.setCustomNameVisible(true);
 
-        Summoned = true;
-        playerData.PetSummon.add(this);
-        PetManager.PetSummonedList.put(entity.getUniqueId(), this);
-        effectManager.entity = entity;
-        player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました§b[" + getSummonId() + "]");
-        playSound(player, SoundList.Click);
-        for (PetParameter pet : playerData.PetSummon) {
-            pet.updateStatus();
-        }
-        runAI();
+            Summoned = true;
+            playerData.PetSummon.add(this);
+            PetManager.PetSummonedList.put(entity.getUniqueId(), this);
+            effectManager.entity = entity;
+            player.sendMessage("§e[" + petData.Display + "]§aを§b召喚§aしました§b[" + getSummonId() + "]");
+            playSound(player, SoundList.Click);
+            for (PetParameter pet : playerData.PetSummon) {
+                pet.updateStatus();
+            }
+            runAI();
+        });
     }
 
     public ItemStack viewPet(String format) {

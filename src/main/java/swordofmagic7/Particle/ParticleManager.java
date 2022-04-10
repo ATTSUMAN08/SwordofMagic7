@@ -22,7 +22,6 @@ public final class ParticleManager {
         MultiThread.TaskRunTimer(() -> {
             if (particleCount > 0) {
                 particleCount -= decParticle;
-                particleDecay = Math.round((float) maxParticle/particleCount);
             }
         }, 1);
     }
@@ -102,11 +101,11 @@ public final class ParticleManager {
 
     private static int particleCount = 0;
     private static int particleCountTick = 0;
-    private static int particleDecay = 1;
+    private static final int particleDecay = 1;
     public static void spawnParticle(ParticleData particleData, Location location) {
         if (particleCount > maxParticle) {
             particleCountTick++;
-            if (particleDecay <= particleCountTick) {
+            if (particleCountTick > particleDecay) {
                 particleCountTick = 0;
                 return;
             }
@@ -124,7 +123,7 @@ public final class ParticleManager {
             float rom = particleData.randomOffsetMultiply;
             offset = new Vector(random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2));
         }
-        Set<Player> Players = PlayerList.getNear(location, 64);
+        Set<Player> Players = PlayerList.getNear(location, 32);
         if (particleData.particle != Particle.REDSTONE) {
             for (Player player : Players) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);

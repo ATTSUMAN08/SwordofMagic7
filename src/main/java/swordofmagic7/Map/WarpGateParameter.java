@@ -9,6 +9,7 @@ import swordofmagic7.Dungeon.AusMine.AusMineB1;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB3;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
+import swordofmagic7.Dungeon.Novaha.NovahaMiddleBoss;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.MultiThread.MultiThread;
@@ -17,13 +18,13 @@ import swordofmagic7.Sound.SoundList;
 
 import static swordofmagic7.Data.DataBase.WarpGateList;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.createHologram;
 import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class WarpGateParameter {
     public String Id;
-    public Location Location;
+    private Location Location;
     public String Target;
     public Location TargetLocation;
     public MapData NextMap;
@@ -38,14 +39,23 @@ public class WarpGateParameter {
             if (Trigger.equals("AusMineB4") && AusMineB4.Start()) return;
             if (Trigger.equals("TarnetB1")) TarnetB1.Start();
             if (Trigger.equals("TarnetB3")) TarnetB3.Start();
+            if (Trigger.equals("NovahaMiddleBoss")) NovahaMiddleBoss.Start();
         } else if (!isActive) return;
         NextMap.enter(player);
-        if (Target != null) TargetLocation = WarpGateList.get(Target).Location;
+        if (Target != null) TargetLocation = WarpGateList.get(Target).getLocation();
         player.teleportAsync(TargetLocation);
         MultiThread.TaskRun(() -> {
             MultiThread.sleepTick(1);
             playSound(player, SoundList.Warp);
         }, "WarpGateTeleport");
+    }
+
+    public void setLocation(org.bukkit.Location location) {
+        Location = location;
+    }
+
+    public org.bukkit.Location getLocation() {
+        return Location.clone();
     }
 
     public void Active() {
@@ -72,11 +82,11 @@ public class WarpGateParameter {
     public void start() {
         if (isStarted) return;
         isStarted = true;
-        Hologram hologram = createHologram("WarpGateHologram:" + Id, Location.clone().add(0, 4, 0));
+        Hologram hologram = createHologram(getLocation().add(0, 4, 0));
         hologram.appendTextLine(NextMap.Color + "§l《" + NextMap.Display + "》");
         hologram.appendTextLine("");
         hologram.appendTextLine(NextMap.Color + "§lエネミーLv" + NextMap.Level);
-        world = Location.getWorld();
+        world = getLocation().getWorld();
         MultiThread.TaskRun(() -> {
             int i = 0;
             final double increment = (2 * Math.PI) / 90;

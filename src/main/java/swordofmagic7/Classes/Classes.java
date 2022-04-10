@@ -12,8 +12,7 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.ClassDataMap;
-import static swordofmagic7.Data.DataBase.getClassData;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
@@ -105,7 +104,7 @@ public class Classes {
             BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました", false);
             playSound(player, SoundList.LevelUp);
         }
-        if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp);
+        if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/Classes.ReqExp(getClassLevel(classData))*100) + "%)");
     }
 
     public void removeExp(ClassData classData, int addExp) {

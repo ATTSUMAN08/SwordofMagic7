@@ -65,14 +65,14 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public static final int AFKTimePeriod = 2;
     public static final int AFKTime = 72000;
 
-    public static Hologram createHologram(String key, Location location) {
+    public static Hologram createHologram(Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
         HologramSet.add(hologram);
         return hologram;
     }
 
     public static Hologram createTouchHologram(String Display, Location location, TouchHandler touchHandler) {
-        Hologram hologram = HologramsAPI.createHologram(plugin, location);
+        Hologram hologram = createHologram(location);
         hologram.appendTextLine(Display).setTouchHandler(touchHandler);
         return hologram;
     }

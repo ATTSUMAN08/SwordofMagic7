@@ -316,6 +316,19 @@ public final class Function {
         return new ArrayList<>(NearLivingEntity(location, radius, predicate));
     }
 
+    public static LivingEntity FarthestLivingEntity(Location location, Set<LivingEntity> entities) {
+        double distance = 0;
+        LivingEntity target = null;
+        for (LivingEntity entity : entities) {
+            double distance2 = entity.getLocation().distance(location);
+            if (distance2 > distance) {
+                target = entity;
+                distance = distance2;
+            }
+        }
+        return target;
+    }
+
     public static boolean isHoldFishingRod(Player player) {
         return playerData(player).Equipment.getEquip(EquipmentSlot.MainHand).Icon == Material.FISHING_ROD;
     }

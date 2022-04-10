@@ -74,18 +74,18 @@ public class EffectManager {
                             if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
                                 entity.removePotionEffect(PotionEffectType.SLOW);
                                 entity.removePotionEffect(PotionEffectType.JUMP);
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 255, false, false, false));
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20, 250, false, false, false));
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 2, 255, false, false, false));
                                 entity.setVelocity(Function.VectorDown);
                             }
                         }
                         if (isSlow) {
                             entity.removePotionEffect(PotionEffectType.SLOW);
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, false, false));
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 2, false, false));
                         }
                         if (isBlind) {
-                            entity.removePotionEffect(PotionEffectType.SLOW);
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0, false, false));
+                            entity.removePotionEffect(PotionEffectType.BLINDNESS);
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
                         }
                     }, "EffectManagerTimer");
                 }

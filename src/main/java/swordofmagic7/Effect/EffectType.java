@@ -46,7 +46,7 @@ public enum EffectType {
     Zucken("ツーケン", true, "[レーデル]が使用できるようになります"),
     Indulgendia("インダルゲンディア", true, "効果中は体力が回復します"),
     IncreaseMagicDef("インクリースマジックDEF", true, "魔法防御力が上昇します", true),
-    Indulgence("インダルジェンス", 3, true, "[一般]デバフを付与されるのを防ぎます"),
+    Indulgence("インダルジェンス", 5, true, "[一般]デバフを付与されるのを防ぎます"),
     HeadShot("ヘッドショット", true, "[クリティカル発生]が上昇します", true),
     RedemptionAble("リデンプション発動可能", true, "[リデンプション]を使用できます"),
     Redemption("リデンプション", true, "回避が上昇します", true),

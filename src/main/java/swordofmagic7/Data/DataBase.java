@@ -187,7 +187,7 @@ public final class DataBase {
                     Location loc = new Location(world, x, y, z, yaw, pitch);
                     WarpGateParameter warp = new WarpGateParameter();
                     warp.Id = fileName;
-                    warp.Location = loc;
+                    warp.setLocation(loc.clone());
                     if (data.isSet("Target")) {
                         warp.Target = data.getString("Target");
                     } else {

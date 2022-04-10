@@ -80,7 +80,7 @@ public class TarnetB3 {
                         Time--;
                         List<String> textData = new ArrayList<>();
                         textData.add(decoText("§c§lダンジョンクエスト"));
-                        textData.add(decoLore("ボス体力") + String.format("%.0f", Enemy.Health) + " (" + String.format("%.0f", Enemy.Health / Enemy.MaxHealth *100) + "%)");
+                        textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
                         textData.add(decoLore("残り時間") + Time + "秒");
                         ViewBar.setSideBar(Players, sidebarId, textData);
                         Set<Player> deBuff = new HashSet<>(list);
@@ -103,10 +103,10 @@ public class TarnetB3 {
                     }
                     ViewBar.resetSideBar(Players, sidebarId);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").Location);
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("TarnetB2_to_TarnetB3BOSS").Location);
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("TarnetB2_to_TarnetB3BOSS").getLocation());
                     }
 
                     Players.clear();

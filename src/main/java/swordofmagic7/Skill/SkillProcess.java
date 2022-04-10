@@ -160,11 +160,11 @@ public class SkillProcess {
         }
     }
 
-    public void normalAttackParticle(LivingEntity victim, Particle particle, double length) {
+    public void normalAttackParticle(LivingEntity victim, Particle particle, double width, double length) {
         if (victim != null) {
-            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), victim.getEyeLocation(), 1, 10);
+            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), victim.getEyeLocation(), width, 10);
         } else {
-            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), playerEyeLocation(player, length), 1, 10);
+            ParticleManager.LineParticle(new ParticleData(particle), playerHandLocation(player), playerEyeLocation(player, length), width, 10);
         }
     }
 
@@ -176,46 +176,42 @@ public class SkillProcess {
                 for (LivingEntity entity : victims) {
                     victim = entity;
                 }
-                if (victim == null) return;
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 switch (category) {
                     case Blade -> {
-                        normalAttackParticle(victim, Particle.SWEEP_ATTACK, 6.5);
-                        Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
+                        normalAttackParticle(victim, Particle.SWEEP_ATTACK, 0, 6.5);
                         normalAttackCoolTime = 7;
                     }
                     case Mace -> {
-                        normalAttackParticle(victim, Particle.CRIT, 6);
-                        Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
+                        normalAttackParticle(victim, Particle.CRIT, 0, 6);
                         normalAttackCoolTime = 15;
                     }
                     case Rod -> {
-                        normalAttackParticle(victim, Particle.CRIT_MAGIC, 25);
-                        Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
+                        normalAttackParticle(victim, Particle.CRIT_MAGIC, 0, 25);
                         playSound(player, SoundList.RodAttack);
                         normalAttackCoolTime = 12;
                     }
                     case ActGun -> {
-                        normalAttackParticle(victim, Particle.CRIT, 25);
-                        Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
+                        normalAttackParticle(victim, Particle.CRIT, 0, 25);
                         playSound(player, GunAttack);
                         normalAttackCoolTime = 10;
                     }
                     case Baton -> {
                         if (playerData.PetSummon.size() == 0) {
-                            player.sendMessage("§e[ペット]§aが§e召喚§aされていません");
-                            playSound(player, SoundList.Nope);
+                            sendMessage(player, "§e[ペット]§aが§e召喚§aされていません", SoundList.Nope);
                         }
                     }
-                    default -> {
-                        player.sendMessage("§e[武器]§aが§e装備§aされていません");
-                        playSound(player, SoundList.Nope);
+                    default -> sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.Nope);
+                }
+                if (victim != null) {
+                    switch (category) {
+                        case Blade, Mace -> Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
+                        case Rod, ActGun -> Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
                     }
                 }
             }
         } else {
-            player.sendMessage("§e[武器]§aが§e装備§aされていません");
-            playSound(player, SoundList.Nope);
+            sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.Nope);
         }
     }
 

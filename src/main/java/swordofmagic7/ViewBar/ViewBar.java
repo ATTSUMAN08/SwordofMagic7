@@ -132,10 +132,10 @@ public class ViewBar {
 
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
-                            playerData.hologramLine[0].setText(playerData.Classes.topClass().Color + "[" + playerData.Classes.topClass().Nick + "] " + (playerData.PvPMode ? "§c" : "§f") + player.getName() + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+                            playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
 
-                            if (!isAlive(player) || player.isSneaking() || playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
+                            if (!isAlive(player) || player.isSneaking() || playerData.EffectManager.hasEffect(EffectType.Cloaking) || playerData.Map.Id.equals("DefenseBattle")) {
                                 if (playerData.visibilityManager.isVisibleByDefault()) {
                                     playerData.visibilityManager.setVisibleByDefault(false);
                                 }

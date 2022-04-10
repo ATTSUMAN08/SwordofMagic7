@@ -2,6 +2,7 @@ package swordofmagic7.Data;
 
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
+import me.libraryaddict.disguise.disguisetypes.watchers.PhantomWatcher;
 import me.libraryaddict.disguise.disguisetypes.watchers.SlimeWatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -607,6 +608,10 @@ public class DataLoader {
                 mobData.Id = fileName;
                 mobData.Display = data.getString("Display");
                 mobData.Lore = data.getStringList("Lore");
+                mobData.Invisible = data.getBoolean("Invisible", false);
+                mobData.NoAI = data.getBoolean("NoAI", false);
+                mobData.ColliderSize = data.getDouble("ColliderSize", 0);
+                mobData.Glowing = data.getBoolean("Glowing", false);
                 String entityType = data.getString("Type").toUpperCase();
                 if (EntityType.fromName(entityType) != null) {
                     mobData.entityType = EntityType.valueOf(entityType);
@@ -614,12 +619,18 @@ public class DataLoader {
                     mobData.entityType = EntityType.SKELETON;
                     Log("§cError Non-EntityType: " + fileName);
                 }
+                mobData.Icon = Material.getMaterial(data.getString("Icon", mobData.entityType + "_SPAWN_EGG"));
+                if (mobData.Icon == null) mobData.Icon = Material.PAPER;
                 if (data.isSet("Disguise.Type")) {
                     mobData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
                     if (mobData.disguise.getType() == DisguiseType.SLIME) {
                         SlimeWatcher slimeWatcher = new SlimeWatcher(mobData.disguise);
                         slimeWatcher.setSize(data.getInt("Disguise.Size", 2));
                         mobData.disguise.setWatcher(slimeWatcher);
+                    } else if (mobData.disguise.getType() == DisguiseType.PHANTOM) {
+                        PhantomWatcher phantomWatcher = new PhantomWatcher(mobData.disguise);
+                        phantomWatcher.setSize(data.getInt("Disguise.Size", 2));
+                        mobData.disguise.setWatcher(phantomWatcher);
                     }
                 }
                 mobData.Health = data.getDouble("Health", 100);

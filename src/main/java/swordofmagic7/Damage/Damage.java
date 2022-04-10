@@ -22,7 +22,6 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
@@ -192,7 +191,8 @@ public final class Damage {
             return;
         }
 
-        baseDamage = (Math.pow(ATK, 2) / (ATK + DEF * 2));
+        baseDamage = (Math.pow(ATK, 2) / (ATK + DEF * 2)) * (1-perforate);
+        baseDamage += ATK*perforate;
         baseDamage *= damageMultiply;
         baseDamage *= Multiply;
         baseDamage /= Resistance;
@@ -275,7 +275,7 @@ public final class Damage {
             boolean isStop = false;
             for (double HPStop : enemyData.mobData.HPStop) {
                 if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
-                    enemyData.Health = enemyData.MaxHealth * HPStop;
+                    enemyData.Health = enemyData.MaxHealth * (HPStop-0.0001);
                     for (MobSkillData skillData : enemyData.mobData.SkillList) {
                         if (skillData.maxHealth == HPStop) {
                             enemyData.skillManager.mobSkillCast(skillData);
@@ -290,7 +290,7 @@ public final class Damage {
             } else {
                 enemyData.Health -= damage;
             }
-            double priority = attackerEffectManager.hasEffect(EffectType.HatePriority) ? damage*2 : damage;
+            double priority = attackerEffectManager.hasEffect(EffectType.SwashBaring) ? damage*10 : damage;
             enemyData.addPriority(attacker, priority);
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);
@@ -381,7 +381,7 @@ public final class Damage {
         double z = random.nextDouble() * 2 - 1;
         MultiThread.TaskRunSynchronized(() -> {
             loc.add(x, y, z);
-            Hologram hologram = createHologram("DamageHologram:" + UUID.randomUUID(), loc);
+            Hologram hologram = createHologram(loc);
             VisibilityManager manager = hologram.getVisibilityManager();
             manager.setVisibleByDefault(false);
             for (Player player : players) {

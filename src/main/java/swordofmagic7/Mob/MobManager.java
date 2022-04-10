@@ -39,6 +39,9 @@ public final class MobManager {
         if (entity instanceof Slime slime) {
             slime.setSize(baseData.Size);
         }
+        entity.setAI(!baseData.NoAI);
+        entity.setInvisible(baseData.Invisible);
+        entity.setGlowing(baseData.Glowing);
         EnemyData enemyData = new EnemyData(entity, baseData, level);
         EnemyTable.put(entity.getUniqueId().toString(), enemyData);
         enemyData.runAI();

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Client;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.ServerId;
+import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.SomCore.plugin;
@@ -67,6 +69,20 @@ public class KingSlime {
                             Message(Players, SummonQuestFailed, "", null, SoundList.DungeonTrigger);
                         }
                         Players.clear();
+                        ItemParameterStack[] rewards = new ItemParameterStack[3];
+                        rewards[0] = new ItemParameterStack(getItemParameter("キングスライムの核"));
+                        rewards[0].Amount = 1;
+                        rewards[1] = new ItemParameterStack(getItemParameter("キングスライムの眼球"));
+                        rewards[1].Amount = 2;
+                        rewards[2] = new ItemParameterStack(getItemParameter("キングスライムの破片"));
+                        rewards[2].Amount = 5;
+                        List<String> message = new ArrayList<>();
+                        message.add(decoText("召喚者特別報酬"));
+                        for (ItemParameterStack stack : rewards) {
+                            message.add(decoLore(stack.itemParameter.Display + "§ax" + stack.Amount));
+                            playerData.ItemInventory.addItemParameter(stack);
+                        }
+                        sendMessage(playerData.player, message, SoundList.LevelUp);
                     }, "KingSlime");
                 } else {
                     sendMessage(playerData.player, "§aすでに開始されています", SoundList.Nope);

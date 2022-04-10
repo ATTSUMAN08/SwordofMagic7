@@ -1,6 +1,5 @@
 package swordofmagic7.Mob;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -15,8 +14,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.BrownItemFlame;
-import static swordofmagic7.Data.DataBase.getPetList;
+import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.DownScrollItem;
+import static swordofmagic7.Data.DataLoader.MaxTitleSlot;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -51,7 +51,7 @@ public class MobInfo {
         for (int i = 0; i < 48; i++) {
             if (list.size() > index) {
                 MobData mobData = list.get(index);
-                itemStacks[slot] = new ItemStackData(Material.PAPER, decoText(mobData.Display), toStringList(mobData)).view();
+                itemStacks[slot] = new ItemStackData(mobData.Icon, decoText(mobData.Display), toStringList(mobData)).view();
                 MobArray[slot] = mobData;
                 index++;
                 slot++;
@@ -61,6 +61,8 @@ public class MobInfo {
                 }
             } else break;
         }
+        if (scroll > 0) itemStacks[8] = UpScrollItem;
+        if (MaxTitleSlot/9-5 > 0) itemStacks[53] = DownScrollItem;
         player.getOpenInventory().getTopInventory().setContents(itemStacks);
     }
 
@@ -69,10 +71,10 @@ public class MobInfo {
             if (currentItem != null) {
                 if (!nonSlotVertical(Slot) && MobArray[Slot] != null) {
 
-                } else if (Slot == 53 && scroll < Math.max(0, (DataBase.MobList.size()/8-5))) {
+                } else if (equalItem(currentItem, DownScrollItem)) {
                     scroll++;
                     MobInfoView(scroll);
-                } else if (Slot == 8 && scroll > 1) {
+                } else if (equalItem(currentItem, UpScrollItem)) {
                     scroll--;
                     MobInfoView(scroll);
                 }

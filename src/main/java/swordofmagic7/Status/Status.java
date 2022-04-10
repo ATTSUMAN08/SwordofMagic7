@@ -7,7 +7,6 @@ import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectDataBase;
@@ -51,7 +50,7 @@ public class Status {
     public double SkillCastTime;
     public double SkillRigidTime;
     public double SkillCooltime;
-    public float Movement;
+    public double Movement;
 
 
     public HashMap<StatusParameter, Double> BaseStatus = new HashMap<>();
@@ -95,20 +94,20 @@ public class Status {
 
     public void setCombatPower() {
         double combatPower = 0;
-        combatPower += MaxHealth/3;
-        combatPower += HealthRegen*3;
-        combatPower += MaxMana/3;
-        combatPower += ManaRegen*3;
-        combatPower += ATK;
-        combatPower += DEF;
-        combatPower += HLP;
-        combatPower += ACC;
-        combatPower += EVA;
-        combatPower += CriticalRate;
-        combatPower += CriticalResist;
-        combatPower += SkillCooltime;
-        combatPower += SkillCastTime;
-        combatPower += SkillRigidTime;
+        combatPower += (BaseStatus(StatusParameter.MaxHealth) + EquipStatus(StatusParameter.MaxHealth))/3;
+        combatPower += (BaseStatus(StatusParameter.HealthRegen) + EquipStatus(StatusParameter.HealthRegen))*3;
+        combatPower += (BaseStatus(StatusParameter.MaxMana) + EquipStatus(StatusParameter.MaxMana))/3;
+        combatPower += (BaseStatus(StatusParameter.ManaRegen) + EquipStatus(StatusParameter.ManaRegen))*3;
+        combatPower += (BaseStatus(StatusParameter.ATK) + EquipStatus(StatusParameter.ATK));
+        combatPower += (BaseStatus(StatusParameter.DEF) + EquipStatus(StatusParameter.DEF));
+        combatPower += (BaseStatus(StatusParameter.HLP) + EquipStatus(StatusParameter.HLP));
+        combatPower += (BaseStatus(StatusParameter.ACC) + EquipStatus(StatusParameter.ACC));
+        combatPower += (BaseStatus(StatusParameter.EVA) + EquipStatus(StatusParameter.EVA));
+        combatPower += (BaseStatus(StatusParameter.CriticalRate) + EquipStatus(StatusParameter.CriticalRate));
+        combatPower += (BaseStatus(StatusParameter.CriticalResist) + EquipStatus(StatusParameter.CriticalResist));
+        combatPower += (BaseStatus(StatusParameter.SkillCooltime) + EquipStatus(StatusParameter.SkillCooltime));
+        combatPower += (BaseStatus(StatusParameter.SkillCastTime) + EquipStatus(StatusParameter.SkillCastTime));
+        combatPower += (BaseStatus(StatusParameter.SkillRigidTime) + EquipStatus(StatusParameter.SkillRigidTime));
         for (DamageCause damageCause : DamageCause.values()) {
             combatPower += DamageCauseMultiply.getOrDefault(damageCause,1d)*100;
             combatPower += DamageCauseResistance.getOrDefault(damageCause,1d*100);
@@ -254,6 +253,7 @@ public class Status {
         BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
         BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
         BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
+        BaseStatus.put(StatusParameter.Movement, 0.24 * BaseMultiplyStatus(StatusParameter.Movement));
 
         MaxHealth = finalStatus(StatusParameter.MaxHealth);
         HealthRegen = finalStatus(StatusParameter.HealthRegen);
@@ -269,6 +269,7 @@ public class Status {
         SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
+        Movement = finalStatus(StatusParameter.Movement);
 
         String color = "§f";
         if (playerData.PvPMode) color = "§c";
@@ -280,12 +281,8 @@ public class Status {
         player.setDisplayName(playerData.Nick);
 
         setCombatPower();
-        Movement = 0.24f;
-        if (playerData.EffectManager.hasEffect(EffectType.Cloaking)) {
-            Movement *= 1 + DataBase.getSkillData("Cloaking").ParameterValue(1) / 100;
-        }
         MultiThread.TaskRunSynchronized(() -> {
-            player.setWalkSpeed(Movement);
+            player.setWalkSpeed((float) Movement);
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
         });
     }

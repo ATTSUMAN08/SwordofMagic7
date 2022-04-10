@@ -50,7 +50,7 @@ public class AusMineB4 {
                         for (int i = 0; i < 10; i++) {
                             List<String> textData = new ArrayList<>();
                             textData.add(decoText("§c§lダンジョンクエスト"));
-                            textData.add(decoLore("ボス体力") + String.format("%.0f", Enemy.Health) + " (" + String.format("%.0f", Enemy.Health / Enemy.MaxHealth *100) + "%)");
+                            textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
                             if (SkillTime > -1)
                                 textData.add(decoLore("スキル詠唱") + String.format("%.0f", SkillTime * 100) + "%");
                             textData.add(decoLore("残り時間") + Time + "秒");
@@ -60,10 +60,10 @@ public class AusMineB4 {
                     }
                     ViewBar.resetSideBar(Players, "AusMineB4");
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").Location);
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AusMineB4_to_AusMineB4Boss").Location);
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AusMineB4_to_AusMineB4Boss").getLocation());
                     }
                     Players.clear();
                     Start = false;

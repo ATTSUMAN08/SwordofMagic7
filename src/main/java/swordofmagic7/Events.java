@@ -11,7 +11,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -52,8 +51,10 @@ import java.util.Set;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Mob.MobManager.*;
-import static swordofmagic7.SomCore.*;
+import static swordofmagic7.Mob.MobManager.EnemyTable;
+import static swordofmagic7.Mob.MobManager.isEnemy;
+import static swordofmagic7.SomCore.isEventServer;
+import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
@@ -192,53 +193,49 @@ public class Events implements Listener {
             playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
             event.setCancelled(false);
         }
-        if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
-            if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
-                switch (action) {
-                    case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
-                        if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
+        MultiThread.TaskRun(() -> {
+            if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
+                if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
+                    switch (action) {
+                        case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
+                            if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
+                                if (player.isSneaking()) {
+                                    playerData.HotBar.use(4);
+                                } else {
+                                    playerData.HotBar.use(0);
+                                }
+                            } else if (playerData.CastMode.isRenewed()) {
+                                playerData.setRightClickHold();
+                            } else if (playerData.CastMode.isHold()) {
+                                int slot = player.getInventory().getHeldItemSlot();
+                                if (slot < 8) {
+                                    if (player.isSneaking()) slot += 8;
+                                    playerData.HotBar.use(slot);
+                                }
+                            }
+                            if (playerData.PetManager.usingBaton()) {
+                                playerData.PetManager.PetAITarget();
+                            }
+                        }
+                        case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
                             if (player.isSneaking()) {
-                                playerData.HotBar.use(4);
+                                if (playerData.CastMode.isLegacy()) {
+                                    playerData.HotBar.use(3);
+                                }
+                                if (playerData.PetManager.usingBaton()) {
+                                    playerData.PetManager.PetAISelect();
+                                }
                             } else {
-                                playerData.HotBar.use(0);
+                                if (playerData.PetManager.usingBaton()) {
+                                    playerData.PetManager.PetSelect();
+                                }
                             }
-                        } else if (playerData.CastMode.isRenewed()) {
-                            playerData.setRightClickHold();
-                        } else if (playerData.CastMode.isHold()) {
-                            int slot = player.getInventory().getHeldItemSlot();
-                            if (slot < 8) {
-                                if (player.isSneaking()) slot += 8;
-                                playerData.HotBar.use(slot);
-                            }
+                            playerData.Skill.SkillProcess.normalAttackTargetSelect();
                         }
-                        if (playerData.PetManager.usingBaton()) {
-                            playerData.PetManager.PetAITarget();
-                        }
-                    }
-                    case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
-                        if (player.isSneaking()) {
-                            if (playerData.CastMode.isLegacy()) {
-                                playerData.HotBar.use(3);
-                            }
-                            if (playerData.PetManager.usingBaton()) {
-                                playerData.PetManager.PetAISelect();
-                            }
-                        } else {
-                            if (playerData.PetManager.usingBaton()) {
-                                playerData.PetManager.PetSelect();
-                            }
-                        }
-                        playerData.Skill.SkillProcess.normalAttackTargetSelect();
                     }
                 }
             }
-
-            if (block != null && block.getState() instanceof Sign sign) {
-                if (sign.getLine(0).equals("訓練用ダミー")) {
-                    mobSpawn(getMobData("訓練用ダミー"), 1, sign.getLocation().add(random.nextDouble(), 0, random.nextDouble()));
-                }
-            }
-        }
+        }, "PlayerInteract");
     }
 
     @EventHandler

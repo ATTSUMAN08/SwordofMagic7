@@ -17,6 +17,7 @@ public enum StatusParameter {
     SkillCooltime("スキル再使用短縮"),
     SkillCastTime("スキル詠唱短縮"),
     SkillRigidTime("スキル硬直短縮"),
+    Movement("移動速度"),
     ;
 
     public String Display;

@@ -28,10 +28,10 @@ public class Griffia {
     final Location[] Candle = new Location[4];
     public Griffia(EnemySkillManager manager) {
         this.Manager = manager;
-        Candle[0] = new Location(world, 649.5, 129, 2031.5);
-        Candle[1] = new Location(world, 652.5, 129, 1923.5);
-        Candle[2] = new Location(world, 760.5, 129, 1927.5);
-        Candle[3] = new Location(world, 756.5, 129, 2035.5);
+        Candle[0] = new Location(world, 649.5, 123, 2031.5);
+        Candle[1] = new Location(world, 652.5, 123, 1923.5);
+        Candle[2] = new Location(world, 760.5, 123, 1927.5);
+        Candle[3] = new Location(world, 756.5, 123, 2035.5);
     }
 
     public void SingleFlameCircle(int CastTime) {
@@ -198,7 +198,7 @@ public class Griffia {
                 } else {
                     ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 30);
                     final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 64);
-                    for (Player player : PlayerList.getNearNonDead(TargetCandle, 12)) {
+                    for (Player player : PlayerList.getNearNonDead(TargetCandle, 14)) {
                         player.sendMessage("§c強力な攻撃§aを§e回避§aしました！");
                         playSound(player, SoundList.Tick);
                         victims.remove(player);

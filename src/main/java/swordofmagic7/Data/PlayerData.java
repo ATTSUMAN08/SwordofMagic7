@@ -48,6 +48,7 @@ import swordofmagic7.Party.PartyData;
 import swordofmagic7.Pet.PetEvolution;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.PlayerList;
 import swordofmagic7.Quest.QuestManager;
 import swordofmagic7.Shop.PetShop;
 import swordofmagic7.Shop.RuneShop;
@@ -221,12 +222,28 @@ public class PlayerData {
     public void InitializeHologram() {
         MultiThread.TaskRunSynchronized(() -> {
             if (hologram != null && !hologram.isDeleted()) hologram.delete();
-            hologram = createHologram(player.getName(), playerHoloLocation());
+            hologram = createHologram(playerHoloLocation());
             visibilityManager = hologram.getVisibilityManager();
             if (!HoloSelfView) visibilityManager.hideTo(player);
             hologramLine[2] = hologram.appendTextLine(DefaultTitle.Display[0]);
             hologramLine[0] = hologram.appendTextLine("NameTag");
             hologramLine[1] = hologram.appendTextLine("HealthBar");
+            MultiThread.TaskRun(() -> {
+                while (plugin.isEnabled() && player.isOnline()) {
+                    if (visibilityManager.isVisibleByDefault()) {
+                        visibilityManager.resetVisibilityAll();
+                        if (HoloSelfView) visibilityManager.showTo(player);
+                        else visibilityManager.hideTo(player);
+                        Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
+                        nonViewer.removeAll(PlayerList.getNear(player.getLocation(), 16));
+                        if (Party != null) Party.Members.forEach(nonViewer::remove);
+                        for (Player player : nonViewer) {
+                            visibilityManager.hideTo(player);
+                        }
+                    }
+                    MultiThread.sleepTick(30);
+                }
+            }, "HologramViewDistance");
             MultiThread.TaskRun(() -> {
                 while (plugin.isEnabled() && player.isOnline()) {
                     if (titleManager.Title.flame > 1) {
@@ -492,7 +509,7 @@ public class PlayerData {
             else if (Level >= 10) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv10"), 1);
             if (Level < MaxLevel) addPlayerLevel(addLevel);
         }
-        if (ExpLog) player.sendMessage("§e経験値§7: §a+" + addExp);
+        if (ExpLog) player.sendMessage("§e経験値[キャラ]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/ReqExp(Level)*100) + "%)");
     }
 
     private boolean isNonSave = false;
@@ -1013,7 +1030,7 @@ public class PlayerData {
                 player.setGameMode(GameMode.SPECTATOR);
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
                 deadTime = 1200;
-                Hologram hologram = createHologram("DeadHologram:" + player.getName(), player.getEyeLocation());
+                Hologram hologram = createHologram(player.getEyeLocation());
                 hologram.appendTextLine(Nick);
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);

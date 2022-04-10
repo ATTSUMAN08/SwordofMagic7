@@ -40,10 +40,6 @@ public class RuneShop {
         this.playerData = playerData;
     }
 
-    public void RuneShopMenu() {
-
-    }
-
     static List<Integer> RuneSlotIndex() {
         List<Integer> List = new ArrayList<>();
         List.add(14);
@@ -82,7 +78,7 @@ public class RuneShop {
             slot++;
             if (slot > 53) break;
         }
-        inv.setItem(53, new ItemStackData(Material.GUNPOWDER, decoText("§c一括粉砕"), "§e品質" + maxQuality*100 + "%§a以下の§bルーン§aをすべて粉砕します").view());
+        inv.setItem(53, new ItemStackData(Material.GUNPOWDER, decoText("§c一括粉砕"), "§e品質" + maxQuality*100 + "%§a未満の§bルーン§aをすべて粉砕します").view());
         return inv;
     }
 
@@ -149,7 +145,7 @@ public class RuneShop {
                         playerData.ItemInventory.addItemParameter(RunePowder, runePower);
                         sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LevelUp);
                     } else {
-                        sendMessage(player, "§e品質" + maxQuality*100 + "%§a以下の§bルーン§aがありません", SoundList.Nope);
+                        sendMessage(player, "§e品質" + maxQuality*100 + "%§a未満の§bルーン§aがありません", SoundList.Nope);
                     }
                 } else {
                     if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {

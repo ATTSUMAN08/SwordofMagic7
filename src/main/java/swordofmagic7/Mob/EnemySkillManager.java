@@ -54,8 +54,10 @@ public class EnemySkillManager {
     LeeLai leeLai = new LeeLai(this);
     Synosas synosas = new Synosas(this);
     KingSlime kingSlime = new KingSlime(this);
+    Exta exta = new Exta(this);
 
     public void mobSkillCast(MobSkillData mobSkillData) {
+        if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
         switch (mobSkillData.Skill) {
             case "PullUpper" -> PullUpper(8, 90, 20);
             case "PileUpper" -> PullUpper(13, 160, 40);
@@ -95,8 +97,12 @@ public class EnemySkillManager {
             case "SummonFamiliar" -> kingSlime.SummonFamiliar();
             case "InsaneRush" -> kingSlime.InsaneRush(100);
 
+            case "Launch" -> exta.Launch(50);
+            case "Impact" -> exta.Impact(50);
+            case "Starting" -> exta.Starting();
+            case "Thought" -> exta.Thought(50);
+            case "Acceleration" -> exta.Acceleration();
         }
-        if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
         MultiThread.TaskRun(() -> {
             if (!CoolTime.containsKey(mobSkillData.Skill)) {
                 CoolTime.put(mobSkillData.Skill, mobSkillData.CoolTime);

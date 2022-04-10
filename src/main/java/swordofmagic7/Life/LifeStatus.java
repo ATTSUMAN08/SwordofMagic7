@@ -6,9 +6,10 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 
+import static swordofmagic7.Data.DataBase.format;
 import static swordofmagic7.Function.BroadCast;
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.random;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class LifeStatus {
     public final static int MaxLifeLevel = 30;
@@ -81,7 +82,7 @@ public class LifeStatus {
                 addLevel++;
             }
             if (addLevel > 0) addLifeLevel(type, addLevel);
-            if (playerData.ExpLog) player.sendMessage("§e" + type.Display + "経験値§7: §a" + exp);
+            if (playerData.ExpLog) player.sendMessage("§e" + type.Display + "経験値§7: §a" + exp + " §7(" + String.format(format, (double) exp/LifeStatus.LifeReqExp(getLevel(type))*100) + "%)");
         } else {
             setExp(type, 0);
         }

@@ -36,6 +36,7 @@ import swordofmagic7.TextView.TextView;
 
 import java.util.*;
 
+import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
@@ -57,6 +58,7 @@ public class EnemyData {
     public double CriticalResist;
     public double Exp;
     public double ClassExp;
+    public double MovementMultiply = 1;
 
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
@@ -77,7 +79,7 @@ public class EnemyData {
     private boolean isDead = false;
 
     public boolean isDead() {
-        return isDead || entity == null || entity.isDead();
+        return isDead || entity == null;
     }
 
     public boolean isAlive() {
@@ -118,6 +120,10 @@ public class EnemyData {
     }
     public static double StatusMultiply3(int level) {
         return level >= 30 ? Math.pow(StatusMultiply(level), 1.04) : StatusMultiply(level);
+    }
+
+    public String viewHealthString() {
+        return String.format("%.0f", Health) + " (" + String.format("%.0f", Health / MaxHealth *100) + "%)";
     }
 
     public void statusUpdate() {
@@ -242,9 +248,9 @@ public class EnemyData {
                         NextLocation = targetLocation;
                         MultiThread.TaskRunSynchronized(() -> {
                             if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
-                                mob.lookAt(NextLocation, 90f, -90f);
+                                mob.lookAt(NextLocation);
                                 if (target != null) mob.setTarget(target);
-                                pathfinder.moveTo(NextLocation, mobData.Mov);
+                                pathfinder.moveTo(NextLocation, mobData.Mov*MovementMultiply);
                                 LastLocation = entity.getLocation();
                             }
                         });
@@ -325,6 +331,7 @@ public class EnemyData {
     private final Map<LivingEntity, Double> TotalDamageTable = new HashMap<>();
     public void addPriority(LivingEntity entity, double addPriority) {
         Priority.put(entity, Priority.getOrDefault(entity, 0d) + addPriority);
+        if (entity instanceof Player player) Involved.add(player);
         TotalDamageTable.put(entity, TotalDamageTable.getOrDefault(entity, 0d) + addPriority);
     }
 
@@ -408,7 +415,7 @@ public class EnemyData {
                         pet.addExp(decayExp(exp, pet.Level, Level));
                     }
                     List<String> Holo = new ArrayList<>();
-                    Holo.add("§e§lEXP §a§l+" + exp);
+                    Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp/ReqExp(Level)*100) + "%)");
                     if (!isDefenseBattle) {
                         for (DropItemData dropData : DropItemTable) {
                             if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
@@ -486,7 +493,7 @@ public class EnemyData {
                         playerData.viewUpdate();
                         Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
                         MultiThread.TaskRunSynchronized(() -> {
-                            Hologram hologram = createHologram("DropHologram:" + UUID.randomUUID(), loc);
+                            Hologram hologram = createHologram(loc);
                             VisibilityManager visibilityManager = hologram.getVisibilityManager();
                             visibilityManager.setVisibleByDefault(false);
                             visibilityManager.showTo(player);
