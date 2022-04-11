@@ -26,7 +26,7 @@ public class AusMineB2 {
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
-    public static int StartTime = 300;
+    public static int StartTime = 600;
     private static EnemyData Enemy;
     private static Set<Player> Players = new HashSet<>();
     private static final String[] EnterTextData = new String[]{

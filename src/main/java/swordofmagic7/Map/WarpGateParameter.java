@@ -5,13 +5,17 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.AusMine.AusMineB1;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB3;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
-import swordofmagic7.Dungeon.Novaha.NovahaMiddleBoss;
+import swordofmagic7.Dungeon.Novaha.Novaha2;
+import swordofmagic7.Dungeon.Novaha.Novaha3;
+import swordofmagic7.Dungeon.Novaha.Novaha4;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Dungeon.Tarnet.TarnetB3;
+import swordofmagic7.Function;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Sound.SoundList;
@@ -32,6 +36,10 @@ public class WarpGateParameter {
     public String Trigger;
 
     public void usePlayer(Player player) {
+        if (NextMap.ReqCombatPower > PlayerData.playerData(player).Status.getCombatPower()) {
+            Function.sendMessage(player, "§e[戦闘力]§aが足りません §c[必要戦闘力:" + NextMap.ReqCombatPower + "]", SoundList.Nope);
+            return;
+        }
         if (Trigger != null) {
             if (Trigger.equals("AusMineB1") && AusMineB1.Start()) return;
             if (Trigger.equals("AusMineB2") && AusMineB2.Start()) return;
@@ -39,7 +47,12 @@ public class WarpGateParameter {
             if (Trigger.equals("AusMineB4") && AusMineB4.Start()) return;
             if (Trigger.equals("TarnetB1")) TarnetB1.Start();
             if (Trigger.equals("TarnetB3")) TarnetB3.Start();
-            if (Trigger.equals("NovahaMiddleBoss")) NovahaMiddleBoss.Start();
+            if (Trigger.equals("NovahaMiddleBoss")) Novaha2.Start();
+            if (Trigger.equals("Novaha3")) if (isActive) Novaha3.Start(); else return;
+            if (Trigger.equals("Novaha4")) if (isActive) Novaha4.Start(); else {
+                Novaha3.Start();
+                return;
+            }
         } else if (!isActive) return;
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).getLocation();

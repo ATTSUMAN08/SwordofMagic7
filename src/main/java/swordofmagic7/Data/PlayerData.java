@@ -157,6 +157,7 @@ public class PlayerData {
     public double RuneQualityFilter = 0d;
     public double HealthRegenDelay = 0d;
     public int AFKTime = 0;
+    public boolean interactTick = false;
 
     public boolean isAFK() {
         return AFKTime > SomCore.AFKTime; //18000;
@@ -494,7 +495,7 @@ public class PlayerData {
         }
     }
 
-    public static final int MaxLevel = 50;
+    public static final int MaxLevel = 65;
 
     public void addPlayerExp(int addExp) {
         Exp += addExp;

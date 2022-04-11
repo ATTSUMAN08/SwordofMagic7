@@ -65,7 +65,7 @@ public class EnemyData {
     public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
     public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
 
-    public final EnemySkillManager skillManager = new EnemySkillManager(this);
+    public final EnemySkillManager skillManager;
     public final EffectManager effectManager;
     public int HitCount = 0;
 
@@ -91,6 +91,7 @@ public class EnemyData {
         mobData = baseData;
         Level = level;
         effectManager = new EffectManager(entity, EffectOwnerType.Enemy, this);
+        skillManager = new EnemySkillManager(this);
 
         statusUpdate();
 
@@ -123,7 +124,7 @@ public class EnemyData {
     }
 
     public String viewHealthString() {
-        return String.format("%.0f", Health) + " (" + String.format("%.0f", Health / MaxHealth *100) + "%)";
+        return String.format("%.0f", Health) + " (" + String.format("%.2f", Health / MaxHealth *100) + "%)";
     }
 
     public void statusUpdate() {
@@ -452,6 +453,7 @@ public class EnemyData {
                                             player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
                                         }
                                     } else {
+                                        playerData.RuneShop.addRuneCrashed(runeParameter);
                                         playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
                                         Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
                                         if (playerData.DropLog.isItem()) {

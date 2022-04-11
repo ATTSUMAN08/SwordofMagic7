@@ -130,7 +130,7 @@ public class TradeManager {
             }
         }
         player.sendMessage(decoLore("/trade <Player> sendItem <SlotID> [<Amount>]") + "アイテムを送ります");
-        player.sendMessage(decoLore("/trade <Player> sendRune <SlotID>") + "ルーンを送ります");
+        player.sendMessage(decoLore("/trade <Player> sendRune <SlotID> [<toSlotID>]") + "ルーンを送ります");
         player.sendMessage(decoLore("/trade <Player> sendPet <SlotID>") + "ペットを送ります");
         player.sendMessage(decoLore("/trade <Player> sendMel <Mel>") + "メルを送ります");
         //player.sendMessage(decoLore("/trade <Player>") + "トレードを申請します");

@@ -145,9 +145,13 @@ public class Menu {
         if (currentItem != null && ClickInventory == view.getBottomInventory()) {
             switch (Slot) {
                 case 0,1,2,3,4,5,6,7 -> {
-                    playerData.HotBar.setSelectSlot(slotToIndex(Slot));
-                    Trigger.TriggerMenuView();
-                    playSound(player, SoundList.Click);
+                    if (clickType.isRightClick()) {
+                        playerData.HotBar.use(slotToIndex(Slot));
+                    } else {
+                        playerData.HotBar.setSelectSlot(slotToIndex(Slot));
+                        Trigger.TriggerMenuView();
+                        playSound(player, SoundList.Click);
+                    }
                 }
                 case 8 -> playerData.Equipment.unEquip(EquipmentSlot.MainHand);
                 case 40 -> playerData.Equipment.unEquip(EquipmentSlot.OffHand);
@@ -220,9 +224,13 @@ public class Menu {
                     case 17 -> playerData.HotBar.ScrollUp();
                     case 35 -> playerData.HotBar.ScrollDown();
                     default -> {
-                        playerData.HotBar.setSelectSlot(slotToIndex(Slot));
-                        Trigger.TriggerMenuView();
-                        playSound(player, SoundList.Click);
+                        if (clickType.isRightClick()) {
+                            playerData.HotBar.use(slotToIndex(Slot));
+                        } else {
+                            playerData.HotBar.setSelectSlot(slotToIndex(Slot));
+                            Trigger.TriggerMenuView();
+                            playSound(player, SoundList.Click);
+                        }
                     }
                 }
             }

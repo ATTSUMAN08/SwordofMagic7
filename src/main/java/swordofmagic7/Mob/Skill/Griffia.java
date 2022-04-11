@@ -166,7 +166,7 @@ public class Griffia {
                     for (LivingEntity player : victims) {
                         ParticleManager.RandomVectorParticle(particleData1, player.getLocation(), 10);
                     }
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "Loyalty", 2.5, true, 1, 2);
+                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "Loyalty", 2.5, 1, 0.2, true, 2);
                     break;
                 }
                 i += Manager.period;
@@ -206,7 +206,7 @@ public class Griffia {
                     for (LivingEntity player : victims) {
                         ParticleManager.RandomVectorParticle(particleData1, player.getLocation(), 10);
                     }
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "Fluctuation", 100, true, 1, 2);
+                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "Fluctuation", 100, 1, 0.2, true, 2);
                     break;
                 }
                 i += Manager.period;
@@ -248,7 +248,7 @@ public class Griffia {
                     for (LivingEntity player : victims) {
                         ParticleManager.RandomVectorParticle(particleData1, player.getLocation(), 10);
                     }
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "FixedStar", 300, true, 1, 2);
+                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "FixedStar", 300, 1, 0.2, true, 2);
                     break;
                 }
                 i += Manager.period;

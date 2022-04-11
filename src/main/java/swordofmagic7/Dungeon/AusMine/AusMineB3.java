@@ -43,7 +43,7 @@ public class AusMineB3 {
         if (!Start) {
             Start = true;
             MultiThread.TaskRun(() -> {
-                Time = 90;
+                Time = 60;
                 Health = 7000;
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);

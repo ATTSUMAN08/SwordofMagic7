@@ -42,6 +42,7 @@ public final class MobManager {
         entity.setAI(!baseData.NoAI);
         entity.setInvisible(baseData.Invisible);
         entity.setGlowing(baseData.Glowing);
+        entity.setInvulnerable(true);
         EnemyData enemyData = new EnemyData(entity, baseData, level);
         EnemyTable.put(entity.getUniqueId().toString(), enemyData);
         enemyData.runAI();

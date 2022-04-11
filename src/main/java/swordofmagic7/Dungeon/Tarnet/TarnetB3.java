@@ -36,7 +36,7 @@ public class TarnetB3 {
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
-    public static int StartTime = 500;
+    public static int StartTime = 1200;
     private static EnemyData Enemy;
     public static Set<Player> Players = new HashSet<>();
     public static Set<Player> Players2 = new HashSet<>();
@@ -92,6 +92,7 @@ public class TarnetB3 {
                         }
                         for (int i = 0; i < 4; i++) {
                             ParticleManager.CircleParticle(useParticle, OverLocation[selectOver], useRadius, 72);
+                            ParticleManager.LineParticle(useParticle, Enemy.entity.getEyeLocation(), OverLocation[selectOver], 1, 5);
                             MultiThread.sleepTick(5);
                         }
                         selectOverTimer++;

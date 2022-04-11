@@ -18,6 +18,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.*;
+import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
@@ -205,6 +206,7 @@ public class PetParameter implements Cloneable {
         SkillData basicTamer = getSkillData("BasicTamer");
         if (playerData.Skill.hasSkill("BasicTamer")) {
             Multiply *= 1+basicTamer.ParameterValue(1)/100;
+            if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
         }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
         MaxHealth = (petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);

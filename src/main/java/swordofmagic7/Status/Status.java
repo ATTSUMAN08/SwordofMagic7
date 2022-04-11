@@ -99,11 +99,11 @@ public class Status {
         combatPower += (BaseStatus(StatusParameter.MaxMana) + EquipStatus(StatusParameter.MaxMana))/3;
         combatPower += (BaseStatus(StatusParameter.ManaRegen) + EquipStatus(StatusParameter.ManaRegen))*3;
         combatPower += (BaseStatus(StatusParameter.ATK) + EquipStatus(StatusParameter.ATK));
-        combatPower += (BaseStatus(StatusParameter.DEF) + EquipStatus(StatusParameter.DEF));
-        combatPower += (BaseStatus(StatusParameter.HLP) + EquipStatus(StatusParameter.HLP));
-        combatPower += (BaseStatus(StatusParameter.ACC) + EquipStatus(StatusParameter.ACC));
-        combatPower += (BaseStatus(StatusParameter.EVA) + EquipStatus(StatusParameter.EVA));
-        combatPower += (BaseStatus(StatusParameter.CriticalRate) + EquipStatus(StatusParameter.CriticalRate));
+        combatPower += (BaseStatus(StatusParameter.DEF) + EquipStatus(StatusParameter.DEF)/2);
+        combatPower += (BaseStatus(StatusParameter.HLP) + EquipStatus(StatusParameter.HLP))*0.75;
+        combatPower += (BaseStatus(StatusParameter.ACC) + EquipStatus(StatusParameter.ACC))*3;
+        combatPower += (BaseStatus(StatusParameter.EVA) + EquipStatus(StatusParameter.EVA))*3;
+        combatPower += (BaseStatus(StatusParameter.CriticalRate) + EquipStatus(StatusParameter.CriticalRate))*0.75;
         combatPower += (BaseStatus(StatusParameter.CriticalResist) + EquipStatus(StatusParameter.CriticalResist));
         combatPower += (BaseStatus(StatusParameter.SkillCooltime) + EquipStatus(StatusParameter.SkillCooltime));
         combatPower += (BaseStatus(StatusParameter.SkillCastTime) + EquipStatus(StatusParameter.SkillCastTime));
@@ -113,9 +113,9 @@ public class Status {
             combatPower += DamageCauseResistance.getOrDefault(damageCause,1d*100);
         }
         for (AttributeType attr : AttributeType.values()) {
-            combatPower += playerData.Attribute.getAttribute(attr)*1.5;
+            combatPower += playerData.Attribute.getAttribute(attr)*7.5;
         }
-        CombatPower = combatPower/6;
+        CombatPower = combatPower/7.5;
     }
 
     public int totalLevel() {

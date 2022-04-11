@@ -1,8 +1,7 @@
-package swordofmagic7.Dungeon.AusMine;
+package swordofmagic7.Dungeon.Novaha;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -18,57 +17,57 @@ import java.util.Set;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 import static swordofmagic7.SomCore.plugin;
 
-public class AusMineB4 {
-    private static final Location EventLocation = new Location(world,704, 119, 1979);
+public class Novaha4 {
+    private static final Location EventLocation = new Location(world, 5371.5, 174, 3902.5);
     private static boolean Start = false;
     public static int Time;
     public static int StartTime = 1200;
+    private static final double Radius = 96;
+    private static final String EventID = "Novaha4";
     private static EnemyData Enemy;
     private static Set<Player> Players = new HashSet<>();
-    private static final double Radius = Dungeon.Radius*2;
-    public static float SkillTime = -1;
-    private static final String[] ClearText = new String[]{
-            "§cグリフィア§aを討伐しました！",
-            };
+    private static final String[] EnterTextData = new String[]{};
+    private static final String[] ClearText = new String[]{"§c[ヴァノセト]§aが退治されました"};
     public static boolean Start() {
         if (!Start && (Enemy == null || Enemy.isDead())) {
             Start = true;
-            MultiThread.TaskRunSynchronized(() -> {
-                Enemy = MobManager.mobSpawn(getMobData("グリフィア"), 25, EventLocation);
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                Enemy = MobManager.mobSpawn(getMobData("ヴァノセト"), 55, EventLocation);
                 MultiThread.TaskRun(() -> {
                     Time = StartTime;
                     Players = PlayerList.getNear(EventLocation, Radius);
-                    Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§cグリフィア§aを討伐せよ", null, SoundList.DungeonTrigger);
+                    Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
+                    Message(Players, DungeonQuestTrigger, "§cヴァノセト§aを討伐せよ", null, SoundList.DungeonTrigger);
                     while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
-                        list = PlayerList.getNear(EventLocation, Radius);
+                        list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
                         Time--;
                         for (int i = 0; i < 10; i++) {
                             List<String> textData = new ArrayList<>();
                             textData.add(decoText("§c§lダンジョンクエスト"));
                             textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
-                            if (SkillTime > -1)
-                                textData.add(decoLore("スキル詠唱") + String.format("%.0f", SkillTime * 100) + "%");
+                            textData.add(decoLore("祭壇体力") + Enemy.skillManager.vanoset.Altar.viewHealthString());
                             textData.add(decoLore("残り時間") + Time + "秒");
-                            ViewBar.setSideBar(Players, "AusMineB4", textData);
+                            if (Enemy.skillManager.vanoset.SacrificeCount > 0) textData.add(decoLore("捧げた生贄") + Enemy.skillManager.vanoset.SacrificeCount + "体");
+                            ViewBar.setSideBar(Players, EventID, textData);
                             MultiThread.sleepTick(2);
                         }
                     }
-                    ViewBar.resetSideBar(Players, "AusMineB4");
+                    ViewBar.resetSideBar(Players, EventID);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").getLocation());
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("Novaha1_to_Vieta").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AusMineB4_to_AusMineB4Boss").getLocation());
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("Novaha3_to_Novaha4").getLocation());
                     }
                     Players.clear();
                     Start = false;
-                }, "AusMineB4DungeonQuest");
-            });
+                }, EventID);
+            }, 20);
         }
         return false;
     }

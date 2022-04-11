@@ -109,6 +109,11 @@ public class RuneShop {
         return (int) Math.round(rune.Level*rune.Quality*3+100);
     }
 
+    public void addRuneCrashed(RuneParameter rune) {
+        RuneCrashed.add(0, rune);
+        if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+    }
+
     public ItemParameter RuneCache;
     public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     public final ItemParameter RunePowder = getItemParameter("ルーンの粉");
@@ -133,8 +138,7 @@ public class RuneShop {
                     for (int i = 0; i < playerData.RuneInventory.getList().size(); i++) {
                         RuneParameter rune = playerData.RuneInventory.getRuneParameter(runeIndex).clone();
                         if (rune.Quality < maxQuality) {
-                            RuneCrashed.add(0, rune);
-                            if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+                            addRuneCrashed(rune);
                             playerData.RuneInventory.removeRuneParameter(runeIndex);
                             runePower++;
                         } else {
@@ -171,8 +175,7 @@ public class RuneShop {
                                 break;
                             }
                         }
-                        RuneCrashed.add(0, rune);
-                        if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
+                        addRuneCrashed(rune);
                         playerData.RuneInventory.removeRuneParameter(index);
                         lastRune = rune.clone();
                         runePower++;
@@ -316,7 +319,7 @@ public class RuneShop {
             if (RuneUpgradeCache[0] != null && RuneUpgradeCache[1] != null) {
                 RuneUpgradeCache[2] = getRuneParameter(RuneUpgradeCache[0].Id);
                 RuneUpgradeCache[2].Level = Math.min(RuneUpgradeCache[0].Level+1, PlayerData.MaxLevel);
-                RuneUpgradeCache[2].Quality = Math.min(2, (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55);
+                RuneUpgradeCache[2].Quality = Math.max(Math.min(2, (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55), RuneUpgradeCache[0].Quality);
                 inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));
             } else {
                 inv.setItem(AnvilUISlot[2], AirItem);

@@ -26,8 +26,26 @@ public class EnemySkillManager {
     public boolean SkillReady = true;
     public boolean setCancel = false;
 
+    final BasicEnemySkills basicSkills = new BasicEnemySkills(this);
+    public Symmore symmore;
+    public Griffia griffia;
+    public LeeLai leeLai;
+    public Synosas synosas;
+    public KingSlime kingSlime;
+    public Exta exta;
+    public Vanoset vanoset;
+
     public EnemySkillManager(EnemyData enemyData) {
         this.enemyData = enemyData;
+        switch (enemyData.mobData.Id) {
+            case "サイモア" -> symmore = new Symmore(this);
+            case "グリフィア" -> griffia = new Griffia(this);
+            case "リーライ" -> leeLai = new LeeLai(this);
+            case "シノサス" -> synosas = new Synosas(this);
+            case "キングスライム" -> kingSlime = new KingSlime(this);
+            case "エクスタ" -> exta = new Exta(this);
+            case "ヴァノセト" -> vanoset = new Vanoset(this);
+        }
     }
 
     void tickSkillTrigger() {
@@ -47,14 +65,6 @@ public class EnemySkillManager {
             }
         }, "tickSkillTrigger");
     }
-
-    BasicEnemySkills basicSkills = new BasicEnemySkills(this);
-    Symmore symmore = new Symmore(this);
-    Griffia griffia = new Griffia(this);
-    LeeLai leeLai = new LeeLai(this);
-    Synosas synosas = new Synosas(this);
-    KingSlime kingSlime = new KingSlime(this);
-    Exta exta = new Exta(this);
 
     public void mobSkillCast(MobSkillData mobSkillData) {
         if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
@@ -102,6 +112,19 @@ public class EnemySkillManager {
             case "Starting" -> exta.Starting();
             case "Thought" -> exta.Thought(50);
             case "Acceleration" -> exta.Acceleration();
+
+            case "Tornado" -> vanoset.Tornado(50);
+            case "Squall" -> vanoset.Squall(50);
+            case "WrongedFaith" -> vanoset.WrongedFaith(50);
+            case "UnderTheSky" -> vanoset.UnderTheSky(100);
+            case "Sacrifice" -> vanoset.Sacrifice();
+            case "Vortex" -> vanoset.Vortex();
+            case "Unconscious" -> vanoset.Unconscious();
+            case "Decay" -> vanoset.Decay();
+            case "CantLook" -> vanoset.CantLook();
+            case "JustHistory" -> vanoset.JustHistory(30);
+
+
         }
         MultiThread.TaskRun(() -> {
             if (!CoolTime.containsKey(mobSkillData.Skill)) {

@@ -1,6 +1,7 @@
 package swordofmagic7.Mob;
 
 import org.bukkit.Location;
+import swordofmagic7.Dungeon.Novaha.Novaha3;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 
@@ -13,6 +14,7 @@ import static swordofmagic7.SomCore.isEventServer;
 import static swordofmagic7.SomCore.random;
 
 public class MobSpawnerData {
+    public String Id;
     public MobData mobData;
     public Location location;
     public int Level = 1;
@@ -20,6 +22,7 @@ public class MobSpawnerData {
     public int Radius = 5;
     public int RadiusY = 5;
     public int PerSpawn = 1;
+    public String DeathTrigger;
     public File file;
 
     private boolean Started = false;
@@ -29,6 +32,14 @@ public class MobSpawnerData {
         if (!Started && !isEventServer()) {
             Started = true;
             MultiThread.TaskRunTimer(() -> {
+                if (DeathTrigger != null) for (EnemyData enemyData : SpawnedList) {
+                    if (enemyData.isDead()) {
+                        switch (DeathTrigger) {
+                            case "Novaha3" -> Novaha3.Count--;
+                        }
+                    }
+                }
+                SpawnedList.removeIf(data -> data.entity == null || data.entity.isDead() || data.isDead());
                 if (PlayerList.getNear(location, Radius + 16 + mobData.Search).size() > 0) {
                     for (EnemyData data : SpawnedList) {
                         if (data.entity == null || data.entity.isDead() || data.isDead()) {
@@ -38,7 +49,6 @@ public class MobSpawnerData {
                             data.resetPriority();
                         }
                     }
-                    SpawnedList.removeIf(data -> data.entity == null || data.entity.isDead() || data.isDead());
                     if (SpawnedList.size() < MaxMob) {
                         MultiThread.TaskRunSynchronized(() -> {
                             for (int i = 0; i < PerSpawn; i++) {

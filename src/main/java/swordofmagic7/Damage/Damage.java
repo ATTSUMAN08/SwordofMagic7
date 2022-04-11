@@ -66,13 +66,13 @@ public final class Damage {
     }
 
     public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, int wait) {
-        makeDamage(attacker, victims, damageCause, damageSource, damageMultiply, false, count, wait);
+        makeDamage(attacker, victims, damageCause, damageSource, damageMultiply, count, 0, false, wait);
     }
 
-    public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, boolean invariably, int count, int wait) {
+    public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably, int wait) {
         MultiThread.TaskRun(() -> {
             for (LivingEntity victim : victims) {
-                makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, 0, invariably);
+                makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably);
                 MultiThread.sleepTick(wait);
             }
         }, "MakeDamage");
@@ -80,6 +80,10 @@ public final class Damage {
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
         makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, 0, false);
+    }
+
+    public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate) {
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, false);
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably) {

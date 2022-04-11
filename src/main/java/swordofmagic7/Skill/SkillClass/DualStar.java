@@ -29,7 +29,7 @@ public class DualStar {
         playerData = skillProcess.playerData;
     }
 
-    public void ExtraAttack(SkillData skillData) {
+    public void ExtraBuff(SkillData skillData, EffectType effectType) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
@@ -38,7 +38,7 @@ public class DualStar {
 
             PetParameter pet = playerData.getPetSelect();
             if (pet != null) {
-                pet.getEffectManager().addEffect(EffectType.ExtraAttack, time);
+                pet.getEffectManager().addEffect(effectType, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
             }
@@ -46,11 +46,11 @@ public class DualStar {
         }, skillData.Id);
     }
 
-    public void AttackOrder(SkillData skillData) {
+    public void Order(SkillData skillData, PetAIState state) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             for (PetParameter pet : playerData.PetSummon) {
-                playerData.PetManager.PetAISelect(pet, PetAIState.Attack);
+                playerData.PetManager.PetAISelect(pet, state);
                 MultiThread.sleepTick(1);
             }
             skillProcess.SkillRigid(skillData);

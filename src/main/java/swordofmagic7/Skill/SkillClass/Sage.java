@@ -82,8 +82,10 @@ public class Sage {
             double radius = skillData.ParameterValue(1);
             ParticleData particleData = new ParticleData(Particle.PORTAL, 0.5f, Function.VectorUp).setRandomOffset(1.5f);
             ParticleData particleData2 = new ParticleData(Particle.ENCHANTMENT_TABLE);
-            Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false);
-            Location origin = ray.HitPosition;
+            Location loc = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false).HitPosition;
+            loc.setPitch(90);
+            Location origin = RayTrace.rayLocationBlock(loc, radius, false).HitPosition;
+
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
@@ -96,7 +98,8 @@ public class Sage {
                     ParticleManager.CircleParticle(particleData, origin, radius, 36);
                     ParticleManager.RandomVectorParticle(particleData, top, 36);
                     for (LivingEntity entity : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
-                        Vector vector = origin.toVector().subtract(entity.getLocation().toVector()).multiply(0.5);
+                        Vector vector = origin.toVector().subtract(entity.getLocation().toVector()).multiply(0.25);
+                        if (vector.length() > 1) vector.normalize();
                         entity.setVelocity(entity.getVelocity().add(vector));
                         ParticleManager.LineParticle(particleData2, entity.getEyeLocation(), top, 0.5, 5);
                     }

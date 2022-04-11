@@ -2,6 +2,7 @@ package swordofmagic7.Dungeon.Novaha;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -21,7 +22,7 @@ import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.SomCore.plugin;
 
-public class NovahaMiddleBoss {
+public class Novaha2 {
 
     private static final Location EventLocation = new Location(world,5396, 115, 2402);
     private static boolean Able = false;
@@ -29,6 +30,7 @@ public class NovahaMiddleBoss {
     public static int Time;
     public static int StartTime = 300;
     private static final double Radius = 96;
+    private static final int ElevatorActiveTime = Dungeon.ElevatorActiveTime*2;
     private static final String sidebarId = "NovahaMiddleBoss";
     private static EnemyData Enemy;
     private static Set<Player> Players = new HashSet<>();

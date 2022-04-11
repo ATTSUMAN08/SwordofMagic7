@@ -193,49 +193,53 @@ public class Events implements Listener {
             playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
             event.setCancelled(false);
         }
-        MultiThread.TaskRun(() -> {
-            if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
-                if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
-                    switch (action) {
-                        case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
-                            if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
+        if (!playerData.interactTick) {
+            playerData.interactTick = true;
+            MultiThread.TaskRun(() -> {
+                if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
+                    if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
+                        switch (action) {
+                            case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
+                                if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
+                                    if (player.isSneaking()) {
+                                        playerData.HotBar.use(4);
+                                    } else {
+                                        playerData.HotBar.use(0);
+                                    }
+                                } else if (playerData.CastMode.isRenewed()) {
+                                    playerData.setRightClickHold();
+                                } else if (playerData.CastMode.isHold()) {
+                                    int slot = player.getInventory().getHeldItemSlot();
+                                    if (slot < 8) {
+                                        if (player.isSneaking()) slot += 8;
+                                        playerData.HotBar.use(slot);
+                                    }
+                                }
+                                if (playerData.PetManager.usingBaton()) {
+                                    playerData.PetManager.PetAITarget();
+                                }
+                            }
+                            case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
                                 if (player.isSneaking()) {
-                                    playerData.HotBar.use(4);
+                                    if (playerData.CastMode.isLegacy()) {
+                                        playerData.HotBar.use(3);
+                                    }
+                                    if (playerData.PetManager.usingBaton()) {
+                                        playerData.PetManager.PetAISelect();
+                                    }
                                 } else {
-                                    playerData.HotBar.use(0);
+                                    if (playerData.PetManager.usingBaton()) {
+                                        playerData.PetManager.PetSelect();
+                                    }
                                 }
-                            } else if (playerData.CastMode.isRenewed()) {
-                                playerData.setRightClickHold();
-                            } else if (playerData.CastMode.isHold()) {
-                                int slot = player.getInventory().getHeldItemSlot();
-                                if (slot < 8) {
-                                    if (player.isSneaking()) slot += 8;
-                                    playerData.HotBar.use(slot);
-                                }
+                                playerData.Skill.SkillProcess.normalAttackTargetSelect();
                             }
-                            if (playerData.PetManager.usingBaton()) {
-                                playerData.PetManager.PetAITarget();
-                            }
-                        }
-                        case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
-                            if (player.isSneaking()) {
-                                if (playerData.CastMode.isLegacy()) {
-                                    playerData.HotBar.use(3);
-                                }
-                                if (playerData.PetManager.usingBaton()) {
-                                    playerData.PetManager.PetAISelect();
-                                }
-                            } else {
-                                if (playerData.PetManager.usingBaton()) {
-                                    playerData.PetManager.PetSelect();
-                                }
-                            }
-                            playerData.Skill.SkillProcess.normalAttackTargetSelect();
                         }
                     }
                 }
-            }
-        }, "PlayerInteract");
+                playerData.interactTick = false;
+            }, "PlayerInteract");
+        }
     }
 
     @EventHandler
@@ -362,10 +366,10 @@ public class Events implements Listener {
     @EventHandler
     void onDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
-        event.setCancelled(true);
         switch (event.getCause()) {
             case FALL, HOT_FLOOR, FIRE_TICK -> {
                 victim.setFireTicks(0);
+                event.setCancelled(true);
                 return;
             }
             case LAVA, DROWNING -> {
@@ -379,6 +383,7 @@ public class Events implements Listener {
                     spawnPlayer(player);
                 }
             }
+            default -> event.setCancelled(true);
         }
         if (isEnemy(victim)) {
             if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
@@ -435,7 +440,8 @@ public class Events implements Listener {
                     playerData.HotBar.use(1);
                 }
             } else {
-                CharaController.WallKick(player);
+                if (player.isSneaking()) playerData.HotBar.ScrollDown();
+                else playerData.HotBar.ScrollUp();
             }
             event.setCancelled(true);
         }
@@ -455,6 +461,9 @@ public class Events implements Listener {
                 } else {
                     playerData.HotBar.use(2);
                 }
+            } else {
+                if (player.isSneaking()) playerData.HotBar.ScrollUp();
+                else playerData.HotBar.ScrollDown();
             }
             event.setCancelled(true);
         }

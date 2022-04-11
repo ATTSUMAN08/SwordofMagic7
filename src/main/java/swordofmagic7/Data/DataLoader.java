@@ -263,6 +263,7 @@ public class DataLoader {
                 mapData.Color = data.getString("Color");
                 mapData.Level = data.getInt("Level");
                 mapData.Safe = data.getBoolean("Safe");
+                mapData.ReqCombatPower = data.getDouble("ReqCombatPower", mapData.Level*15);
                 if (data.isSet("Life.Mine")) {
                     for (String str : data.getStringList("Life.Mine")) {
                         String[] split = str.split(",");
@@ -771,7 +772,13 @@ public class DataLoader {
                                 slot += Integer.parseInt(str3.replace("+", ""));
                             } else {
                                 int index = Integer.parseInt(str3);
-                                slot = index == -1 ? (int) (Math.ceil(slot / 9f) * 9) : index;
+                                if (index == -1) {
+                                    slot = (int) (Math.ceil(slot / 9f) * 9);
+                                }
+                                else if (index == -2) {
+                                    slot = (int) (Math.ceil(slot / 45f) * 45);
+                                }
+                                else slot = index;
                             }
                         } else if (str2.contains("Recipe:")) {
                             shopSlot.itemRecipe = getItemRecipe(str2.replace("Recipe:", ""));
@@ -838,6 +845,7 @@ public class DataLoader {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                 MobSpawnerData mobSpawnerData = new MobSpawnerData();
+                mobSpawnerData.Id = fileName;
                 mobSpawnerData.mobData = getMobData(data.getString("MobData"));
                 mobSpawnerData.Level = data.getInt("Level");
                 mobSpawnerData.Radius = data.getInt("Radius");
@@ -845,6 +853,7 @@ public class DataLoader {
                 mobSpawnerData.MaxMob = data.getInt("MaxMob");
                 mobSpawnerData.PerSpawn = data.getInt("PerSpawn");
                 mobSpawnerData.file = file;
+                mobSpawnerData.DeathTrigger = data.getString("DeathTrigger", null);
                 double x = data.getDouble("Location.x");
                 double y = data.getDouble("Location.y");
                 double z = data.getDouble("Location.z");

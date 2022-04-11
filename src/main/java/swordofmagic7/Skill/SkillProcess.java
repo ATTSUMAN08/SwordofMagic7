@@ -205,8 +205,8 @@ public class SkillProcess {
                 }
                 if (victim != null) {
                     switch (category) {
-                        case Blade, Mace -> Damage.makeDamage(player, victims, DamageCause.ATK, damageSource, 1, 1, 2);
-                        case Rod, ActGun -> Damage.makeDamage(player, victims, DamageCause.MAT, damageSource, 1, 1, 2);
+                        case Blade, Mace -> Damage.makeDamage(player, victim, DamageCause.ATK, damageSource, 1, 1);
+                        case Rod, ActGun -> Damage.makeDamage(player, victim, DamageCause.MAT, damageSource, 1, 1);
                     }
                 }
             }

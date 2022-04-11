@@ -18,7 +18,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
     public static final int MaxSlot = 4;
-    public static final int MaxLevel = 15;
+    public static final int MaxLevel = 25;
     public static final int[] SlotReqLevel = {1, 10, 30, 50};
     public static final ClassData defaultClass = getClassData("Novice");
     private final Player player;
@@ -46,6 +46,7 @@ public class Classes {
                 reqExp *= Math.ceil(level/10f);
                 if (level >= 30) reqExp *= 2;
                 if (level >= 50) reqExp *= 4;
+                if (level >= 60) reqExp *= 4;
                 ReqExp[level] = (int) Math.round(reqExp);
             }
         }
@@ -165,6 +166,10 @@ public class Classes {
             classSlot[slot] = classData;
             player.sendMessage("§e[クラススロット" + (slot+1) + "]§aを" + classData.getDisplay(true, true) + "§aに§b転職§aしました");
             playerData.EffectManager.clearEffect();
+            int petSummoned = playerData.PetSummon.size();
+            for (int i = 0; i < petSummoned; i++) {
+                playerData.PetSummon.get(0).cage();
+            }
             playSound(player, SoundList.LevelUp);
         } else {
             player.sendMessage(decoText("§c転職条件"));

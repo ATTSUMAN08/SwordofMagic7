@@ -14,6 +14,7 @@ import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Pet.PetAIState;
 import swordofmagic7.Skill.SkillClass.Alchemist.Alchemist;
 import swordofmagic7.Skill.SkillClass.*;
 import swordofmagic7.Sound.SoundList;
@@ -241,8 +242,13 @@ public class Skill {
                                             case "Cloaking" -> assassin.Cloaking(skillData);
                                             case "Annihilation" -> assassin.Annihilation(skillData);
                                             //デュアルスター
-                                            case "ExtraAttack" -> dualStar.ExtraAttack(skillData);
-                                            case "AttackOrder" -> dualStar.AttackOrder(skillData);
+                                            case "ExtraAttack" -> dualStar.ExtraBuff(skillData, EffectType.ExtraAttack);
+                                            case "ExtraDefense" -> dualStar.ExtraBuff(skillData, EffectType.ExtraDefense);
+                                            case "ExtraCritical" -> dualStar.ExtraBuff(skillData, EffectType.ExtraCritical);
+                                            case "EyeSight" -> dualStar.ExtraBuff(skillData, EffectType.EyeSight);
+                                            case "AttackOrder" -> dualStar.Order(skillData, PetAIState.Attack);
+                                            case "SupportOrder" -> dualStar.Order(skillData, PetAIState.Support);
+                                            case "FollowOrder" -> dualStar.Order(skillData, PetAIState.Follow);
                                             //レンジャー
                                             case "ChainAttack" -> ranger.ChainAttack(skillData);
                                             //セージ
