@@ -58,7 +58,7 @@ public class Assassin {
             start.setPitch(0);
             Ray ray = RayTrace.rayLocationBlock(start, length, false);
             Location origin = ray.HitPosition;
-            origin.add(player.getEyeLocation().getDirection().multiply(-1));
+            origin.add(origin.toVector().subtract(player.getLocation().toVector()).normalize().multiply(-1));
             origin.setDirection(start.getDirection());
             ParticleManager.LineParticle(particleData, origin, player.getLocation(), 2, 10);
             Set<LivingEntity> victims = RectangleCollider(player.getLocation(), length, 2, skillProcess.Predicate(), false);

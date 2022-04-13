@@ -38,7 +38,6 @@ import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleManager;
-import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
@@ -62,8 +61,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public static final Random random = new Random();
     public static final Set<Hologram> HologramSet = new HashSet<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
-    public static final int AFKTimePeriod = 2;
-    public static final int AFKTime = 72000;
+    public static final int AFKTimePeriod = 1;
+    public static final int AFKTime = 600;//1800;
 
     public static Hologram createHologram(Location location) {
         Hologram hologram = HologramsAPI.createHologram(plugin, location);
@@ -114,6 +113,11 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
         if (protocolManager != null) {
             protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.BLOCK_CHANGE));
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.WORLD_PARTICLES));
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.STOP_SOUND));
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.CUSTOM_SOUND_EFFECT));
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.ENTITY_SOUND));
+            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT));
         }
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -151,28 +155,26 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             HologramSet.removeIf(Hologram::isDeleted);
         }, 200, 6000), "AutoSave");
 
-        /*
         MultiThread.TaskRunTimer(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 PlayerData playerData = PlayerData.playerData(player);
-                if (!playerData.Map.Safe && !player.isOp()) {
-                    if (PlayerLastLocation.containsKey(player)) {
-                        Location location = PlayerLastLocation.get(player);
-                        if (location.distance(player.getLocation()) < 1) {
-                            playerData.AFKTime += AFKTimePeriod;
-                        } else {
-                            PlayerLastLocation.put(player, player.getLocation().clone());
-                            playerData.AFKTime = 0;
-                        }
+                if (PlayerLastLocation.containsKey(player)) {
+                    Location location = PlayerLastLocation.get(player);
+                    if (location.distance(player.getLocation()) < 2) {
+                        playerData.AFKTime += AFKTimePeriod;
+                        playerData.statistics.AFKTime += AFKTimePeriod;
+                        if (playerData.isAFK()) player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "", 0, AFKTimePeriod*20+5, 0);
                     } else {
                         PlayerLastLocation.put(player, player.getLocation().clone());
                         playerData.AFKTime = 0;
                     }
+                } else {
+                    PlayerLastLocation.put(player, player.getLocation().clone());
+                    playerData.AFKTime = 0;
                 }
             }
             PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());
         }, AFKTimePeriod*20);
-         */
 
         ParticleManager.onLoad();
 
@@ -192,14 +194,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
             player.sendMessage("§cシステムをリロードします");
-            HashMap<UUID, PlayerData> list = playerDataList();
-            if (list.containsKey(player.getUniqueId())) {
-                PlayerData playerData = list.get(player.getUniqueId());
-                playerData.save();
-                for (PetParameter pet : playerData.PetSummon) {
-                    pet.entity.remove();
-                }
-            }
         }
 
         int count = 0;
@@ -219,7 +213,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("SomReload")) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                CloseInventory(player);
+                playerData(player).saveCloseInventory();
             }
             for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
                 if (!hologram.isDeleted()) hologram.delete();
@@ -346,9 +340,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("loadedPlayer")) {
                     player.sendMessage("Loaded PlayerData: ");
-                    HashMap<UUID, PlayerData> list = playerDataList();
-                    for (Map.Entry<UUID, PlayerData> loopData : list.entrySet()) {
-                        player.sendMessage(Bukkit.getOfflinePlayer(loopData.getKey()).getName() + ": " + loopData.getKey());
+                    HashMap<Player, PlayerData> list = playerDataList();
+                    for (Map.Entry<Player, PlayerData> loopData : list.entrySet()) {
+                        player.sendMessage(loopData.getKey().getName() + ": " + loopData.getKey());
                     }
                     return true;
                 }  else if (cmd.getName().equalsIgnoreCase("getExp")) {
@@ -534,6 +528,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("pvpMode")) {
                 playerData.PvPMode();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("effectLog")) {
+                playerData.EffectLog();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("strafeMode")) {
                 playerData.StrafeMode();
@@ -796,6 +793,10 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 playSound(player, SoundList.Tick);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("ch")) {
+                if (playerData.isPlayDungeonQuest) {
+                    sendMessage(player, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.Nope);
+                    return true;
+                }
                 if (args.length == 1) {
                     String teleportServer;
                     switch (args[0]) {

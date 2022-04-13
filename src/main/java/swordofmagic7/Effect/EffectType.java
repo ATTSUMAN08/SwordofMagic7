@@ -64,6 +64,7 @@ public enum EffectType {
     CrossGuardCounter("クロスガード:カウンター", true, "[物理与ダメージ]が上昇します", true),
     ArcaneEnergy("アーケインエナジー", true, "スキルのマナ消費が0になります", false),
     Foretell("フォアテル", true, "被ダメージ耐性増加が上昇します", true),
+    Brutality("フォアテル", true, true, "魔法与ダメ－ジが上昇し、持続中はマナが消費されます", true),
     ;
 
     public String Display;
@@ -74,6 +75,7 @@ public enum EffectType {
     public boolean view = true;
     public boolean isUpdateStatus = false;
     public boolean isStatic = false;
+    public boolean isToggle = false;
 
     EffectType(String Display, boolean Buff, String Lore) {
         this.Display = Display;
@@ -86,6 +88,14 @@ public enum EffectType {
         this.Buff = Buff;
         this.Lore = List.of(Lore.split("\n"));
         this.isUpdateStatus = isUpdateStatus;
+    }
+
+    EffectType(String Display, boolean Buff, boolean isToggle, String Lore, boolean isUpdateStatus) {
+        this.Display = Display;
+        this.Buff = Buff;
+        this.Lore = List.of(Lore.split("\n"));
+        this.isUpdateStatus = isUpdateStatus;
+        this.isToggle = isToggle;
     }
 
     EffectType(String Display, EffectRank effectRank, boolean Buff, String Lore) {
@@ -162,6 +172,10 @@ public enum EffectType {
 
     public boolean isSkillsNotAvailable() {
         return this == Silence || isFreeze();
+    }
+
+    public boolean isInvincible() {
+        return this == Invincible || this == Stop;
     }
 
     public boolean isSlow() {

@@ -158,6 +158,9 @@ commands:
   castMode:
     description: description
     usage: /<command>
+  effectLog:
+    description: description
+    usage: /<command>
   viewFormat:
     description: description
     usage: /<command>

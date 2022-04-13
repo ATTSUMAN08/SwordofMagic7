@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
+import swordofmagic7.Dungeon.Novaha.Novaha2;
+import swordofmagic7.Dungeon.Novaha.Novaha4;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.Life.LifeType;
@@ -33,6 +35,7 @@ public class Statistics {
     }
 
     public int playTime = 0;
+    public int AFKTime = 0;
     public int MaxFishingCombo = 0;
     public double MaxFishingCPS = 0;
     public int TotalEnemyKills = 0;
@@ -55,6 +58,7 @@ public class Statistics {
     public List<String> getStringList() {
         List<String> list = new ArrayList<>();
         list.add(decoLore("プレイ時間") + String.format("%.2f", playTime/3600f) + "時間");
+        list.add(decoLore("放置時間") + String.format("%.2f", AFKTime/3600f) + "時間");
         list.add(decoLore("釣獲最大コンボ") + MaxFishingCombo);
         list.add(decoLore("釣獲最高CPS") + String.format("%.2f", MaxFishingCPS));
         list.add(decoLore("エネミ討伐数") + TotalEnemyKills);
@@ -80,6 +84,7 @@ public class Statistics {
         if (playerData.Level >= 30) titleManager.addTitle("プレイヤーレベル30");
         if (playerData.Level >= 40) titleManager.addTitle("プレイヤーレベル40");
         if (playerData.Level >= 50) titleManager.addTitle("プレイヤーレベル50");
+        if (playerData.Level >= 60) titleManager.addTitle("プレイヤーレベル60");
 
         if (MaxFishingCPS >= 10) titleManager.addTitle("釣獲CPS10");
         if (MaxFishingCombo >= 100) titleManager.addTitle("釣獲コンボ100");
@@ -101,6 +106,9 @@ public class Statistics {
         for (ClassData classData : DataBase.ClassList.values()) {
             if (playerData.Classes.getClassLevel(classData) >= 15) {
                 titleManager.addTitle(classData.Display + "レベル15");
+            }
+            if (playerData.Classes.getClassLevel(classData) >= 25) {
+                titleManager.addTitle(classData.Display + "レベル25");
             }
         }
 
@@ -148,15 +156,23 @@ public class Statistics {
                 titleManager.addTitle("シノサス討伐");
                 if ((TarnetB3.StartTime- TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
             }
-            case "訓練用ダミー" -> {
-                titleManager.addTitle("訓練用ダミー討伐");
+            case "エクスタ" -> {
+                titleManager.addTitle("エクスタ討伐");
+                if ((Novaha2.StartTime- Novaha2.Time) < 100) titleManager.addTitle("エクスタ討伐2");
             }
+            case "ヴァノセト" -> {
+                titleManager.addTitle("ヴァノセト討伐");
+                if ((Novaha4.StartTime- Novaha4.Time) < 300) titleManager.addTitle("ヴァノセト討伐2");
+                if ((Novaha4.StartTime- Novaha4.Time) < 150) titleManager.addTitle("ヴァノセト討伐3");
+            }
+            case "訓練用ダミー" -> titleManager.addTitle("訓練用ダミー討伐");
         }
         checkTitleEnemyKill();
     }
 
     public void save(FileConfiguration data) {
         data.set("Statistics.PlayTime", playTime);
+        data.set("Statistics.AFKTime", AFKTime);
         data.set("Statistics.MaxFishingCombo", MaxFishingCombo);
         data.set("Statistics.MaxFishingCPS", MaxFishingCPS);
         data.set("Statistics.TotalEnemyKills", TotalEnemyKills);
@@ -179,6 +195,7 @@ public class Statistics {
 
     public void load(FileConfiguration data) {
         playTime = data.getInt("Statistics.PlayTime", 0);
+        AFKTime = data.getInt("Statistics.AFKTime", 0);
         MaxFishingCombo = data.getInt("Statistics.MaxFishingCombo", 0);
         MaxFishingCPS = data.getDouble("Statistics.MaxFishingCPS", 0d);
         TotalEnemyKills = data.getInt("Statistics.TotalEnemyKills", 0);

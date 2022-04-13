@@ -81,7 +81,7 @@ public class Alchemist {
             if (page > 1) itemStacks[45] = PreviousPageItem;
             if (page < MaxPage()) itemStacks[53] = NextPageItem;
             itemStacks[49] = ItemFlameAmount(AlchemyPrefix, AlchemyAmount);
-            player.getOpenInventory().getTopInventory().setStorageContents(itemStacks);
+            player.getOpenInventory().getTopInventory().setContents(itemStacks);
             playSound(player, SoundList.Tick);
         }
     }

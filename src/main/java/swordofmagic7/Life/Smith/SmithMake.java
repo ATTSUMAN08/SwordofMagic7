@@ -66,7 +66,7 @@ public class SmithMake {
             }
             if (Scroll > 0) itemStacks[8] = UpScrollItem;
             if (MaxMakeSlot/9-5 > 0) itemStacks[53] = DownScrollItem;
-            player.getOpenInventory().getTopInventory().setStorageContents(itemStacks);
+            player.getOpenInventory().getTopInventory().setContents(itemStacks);
             playSound(player, SoundList.Tick);
         }
     }

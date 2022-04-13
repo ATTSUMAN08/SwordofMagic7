@@ -1,5 +1,6 @@
 package swordofmagic7.Item.ItemExtend;
 
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.RuneParameter;
@@ -22,11 +23,15 @@ public class ItemEquipmentData implements Cloneable {
     public List<RuneParameter> Rune = new ArrayList<>();
 
     public HashMap<StatusParameter, Double> Parameter() {
+        return Parameter(PlayerData.MaxLevel);
+    }
+
+    public HashMap<StatusParameter, Double> Parameter(int limit) {
         HashMap<StatusParameter, Double> Parameter = new HashMap<>();
         for (StatusParameter statusParameter : StatusParameter.values()) {
             double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05+(Math.pow(Plus, 1.8)/100));
             for (RuneParameter rune : Rune) {
-                parameter += rune.Parameter(statusParameter);
+                parameter += rune.Parameter(statusParameter, limit);
             }
             Parameter.put(statusParameter, parameter);
         }

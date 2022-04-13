@@ -221,22 +221,28 @@ public class Gathering {
                     requestFishingCommand[i] = FishingCommands[random.nextInt(FishingCommands.length)];
                 }
                 while (player.isOnline() && plugin.isEnabled() && isAlive(player) && inputProgress < requestFishingCommand.length && Function.isHoldFishingRod(player) && FishingMissCount < MissLeft) {
-                    StringBuilder title = new StringBuilder();
-                    StringBuilder preview = new StringBuilder();
-                    for (int i = inputProgress; i < requestFishingCommand.length; i++) {
-                        title.append(requestFishingCommand[i].getDisplayColored(playerData.FishingDisplayNum)).append(" ");
-                        preview.append("  ");
+                    if (!playerData.isAFK()) {
+                        StringBuilder title = new StringBuilder();
+                        StringBuilder preview = new StringBuilder();
+                        int length = Math.min(requestFishingCommand.length, inputProgress + 20);
+                        for (int i = inputProgress; i < length; i++) {
+                            if (requestFishingCommand[i] == null) break;
+                            title.append(requestFishingCommand[i].getDisplayColored(playerData.FishingDisplayNum)).append(" ");
+                            preview.append("  ");
+                        }
+                        preview.append(title);
+                        String subTitle = "§7MissLeft " + (MissLeft - FishingMissCount);
+                        if (!FishingUseCombo) {
+                            subTitle = "                      " + subTitle + "    §eTime" + String.format("%.2f", time * 0.05) + "秒";
+                        }
+                        player.sendTitle(preview.toString(), subTitle, 0, 5, 0);
                     }
-                    preview.append(title);
-                    String subTitle = "§7MissLeft " + (MissLeft - FishingMissCount);
                     if (!FishingUseCombo) {
                         if (time > 3600 + combo*10) {
                             inputProgress = requestFishingCommand.length;
                             break;
                         }
-                        subTitle = "                      " + subTitle + "    §eTime" + String.format("%.2f", time * 0.05) + "秒";
                     }
-                    player.sendTitle(preview.toString(), subTitle, 0, 5, 0);
                     time++;
                     MultiThread.sleepTick(1);
                 }

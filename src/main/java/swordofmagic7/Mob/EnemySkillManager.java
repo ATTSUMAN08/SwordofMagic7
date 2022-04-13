@@ -116,7 +116,7 @@ public class EnemySkillManager {
             case "Tornado" -> vanoset.Tornado(50);
             case "Squall" -> vanoset.Squall(50);
             case "WrongedFaith" -> vanoset.WrongedFaith(50);
-            case "UnderTheSky" -> vanoset.UnderTheSky(100);
+            case "UnderTheSky" -> vanoset.UnderTheSky(70);
             case "Sacrifice" -> vanoset.Sacrifice();
             case "Vortex" -> vanoset.Vortex();
             case "Unconscious" -> vanoset.Unconscious();

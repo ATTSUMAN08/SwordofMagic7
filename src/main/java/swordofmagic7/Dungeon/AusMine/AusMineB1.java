@@ -2,6 +2,7 @@ package swordofmagic7.Dungeon.AusMine;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -9,16 +10,12 @@ import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.ViewBar.ViewBar;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
 import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.SomCore.random;
 
@@ -26,7 +23,9 @@ public class AusMineB1 {
     private static boolean Able = false;
     private static boolean Start = false;
     private static int Time;
+    private static final int StartTime = 300;
     private static int Count;
+    private static final int StartCount = 15;
     private static final Location EventLocation = new Location(world,1145, 141, 1293);
     private static final Set<EnemyData> EnemyList = new HashSet<>();
     private static Set<Player> Players = new HashSet<>();
@@ -42,14 +41,15 @@ public class AusMineB1 {
         if (!Start) {
             Start = true;
             MultiThread.TaskRun(() -> {
-                Time = 300;
-                Count = 15;
+                Time = StartTime;
+                Count = StartCount;
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§cゴブリン§aを§c" + Count + "体§a討伐せよ", EnterTextData, SoundList.DungeonTrigger);
                 while (Time > 0 && list.size() > 0 && plugin.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
+                    Function.setPlayDungeonQuest(Players, true);
                     for (EnemyData enemyData : new HashSet<>(EnemyList)) {
                         if (enemyData.isDead()) {
                             EnemyList.remove(enemyData);
@@ -62,11 +62,8 @@ public class AusMineB1 {
                             Location loc = EventLocation.clone().add(random.nextDouble() * 20, 0, random.nextDouble() * 20);
                             MultiThread.TaskRunSynchronized(() -> EnemyList.add(MobManager.mobSpawn(getMobData("ゴブリン"), 15, loc)));
                         }
-                        List<String> textData = new ArrayList<>();
-                        textData.add(decoText("§c§lダンジョンクエスト"));
-                        textData.add(decoLore("残存敵数") + Count);
-                        textData.add(decoLore("残り時間") + Time + "秒");
-                        ViewBar.setSideBar(Players,"AusMineB1", textData);
+                        ViewBar.setBossBarOther(Players, "§c残存敵数 " + Count + "体", (float) Count/StartCount);
+                        ViewBar.setBossBarTimer(Players, "§e残り時間 " + Time + "秒", (float) Time/StartTime);
                     } else {
                         Able = true;
                         break;
@@ -76,7 +73,9 @@ public class AusMineB1 {
                 for (EnemyData enemyData : EnemyList) {
                     enemyData.delete();
                 }
-                ViewBar.resetSideBar(Players, "AusMineB1");
+                ViewBar.resetBossBarTimer(Players);
+                ViewBar.resetBossBarOther(Players);
+                Function.setPlayDungeonQuest(Players, false);
                 for (EnemyData enemyData : EnemyList) {
                     enemyData.delete();
                 }

@@ -44,7 +44,7 @@ public class Vanoset {
         SacrificeLocation[2] = new Location(world, 5371.5, 172, 3946.5);
         SacrificeLocation[3] = new Location(world, 5415.5, 172, 3902.5);
 
-        MultiThread.TaskRunSynchronized(() -> {
+        MultiThread.TaskRunSynchronizedLater(() -> {
             Altar = MobManager.mobSpawn(DataBase.getMobData("ノヴァハ祭壇"), Manager.enemyData.Level, location);
             MultiThread.TaskRun(() -> {
                 while (plugin.isEnabled() && Manager.enemyData.isAlive() && Altar.isAlive() && !Altar.entity.isDead()) {
@@ -76,7 +76,7 @@ public class Vanoset {
                     MultiThread.sleepTick(20);
                 }
             }, "NovahaAlter");
-        });
+        }, 2);
         MultiThread.TaskRunLater(() -> entity = Manager.enemyData.entity, 1, "Vanoset");
     }
 
@@ -113,7 +113,7 @@ public class Vanoset {
                     victims.removeAll(Function.NearEntityByEnemy(origin, radius));
                     for (LivingEntity victim : victims) {
                         victim.setVelocity(Function.VectorUp.clone().setY(2));
-                        Damage.makeDamage(entity, victim, DamageCause.ATK, "Tornado", 6, 1);
+                        Damage.makeDamage(entity, victim, DamageCause.ATK, "Tornado", 4, 1);
                         if (victim instanceof Player player) playSound(player, SoundList.Explosion);
                     }
                     MultiThread.sleepTick(7);
@@ -147,7 +147,7 @@ public class Vanoset {
             for (LivingEntity victim : Function.NearEntityByEnemy(origin, radius)) {
                 Vector vector = victim.getLocation().toVector().subtract(origin.toVector()).setY(1);
                 victim.setVelocity(vector);
-                Damage.makeDamage(entity, victim, DamageCause.ATK, "Squall", 8, 1);
+                Damage.makeDamage(entity, victim, DamageCause.ATK, "Squall", 6, 1);
                 if (victim instanceof Player player) playSound(player, SoundList.Explosion);
             }
 
@@ -189,11 +189,11 @@ public class Vanoset {
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.01f, Function.VectorUp);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime+40);
-            double radius = 5;
+            double radius = 3;
 
             Location[] locations = new Location[3];
             for (int i = 0; i < locations.length; i ++) {
-                Location origin = entity.getLocation().clone().add(random.nextDouble()*15+5, 0, random.nextDouble()*15+5);
+                Location origin = entity.getLocation().clone().add(random.nextDouble()*30-15, 0, random.nextDouble()*30-15);
                 origin.setPitch(90);
                 locations[i] = RayTrace.rayLocationBlock(origin, 16, false).HitPosition;
             }
@@ -232,7 +232,7 @@ public class Vanoset {
                 Damage.makeDamage(this.entity, entity, DamageCause.ATK, "UnderTheSky", 100, 1, 0.5);
                 ParticleManager.CircleParticle(particleData2, entity.getLocation(), radius, 24);
                 for (LivingEntity entity2 : Function.NearEntityByEnemy(entity.getLocation(), radius)) {
-                    Damage.makeDamage(this.entity, entity2, DamageCause.ATK, "UnderTheSky", 10, 1);
+                    Damage.makeDamage(this.entity, entity2, DamageCause.ATK, "UnderTheSky", 7, 1);
                     if (entity2 instanceof  Player player) playSound(player, SoundList.Explosion);
                 }
             }
@@ -371,7 +371,7 @@ public class Vanoset {
 
             for (int i = 0; i < 8; i++) {
                 for (Player player : PlayerList.getNearNonDead(entity.getLocation(), 96)) {
-                    if (RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 0, entity -> entity == this.entity).isHitEntity()) {
+                    if (RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 2, entity -> entity == this.entity).isHitEntity()) {
                         Damage.makeDamage(this.entity, player, DamageCause.MAT, "CantLook", 100, 1, 0.5, true);
                         sendMessage(player, "§c[見堪]により致死ダメージを受けました", SoundList.Nope);
                     }
@@ -424,7 +424,7 @@ public class Vanoset {
                 victims.remove(Manager.enemyData.target);
                 for (LivingEntity victim : victims) {
                     particleData2.spawn(victim.getEyeLocation());
-                    Damage.makeDamage(entity, victim, DamageCause.MAT, "Potential", 10, 1);
+                    Damage.makeDamage(entity, victim, DamageCause.MAT, "Potential", 7, 1);
                 }
                 for (int i2 = 0; i2 < 4; i2++) {
                     ParticleManager.CircleParticle(particleData, entity.getLocation(), radius, 24);

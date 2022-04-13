@@ -19,6 +19,17 @@ public class PartyManager {
 
     public static HashMap<String, PartyData> PartyList = new HashMap<>();
     public static HashMap<Player, PartyData> PartyInvites = new HashMap<>();
+    public static HashMap<String, String> PartyRejoin = new HashMap<>();
+
+    public static void rejoinCheck(Player player) {
+        String uuid = player.getUniqueId().toString();
+        if (PartyRejoin.containsKey(uuid)) {
+            String party = PartyRejoin.get(uuid);
+            if (PartyList.containsKey(party)) {
+                PartyList.get(party).Join(player);
+            }
+        }
+    }
 
     public static void partyCommand(Player player, PlayerData playerData, String[] args) {
         if (args.length > 0) {

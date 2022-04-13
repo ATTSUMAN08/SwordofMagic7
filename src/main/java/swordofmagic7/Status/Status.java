@@ -166,7 +166,7 @@ public class Status {
         }
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             for (StatusParameter param : StatusParameter.values()) {
-                EquipStatus.put(param, EquipStatus(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter().get(param));
+                EquipStatus.put(param, EquipStatus(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter(playerData.Level).get(param));
             }
         }
         for (AttributeType attr : AttributeType.values()) {
@@ -282,7 +282,7 @@ public class Status {
 
         setCombatPower();
         MultiThread.TaskRunSynchronized(() -> {
-            player.setWalkSpeed((float) Movement);
+            player.setWalkSpeed((float) Math.min(Movement, 1));
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
         });
     }

@@ -43,6 +43,20 @@ public final class PlayerList {
         }
     }
 
+    public static Set<Player> getNearNonAFK(Location loc, double radius) {
+        Set<Player> List = new HashSet<>();
+        try {
+            for (Player player : get()) {
+                if (player.isOnline() && !playerData(player).isAFK()) {
+                    if (player.getLocation().distance(loc) <= radius) List.add(player);
+                }
+            }
+            return List;
+        } catch (Exception e) {
+            return List;
+        }
+    }
+
     public static Set<Player> getNearNonDead(Location loc, double radius) {
         Set<Player> List = new HashSet<>();
         for (Player player : get()) {

@@ -3,6 +3,7 @@ package swordofmagic7.Dungeon.Novaha;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import swordofmagic7.Dungeon.Dungeon;
+import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -10,16 +11,12 @@ import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.ViewBar.ViewBar;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
 import static swordofmagic7.SomCore.plugin;
 
 public class Novaha2 {
@@ -28,7 +25,7 @@ public class Novaha2 {
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
-    public static int StartTime = 300;
+    public static int StartTime = 600;
     private static final double Radius = 96;
     private static final int ElevatorActiveTime = Dungeon.ElevatorActiveTime*2;
     private static final String sidebarId = "NovahaMiddleBoss";
@@ -51,15 +48,15 @@ public class Novaha2 {
                     while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
+                        Function.setPlayDungeonQuest(Players, true);
                         Time--;
-                        List<String> textData = new ArrayList<>();
-                        textData.add(decoText("§c§lダンジョンクエスト"));
-                        textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
-                        textData.add(decoLore("残り時間") + Time + "秒");
-                        ViewBar.setSideBar(Players, sidebarId, textData);
+                        ViewBar.setBossBarOverrideTargetInfo(Players, Enemy.entity);
+                        ViewBar.setBossBarTimer(Players, "§e残り時間 " + Time + "秒", (float) Time/StartTime);
                         MultiThread.sleepTick(20);
                     }
-                    ViewBar.resetSideBar(Players, sidebarId);
+                    ViewBar.resetBossBarTimer(Players);
+                    ViewBar.resetBossBarOverrideTargetInfo(Players);
+                    Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
                         Able = true;
                         getWarpGate("Novaha2_to_Novaha3").ActiveAtTime(ElevatorActiveTime);

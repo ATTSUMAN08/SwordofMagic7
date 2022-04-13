@@ -123,7 +123,7 @@ public final class ParticleManager {
             float rom = particleData.randomOffsetMultiply;
             offset = new Vector(random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2));
         }
-        Set<Player> Players = PlayerList.getNear(location, 32);
+        Set<Player> Players = PlayerList.getNearNonAFK(location, 32);
         if (particleData.particle != Particle.REDSTONE) {
             for (Player player : Players) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);

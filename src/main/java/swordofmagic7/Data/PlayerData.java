@@ -3,10 +3,9 @@ package swordofmagic7.Data;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
@@ -76,18 +75,18 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
-    private static final HashMap<UUID, PlayerData> playerData = new HashMap<>();
+    private static final HashMap<Player, PlayerData> playerData = new HashMap<>();
     public static PlayerData playerData(Player player) {
         if (player.isOnline()) {
-            if (!playerData.containsKey(player.getUniqueId())) {
-                playerData.put(player.getUniqueId(), new PlayerData(player));
+            if (!playerData.containsKey(player)) {
+                playerData.put(player, new PlayerData(player));
             }
-            return playerData.get(player.getUniqueId());
+            return playerData.get(player);
         }
         Log("§c" + player.getName() + "§c, " + player.getUniqueId() + " is Offline or Npc", true);
         return new PlayerData(null);
     }
-    public static HashMap<UUID, PlayerData> playerDataList() {
+    public static HashMap<Player, PlayerData> playerDataList() {
         return playerData;
     }
 
@@ -151,6 +150,8 @@ public class PlayerData {
     public boolean isLoaded = false;
     public boolean isPTChat = false;
     public LivingEntity targetEntity = null;
+    public LivingEntity overrideTargetEntity = null;
+    public LivingEntity otherTargetEntity = null;
     public String saveTeleportServer = null;
     public boolean NaturalMessage = true;
     public Location logoutLocation = null;
@@ -158,9 +159,11 @@ public class PlayerData {
     public double HealthRegenDelay = 0d;
     public int AFKTime = 0;
     public boolean interactTick = false;
+    public boolean EffectLog = true;
+    public boolean isPlayDungeonQuest = false;
 
     public boolean isAFK() {
-        return AFKTime > SomCore.AFKTime; //18000;
+        return AFKTime > SomCore.AFKTime;
     }
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
@@ -233,11 +236,13 @@ public class PlayerData {
                 while (plugin.isEnabled() && player.isOnline()) {
                     if (visibilityManager.isVisibleByDefault()) {
                         visibilityManager.resetVisibilityAll();
-                        if (HoloSelfView) visibilityManager.showTo(player);
+                        if (HoloSelfView && !isAFK()) visibilityManager.showTo(player);
                         else visibilityManager.hideTo(player);
                         Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
-                        nonViewer.removeAll(PlayerList.getNear(player.getLocation(), 16));
-                        if (Party != null) Party.Members.forEach(nonViewer::remove);
+                        nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
+                        if (Party != null) for (Player player : Party.Members) {
+                            if (!playerData(player).isAFK()) nonViewer.remove(player);
+                        }
                         for (Player player : nonViewer) {
                             visibilityManager.hideTo(player);
                         }
@@ -283,22 +288,34 @@ public class PlayerData {
         }, "HologramInitialize");
     }
 
+    public BossBar BossBarTargetInfo = BossBar.bossBar(Component.text(), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
+    public BossBar BossBarOther = BossBar.bossBar(Component.text(), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
+    public BossBar BossBarTimer = BossBar.bossBar(Component.text(), 1, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
+    public BossBar BossBarSkillProgress = BossBar.bossBar(Component.text(), 0, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
     public void InitializeBossBar() {
-        BossBar bossBar = Bukkit.createBossBar("§7§lNon Target", BarColor.RED, BarStyle.SOLID);
-        bossBar.addPlayer(player);
+        player.showBossBar(BossBarTargetInfo);
         MultiThread.TaskRun(() -> {
             while (plugin.isEnabled() && player.isOnline()) {
-                if (targetEntity != null && !targetEntity.isDead()) {
-                    double percent = targetEntity.getHealth()/targetEntity.getMaxHealth();
-                    bossBar.setTitle("§c§l" + targetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]");
-                    bossBar.setProgress(percent);
+                LivingEntity entity = overrideTargetEntity != null ? overrideTargetEntity : targetEntity;
+                if (entity != null && !entity.isDead()) {
+                    player.showBossBar(BossBarTargetInfo);
+                    float percent = (float) Math.min(Math.max(entity.getHealth()/entity.getMaxHealth(), 0), 1);
+                    BossBarTargetInfo.name(Component.text("§c§l" + entity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
+                    BossBarTargetInfo.progress(percent);
                 } else {
-                    bossBar.setTitle("§7§lNon Target");
-                    bossBar.setProgress(1);
+                    player.hideBossBar(BossBarTargetInfo);
+                }
+                if (otherTargetEntity != null && !otherTargetEntity.isDead()) {
+                    player.showBossBar(BossBarOther);
+                    float percent = (float) Math.min(Math.max(otherTargetEntity.getHealth()/otherTargetEntity.getMaxHealth(), 0), 1);
+                    BossBarOther.name(Component.text("§c§l" + otherTargetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
+                    BossBarOther.progress(percent);
+                } else if (otherTargetEntity != null && otherTargetEntity.isDead()) {
+                    otherTargetEntity = null;
+                    player.hideBossBar(BossBarOther);
                 }
                 MultiThread.sleepTick(10);
             }
-            bossBar.removeAll();
         }, "PlayerBossBar");
     }
 
@@ -371,6 +388,17 @@ public class PlayerData {
     void PvPMode(boolean bool) {
         PvPMode = bool;
         String msg = "§e[PvPモード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        Status.StatusUpdate();
+        sendMessage(player, msg, SoundList.Click);
+    }
+
+    public void EffectLog() {
+        EffectLog(!EffectLog);
+    }
+
+    void EffectLog(boolean bool) {
+        EffectLog = bool;
+        String msg = "§e[効果ログ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
         Status.StatusUpdate();
         sendMessage(player, msg, SoundList.Click);
     }
@@ -467,7 +495,7 @@ public class PlayerData {
     }
 
     public void remove() {
-        playerData.remove(player.getUniqueId());
+        playerData.remove(player);
     }
 
     public boolean isPvPModeNonMessage() {
@@ -566,7 +594,10 @@ public class PlayerData {
             }
         }
 
-        Location lastLocation = logoutLocation != null ? logoutLocation : player.getLocation().clone();
+        Location lastLocation;
+        if (isPlayDungeonQuest) {
+            lastLocation = player.getWorld().getSpawnLocation();
+        } else lastLocation = Objects.requireNonNullElseGet(logoutLocation, () -> player.getLocation().clone());
         lastLocation.add(0, 0.5, 0);
         data.set("Location.x", lastLocation.getX());
         data.set("Location.y", lastLocation.getY());
@@ -585,6 +616,7 @@ public class PlayerData {
         data.set("Setting.DropLog", DropLog.toString());
         data.set("Setting.PvPMode", PvPMode);
         data.set("Setting.CastMode", CastMode.toString());
+        data.set("Setting.EffectLog", EffectLog);
         data.set("Setting.StrafeMode", StrafeMode.toString());
         data.set("Setting.ShopAmountReset", Shop.AmountReset);
         data.set("Setting.ViewFormat", ViewFormat);
@@ -718,6 +750,7 @@ public class PlayerData {
             ExpLog = data.getBoolean("Setting.ExpLog", false);
             DropLog = DropLogType.fromString(data.getString("Setting.DropLog"));
             CastMode = CastType.valueOf(data.getString("Setting.CastMode", "Renewed"));
+            EffectLog = data.getBoolean("EffectLog", true);
             StrafeMode = StrafeType.fromString(data.getString("Setting.StrafeMode"));
             Shop.AmountReset = data.getBoolean("Setting.ShopAmountReset");
             PvPMode = data.getBoolean("Setting.PvPMode", false);
@@ -1023,6 +1056,9 @@ public class PlayerData {
     public int deadTime = 0;
     public void dead() {
         final Location LastDeadLocation = player.getLocation();
+        for (Player player : PlayerList.getNear(LastDeadLocation, 48)) {
+            sendMessage(player, getNick() + "§aさんが§cダウン§aしました...");
+        }
         MultiThread.TaskRunSynchronized(() -> {
             if (!isDead) {
                 statistics.DownCount++;

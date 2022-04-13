@@ -29,7 +29,7 @@ public class MobSpawnerData {
     private final List<EnemyData> SpawnedList = new ArrayList<>();
 
     public void start() {
-        if (!Started && !isEventServer()) {
+        if (!Started && (!isEventServer() || DeathTrigger != null)) {
             Started = true;
             MultiThread.TaskRunTimer(() -> {
                 if (DeathTrigger != null) for (EnemyData enemyData : SpawnedList) {

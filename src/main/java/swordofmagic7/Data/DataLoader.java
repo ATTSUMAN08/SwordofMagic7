@@ -263,7 +263,7 @@ public class DataLoader {
                 mapData.Color = data.getString("Color");
                 mapData.Level = data.getInt("Level");
                 mapData.Safe = data.getBoolean("Safe");
-                mapData.ReqCombatPower = data.getDouble("ReqCombatPower", mapData.Level*15);
+                mapData.ReqCombatPower = data.getDouble("ReqCombatPower", mapData.Level*10);
                 if (data.isSet("Life.Mine")) {
                     for (String str : data.getStringList("Life.Mine")) {
                         String[] split = str.split(",");

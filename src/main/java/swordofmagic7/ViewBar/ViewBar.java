@@ -1,7 +1,9 @@
 package swordofmagic7.ViewBar;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import swordofmagic7.Classes.Classes;
@@ -18,7 +20,6 @@ import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.AFKTimePeriod;
 import static swordofmagic7.SomCore.plugin;
 
 public class ViewBar {
@@ -61,6 +62,82 @@ public class ViewBar {
         for (Player player : players) {
             if (player.isOnline()) {
                 playerData(player).ViewBar.resetSideBar(key);
+            }
+        }
+    }
+
+    public static void setBossBarTimer(Set<Player> players, String text, float progress) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.BossBarTimer.name(Component.text(text));
+                playerData.BossBarTimer.progress(Math.min(Math.max(progress, 0), 1));
+                player.showBossBar(playerData.BossBarTimer);
+            }
+        }
+    }
+
+    public static void resetBossBarTimer(Set<Player> players) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                player.hideBossBar(playerData.BossBarTimer);
+            }
+        }
+    }
+
+    public static void setBossBarOther(Set<Player> players, String text, float progress) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.BossBarOther.name(Component.text(text));
+                playerData.BossBarOther.progress(Math.min(Math.max(progress, 0), 1));
+                player.showBossBar(playerData.BossBarOther);
+            }
+        }
+    }
+
+    public static void resetBossBarOther(Set<Player> players) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                player.hideBossBar(playerData.BossBarOther);
+            }
+        }
+    }
+
+    public static void setBossBarOverrideTargetInfo(Set<Player> players, LivingEntity entity) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.overrideTargetEntity = entity;
+            }
+        }
+    }
+
+    public static void resetBossBarOverrideTargetInfo(Set<Player> players) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.overrideTargetEntity = null;
+            }
+        }
+    }
+
+    public static void setBossBarOtherTargetInfo(Set<Player> players, LivingEntity entity) {
+        if (entity != null) for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.otherTargetEntity = entity;
+            }
+        }
+    }
+
+    public static void resetBossBarOtherTargetInfo(Set<Player> players) {
+        for (Player player : players) {
+            if (player.isOnline()) {
+                PlayerData playerData = playerData(player);
+                playerData.otherTargetEntity = null;
             }
         }
     }
@@ -127,8 +204,6 @@ public class ViewBar {
                                 "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );
-
-                        if (playerData.isAFK()) player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "§cAFK中はPvPModeが有効になります", 0, AFKTimePeriod*20+1, 0);
 
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));

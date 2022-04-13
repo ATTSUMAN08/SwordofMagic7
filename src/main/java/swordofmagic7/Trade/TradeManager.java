@@ -64,11 +64,14 @@ public class TradeManager {
                             return;
                         } else if (args[1].equalsIgnoreCase("sendRune") || args[1].equalsIgnoreCase("sR")) {
                             if (playerData.RuneInventory.getList().size() > index) {
-                                RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
-                                targetData.RuneInventory.addRuneParameter(rune);
-                                playerData.RuneInventory.removeRuneParameter(index);
-                                player.sendMessage(targetData.getNick() + "§aさんに§e[" + rune.Display + "§e]§aを送りました");
-                                target.sendMessage(playerData.getNick() + "§aさんから§e[" + rune.Display + "§e]§aが送られてきました");
+                                int toIndex = args.length == 4 ? Integer.parseInt(args[3]) : index;
+                                for (int i = index; i < toIndex; i++) {
+                                    RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
+                                    targetData.RuneInventory.addRuneParameter(rune);
+                                    playerData.RuneInventory.removeRuneParameter(index);
+                                    player.sendMessage(targetData.getNick() + "§aさんに§e[" + rune.Display + "§e]§aを送りました");
+                                    target.sendMessage(playerData.getNick() + "§aさんから§e[" + rune.Display + "§e]§aが送られてきました");
+                                }
                                 playerData.viewUpdate();
                                 targetData.viewUpdate();
                                 playSound(player, SoundList.Tick);

@@ -172,7 +172,7 @@ public class EnemyData {
         }
 
         MaxHealth = mobData.Health * multiply2 * statusMultiply(StatusParameter.MaxHealth);
-        ATK = mobData.ATK * multiply * statusMultiply(StatusParameter.ATK);
+        ATK = mobData.ATK * Math.pow(multiply, 1.1) * statusMultiply(StatusParameter.ATK);
         DEF = mobData.DEF * multiply3 * statusMultiply(StatusParameter.DEF);
         ACC = mobData.ACC * multiply * statusMultiply(StatusParameter.ACC);
         EVA = mobData.EVA * multiply * statusMultiply(StatusParameter.EVA);
@@ -396,10 +396,8 @@ public class EnemyData {
             Set<String> IPCheck = new HashSet<>();
             for (Player player : Involved) {
                 if (player.isOnline()) {
-                    String ip = player.getAddress().toString();
-                    if (IPCheck.contains(ip)) return;
-                    if (!IgnoreIPList.contains(player.getUniqueId().toString())) IPCheck.add(ip);
                     PlayerData playerData = playerData(player);
+                    double percentMultiply = playerData.isAFK() ? 0.3 : 1;
                     playerData.statistics.enemyKill(mobData);
                     Classes classes = playerData.Classes;
                     List<ClassData> classList = new ArrayList<>();
@@ -417,10 +415,12 @@ public class EnemyData {
                     }
                     List<String> Holo = new ArrayList<>();
                     Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp/ReqExp(Level)*100) + "%)");
-                    if (!isDefenseBattle) {
+                    String ip = getIP(player.getAddress());
+                    if (!isDefenseBattle && !IPCheck.contains(ip)) {
+                        if (!IgnoreIPList.contains(player.getUniqueId().toString())) IPCheck.add(ip);
                         for (DropItemData dropData : DropItemTable) {
                             if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                                if (random.nextDouble() <= dropData.Percent) {
+                                if (random.nextDouble() <= dropData.Percent * percentMultiply) {
                                     int amount;
                                     if (dropData.MaxAmount != dropData.MinAmount) {
                                         amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
@@ -442,7 +442,7 @@ public class EnemyData {
                         }
                         for (DropRuneData dropData : mobData.DropRuneTable) {
                             if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                                if (random.nextDouble() <= dropData.Percent) {
+                                if (random.nextDouble() <= dropData.Percent * percentMultiply) {
                                     RuneParameter runeParameter = dropData.runeParameter.clone();
                                     runeParameter.Quality = random.nextDouble();
                                     runeParameter.Level = Level;
@@ -477,7 +477,7 @@ public class EnemyData {
                         if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
                             PetData petData = getPetData(mobData.Id);
                             if (petData.BossPet) {
-                                if (random.nextDouble() <= 0.0005) {
+                                if (random.nextDouble() <= 0.0005 * percentMultiply) {
                                     PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
                                     playerData.PetInventory.addPetParameter(pet);
                                     TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
@@ -485,7 +485,7 @@ public class EnemyData {
                                     Client.BroadCast(text);
                                 }
                             } else {
-                                if (random.nextDouble() <= 0.01) {
+                                if (random.nextDouble() <= 0.01 * percentMultiply) {
                                     PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
                                     playerData.PetInventory.addPetParameter(pet);
                                     Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);

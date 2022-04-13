@@ -56,6 +56,7 @@ public class RuneShop {
 
     public void RuneMenuView() {
         Inventory inv = decoInv(RuneShopMenuDisplay, 1);
+        inv.setMaxStackSize(128);
         inv.setItem(0, RuneShopMenu_RuneCrash);
         inv.setItem(1, RuneShopMenu_RuneEquip);
         inv.setItem(2, RuneShopMenu_RuneUpgrade);

@@ -16,17 +16,15 @@ import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.ViewBar.ViewBar;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.Function.VectorUp;
 import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class TarnetB3 {
     private static final Location EventLocation = new Location(world,3372.5, 80, 1497);
@@ -77,12 +75,10 @@ public class TarnetB3 {
                     while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
+                        Function.setPlayDungeonQuest(Players, true);
                         Time--;
-                        List<String> textData = new ArrayList<>();
-                        textData.add(decoText("§c§lダンジョンクエスト"));
-                        textData.add(decoLore("ボス体力") + Enemy.viewHealthString());
-                        textData.add(decoLore("残り時間") + Time + "秒");
-                        ViewBar.setSideBar(Players, sidebarId, textData);
+                        ViewBar.setBossBarOverrideTargetInfo(Players, Enemy.entity);
+                        ViewBar.setBossBarTimer(Players, "§e残り時間 " + Time + "秒", (float) Time/StartTime);
                         Set<Player> deBuff = new HashSet<>(list);
                         Players2 = new HashSet<>(list);
                         deBuff.removeIf(player -> player.getLocation().distance(OverLocation[selectOver]) < useRadius);
@@ -102,7 +98,9 @@ public class TarnetB3 {
                             radiusMessage("§e[過充填区域]§aが切り替わりました");
                         }
                     }
-                    ViewBar.resetSideBar(Players, sidebarId);
+                    ViewBar.resetBossBarTimer(Players);
+                    ViewBar.resetBossBarOverrideTargetInfo(Players);
+                    Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
                         MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").getLocation());
                     } else {

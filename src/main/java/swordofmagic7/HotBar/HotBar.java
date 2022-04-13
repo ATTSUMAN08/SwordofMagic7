@@ -184,12 +184,14 @@ public class HotBar {
                         HotBarData[slot] = HotBarData[i];
                         slot++;
                     }
+                    sendMessage(player, "§eスキルスロット§aを保存しました");
                 } else if (args[0].equalsIgnoreCase("load")) {
                     int slot = index * 32;
                     for (int i = 0; i < 32; i++) {
                         HotBarData[i] = HotBarData[slot];
                         slot++;
                     }
+                    sendMessage(player, "§eスキルスロット§aを読み込みしました");
                 }
                 playerData.viewUpdate();
             } else {

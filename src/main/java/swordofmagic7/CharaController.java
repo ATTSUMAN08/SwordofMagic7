@@ -12,7 +12,7 @@ public class CharaController {
 
     static void WallKick(Player player) {
         PlayerData playerData = playerData(player);
-        if (!playerData.EffectManager.isCrowdControl()) {
+        if (!playerData.EffectManager.isCrowdControl) {
             Location loc = player.getLocation();
             loc.setPitch(0);
             Material type = loc.clone().add(loc.getDirection().setY(0.1).normalize()).getBlock().getType();
@@ -30,7 +30,7 @@ public class CharaController {
 
     static void Strafe(Player player) {
         PlayerData playerData = playerData(player);
-        if (!playerData.EffectManager.isCrowdControl()) {
+        if (!playerData.EffectManager.isCrowdControl) {
             if (!player.isFlying() && inAir(player) && playerData.Strafe > 0) {
                 playerData.Strafe--;
                 double y;

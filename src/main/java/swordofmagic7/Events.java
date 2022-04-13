@@ -37,6 +37,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Npc.NpcMessage;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
+import swordofmagic7.Party.PartyManager;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
@@ -52,7 +53,6 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.EnemyTable;
-import static swordofmagic7.Mob.MobManager.isEnemy;
 import static swordofmagic7.SomCore.isEventServer;
 import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -72,7 +72,7 @@ public class Events implements Listener {
             IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
             if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (player.getAddress().toString().split(":")[0].equals(event.getAddress().toString().split(":")[0])) {
+                    if (getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
                         event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
                         return;
                     }
@@ -96,6 +96,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         playerData(player).load();
         PlayerList.load();
+        PartyManager.rejoinCheck(player);
     }
 
     @EventHandler
@@ -107,6 +108,7 @@ public class Events implements Listener {
             pet.cage();
         }
         if (playerData.Party != null) {
+            PartyManager.PartyRejoin.put(player.getUniqueId().toString(), playerData.Party.Display);
             playerData.Party.Quit(player);
         }
         if (playerData.hologram != null) playerData.hologram.delete();
@@ -370,7 +372,6 @@ public class Events implements Listener {
             case FALL, HOT_FLOOR, FIRE_TICK -> {
                 victim.setFireTicks(0);
                 event.setCancelled(true);
-                return;
             }
             case LAVA, DROWNING -> {
                 if (victim instanceof Player player) {
@@ -379,19 +380,17 @@ public class Events implements Listener {
                 }
             }
             case VOID -> {
+                event.setCancelled(true);
                 if (victim instanceof Player player) {
                     spawnPlayer(player);
                 }
             }
+            case SUFFOCATION -> {
+                event.setCancelled(true);
+            }
             default -> event.setCancelled(true);
         }
-        if (isEnemy(victim)) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
-                if (MobManager.isEnemy(victim)) {
-                    MobManager.EnemyTable(victim.getUniqueId()).delete();
-                }
-            }
-        }
+
     }
 
     @EventHandler

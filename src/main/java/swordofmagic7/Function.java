@@ -28,6 +28,8 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,9 +38,9 @@ import java.util.function.Predicate;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.SomCore.random;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class Function {
 
@@ -93,6 +95,12 @@ public final class Function {
                 ;
 
     }
+    public static void setVelocity(LivingEntity entity, Vector vector) {
+        if (!EffectManager.hasEffect(entity, EffectType.PainBarrier)) {
+
+        }
+    }
+
     public static String decoText(String str) {
         int flame = 6 - Math.round(str.length() / 2f);
         StringBuilder deco = new StringBuilder("===");
@@ -182,7 +190,9 @@ public final class Function {
     }
 
     public static Inventory decoInv(String name, int size) {
-        return Bukkit.createInventory(null, size*9, name);
+        Inventory inv = Bukkit.createInventory(null, size*9, name);
+        inv.setMaxStackSize(127);
+        return inv;
     }
 
     public static Inventory decoAnvil(String name) {
@@ -337,6 +347,22 @@ public final class Function {
         String text = String.format(format, i);
         if (i >= 0) return text;
         else return "-" + text;
+    }
+
+    public static void setPlayDungeonQuest(Set<Player> Players, boolean bool) {
+        for (Player player : Players) {
+            if (player.isOnline()) {
+                playerData(player).isPlayDungeonQuest = bool;
+            }
+        }
+    }
+
+    public static String getIP(InetAddress address) {
+        return address.toString().split(":")[0];
+    }
+
+    public static String getIP(InetSocketAddress address) {
+        return address.toString().split(":")[0];
     }
 
     public static void sendMessage(Player player, String message) {

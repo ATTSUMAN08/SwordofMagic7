@@ -5,6 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
@@ -28,6 +29,14 @@ public class EffectManager {
     public EnemyData enemyData;
     public boolean isRunnable = true;
 
+    public boolean isCrowdControl = false;
+    public boolean isSkillsNotAvailable = false;
+    public boolean isInvincible = false;
+    public boolean isSlow = false;
+    public boolean isBlind = false;
+
+    private static final int period = 5;
+
     public HashMap<EffectType, EffectData> Effect = new HashMap<>();
 
     public EffectManager(LivingEntity entity, EffectOwnerType ownerType, Object ownerData) {
@@ -40,18 +49,27 @@ public class EffectManager {
         }
         MultiThread.TaskRun(() -> {
             while (isRunnable && plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
-                    || (ownerType.isEnemy() && enemyData.isAlive())
-                    || (ownerType.isPet() && petParameter.player.isOnline()))) {
+                || (ownerType.isEnemy() && enemyData.isAlive())
+                || (ownerType.isPet() && petParameter.player.isOnline()))) {
+                isCrowdControl = false;
+                isSkillsNotAvailable = false;
+                isInvincible = false;
+                isSlow = false;
+                isBlind = false;
                 if (Effect.size() > 0) {
                     for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
-                        effect.getValue().time -= 2;
+                        effect.getValue().time -= period;
                         EffectType effectType = effect.getKey();
-                        if (entity != null) {
-
-                        }
-                        if (ownerType == EffectOwnerType.Player) {
+                        if (effectType.isCrowdControl()) isCrowdControl = true;
+                        if (effectType.isSkillsNotAvailable()) isSkillsNotAvailable = true;
+                        if (effectType.isInvincible()) isInvincible = true;
+                        if (effectType.isSlow()) isSlow = true;
+                        if (effectType.isBlind()) isBlind = true;
+                        if (entity instanceof Player player) {
                             if (effectType == EffectType.Indulgendia && Math.floorMod(effect.getValue().time, 20) == 0) {
-                                playerData.changeHealth(effect.getValue().doubleData[0]);
+                                double health = effect.getValue().doubleData[0];
+                                if (playerData(player).PvPMode) health /= Damage.PvPHealDecay;
+                                playerData.changeHealth(health);
                             }
                         }
                         if (effect.getValue().time <= 0 || effect.getValue().stack < 1) {
@@ -61,22 +79,11 @@ public class EffectManager {
                 }
                 if (entity != null) {
                     MultiThread.TaskRunSynchronized(() -> {
-                        boolean isCrowdControl = false;
-                        boolean isSlow = false;
-                        boolean isBlind = false;
-                        for (EffectType effectType : Effect.keySet()) {
-                            if (effectType.isCrowdControl()) isCrowdControl = true;
-                            if (effectType.isSlow()) isSlow = true;
-                            if (effectType.isBlind()) isBlind = true;
-                        }
                         if (isCrowdControl) {
                             if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return;
                             if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
                                 entity.removePotionEffect(PotionEffectType.SLOW);
-                                entity.removePotionEffect(PotionEffectType.JUMP);
                                 entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 2, 255, false, false, false));
-                                entity.setVelocity(Function.VectorDown);
                             }
                         }
                         if (isSlow) {
@@ -88,19 +95,24 @@ public class EffectManager {
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
                         }
                     }, "EffectManagerTimer");
+                    MultiThread.TaskRun(() -> {
+                        if (isCrowdControl) for (int i = 0; i < period; i++) {
+                            entity.setVelocity(Function.VectorDown);
+                            MultiThread.sleepTick(1);
+                        }
+                    }, "EffectManagerCrowdControl");
                 }
-                MultiThread.sleepTick(2);
+                MultiThread.sleepTick(period);
             }
         }, "EffectManager");
     }
 
-    public void stunVelocity(LivingEntity entity, EffectType effectType) {
-        if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return;
-        entity.setVelocity(Function.VectorDown);
-    }
-
     public boolean hasEffect(EffectType effect) {
         return Effect.containsKey(effect);
+    }
+
+    public boolean addEffect(EffectType effectType) {
+        return addEffect(effectType, 1);
     }
 
     public boolean addEffect(EffectType effectType, int time) {
@@ -225,20 +237,6 @@ public class EffectManager {
         return false;
     }
 
-    public boolean isCrowdControl() {
-        for (EffectType effectType : Effect.keySet()) {
-            if (effectType.isCrowdControl()) return true;
-        }
-        return false;
-    }
-
-    public boolean isSkillsNotAvailable() {
-        for (EffectType effectType : Effect.keySet()) {
-            if (effectType.isSkillsNotAvailable()) return true;
-        }
-        return false;
-    }
-
     public boolean isInvincible() {
         return hasEffect(EffectType.Invincible) || hasEffect(EffectType.Stop);
     }
@@ -261,12 +259,12 @@ public class EffectManager {
     }
 
     public static void addEffectMessage(Player player, LivingEntity entity, EffectType effectType) {
-        addEffectMessage(player, entity, effectType.Display, effectType.color());
+        if (playerData(player).EffectLog) addEffectMessage(player, entity, effectType.Display, effectType.color());
     }
 
     public static void addEffectMessage(Player player, LivingEntity entity, String Display, String color) {
         if (player == null) return;
-        player.sendMessage(color + EffectManager.getOwnerName(entity) + "§aに" + color + "[" + Display + "]§aを付与しました");
-        if (entity instanceof Player target && player != entity) target.sendMessage(color + playerData(player).getNick() + "§aから" + color + "[" + Display + "]§aを付与されました");
+        if (playerData(player).EffectLog) player.sendMessage(color + EffectManager.getOwnerName(entity) + "§aに" + color + "[" + Display + "]§aを付与しました");
+        if (entity instanceof Player target && player != entity && !playerData(target).EffectLog) target.sendMessage(color + playerData(player).getNick() + "§aから" + color + "[" + Display + "]§aを付与されました");
     }
 }

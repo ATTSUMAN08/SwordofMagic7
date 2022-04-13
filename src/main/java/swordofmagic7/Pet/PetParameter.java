@@ -18,6 +18,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.*;
+import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
@@ -206,7 +207,9 @@ public class PetParameter implements Cloneable {
         SkillData basicTamer = getSkillData("BasicTamer");
         if (playerData.Skill.hasSkill("BasicTamer")) {
             Multiply *= 1+basicTamer.ParameterValue(1)/100;
-            if (playerData.Equipment.isEquip(EquipmentSlot.MainHand)) Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
+            if (playerData.Equipment.isEquip(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == EquipmentCategory.Baton) {
+                Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
+            }
         }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
         MaxHealth = (petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);
@@ -216,7 +219,7 @@ public class PetParameter implements Cloneable {
         ATK = (petData.ATK * Multiply + EquipmentStatus(StatusParameter.ATK)) * MultiplyStatus(StatusParameter.ATK);
         DEF = (petData.DEF * Multiply + EquipmentStatus(StatusParameter.DEF)) * MultiplyStatus(StatusParameter.DEF);
         HLP = (petData.HLP * Multiply + EquipmentStatus(StatusParameter.HLP)) * MultiplyStatus(StatusParameter.HLP);
-        ACC = (petData.ACC * Multiply + EquipmentStatus(StatusParameter.ACC)) * MultiplyStatus(StatusParameter.ACC);
+        ACC = (petData.ACC * Multiply + EquipmentStatus(StatusParameter.ACC)) * MultiplyStatus(StatusParameter.ACC) * 3;
         EVA = (petData.EVA * Multiply + EquipmentStatus(StatusParameter.EVA)) * MultiplyStatus(StatusParameter.EVA);
         CriticalRate = (petData.CriticalRate * Multiply + EquipmentStatus(StatusParameter.CriticalRate)) * MultiplyStatus(StatusParameter.CriticalRate);
         CriticalResist = (petData.CriticalResist * Multiply + EquipmentStatus(StatusParameter.CriticalResist)) * MultiplyStatus(StatusParameter.CriticalResist);

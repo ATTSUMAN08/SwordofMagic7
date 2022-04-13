@@ -1,5 +1,6 @@
 package swordofmagic7.Skill;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -134,7 +135,7 @@ public class Skill {
                     if (hasSkill(skillData.Id)) {
                         if (SkillStack(skillData) > 0) {
                             if (playerData.Status.Mana >= skillData.Mana) {
-                                if (!playerData.EffectManager.isSkillsNotAvailable()) {
+                                if (!playerData.EffectManager.isSkillsNotAvailable) {
                                     Tutorial.tutorialTrigger(player, 7);
                                     if (skillData.SkillType.isPetSkill()) {
                                         if (playerData.getPetSelect() == null) {
@@ -271,17 +272,23 @@ public class Skill {
                                             case "DivineMight" -> oracle.DivineMight(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
+                                            player.showBossBar(playerData.BossBarSkillProgress);
                                             if (skillData.CastTime > 0) {
                                                 for (int i = 0; i < skillData.CastTime; i++) {
-                                                    SkillCastProgress = (float) SkillProcess.SkillCastTime / skillData.CastTime;
-                                                    player.sendTitle(" ", "§e" + String.format("%.0f", SkillCastProgress * 100) + "%", 0, 10, 0);
                                                     SkillProcess.SkillCastTime++;
+                                                    SkillCastProgress = (float) SkillProcess.SkillCastTime / skillData.CastTime;
+                                                    playerData.BossBarSkillProgress.name(Component.text("§e" + String.format("%.0f", SkillCastProgress * 100) + "%"));
+                                                    playerData.BossBarSkillProgress.progress(Math.min(Math.max(SkillCastProgress, 0), 1));
                                                     MultiThread.sleepTick(1);
                                                 }
                                             } else {
                                                 MultiThread.sleepTick(1);
                                                 SkillCastProgress = 1f;
                                             }
+                                            playerData.BossBarSkillProgress.name(Component.text("§e硬直中"));
+                                            MultiThread.sleepTick(skillData.RigidTime);
+                                            player.hideBossBar(playerData.BossBarSkillProgress);
+                                            playerData.BossBarSkillProgress.progress(0);
                                         }, "CastTime");
                                         playerData.changeMana(-skillData.Mana);
                                         useStack(skillData);

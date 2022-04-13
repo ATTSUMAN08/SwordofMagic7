@@ -84,6 +84,14 @@ public class Equipment {
                 reqText.add("§aレベルが足りません §c[要求:" + param.itemEquipmentData.ReqLevel + ",現在:" + playerData.Level + "]");
                 req = true;
             }
+            /*
+            for (RuneParameter rune : param.itemEquipmentData.Rune) {
+                if (playerData.Level < rune.Level) {
+                    reqText.add("§e装着ルーン§aが§eキャラレベル§aを超えているため§e装備§aできません §c[要求:" + rune.Level + ",現在:" + playerData.Level + "]");
+                    req = true;
+                }
+            }
+             */
             if (req) {
                 for (String msg : reqText) {
                     player.sendMessage(msg);

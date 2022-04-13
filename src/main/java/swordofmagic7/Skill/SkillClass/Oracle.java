@@ -152,7 +152,7 @@ public class Oracle {
             int minTime = skillData.ParameterValueInt(0)*20;
             double multiTime = skillData.ParameterValue(1);
 
-            MultiThread.sleepMillis(skillData.CastTime);
+            MultiThread.sleepTick(skillData.CastTime);
 
             double radius = skillData.ParameterValue(1);
             ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 30);
