@@ -184,13 +184,13 @@ public class Status {
                             MultiplyStatusAdd(statusParam, param.Value / 100);
                         }
                     }
-                    if (param.Display.equalsIgnoreCase("物理与ダメージ")) {
+                    if (param.Display.equalsIgnoreCase("物理与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
                         DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100);
-                    } else if (param.Display.equalsIgnoreCase("魔法与ダメージ")) {
+                    } if (param.Display.equalsIgnoreCase("魔法与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
                         DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100);
-                    } else if (param.Display.equalsIgnoreCase("物理被ダメージ耐性")) {
+                    } if (param.Display.equalsIgnoreCase("物理被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
                         DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100);
-                    } else if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性")) {
+                    } if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
                         DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
                     }
                 }
