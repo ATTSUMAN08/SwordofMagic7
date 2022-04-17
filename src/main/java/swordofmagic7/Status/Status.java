@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static swordofmagic7.Attribute.AttributeType.*;
+import static swordofmagic7.Data.DataBase.Som7Premium;
+import static swordofmagic7.Data.DataBase.Som7VIP;
 
 public class Status {
     private final Player player;
@@ -285,6 +287,11 @@ public class Status {
             player.setWalkSpeed((float) Math.min(Movement, 1));
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
         });
+
+        String prefix = "";
+        if (player.hasPermission(Som7VIP)) prefix = "§e[V]";
+        if (player.hasPermission(Som7Premium)) prefix = "§b[P]";
+        playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
     }
 
     public double finalStatus(StatusParameter param) {

@@ -194,7 +194,7 @@ public class Griffia {
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i < CastTime) {
-                    ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), TargetCandle, 2, 3);
+                    ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), TargetCandle, 2, 0.5);
                 } else {
                     ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 30);
                     final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 64);

@@ -4,18 +4,27 @@ public class EffectData {
     public EffectType effectType;
     public int time;
     public int stack = 1;
-    public double[] doubleData;
+    public Object[] objectData;
     public boolean flags = false;
 
     public double getDouble(int i) {
-        return doubleData[i];
+        return (double) objectData[i];
     }
 
     public int getInt(int i) {
-        return Math.toIntExact(Math.round(doubleData[i]));
+        return (int) objectData[i];
+    }
+
+    public Object getObject(int i) {
+        return objectData[i];
+    }
+
+    public void addStack(int addStack) {
+        stack = Math.min(stack + addStack, effectType.MaxStack);
     }
 
     EffectData(EffectType effectType, int time) {
+        this.effectType = effectType;
         this.time = time;
     }
 }

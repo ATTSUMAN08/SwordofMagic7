@@ -58,9 +58,32 @@ public class TitleMenu {
                     slot++;
                     index++;
                 }
+                if (MaxTitleSlot <= index) {
+                    slot = (int) Math.ceil(slot/9f)*9;
+                    for (i = 0; i < 9; i++) {
+                        if (slot > 52) break;
+                        itemStacks[slot] = ItemFlame;
+                        slot++;
+                    }
+                    for (TitleData titleData : HiddenTitleDataList) {
+                        if (slot > 52) break;
+                        if (playerData.titleManager.TitleList.contains(titleData.Id)) {
+                            itemStacks[slot] = titleData.view(playerData.titleManager.TitleList.contains(titleData.Id));
+                            TitleArray[slot] = titleData;
+                            slot++;
+                            index++;
+                            if (nonSlotVertical(slot)) {
+                                itemStacks[slot] = BrownItemFlame;
+                                slot++;
+                                index++;
+                            }
+                        }
+                    }
+                    break;
+                }
             }
             if (Scroll > 0) itemStacks[8] = UpScrollItem;
-            if (MaxTitleSlot/9-5 > 0) itemStacks[53] = DownScrollItem;
+            if ((MaxTitleSlot-index+HiddenTitleDataList.size()+9) > 0) itemStacks[53] = DownScrollItem;
             player.getOpenInventory().getTopInventory().setContents(itemStacks);
             playSound(player, SoundList.Tick);
         }
@@ -68,7 +91,7 @@ public class TitleMenu {
 
     public void TitleMenuClick(InventoryView view, ItemStack currentItem, int Slot) {
         if (equalInv(view, TitleMenuDisplay)) {
-            if (currentItem != null) {
+            if (currentItem != null && !equalItem(currentItem, ItemFlame)) {
                 if (!nonSlotVertical(Slot) && TitleArray[Slot] != null) {
                     playerData.titleManager.setTitle(TitleArray[Slot]);
                 } else if (equalItem(currentItem, UpScrollItem)) {

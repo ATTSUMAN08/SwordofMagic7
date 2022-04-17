@@ -4,6 +4,7 @@ import java.util.List;
 
 public enum EffectType {
     Stun("スタン", false, "移動できなくなります"),
+    Fixed("固定", false, "座標が固定されます"),
     Silence("沈黙", false, "スキルが使えなくなります"),
     Freeze("氷結", false, "[スタン]と[沈黙]を合わせた効果です"),
     Rigidity("硬直", EffectRank.Impossible, false, false, "様々なアクションが実行できなくなります", true),
@@ -25,6 +26,14 @@ public enum EffectType {
     Unconscious("無自覚", EffectRank.Impossible, false, "「自分では、自分が狂っていることはわからないものです」", false),
     Decay("崩壊", EffectRank.Impossible, false, "「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", false),
     CantLook("見堪", EffectRank.Impossible, false, "「ときに同調圧力は、文明を滅ぼします」", false),
+    IronHook("アイアンフック", EffectRank.Impossible, false, "[氷結]と同じ状態になります", false),
+    Keelhauling("キールハウリング", EffectRank.Impossible, false, "[氷結]と[固定]を合わせた効果です", false),
+    SprinkleSand("スプリンクルサンド", false, "命中が下がります", true),
+    BreakBrick("ブレイクブリック", false, "クリティカル発生が下がります", true),
+    Scary("恐怖", false, "怖いです", false),
+    Gevura("ゲブラ", false, "被ダメージ耐性が減少します", true),
+    ExcessiveTreatment("過剰な治療", false, "「過剰な治療は時に死ぬ招くこともあります」", false),
+    UnpleasantOmen("周りが気になります", false, "「どこかから嫌な気配を感じます」", false),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動職度が上昇します", true),
@@ -64,7 +73,19 @@ public enum EffectType {
     CrossGuardCounter("クロスガード:カウンター", true, "[物理与ダメージ]が上昇します", true),
     ArcaneEnergy("アーケインエナジー", true, "スキルのマナ消費が0になります", false),
     Foretell("フォアテル", true, "被ダメージ耐性増加が上昇します", true),
-    Brutality("フォアテル", true, true, "魔法与ダメ－ジが上昇し、持続中はマナが消費されます", true),
+    Brutality("ブルタリティ", true, true, "魔法与ダメ－ジが上昇し、持続中はマナが消費されます", true),
+    CoveringFire("カバーリングファイア", true, "通常攻撃が強化されます"),
+    JollyRoger("ジャリーロジャー", true, "与ダメージが上昇します", true),
+    JollyRogerCombo("ジャリーロジャー:コンボ", 100, true, "エネミーを攻撃するとジャリーロジャー:コンボが増えます"),
+    Bully("ブリー", 20, true, "回避が上昇します"),
+    Rampage("ランページ", true, "回避が減少します\n防御力が減少します\n被ダメージが上昇します\n与ダメージが上昇します", true),
+    Nachash("ナハシ", true, "攻撃時に体力を回復します"),
+    Sevenfold("セブンフォールド", true, "被ダメージ耐性が上昇します\n被弾すると解除されます", true),
+    Ayinsof("アインソフ", true, "最大体力が上昇します", true),
+    SubzeroShield("サブゼロシールド", true, "[氷結]にかからなくなります", false),
+    BeakMask("ビークマスク", true, "[スタン]と[スロー]以外の一般解除可能デバフにかからなくなります", false),
+    HealingFactor("ヒーリングファクター", true, "持続的に体力を回復します\n付与時以上には回復しません", false),
+    Modafinil("モダフィニル", true, "移動速度が上昇します", true),
     ;
 
     public String Display;
@@ -162,8 +183,12 @@ public enum EffectType {
         this.isUpdateStatus = isUpdateStatus;
     }
 
+    public boolean isFixed() {
+        return this == Fixed || this == Keelhauling;
+    }
+
     public boolean isFreeze() {
-        return this == Freeze || this == Stop || this == PeaceMaker || this == Concussion;
+        return this == Freeze || this == Stop || this == PeaceMaker || this == Concussion || this == IronHook || this == Keelhauling;
     }
 
     public boolean isCrowdControl() {

@@ -127,7 +127,7 @@ public class KingSlime {
             int i = 0;
             Familiar.removeIf(EnemyData::isDead);
             while (Familiar.size() < maxMob && i < maxMob) {
-                MobManager.mobSpawn(mobData, Manager.enemyData.Level, entity.getLocation());
+                MultiThread.TaskRunSynchronized(() -> MobManager.mobSpawn(mobData, Manager.enemyData.Level, entity.getLocation()));
                 i++;
                 MultiThread.sleepTick(20);
             }

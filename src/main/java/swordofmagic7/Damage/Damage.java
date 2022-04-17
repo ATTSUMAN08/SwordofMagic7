@@ -121,10 +121,17 @@ public final class Damage {
             ACC = playerData.Status.ACC;
             CriticalRate = playerData.Status.CriticalRate;
             CriticalMultiply = playerData.Status.CriticalMultiply;
-            Multiply = playerData.Status.DamageCauseMultiply.get(damageCause);
+            Multiply = playerData.Status.DamageCauseMultiply.getOrDefault(damageCause, Resistance);
             attackerLevel = playerData.Level;
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
+            if (attackerEffectManager.hasEffect(EffectType.JollyRogerCombo)) {
+                PlayerData JollyRogerPlayerData = (PlayerData) attackerEffectManager.getData(EffectType.JollyRogerCombo).getObject(0);
+                JollyRogerPlayerData.Skill.corsair.JollyRogerCombo++;
+            }
+            if (attackerEffectManager.hasEffect(EffectType.Nachash)) {
+                playerData.changeHealth(attackerEffectManager.getData(EffectType.Nachash).getDouble(0));
+            }
             playerData.setTargetEntity(victim);
         } else if (MobManager.isEnemy(attacker)) {
             EnemyData enemyData = MobManager.EnemyTable(attacker.getUniqueId());
@@ -132,7 +139,7 @@ public final class Damage {
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
-            Multiply = enemyData.DamageCauseMultiply.get(damageCause);
+            Multiply = enemyData.DamageCauseMultiply.getOrDefault(damageCause, Multiply);
             attackerLevel = enemyData.Level;
             attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
@@ -140,7 +147,7 @@ public final class Damage {
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
-            Multiply = petParameter.DamageCauseMultiply.get(damageCause);
+            Multiply = petParameter.DamageCauseMultiply.getOrDefault(damageCause, Multiply);
             attackerLevel = petParameter.Level;
             petParameter.DecreaseStamina(1, 1);
             attackerEffectManager = petParameter.getEffectManager();
@@ -153,15 +160,29 @@ public final class Damage {
             EVA = playerData.Status.EVA;
             CriticalResist = playerData.Status.CriticalResist;
             victimLevel = playerData.Level;
-            Resistance = playerData.Status.DamageCauseResistance.get(damageCause);
+            Resistance = playerData.Status.DamageCauseResistance.getOrDefault(damageCause, Resistance);
+            if (player.isInsideVehicle()) {
+                DEF = 0;
+                EVA = 0;
+                CriticalResist = 0;
+                Resistance = 1;
+            }
             victimEffectManager = playerData.EffectManager;
+            if (victimEffectManager.hasEffect(EffectType.Sevenfold)) {
+                victimEffectManager.removeEffect(EffectType.Sevenfold);
+            }
+            if (victimEffectManager.hasEffect(EffectType.SubzeroShield)) {
+                if (random.nextDouble() < victimEffectManager.getData(EffectType.SubzeroShield).getDouble(0)) {
+                    attackerEffectManager.addEffect(EffectType.Freeze, 20);
+                }
+            }
         } else if (MobManager.isEnemy(victim)) {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
             if (enemyData == null) return;
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
-            Resistance = enemyData.DamageCauseResistance.get(damageCause);
+            Resistance = enemyData.DamageCauseResistance.getOrDefault(damageCause, Resistance);
             victimLevel = enemyData.Level;
             victimEffectManager = enemyData.effectManager;
             enemyData.HitCount++;
@@ -170,7 +191,7 @@ public final class Damage {
             DEF = petParameter.DEF;
             EVA = petParameter.EVA;
             CriticalResist = petParameter.CriticalResist;
-            Resistance = petParameter.DamageCauseResistance.get(damageCause);
+            Resistance = petParameter.DamageCauseResistance.getOrDefault(damageCause, Resistance);
             victimLevel = petParameter.Level;
             petParameter.DecreaseStamina(3, 1);
             victimEffectManager = petParameter.getEffectManager();
@@ -231,6 +252,7 @@ public final class Damage {
                 }
             } else {
                 randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation(), HoloView);
+                if (victimEffectManager.hasEffect(EffectType.Bully)) victimEffectManager.getData(EffectType.Bully).addStack(1);
             }
         }
         if (victimLevel - attackerLevel > 30) {

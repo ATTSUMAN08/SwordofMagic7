@@ -94,13 +94,11 @@ public class Assassin {
             int hitRate = 20;
             int time = skillData.ParameterValueInt(0)*20;
             MultiThread.TaskRun(() -> {
-                int i = 0;
-                while (i < time) {
+                for (int i = 0; i <= time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 10);
                     for (LivingEntity entity : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
                         EffectManager.addEffect(entity, EffectType.HallucinationSmoke, effectTime, EffectManager.hasEffect(entity, EffectType.HallucinationSmoke) ? null : player);
                     }
-                    i += hitRate;
                     MultiThread.sleepTick(hitRate);
                 }
             }, "HallucinationSmoke");

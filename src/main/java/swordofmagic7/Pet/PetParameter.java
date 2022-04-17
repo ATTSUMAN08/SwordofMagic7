@@ -269,7 +269,7 @@ public class PetParameter implements Cloneable {
         MultiThread.TaskRunSynchronized(() -> {
             target = null;
             List<String> cancel = new ArrayList<>();
-            if (playerData.Level < MaxLevel - 30) {
+            if (playerData.Level < Level - 10) {
                 cancel.add("§aレベルが足りないため召喚出来ません");
             }
             if (cancel.size() > 0) {

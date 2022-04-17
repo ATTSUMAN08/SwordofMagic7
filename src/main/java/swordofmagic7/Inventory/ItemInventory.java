@@ -19,8 +19,8 @@ import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
-    public final int MaxSlot = 1000;
-    private List<ItemParameterStack> List = new ArrayList<>();
+    public final int MaxSlot = 300;
+    private final List<ItemParameterStack> List = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Category;
     public boolean SortReverse = false;
@@ -62,7 +62,7 @@ public class ItemInventory extends BasicInventory {
     public synchronized void viewInventory() {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
-        int slot = 9;
+        int slot;
         List.removeIf(stack -> stack.Amount <= 0);
         try {
             if (List.size() > 0) switch (Sort) {
@@ -74,23 +74,29 @@ public class ItemInventory extends BasicInventory {
         } catch (Exception e) {
             sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました" + e.getMessage());
         }
-        for (int i = index; i < index+24; i++) {
+        int i = index;
+        for (slot = 9; i < slot+24; slot++) {
             if (i < List.size()) {
-                ItemParameterStack stack = List.get(i);
-                ItemStack item = stack.itemParameter.viewItem(stack.Amount, playerData.ViewFormat());
-                ItemMeta meta = item.getItemMeta();
-                List<String> Lore = new ArrayList<>(meta.getLore());
-                Lore.add(itemStack);
-                Lore.add(decoLore("個数") + stack.Amount);
-                Lore.add(decoLore("売値") + stack.itemParameter.Sell * stack.Amount);
-                Lore.add("§8SlotID:" + i);
-                meta.setLore(Lore);
-                item.setItemMeta(meta);
-                player.getInventory().setItem(slot, item);
+                while (i < List.size()) {
+                    ItemParameterStack stack = List.get(i);
+                    if (wordSearch == null || stack.itemParameter.Id.contains(wordSearch)) {
+                        ItemStack item = stack.itemParameter.viewItem(stack.Amount, playerData.ViewFormat());
+                        ItemMeta meta = item.getItemMeta();
+                        List<String> Lore = new ArrayList<>(meta.getLore());
+                        Lore.add(itemStack);
+                        Lore.add(decoLore("個数") + stack.Amount);
+                        Lore.add(decoLore("売値") + stack.itemParameter.Sell * stack.Amount);
+                        Lore.add("§8SlotID:" + i);
+                        meta.setLore(Lore);
+                        item.setItemMeta(meta);
+                        player.getInventory().setItem(slot, item);
+                        break;
+                    }
+                    i++;
+                }
             } else {
                 player.getInventory().setItem(slot, AirItem);
             }
-            slot++;
             if (slot == 17 || slot == 26) slot++;
         }
     }

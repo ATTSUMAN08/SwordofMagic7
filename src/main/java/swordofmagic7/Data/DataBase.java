@@ -45,6 +45,8 @@ public final class DataBase {
     public static final String DataBasePath = "M:\\Minecraft\\Server\\SwordofMagic7\\DataBase\\";
     public static final String format = "%.3f";
     public static final int MaxStackAmount = 100;
+    public static final String Som7VIP = "som7.VIP";
+    public static final String Som7Premium = "som7.Premium";
     public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 1200.5, 100, 0.5, 0, 0);
     public static final ItemStack AirItem = new ItemStack(Material.AIR);
     public static ItemStack FlameItem(int i) {
@@ -91,6 +93,7 @@ public final class DataBase {
     public static final HashMap<String, MakeData> MakeDataList = new HashMap<>();
     public static final HashMap<Integer, String> MakeGUIMap = new HashMap<>();
     public static final HashMap<String, TitleData> TitleDataList = new HashMap<>();
+    public static final List<TitleData> HiddenTitleDataList = new ArrayList<>();
     public static final HashMap<Integer, String> TitleGUIMap = new HashMap<>();
     public static final HashMap<String, AlchemyData> AlchemyDataList = new HashMap<>();
     public static final HashMap<Integer, String> AlchemyShopMap = new HashMap<>();

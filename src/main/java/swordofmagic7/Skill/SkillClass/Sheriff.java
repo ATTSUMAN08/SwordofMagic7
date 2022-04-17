@@ -92,7 +92,7 @@ public class Sheriff {
                 MultiThread.sleepMillis(millis);
             }
 
-            for (int i = 0; i < time/hitRate; i++) {
+            for (int i = 0; i <= time/hitRate; i++) {
                 Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
                 Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, count, 1);
                 ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);

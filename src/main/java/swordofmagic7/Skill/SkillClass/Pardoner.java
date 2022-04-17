@@ -57,7 +57,7 @@ public class Pardoner {
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "Indulgendia");
+        }, skillData.Id);
     }
 
     public void DiscernEvil(SkillData skillData) {

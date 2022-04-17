@@ -88,7 +88,7 @@ public class Highlander {
     public void Crown(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            int time = skillData.ParameterValueInt(2);
+            int time = skillData.ParameterValueInt(2)*20;
             ParticleData particleData = new ParticleData(Particle.SWEEP_ATTACK, 0.05f);
 
             MultiThread.sleepTick(skillData.CastTime);
@@ -96,7 +96,7 @@ public class Highlander {
             Ray ray = rayLocationEntity(player.getEyeLocation(), 5, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
                 ParticleManager.RandomVectorParticle(particleData, ray.HitEntity.getEyeLocation(), 30);
-                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0) / 100, 5);
+                Damage.makeDamage(player, ray.HitEntity, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Concussion, time, player);
             }
             playSound(player, SoundList.AttackSweep);

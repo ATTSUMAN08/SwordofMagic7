@@ -9,7 +9,6 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.MultiThread.MultiThread;
-import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -42,11 +41,9 @@ public class Alchemist {
     }
 
     public static String AlchemyShopDisplay = "アルケミーショップ";
-    public static ShopData AlchemyShopData;
 
     public void AlchemyView() {
         MultiThread.TaskRunSynchronized(() -> {
-            AlchemyShopData = getShopData(AlchemyShopDisplay);
             Inventory inv = decoInv(AlchemyShopDisplay, 6);
             player.openInventory(inv);
             playSound(player, SoundList.MenuOpen);

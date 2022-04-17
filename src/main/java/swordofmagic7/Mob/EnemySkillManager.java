@@ -34,6 +34,7 @@ public class EnemySkillManager {
     public KingSlime kingSlime;
     public Exta exta;
     public Vanoset vanoset;
+    public LibraryGovernor libraryGovernor;
 
     public EnemySkillManager(EnemyData enemyData) {
         this.enemyData = enemyData;
@@ -45,6 +46,7 @@ public class EnemySkillManager {
             case "キングスライム" -> kingSlime = new KingSlime(this);
             case "エクスタ" -> exta = new Exta(this);
             case "ヴァノセト" -> vanoset = new Vanoset(this);
+            case "リブラリーガバナー" -> libraryGovernor = new LibraryGovernor(this);
         }
     }
 
@@ -123,6 +125,11 @@ public class EnemySkillManager {
             case "Decay" -> vanoset.Decay();
             case "CantLook" -> vanoset.CantLook();
             case "JustHistory" -> vanoset.JustHistory(30);
+
+            case "ToBow" -> libraryGovernor.ToBow();
+            case "ItsGlory" -> libraryGovernor.ItsGlory();
+            case "ExcessiveTreatment" -> libraryGovernor.ExcessiveTreatment();
+            case "UnpleasantOmen" -> libraryGovernor.UnpleasantOmen();
 
 
         }

@@ -59,7 +59,7 @@ public class Priest {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
 
-            MultiThread.sleepMillis(skillData.CastTime);
+            MultiThread.sleepTick(skillData.CastTime);
 
             double radius = skillData.ParameterValue(1);
             ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 30);
@@ -79,7 +79,7 @@ public class Priest {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
 
-            MultiThread.sleepMillis(skillData.CastTime);
+            MultiThread.sleepTick(skillData.CastTime);
 
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {

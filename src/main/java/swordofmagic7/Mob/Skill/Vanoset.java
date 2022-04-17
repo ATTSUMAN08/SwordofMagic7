@@ -59,6 +59,15 @@ public class Vanoset {
                     }
                     MultiThread.sleepTick(5);
                 }
+                if (Altar.isAlive()) {
+                    ParticleData particleData = new ParticleData(Particle.EXPLOSION_HUGE);
+                    for (Player player : PlayerList.getNearNonDead(location, 96)) {
+                        particleData.spawn(player.getEyeLocation());
+                        PlayerData.playerData(player).dead();
+
+                        sendMessage(player, "§c祭壇が崩壊しました...", SoundList.Explosion);
+                    }
+                }
             }, "SoulSyncAlterAndBoss");
             MultiThread.TaskRun(() -> {
                 boolean potential = true;

@@ -49,7 +49,6 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Data.PlayerData.playerDataList;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Party.PartyManager.partyCommand;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -120,12 +119,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT));
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                playerData(player).load();
-            }
-        }, 5);
-
         for (WarpGateParameter warp : WarpGateList.values()) {
             warp.start();
         }
@@ -143,13 +136,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
-            for (PlayerData playerData : new HashSet<>(PlayerData.playerDataList().values())) {
-                Player player = playerData.player;
-                if (player.isOnline()) {
-                    playerData.saveCloseInventory();
-                } else {
-                    playerData.remove();
-                }
+            PlayerData.getPlayerData().entrySet().removeIf(entry -> !entry.getKey().isOnline());
+            for (PlayerData playerData : PlayerData.getPlayerData().values()) {
+                playerData.saveCloseInventory();
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
             HologramSet.removeIf(Hologram::isDeleted);
@@ -180,6 +169,12 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         createTouchHologram("§e§l鍛冶場", new Location(world, 1149.5, 97.75, 17.5), (Player player) -> playerData(player).Menu.Smith.SmithMenuView());
         createTouchHologram("§e§l料理場", new Location(world, 1159.5, 94.5, 66.5), (Player player) -> playerData(player).Menu.Cook.CookMenuView());
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                playerData(player).load();
+            }
+        }, 20);
     }
 
     @Override
@@ -340,9 +335,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("loadedPlayer")) {
                     player.sendMessage("Loaded PlayerData: ");
-                    HashMap<Player, PlayerData> list = playerDataList();
-                    for (Map.Entry<Player, PlayerData> loopData : list.entrySet()) {
-                        player.sendMessage(loopData.getKey().getName() + ": " + loopData.getKey());
+                    for (Map.Entry<Player, PlayerData> loopData : PlayerData.getPlayerData().entrySet()) {
+                        player.sendMessage(loopData.getKey().getUniqueId() + ": " + loopData.getValue().player.getName());
                     }
                     return true;
                 }  else if (cmd.getName().equalsIgnoreCase("getExp")) {
@@ -437,6 +431,11 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         playerData.Classes.classSlot[Integer.parseInt(args[0])] = getClassData(args[1]);
                     } catch (Exception e) {
                         player.sendMessage("/classSelect <slot> <class>");
+                    }
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("skillCTReset")) {
+                    for (String skillData : playerData.Skill.SkillCoolTime.keySet()) {
+                        playerData.Skill.resetSkillCoolTime(skillData);
                     }
                     return true;
                 }
@@ -827,16 +826,30 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("runeFilter")) {
                 try {
-                    if (args[0].equalsIgnoreCase("Quality")) {
+                    if (args[0].equalsIgnoreCase("Quality") || args[0].equalsIgnoreCase("Q")) {
                         double value = Double.parseDouble(args[1])/100;
                         if (0 <= value && value <= 100) {
                             playerData.RuneQualityFilter = value;
                             sendMessage(player, "§eルーンフィルター[品質] §b-> §a" + value*100 + "%");
                             return true;
                         }
+                    } else if (args[0].equalsIgnoreCase("Id")) {
+                        String runeId = args[1];
+                        if (DataBase.getRuneList().containsKey(runeId)) {
+                            if (playerData.RuneIdFilter.contains(runeId)) {
+                                playerData.RuneIdFilter.remove(runeId);
+                            } else {
+                                playerData.RuneIdFilter.add(runeId);
+                            }
+                            sendMessage(player, "§eルーンフィルター[ID:" + runeId + "] §b-> §a" + (playerData.RuneIdFilter.contains(runeId) ? "§b有効" : "§c無効"));
+                            return true;
+                        } else {
+                            sendMessage(player, "§a存在しない§eルーン§aです");
+                        }
                     }
                 } catch (Exception ignored) {}
                 sendMessage(player, "§e/runeFilter Quality <0~100>");
+                sendMessage(player, "§e/runeFilter Id <RuneId>");
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("entities")) {
                 sendMessage(player, "EntityCount: " + player.getWorld().getEntityCount());
@@ -884,18 +897,35 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     sendMessage(player, "§e/setFastUpgrade <1~25>");
                 }
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("cast")) {
+                try {
+                    int slot = Integer.parseInt(args[0])-1;
+                    if (0 <= slot && slot <= 31) {
+                        playerData.HotBar.use(slot);
+                    } else {
+                        sendMessage(player, "§e/cast <1~32>");
+                    }
+                } catch (Exception e) {
+                    sendMessage(player, "§e/cast <1~32>");
+                }
+                return true;
             }
         }
         return false;
     }
 
+    private static final Set<Player> nextSpawnPlayer = new HashSet<>();
     public static void spawnPlayer(Player player) {
-        MultiThread.TaskRunSynchronized(() -> {
-            MapList.get("Alden").enter(player);
-            player.setFlying(false);
-            player.setGravity(true);
-            player.teleportAsync(SpawnLocation);
-        }, "spawnPlayer");
+        if (!nextSpawnPlayer.contains(player)) {
+            nextSpawnPlayer.add(player);
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                MapList.get("Alden").enter(player);
+                player.setFlying(false);
+                player.setGravity(true);
+                player.teleportAsync(SpawnLocation);
+                nextSpawnPlayer.remove(player);
+            }, 1, "spawnPlayer");
+        }
     }
 
     public static HashMap<BukkitTask, String> BukkitTaskTag = new HashMap<>();

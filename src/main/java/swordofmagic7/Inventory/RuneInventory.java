@@ -18,7 +18,7 @@ import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class RuneInventory extends BasicInventory {
-    public final int MaxSlot = 1000;
+    public final int MaxSlot = 300;
     private final java.util.List<RuneParameter> List = new ArrayList<>();
 
     public RuneInventory(Player player, PlayerData playerData) {
@@ -94,19 +94,26 @@ public class RuneInventory extends BasicInventory {
         } catch (Exception e) {
             sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
         }
-        for (int i = index; i < index+24; i++) {
+        int i = index;
+        for (slot = 9; i < slot+24; slot++) {
             if (i < List.size()) {
-                ItemStack item = List.get(i).viewRune(playerData.ViewFormat());
-                ItemMeta meta = item.getItemMeta();
-                List<String> Lore = new ArrayList<>(meta.getLore());
-                Lore.add("§8SlotID:" + i);
-                meta.setLore(Lore);
-                item.setItemMeta(meta);
-                player.getInventory().setItem(slot, item);
+                while (i < List.size()) {
+                    RuneParameter rune = List.get(i);
+                    if (wordSearch == null || rune.Id.contains(wordSearch)) {
+                        ItemStack item = rune.viewRune(playerData.ViewFormat());
+                        ItemMeta meta = item.getItemMeta();
+                        List<String> Lore = new ArrayList<>(meta.getLore());
+                        Lore.add("§8SlotID:" + i);
+                        meta.setLore(Lore);
+                        item.setItemMeta(meta);
+                        player.getInventory().setItem(slot, item);
+                        break;
+                    }
+                    i++;
+                }
             } else {
                 player.getInventory().setItem(slot, AirItem);
             }
-            slot++;
             if (slot == 17 || slot == 26) slot++;
         }
     }

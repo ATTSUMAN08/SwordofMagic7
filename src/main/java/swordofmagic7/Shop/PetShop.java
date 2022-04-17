@@ -59,8 +59,10 @@ public class PetShop {
         playerData.setView(ViewInventoryType.PetInventory, false);
         int slot = 0;
         for (PetParameter pet : PetSell) {
-            inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
-            slot++;
+            if (pet != null) {
+                inv.setItem(slot, pet.viewPet(playerData.ViewFormat()));
+                slot++;
+            }
         }
         return inv;
     }

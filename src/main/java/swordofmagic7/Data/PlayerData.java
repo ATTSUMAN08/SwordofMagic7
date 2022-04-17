@@ -10,7 +10,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -84,12 +83,20 @@ public class PlayerData {
             return playerData.get(player);
         }
         Log("§c" + player.getName() + "§c, " + player.getUniqueId() + " is Offline or Npc", true);
-        return new PlayerData(null);
-    }
-    public static HashMap<Player, PlayerData> playerDataList() {
-        return playerData;
+        return playerData.get(player);
     }
 
+    public static void remove(Player player) {
+        playerData.remove(player);
+    }
+
+    public void remove() {
+        playerData.remove(player);
+    }
+
+    public static HashMap<Player, PlayerData> getPlayerData() {
+        return playerData;
+    }
 
     public final Player player;
     public swordofmagic7.Inventory.ItemInventory ItemInventory;
@@ -156,6 +163,7 @@ public class PlayerData {
     public boolean NaturalMessage = true;
     public Location logoutLocation = null;
     public double RuneQualityFilter = 0d;
+    public Set<String> RuneIdFilter = new HashSet<>();
     public double HealthRegenDelay = 0d;
     public int AFKTime = 0;
     public boolean interactTick = false;
@@ -170,7 +178,10 @@ public class PlayerData {
 
     PlayerData(Player player) {
         this.player = player;
-        if (player == null) return;
+        if (player == null) {
+            Log("PlayerDataのクラス生成にエラーが発生しました");
+            return;
+        }
         ItemInventory = new ItemInventory(player, this);
         HotBar = new HotBar(player, this);
         RuneInventory = new RuneInventory(player, this);
@@ -494,18 +505,16 @@ public class PlayerData {
         return String.format("%.3f", (float)Exp/ ReqExp(Level) * 100);
     }
 
-    public void remove() {
-        playerData.remove(player);
-    }
-
     public boolean isPvPModeNonMessage() {
         if (PvPMode) sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.Nope);
         return PvPMode;
     }
 
     public void saveCloseInventory() {
-        CloseInventory(player);
-        Bukkit.getScheduler().runTaskLater(plugin, this::save, 2);
+        MultiThread.TaskRunSynchronized(() -> {
+            CloseInventory(player);
+            Bukkit.getScheduler().runTaskLater(plugin, this::save, 2);
+        });
     }
 
     public void addPlayerLevel(int addLevel) {
@@ -533,7 +542,8 @@ public class PlayerData {
                 Exp -= ReqExp(Level);
                 addLevel++;
             }
-            if (Level >= 50) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv50"), 1);
+            if (Level >= 60) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv60"), 1);
+            else if (Level >= 50) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv50"), 1);
             else if (Level >= 30) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv30"), 1);
             else if (Level >= 10) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv10"), 1);
             if (Level < MaxLevel) addPlayerLevel(addLevel);
@@ -548,9 +558,6 @@ public class PlayerData {
             player.sendMessage(Tutorial.TutorialNonSave);
             return;
         }
-        if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
-            player.closeInventory();
-        }
         File playerFile = new File(DataBasePath, "PlayerData/" + player.getUniqueId() + ".yml");
         if (!playerFile.exists()) {
             try {
@@ -561,11 +568,9 @@ public class PlayerData {
         }
         FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
 
-
-
         if (statistics.playTime < data.getInt("Statistics.PlayTime")) {
             player.sendMessage("§eロールバック§aを検知したため§eデータ保護§aのため§bロビ－§aに転送しました");
-            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId());
+            Log("§cロールバック検知: §f" + player.getName() + ", " + player.getUniqueId(), true);
             isNonSave = true;
             if (player.isOnline()) teleportServer(player, "Lobby");
             return;
@@ -629,7 +634,8 @@ public class PlayerData {
         data.set("Setting.PlayMode", PlayMode);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.NaturalMessage", NaturalMessage);
-        data.set("Setting.RuneQualityFilter", RuneQualityFilter);
+        data.set("Setting.RuneFilter.Quality", RuneQualityFilter);
+        data.set("Setting.RuneFilter.Id", RuneIdFilter);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -762,7 +768,9 @@ public class PlayerData {
             PlayMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
             NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
-            RuneQualityFilter = data.getDouble("Setting.RuneQualityFilter",0d);
+            RuneQualityFilter = data.getDouble("Setting.RuneFilter.Quality",0d);
+            RuneIdFilter = new HashSet<>(data.getStringList("Setting.RuneFilter.Id"));
+            RuneIdFilter.removeIf(runeId -> !DataBase.getRuneList().containsKey(runeId));
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));
@@ -772,6 +780,7 @@ public class PlayerData {
             PetInventory.SortReverse = data.getBoolean("Setting.Inventory.PetInventorySortReverse",false);
 
             titleManager.TitleList = new HashSet<>(data.getStringList("Title.List"));
+            titleManager.TitleList.removeIf(title -> !TitleDataList.containsKey(title));
             titleManager.Title = TitleDataList.getOrDefault(data.getString("Title.Select"), DefaultTitle);
 
             ActiveTeleportGate = data.getStringList("ActiveTeleportGate");
@@ -1055,15 +1064,15 @@ public class PlayerData {
 
     public int deadTime = 0;
     public void dead() {
-        final Location LastDeadLocation = player.getLocation();
-        for (Player player : PlayerList.getNear(LastDeadLocation, 48)) {
-            sendMessage(player, getNick() + "§aさんが§cダウン§aしました...");
-        }
-        MultiThread.TaskRunSynchronized(() -> {
-            if (!isDead) {
+        if (!isDead) {
+            isDead = true;
+            final Location LastDeadLocation = player.getLocation();
+            for (Player player : PlayerList.getNear(LastDeadLocation, 48)) {
+                sendMessage(player, getNick() + "§aさんが§cダウン§aしました...");
+            }
+            MultiThread.TaskRunSynchronized(() -> {
                 statistics.DownCount++;
                 logoutLocation = player.getWorld().getSpawnLocation();
-                isDead = true;
                 player.setGameMode(GameMode.SPECTATOR);
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
                 deadTime = 1200;
@@ -1107,7 +1116,7 @@ public class PlayerData {
                         }
                     }
                 }.runTaskTimer(plugin, 0, 15);
-            }
-        }, "PlayerDead");
+            }, "PlayerDead");
+        }
     }
 }

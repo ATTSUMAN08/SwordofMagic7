@@ -59,6 +59,7 @@ public class Novaha4 {
                         Enemy.delete();
                         MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("Novaha3_to_Novaha4").getLocation());
                     }
+                    Enemy.skillManager.vanoset.Altar.delete();
                     Players.clear();
                     Start = false;
                 }, EventID);

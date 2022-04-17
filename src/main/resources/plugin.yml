@@ -100,6 +100,10 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  skillCTReset:
+    permission: som7.developer
+    description: description
+    usage: /<command>
 
   gm:
     permission: som7.builder
@@ -303,5 +307,20 @@ commands:
     description: description
     usage: /<command>
   setFastUpgrade:
+    description: description
+    usage: /<command>
+  cast:
+    description: description
+    usage: /<command>
+  itemSearch:
+    aliases: is
+    description: description
+    usage: /<command>
+  runeSearch:
+    aliases: rs
+    description: description
+    usage: /<command>
+  petSearch:
+    aliases: ps
     description: description
     usage: /<command>

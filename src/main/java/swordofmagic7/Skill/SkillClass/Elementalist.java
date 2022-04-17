@@ -82,16 +82,14 @@ public class Elementalist {
             int time = (int) Math.round(skillData.ParameterValue(1)*20);
             double freezePercent = skillData.ParameterValue(3)/100;
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time/hitRate; i++) {
+                for (int i = 0; i <= time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin.clone().add(0, 6, 0), radius / 2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     MultiThread.TaskRun(() -> {
                         for (LivingEntity victim : victims) {
                             ParticleManager.LineParticle(particleData, victim.getLocation(), victim.getEyeLocation().clone().add(0, 3, 0), 1, 10);
                             Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
-                            if (random.nextDouble() < freezePercent) {
-                                EffectManager.addEffect(victim, EffectType.Freeze, 20, player);
-                            }
+                            if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, 20, player);
                             MultiThread.sleepTick(2);
                         }
                     }, "MagicCircleDataHeilTick");
@@ -194,7 +192,7 @@ public class Elementalist {
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
             final int time = (int) Math.round(skillData.ParameterValue(1)*20);
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time/hitRate; i++) {
+                for (int i = 0; i <= time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 2);

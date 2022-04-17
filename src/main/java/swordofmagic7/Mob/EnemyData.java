@@ -172,7 +172,7 @@ public class EnemyData {
         }
 
         MaxHealth = mobData.Health * multiply2 * statusMultiply(StatusParameter.MaxHealth);
-        ATK = mobData.ATK * Math.pow(multiply, 1.1) * statusMultiply(StatusParameter.ATK);
+        ATK = mobData.ATK * Math.pow(multiply, 1.11) * statusMultiply(StatusParameter.ATK);
         DEF = mobData.DEF * multiply3 * statusMultiply(StatusParameter.DEF);
         ACC = mobData.ACC * multiply * statusMultiply(StatusParameter.ACC);
         EVA = mobData.EVA * multiply * statusMultiply(StatusParameter.EVA);
@@ -319,7 +319,7 @@ public class EnemyData {
                             }
                         }
                     }
-                    if (!isDefenseBattle && !mobData.enemyType.isBoss()) {
+                    if (!isDefenseBattle && !mobData.enemyType.isBoss() && !mobData.NoAI && !mobData.Invisible) {
                         if (PlayerList.getNear(entity.getLocation(), 64).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                             delete();
                         }
@@ -397,7 +397,7 @@ public class EnemyData {
             for (Player player : Involved) {
                 if (player.isOnline()) {
                     PlayerData playerData = playerData(player);
-                    double percentMultiply = playerData.isAFK() ? 0.3 : 1;
+                    double percentMultiply = 1; //playerData.isAFK() ? 0.3 : 1;
                     playerData.statistics.enemyKill(mobData);
                     Classes classes = playerData.Classes;
                     List<ClassData> classList = new ArrayList<>();
@@ -415,9 +415,7 @@ public class EnemyData {
                     }
                     List<String> Holo = new ArrayList<>();
                     Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp/ReqExp(Level)*100) + "%)");
-                    String ip = getIP(player.getAddress());
-                    if (!isDefenseBattle && !IPCheck.contains(ip)) {
-                        if (!IgnoreIPList.contains(player.getUniqueId().toString())) IPCheck.add(ip);
+                    if (!isDefenseBattle) {
                         for (DropItemData dropData : DropItemTable) {
                             if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
                                 if (random.nextDouble() <= dropData.Percent * percentMultiply) {
@@ -429,7 +427,8 @@ public class EnemyData {
                                     }
                                     playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
                                     Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                                    if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) ItemGetLog(player, dropData.itemParameter, amount);
+                                    if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare()))
+                                        ItemGetLog(player, dropData.itemParameter, amount);
                                     if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
                                         TextView text = new TextView(playerData.getNick() + "§aさんが");
                                         text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
@@ -446,18 +445,18 @@ public class EnemyData {
                                     RuneParameter runeParameter = dropData.runeParameter.clone();
                                     runeParameter.Quality = random.nextDouble();
                                     runeParameter.Level = Level;
-                                    if (mobData.enemyType.isBoss() || playerData.RuneQualityFilter <= runeParameter.Quality) {
-                                        playerData.RuneInventory.addRuneParameter(runeParameter);
-                                        Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                                        if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
-                                            player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
-                                        }
-                                    } else {
+                                    if (!mobData.enemyType.isBoss() && (playerData.RuneQualityFilter > runeParameter.Quality || playerData.RuneIdFilter.contains(runeParameter.Id))) {
                                         playerData.RuneShop.addRuneCrashed(runeParameter);
                                         playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
                                         Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
                                         if (playerData.DropLog.isItem()) {
                                             ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
+                                        }
+                                    } else {
+                                        playerData.RuneInventory.addRuneParameter(runeParameter);
+                                        Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                                        if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
+                                            player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
                                         }
                                     }
                                 }
@@ -492,18 +491,20 @@ public class EnemyData {
                                 }
                             }
                         }
-                        playerData.viewUpdate();
-                        Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-                        MultiThread.TaskRunSynchronized(() -> {
-                            Hologram hologram = createHologram(loc);
-                            VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                            visibilityManager.setVisibleByDefault(false);
-                            visibilityManager.showTo(player);
-                            for (String holo : Holo) {
-                                hologram.appendTextLine(holo);
-                            }
-                            MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
-                        }, "EnemyKillRewardHolo");
+                        if (!playerData.isAFK()) {
+                            playerData.viewUpdate();
+                            Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
+                            MultiThread.TaskRunSynchronized(() -> {
+                                Hologram hologram = createHologram(loc);
+                                VisibilityManager visibilityManager = hologram.getVisibilityManager();
+                                visibilityManager.setVisibleByDefault(false);
+                                visibilityManager.showTo(player);
+                                for (String holo : Holo) {
+                                    hologram.appendTextLine(holo);
+                                }
+                                MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
+                            }, "EnemyKillRewardHolo");
+                        }
                     }
                 }
             }

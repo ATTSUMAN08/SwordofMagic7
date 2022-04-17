@@ -9,6 +9,8 @@ public class BasicInventory {
     public final Player player;
     public final PlayerData playerData;
 
+    public String wordSearch;
+
     int ScrollTick = 0;
 
     public BasicInventory(Player player, PlayerData playerData) {

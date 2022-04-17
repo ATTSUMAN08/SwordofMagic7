@@ -66,6 +66,11 @@ public class Skill {
     public final Sage sage;
     public final Highlander highlander;
     public final Oracle oracle;
+    public final Corsair corsair;
+    public final OutLaw outLaw;
+    public final Kabbalist kabbalist;
+    public final Cryomancer cryomancer;
+    public final PlagueDoctor plagueDoctor;
 
     public Alchemist getAlchemist() {
         return alchemist;
@@ -97,6 +102,11 @@ public class Skill {
         sage = new Sage(SkillProcess);
         highlander = new Highlander(SkillProcess);
         oracle = new Oracle(SkillProcess);
+        corsair = new Corsair(SkillProcess);
+        outLaw = new OutLaw(SkillProcess);
+        kabbalist = new Kabbalist(SkillProcess);
+        cryomancer = new Cryomancer(SkillProcess);
+        plagueDoctor = new PlagueDoctor(SkillProcess);
 
         alchemist = new Alchemist(SkillProcess);
 
@@ -270,6 +280,34 @@ public class Skill {
                                             case "DeathVerdict" -> oracle.DeathVerdict(skillData);
                                             case "Foretell" -> oracle.Foretell(skillData);
                                             case "DivineMight" -> oracle.DivineMight(skillData);
+                                            //コルセア
+                                            case "Brutality" -> corsair.Brutality(skillData);
+                                            case "CoveringFire" -> corsair.CoveringFire(skillData);
+                                            case "JollyRoger" -> corsair.JollyRoger(skillData);
+                                            case "IronHook" -> corsair.IronHook(skillData);
+                                            case "Keelhauling" -> corsair.Keelhauling(skillData);
+                                            //アウトロー
+                                            case "SprinkleSand" -> outLaw.SprinkleSand(skillData);
+                                            case "BreakBrick" -> outLaw.BreakBrick(skillData);
+                                            case "Bully" -> outLaw.Bully(skillData);
+                                            case "FireBlindly" -> outLaw.FireBlindly(skillData);
+                                            case "Rampage" -> outLaw.Rampage(skillData);
+                                            //カバリスト
+                                            case "Ayinsof" -> SkillProcess.PartyBuffApply(skillData, EffectType.Ayinsof, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "Sevenfold" -> SkillProcess.PartyBuffApply(skillData, EffectType.Sevenfold, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "Gevura" -> kabbalist.Gevura(skillData);
+                                            case "Nachash" -> kabbalist.Nachash(skillData);
+                                            case "TreeOfSepiroth" -> kabbalist.TreeOfSepiroth(skillData);
+                                            //クリオマンサー
+                                            case "FrostPillar" -> cryomancer.FrostPillar(skillData);
+                                            case "IceBlast" -> cryomancer.IceBlast(skillData);
+                                            case "IcePike" -> cryomancer.IcePike(skillData);
+                                            case "SubzeroShield" -> cryomancer.SubzeroShield(skillData);
+                                            case "SnowRolling" -> cryomancer.SnowRolling(skillData);
+                                            //プレイグドクター
+                                            case "BeakMask" -> SkillProcess.BuffApply(skillData, EffectType.BeakMask, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "Modafinil" -> SkillProcess.PartyBuffApply(skillData, EffectType.Modafinil, new ParticleData(Particle.ELECTRIC_SPARK), skillData.ParameterValueInt(0)*20);
+                                            case "HealingFactor" -> plagueDoctor.HealingFactor(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
                                             player.showBossBar(playerData.BossBarSkillProgress);

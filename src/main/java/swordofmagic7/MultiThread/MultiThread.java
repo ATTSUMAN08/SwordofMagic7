@@ -10,6 +10,7 @@ import static swordofmagic7.Function.Log;
 import static swordofmagic7.SomCore.plugin;
 
 public class MultiThread extends Thread {
+
     public static List<Thread> MultiThreads = new ArrayList<>();
     /*
     private static final List<MultiThreadRunnable> SynchronizedTaskList = new ArrayList<>();

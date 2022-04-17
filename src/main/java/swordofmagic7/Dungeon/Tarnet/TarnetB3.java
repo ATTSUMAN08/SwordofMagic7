@@ -88,7 +88,7 @@ public class TarnetB3 {
                         }
                         for (int i = 0; i < 4; i++) {
                             ParticleManager.CircleParticle(useParticle, OverLocation[selectOver], useRadius, 72);
-                            ParticleManager.LineParticle(useParticle, Enemy.entity.getEyeLocation(), OverLocation[selectOver], 1, 5);
+                            ParticleManager.LineParticle(useParticle, Enemy.entity.getEyeLocation(), OverLocation[selectOver], 2, 0.5);
                             MultiThread.sleepTick(5);
                         }
                         selectOverTimer++;

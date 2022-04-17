@@ -65,7 +65,7 @@ public class Doppelsoeldner {
                 MultiThread.sleepMillis(millis);
             }
 
-            for (int i = 0; i < time/hitRate; i++) {
+            for (int i = 0; i <= time; i+=hitRate) {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius/2, 15);
                 Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
                 Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 2);

@@ -272,7 +272,7 @@ public class Gathering {
                             }
                         }
                         int amount = playerData.LifeStatus.getMultiplyAmount(LifeType.Angler);
-                        double percent = combo/30f;
+                        double percent = hitData.Percent*multiply/30f;
                         while (percent >= 1) {
                             percent--;
                             amount++;

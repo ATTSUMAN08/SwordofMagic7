@@ -98,8 +98,8 @@ public class Oracle {
             }
 
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time; i++) {
-                    for (Player victim : PlayerList.getNear(origin, radius)) {
+                for (int i = 0; i <= time; i++) {
+                    for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
                         if (player != victim && playerData.Party != null && playerData.Party == playerData(victim).Party) {
                             EffectManager.addEffect(victim, EffectType.Invincible, 25, null);
                         }
@@ -124,7 +124,7 @@ public class Oracle {
             ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.AQUA, 1));
             particleData.setVector(Function.VectorDown);
 
-            for (int i = 0; i < skillData.CastTime; i++) {
+            for (int i = 0; i <= skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
             }

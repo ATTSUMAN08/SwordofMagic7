@@ -332,6 +332,14 @@ public class RuneShop {
                 if (Slot == AnvilUISlot[2]) {
                     if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
                         int mel = runeCost(RuneUpgradeCache[2]);
+                        int amount = 1;
+                        if (clickType.isShiftClick()) {
+                            while (RuneUpgradeCache[2].Quality < 0.7) {
+                                RuneUpgradeCache[2].Quality = Math.min(0.7, RuneUpgradeCache[2].Quality * 1.1 + 0.05);
+                                amount++;
+                                mel += runeCost(RuneUpgradeCache[2]);
+                            }
+                        }
                         if (playerData.Mel >= mel) {
                             playerData.Mel -= mel;
                             if (RuneUpgradeCache[2].Quality < maxQuality) {
@@ -340,7 +348,7 @@ public class RuneShop {
                                 playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[2]);
                                 RuneUpgradeCache[0] = null;
                             }
-                            playerData.ItemInventory.removeItemParameter(RunePowder, 1);
+                            playerData.ItemInventory.removeItemParameter(RunePowder, amount);
                             player.sendMessage("§e[ルーン]§aを§b研磨§aしました §c[-" + mel + "メル]");
                             playSound(player, SoundList.LevelUp);
                         } else {

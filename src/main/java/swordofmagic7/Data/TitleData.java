@@ -21,6 +21,7 @@ public class TitleData {
     public final List<String> Lore;
     public final int[] waitTick;
     public final int flame;
+    public boolean isHidden = false;
     public int attributePoint = 1;
 
     TitleData(String Id, Material icon, int amount, List<String> Data, List<String> Lore) {

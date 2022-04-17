@@ -65,7 +65,7 @@ public class TradeManager {
                         } else if (args[1].equalsIgnoreCase("sendRune") || args[1].equalsIgnoreCase("sR")) {
                             if (playerData.RuneInventory.getList().size() > index) {
                                 int toIndex = args.length == 4 ? Integer.parseInt(args[3]) : index;
-                                for (int i = index; i < toIndex; i++) {
+                                for (int i = index; i <= toIndex; i++) {
                                     RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
                                     targetData.RuneInventory.addRuneParameter(rune);
                                     playerData.RuneInventory.removeRuneParameter(index);

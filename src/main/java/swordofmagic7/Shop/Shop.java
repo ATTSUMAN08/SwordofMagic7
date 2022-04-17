@@ -197,6 +197,7 @@ public class Shop {
                 }
             } else if (ClickInventory == player.getInventory() && index > -1) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
+                if (stack == null) return;
                 ItemParameter item = stack.itemParameter;
                 if (clickType.isRightClick()) {
                     if (item.Category.isEquipment()) {

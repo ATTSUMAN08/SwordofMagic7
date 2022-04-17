@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -194,7 +195,7 @@ public class SkillProcess {
                     case ActGun -> {
                         normalAttackParticle(victim, Particle.CRIT, 0, 25);
                         playSound(player, GunAttack);
-                        normalAttackCoolTime = 10;
+                        normalAttackCoolTime = playerData.EffectManager.hasEffect(EffectType.DoubleGunStance) ? 7 : 10;
                     }
                     case Baton -> {
                         if (playerData.PetSummon.size() == 0) {
@@ -203,10 +204,12 @@ public class SkillProcess {
                     }
                     default -> sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.Nope);
                 }
+                double damageMultiply = 1;
+                if (playerData.EffectManager.hasEffect(EffectType.CoveringFire)) damageMultiply += playerData.EffectManager.getData(EffectType.CoveringFire).getDouble(0);
                 if (victim != null) {
                     switch (category) {
-                        case Blade, Mace -> Damage.makeDamage(player, victim, DamageCause.ATK, damageSource, 1, 1);
-                        case Rod, ActGun -> Damage.makeDamage(player, victim, DamageCause.MAT, damageSource, 1, 1);
+                        case Blade, Mace -> Damage.makeDamage(player, victim, DamageCause.ATK, damageSource, damageMultiply, 1);
+                        case Rod, ActGun -> Damage.makeDamage(player, victim, DamageCause.MAT, damageSource, damageMultiply, 1);
                     }
                 }
             }
@@ -225,6 +228,24 @@ public class SkillProcess {
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             SkillRigid(skillData);
-        }, "BuffApply");
+        }, skillData.Id);
+    }
+
+    public void PartyBuffApply(SkillData skillData, EffectType effectType, ParticleData particleData, int time) {
+        MultiThread.TaskRun(() -> {
+            skill.setCastReady(false);
+
+            MultiThread.sleepTick(skillData.CastTime);
+
+            Set<Player> players = new HashSet<>();
+            players.add(player);
+            if (playerData.Party != null) players.addAll(playerData.Party.Members);
+            for (Player player : players) {
+                EffectManager.addEffect(player, effectType, time, this.player);
+                ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
+                playSound(player, SoundList.Heal);
+            }
+            SkillRigid(skillData);
+        }, skillData.Id);
     }
 }

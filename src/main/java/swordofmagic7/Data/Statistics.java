@@ -163,7 +163,7 @@ public class Statistics {
             case "ヴァノセト" -> {
                 titleManager.addTitle("ヴァノセト討伐");
                 if ((Novaha4.StartTime- Novaha4.Time) < 300) titleManager.addTitle("ヴァノセト討伐2");
-                if ((Novaha4.StartTime- Novaha4.Time) < 150) titleManager.addTitle("ヴァノセト討伐3");
+                if ((Novaha4.StartTime- Novaha4.Time) < 130) titleManager.addTitle("ヴァノセト討伐Period");
             }
             case "訓練用ダミー" -> titleManager.addTitle("訓練用ダミー討伐");
         }

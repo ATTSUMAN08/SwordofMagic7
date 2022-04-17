@@ -68,14 +68,12 @@ public class Events implements Listener {
 
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        if (SomCore.isEventServer()) {
-            IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
-            if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
-                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
-                        return;
-                    }
+        IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
+        if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission(Som7Premium) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                    return;
                 }
             }
         }
@@ -84,9 +82,17 @@ public class Events implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (Bukkit.getOnlinePlayers().size() >= 50 && !isEventServer()) {
-            if (!player.hasPermission("som7.OverLogin")) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e別CH§aをお試しください");
+        int playerCount = Bukkit.getOnlinePlayers().size();
+        if (playerCount >= 45 && !isEventServer()) {
+            if (player.hasPermission("som7.OverLogin")) return;
+            if (playerCount <= 50 && player.hasPermission(Som7VIP)) return;
+            if (player.hasPermission(Som7Premium)) return;
+            if (playerCount <= 45) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§eVIP枠は開いています");
+            } else if (playerCount <= 50) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§ePremium枠は開いています");
+            }  else {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e全ての枠が埋まっています");
             }
         }
     }
@@ -94,7 +100,8 @@ public class Events implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        playerData(player).load();
+        PlayerData playerData = playerData(player);
+        playerData.load();
         PlayerList.load();
         PartyManager.rejoinCheck(player);
     }
@@ -451,6 +458,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
+            event.setCancelled(true);
             if (isHoldFishingRod(player)) {
                 playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
             }
@@ -464,7 +472,6 @@ public class Events implements Listener {
                 if (player.isSneaking()) playerData.HotBar.ScrollUp();
                 else playerData.HotBar.ScrollDown();
             }
-            event.setCancelled(true);
         }
     }
 

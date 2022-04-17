@@ -806,6 +806,8 @@ public class DataLoader {
                     int amount = data.getInt("Amount", 1);
                     TitleData titleData = new TitleData(fileName, icon, amount, data.getStringList("Display"), data.getStringList("Lore"));
                     titleData.attributePoint = data.getInt("AttributePoint", 1);
+                    titleData.isHidden = data.getBoolean("Hidden", false);
+                    if (titleData.isHidden) HiddenTitleDataList.add(titleData);
                     TitleDataList.put(fileName, titleData);
                 } else {
                     int slot = 0;

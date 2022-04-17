@@ -73,7 +73,7 @@ public class Novice {
             Set<LivingEntity> victims = RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
             skillProcess.SkillRigid(skillData);
-        }, "Vertical");
+        }, skillData.Id);
     }
 
     public void Rain(SkillData skillData, double radius) {
