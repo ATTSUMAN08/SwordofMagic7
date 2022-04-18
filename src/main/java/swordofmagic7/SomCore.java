@@ -28,6 +28,7 @@ import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
+import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.LifeStatus;
@@ -39,6 +40,7 @@ import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
 
@@ -133,6 +135,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         world.setGameRule(GameRule.NATURAL_REGENERATION, false);
         world.setGameRule(GameRule.MOB_GRIEFING, false);
         world.setGameRule(GameRule.DO_MOB_LOOT, false);
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setTime(6000);
 
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
@@ -222,6 +226,34 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 Log("/sendData <text>");
             }
             return true;
+        } else if (cmd.getName().equalsIgnoreCase("get")) {
+            PlayerData targetData = null;
+            if (args.length == 2) {
+                Player target = Bukkit.getPlayer(args[0]);
+                if (target.isOnline()) targetData = playerData(target);
+            } else if (args.length == 1 && sender instanceof Player player) {
+                targetData = playerData(player);
+            }
+            if (targetData != null) {
+                if (getItemList().containsKey(args[0])) {
+                    int amount = 1;
+                    if (args.length == 2) amount = Integer.parseInt(args[1]);
+                    ItemParameterStack stack = new ItemParameterStack(getItemParameter(args[0]));
+                    stack.Amount = amount;
+                    targetData.ItemInventory.addItemParameter(stack);
+                    targetData.ItemInventory.viewInventory();
+                    TextView textView = stack.itemParameter.getTextView(stack.Amount, targetData.ViewFormat());
+                    textView.addText("§aを§e獲得§aしました");
+                    sendMessage(targetData.player, textView.toComponent());
+                    return true;
+                }
+            } else {
+                sender.sendMessage("§c無効なプレイヤーです");
+            }
+            for (Map.Entry<String, ItemParameter> str : getItemList().entrySet()) {
+                sender.sendMessage(str.getKey());
+            }
+            return true;
         }
         if (sender instanceof Player player) {
             PlayerData playerData = playerData(player);
@@ -230,20 +262,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     MultiThread.TaskRun(() -> {
 
                     }, "RayTest");
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("get")) {
-                    if (args.length >= 1) {
-                        if (getItemList().containsKey(args[0])) {
-                            int amount = 1;
-                            if (args.length == 2) amount = Integer.parseInt(args[1]);
-                            playerData.ItemInventory.addItemParameter(getItemParameter(args[0]), amount);
-                            playerData.ItemInventory.viewInventory();
-                            return true;
-                        }
-                    }
-                    for (Map.Entry<String, ItemParameter> str : getItemList().entrySet()) {
-                        player.sendMessage(str.getKey());
-                    }
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("getRune")) {
                     if (args.length >= 1) {
@@ -296,6 +314,20 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     }
                     if (target.isOnline()) {
                         playerData(target).load();
+                    } else {
+                        player.sendMessage("§c無効なプレイヤーです");
+                    }
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("setNick")) {
+                    Player target = player;
+                    if (args.length == 2) {
+                        target = Bukkit.getPlayer(args[1]);
+                    }
+                    if (target.isOnline()) {
+                        PlayerData targetData = playerData(target);
+                        targetData.Nick = args[0];
+                        player.sendMessage(targetData.Nick);
+                        targetData.Status.StatusUpdate();
                     } else {
                         player.sendMessage("§c無効なプレイヤーです");
                     }
@@ -908,6 +940,36 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 } catch (Exception e) {
                     sendMessage(player, "§e/cast <1~32>");
                 }
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("itemSearch")) {
+                if (args.length == 1) {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[" + args[0] + "]", SoundList.Tick);
+                    playerData.ItemInventory.wordSearch = args[0];
+                } else {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[すべて]", SoundList.Tick);
+                    playerData.ItemInventory.wordSearch = null;
+                }
+                playerData.viewUpdate();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("runeSearch")) {
+                if (args.length == 1) {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[" + args[0] + "]", SoundList.Tick);
+                    playerData.RuneInventory.wordSearch = args[0];
+                } else {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[すべて]", SoundList.Tick);
+                    playerData.RuneInventory.wordSearch = null;
+                }
+                playerData.viewUpdate();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("petSearch")) {
+                if (args.length == 1) {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[" + args[0] + "]", SoundList.Tick);
+                    playerData.PetInventory.wordSearch = args[0];
+                } else {
+                    sendMessage(player, "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[すべて]", SoundList.Tick);
+                    playerData.PetInventory.wordSearch = null;
+                }
+                playerData.viewUpdate();
                 return true;
             }
         }

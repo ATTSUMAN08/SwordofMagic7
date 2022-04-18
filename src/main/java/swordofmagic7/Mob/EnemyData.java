@@ -333,7 +333,9 @@ public class EnemyData {
     public void addPriority(LivingEntity entity, double addPriority) {
         Priority.put(entity, Priority.getOrDefault(entity, 0d) + addPriority);
         if (entity instanceof Player player) Involved.add(player);
-        TotalDamageTable.put(entity, TotalDamageTable.getOrDefault(entity, 0d) + addPriority);
+    }
+    public void addDamage(LivingEntity entity, double damage) {
+        TotalDamageTable.put(entity, TotalDamageTable.getOrDefault(entity, 0d) + damage);
     }
 
     public void resetPriority() {
@@ -371,29 +373,37 @@ public class EnemyData {
                 Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
             }
             delete();
-            if (mobData.DamageRanking) {
-                List<Map.Entry<LivingEntity, Double>> entries = new ArrayList<>(TotalDamageTable.entrySet());
-                entries.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
-                List<String> message = new ArrayList<>();
-                message.add(decoText("ダメージランキング"));
-                int i = 1;
-                for (Map.Entry<LivingEntity, Double> entry : entries) {
-                    message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
-                    i++;
-                }
-                for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
-                    if (player.isOnline()) {
-                        sendMessage(player, message, SoundList.Tick);
-                    }
-                }
-            }
 
             int exp = (int) Math.floor(Exp);
             int classExp = (int) Math.floor(ClassExp);
             List<DropItemData> DropItemTable = new ArrayList<>(mobData.DropItemTable);
             DropItemTable.add(new DropItemData(getItemParameter("生命の雫"), 0.0001));
             DropItemTable.add(new DropItemData(getItemParameter("強化石"), 0.05));
-            Set<String> IPCheck = new HashSet<>();
+
+            if (mobData.DamageRanking) {
+                List<Map.Entry<LivingEntity, Double>> DamageTable = new ArrayList<>(TotalDamageTable.entrySet());
+                List<Map.Entry<LivingEntity, Double>> PriorityTable = new ArrayList<>(Priority.entrySet());
+                DamageTable.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
+                PriorityTable.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
+                List<String> message = new ArrayList<>();
+                message.add(decoText("ダメージランキング"));
+                message.add("§7・§eTOPヘイト値§7: §e" + PriorityTable.get(0).getKey().getName() + " §b-> §c" + String.format("%.0f", PriorityTable.get(0).getValue()));
+                int i = 1;
+                for (Map.Entry<LivingEntity, Double> entry : DamageTable) {
+                    message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
+                    if (i >= 5) break;
+                    i++;
+                }
+                for (Player player : PlayerList.getNear(entity.getLocation(), 32)) {
+                    if (player.isOnline()) {
+                        List<String> perMessage = new ArrayList<>(message);
+                        perMessage.add(decoText("個人戦績"));
+                        perMessage.add(decoLore("ダメージ") + "§c" + String.format("%.0f", TotalDamageTable.get(player)));
+                        perMessage.add(decoLore("ヘイト値") + "§c" + String.format("%.0f", Priority.get(player)));
+                        sendMessage(player, perMessage, SoundList.Tick);
+                    }
+                }
+            }
             for (Player player : Involved) {
                 if (player.isOnline()) {
                     PlayerData playerData = playerData(player);

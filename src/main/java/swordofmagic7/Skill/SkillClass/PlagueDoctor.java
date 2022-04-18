@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
@@ -51,10 +52,11 @@ public class PlagueDoctor {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            double heal = playerData.Status.HLP * skillData.ParameterValue(0) / 100;
+            double value = skillData.ParameterValue(0) / 100;
             int time = skillData.ParameterValueInt(1)*20;
             int hitRate = Math.toIntExact(Math.round(skillData.ParameterValue(2) * 20));
             LivingEntity entity = RayTrace.rayLocationEntity(player.getEyeLocation(), 20, 1, skillProcess.PredicateA()).HitEntity;
+            if (entity == null) entity = player;
             if (entity instanceof Player target) {
                 ParticleManager.LineParticle(new ParticleData(Particle.HEART), player.getLocation(), target.getEyeLocation(), 1, 2);
                 PlayerData targetData = playerData(target);
@@ -65,7 +67,7 @@ public class PlagueDoctor {
                     for (int i = 0; i < time; i += hitRate) {
                         if (targetData.EffectManager.hasEffect(EffectType.HealingFactor)) {
                             if (targetData.Status.Health < maxHealth) {
-                                targetData.changeHealth(Math.min(heal, maxHealth-targetData.Status.Health));
+                                Damage.makeHeal(player, target, value);
                             }
                             MultiThread.sleepTick(hitRate);
                         } else break;
@@ -83,9 +85,10 @@ public class PlagueDoctor {
     public void FumiGate(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            int time = skillData.ParameterValueInt(0);
+            int time = skillData.ParameterValueInt(0)*20;
             int hitRate = Math.toIntExact(Math.round(skillData.ParameterValue(1)*20));
-            double radius = skillData.ParameterValue(2);
+            int count = skillData.ParameterValueInt(2);
+            double radius = skillData.ParameterValue(3);
             ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.RED, 1));
             Location origin = player.getLocation();
 
@@ -99,12 +102,17 @@ public class PlagueDoctor {
                     for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
                         if (skillProcess.Predicate().test(victim)) {
                             EffectManager effectManager = EffectManager.getEffectManager(victim);
+                            int perCount = 0;
                             for (EffectType effectType : effectManager.Effect.keySet()) {
-                                if (effectType.Buff) effectManager.removeEffect(effectType, player);
+                                if (perCount >= count) break;
+                                if (effectType.Buff && effectType.effectRank.isNormal()) {
+                                    effectManager.removeEffect(effectType, player);
+                                    perCount++;
+                                }
                             }
                         }
                     }
-                    for (int i2 = 0; i2 < hitRate; i2+=5) {
+                    for (int i2 = 0; i2 <= hitRate; i2+=5) {
                         ParticleManager.CirclePointLineParticle(particleData, origin, radius/1.5, 6, 0, 5);
                         ParticleManager.CircleParticle(particleData, origin, radius, 24);
                         MultiThread.sleepTick(5);
@@ -146,6 +154,27 @@ public class PlagueDoctor {
                 }
             }
 
+            skillProcess.SkillRigid(skillData);
+        }, skillData.Id);
+    }
+
+    public void Modafinil(SkillData skillData) {
+        MultiThread.TaskRun(() -> {
+            skill.setCastReady(false);
+            int time = skillData.ParameterValueInt(0)*20;
+            double movement = skillData.ParameterValue(1)/100;
+            ParticleData particleData = new ParticleData(Particle.ELECTRIC_SPARK);
+
+            MultiThread.sleepTick(skillData.CastTime);
+
+            Set<Player> players = new HashSet<>();
+            players.add(player);
+            if (playerData.Party != null) players.addAll(playerData.Party.Members);
+            for (Player player : players) {
+                EffectManager.addEffect(player, EffectType.Modafinil, time, this.player, movement);
+                ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
+                playSound(player, SoundList.Heal);
+            }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

@@ -104,6 +104,10 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  setNick:
+    permission: som7.developer
+    description: description
+    usage: /<command>
 
   gm:
     permission: som7.builder

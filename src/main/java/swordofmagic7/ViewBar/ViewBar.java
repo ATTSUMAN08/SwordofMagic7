@@ -236,6 +236,7 @@ public class ViewBar {
     }
 
     public void ViewSideBar() {
+        if (!player.isOnline()) return;
         for (String scoreName : ScoreKey) {
             board.resetScores(scoreName);
         }

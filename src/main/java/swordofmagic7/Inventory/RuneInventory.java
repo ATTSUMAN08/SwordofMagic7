@@ -95,7 +95,7 @@ public class RuneInventory extends BasicInventory {
             sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました §c" + e.getMessage());
         }
         int i = index;
-        for (slot = 9; i < slot+24; slot++) {
+        for (slot = 9; slot < 36; slot++) {
             if (i < List.size()) {
                 while (i < List.size()) {
                     RuneParameter rune = List.get(i);
@@ -107,6 +107,7 @@ public class RuneInventory extends BasicInventory {
                         meta.setLore(Lore);
                         item.setItemMeta(meta);
                         player.getInventory().setItem(slot, item);
+                        i++;
                         break;
                     }
                     i++;
@@ -114,7 +115,7 @@ public class RuneInventory extends BasicInventory {
             } else {
                 player.getInventory().setItem(slot, AirItem);
             }
-            if (slot == 17 || slot == 26) slot++;
+            if (slot == 16 || slot == 25) slot++;
         }
     }
 }

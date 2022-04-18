@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import swordofmagic7.Attribute.AttributeType;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.DamageLogType;
 import swordofmagic7.Effect.EffectManager;
@@ -252,7 +253,7 @@ public final class Damage {
                 }
             } else {
                 randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation(), HoloView);
-                if (victimEffectManager.hasEffect(EffectType.Bully)) victimEffectManager.getData(EffectType.Bully).addStack(1);
+                if (victimEffectManager.hasEffect(EffectType.Bully)) victimEffectManager.addEffect(EffectType.Bully, DataBase.getSkillData("Bully").ParameterValueInt(0)*20, null, 1);
             }
         }
         if (victimLevel - attackerLevel > 30) {
@@ -318,6 +319,7 @@ public final class Damage {
             }
             double priority = attackerEffectManager.hasEffect(EffectType.SwashBaring) ? damage*10 : damage;
             enemyData.addPriority(attacker, priority);
+            enemyData.addDamage(attacker, damage);
             if (enemyData.Health > 0) {
                 victim.setHealth(enemyData.Health);
             } else {

@@ -159,6 +159,7 @@ public class Menu {
                 case 39 -> playerData.Menu.StatusInfo.StatusInfoView(player);
             }
 
+            boolean viewAble = view.getType() != InventoryType.CRAFTING || equalInv(view, UserMenuDisplay);
             if (playerData.ViewInventory.isItem()) {
                 switch (Slot) {
                     case 17 -> playerData.ItemInventory.upScrollTick();
@@ -168,7 +169,7 @@ public class Menu {
                             ItemParameterStack clickedItemStack = playerData.ItemInventory.getItemParameterStack(index);
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
-                                if (clickType.isShiftClick() && clickType.isRightClick()) {
+                                if (viewAble && clickType.isShiftClick() && clickType.isRightClick()) {
                                     player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat()));
                                 } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
@@ -197,7 +198,7 @@ public class Menu {
                     case 17 -> playerData.RuneInventory.upScrollTick();
                     case 35 -> playerData.RuneInventory.downScrollTick(playerData.RuneInventory.getList().size());
                     default -> {
-                        if (index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
+                        if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
                             player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat()));
                         }
@@ -208,7 +209,7 @@ public class Menu {
                     case 17 -> playerData.PetInventory.upScrollTick();
                     case 35 -> playerData.PetInventory.downScrollTick(playerData.PetInventory.getList().size());
                     default -> {
-                        if (index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
+                        if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
                             player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat()));
                         } else if (EquipAble() && index > -1) {

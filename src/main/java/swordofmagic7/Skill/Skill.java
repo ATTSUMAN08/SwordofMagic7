@@ -306,8 +306,10 @@ public class Skill {
                                             case "SnowRolling" -> cryomancer.SnowRolling(skillData);
                                             //プレイグドクター
                                             case "BeakMask" -> SkillProcess.BuffApply(skillData, EffectType.BeakMask, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
-                                            case "Modafinil" -> SkillProcess.PartyBuffApply(skillData, EffectType.Modafinil, new ParticleData(Particle.ELECTRIC_SPARK), skillData.ParameterValueInt(0)*20);
+                                            case "Modafinil" -> plagueDoctor.Modafinil(skillData);
                                             case "HealingFactor" -> plagueDoctor.HealingFactor(skillData);
+                                            case "FumiGate" -> plagueDoctor.FumiGate(skillData);
+                                            case "Pandemic" -> plagueDoctor.Pandemic(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
                                             player.showBossBar(playerData.BossBarSkillProgress);

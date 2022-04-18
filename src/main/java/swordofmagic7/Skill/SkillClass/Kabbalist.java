@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
@@ -18,7 +19,6 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.Set;
 
-import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
@@ -64,7 +64,7 @@ public class Kabbalist {
     public void TreeOfSepiroth(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            double value = playerData.Status.HLP * skillData.ParameterValue(0)/100;
+            double value = skillData.ParameterValue(0)/100;
             int time = skillData.ParameterValueInt(1)*20;
             double hitRate = skillData.ParameterValue(2)*20;
             double radius = skillData.ParameterValue(3);
@@ -79,11 +79,9 @@ public class Kabbalist {
             MultiThread.TaskRun(() -> {
                 for (double i = 0; i < time; i+=hitRate) {
                     for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
-                        if (player != victim && playerData.Party != null && playerData.Party == playerData(victim).Party) {
-                            EffectManager.addEffect(victim, EffectType.Invincible, 25, null);
-                        }
+                        Damage.makeHeal(player, victim, value);
                     }
-                    for (int i2 = 0; i2 < 4; i2++) {
+                    for (int i2 = 0; i2 < hitRate; i2+=5) {
                         ParticleManager.CirclePointLineParticle(particleData, origin, radius, 3, 0, 5);
                         ParticleManager.CircleParticle(particleData, origin, radius, 24);
                         MultiThread.sleepTick(5);

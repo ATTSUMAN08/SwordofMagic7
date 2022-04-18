@@ -131,11 +131,12 @@ public class Assassin {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
+            double movement  = skillData.ParameterValue(1)/100;
 
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.Covert, time);
-            playerData.EffectManager.addEffect(EffectType.Cloaking, time);
+            playerData.EffectManager.addEffect(EffectType.Cloaking, time, movement);
             MultiThread.TaskRunSynchronized(() -> {
                 for (Player player : PlayerList.get()) {
                     player.hidePlayer(plugin, playerData.player);

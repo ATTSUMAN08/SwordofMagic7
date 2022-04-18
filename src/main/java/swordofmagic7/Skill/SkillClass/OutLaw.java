@@ -112,7 +112,7 @@ public class OutLaw {
             skill.setCastReady(false);
             double length = 7;
             double angle = 130;
-            double value = skillData.ParameterValue(0);
+            double value = skillData.ParameterValue(0)/100;
             int time = skillData.ParameterValueInt(1)*20;
             int count = skillData.ParameterValueInt(1);
             for (int i = 0; i < skillData.CastTime; i++) {
@@ -133,7 +133,7 @@ public class OutLaw {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double radius = skillData.ParameterValue(1);
-            double value = skillData.ParameterValue(0);
+            double value = skillData.ParameterValue(0)/100;
             int time = skillData.ParameterValueInt(1)*20;
             int count = skillData.ParameterValueInt(1);
             for (int i = 0; i < skillData.CastTime; i++) {

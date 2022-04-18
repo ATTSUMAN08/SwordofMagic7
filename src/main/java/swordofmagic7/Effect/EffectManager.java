@@ -90,7 +90,6 @@ public class EffectManager {
                                 }
                             }
                         }
-                        if (isFixed != null) entity.teleportAsync(isFixed);
                         if (effectData.time <= 0 || effectData.stack < 1) {
                             removeEffect(effectType);
                         }
@@ -98,6 +97,7 @@ public class EffectManager {
                 }
                 if (entity != null) {
                     MultiThread.TaskRunSynchronized(() -> {
+                        if (isFixed != null) entity.teleportAsync(isFixed);
                         if (isCrowdControl) {
                             if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
                                 entity.removePotionEffect(PotionEffectType.SLOW);
@@ -256,7 +256,7 @@ public class EffectManager {
         EffectManager manager = getEffectManager(entity);
         if (manager != null) {
             boolean isSendMessage = !manager.hasEffect(effectType);
-            if (manager.addEffect(effectType, time, new Object[]{object}, stack)) {
+            if (manager.addEffect(effectType, time, object, stack)) {
                 if (player != null && isSendMessage) addEffectMessage(player, entity, effectType);
             } else {
                 if (player != null) player.sendMessage(effectType.color() + "[" + effectType.Display + "]§aが無効化されました");

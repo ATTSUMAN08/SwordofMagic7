@@ -77,7 +77,7 @@ public enum EffectType {
     CoveringFire("カバーリングファイア", true, "通常攻撃が強化されます"),
     JollyRoger("ジャリーロジャー", true, "与ダメージが上昇します", true),
     JollyRogerCombo("ジャリーロジャー:コンボ", 100, true, "エネミーを攻撃するとジャリーロジャー:コンボが増えます"),
-    Bully("ブリー", 20, true, "回避が上昇します"),
+    Bully("ブリー", 30, true, "回避が上昇します", true),
     Rampage("ランページ", true, "回避が減少します\n防御力が減少します\n被ダメージが上昇します\n与ダメージが上昇します", true),
     Nachash("ナハシ", true, "攻撃時に体力を回復します"),
     Sevenfold("セブンフォールド", true, "被ダメージ耐性が上昇します\n被弾すると解除されます", true),

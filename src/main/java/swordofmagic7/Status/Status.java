@@ -17,7 +17,9 @@ import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import static swordofmagic7.Attribute.AttributeType.*;
@@ -255,7 +257,6 @@ public class Status {
         BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
         BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
         BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
-        BaseStatus.put(StatusParameter.Movement, 0.24 * BaseMultiplyStatus(StatusParameter.Movement));
 
         MaxHealth = finalStatus(StatusParameter.MaxHealth);
         HealthRegen = finalStatus(StatusParameter.HealthRegen);
@@ -271,16 +272,15 @@ public class Status {
         SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
-        Movement = finalStatus(StatusParameter.Movement);
-
-        String color = "§f";
-        if (playerData.PvPMode) color = "§c";
-        StringBuilder classText = new StringBuilder();
-        for (ClassData classData : playerData.Classes.classSlot) {
-            classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
+        Movement = 0.24f;
+        Collection<EffectType> movementEffect = new HashSet<>();
+        movementEffect.add(EffectType.Cloaking);
+        movementEffect.add(EffectType.Modafinil);
+        for (EffectType effectType : movementEffect) {
+            if (playerData.EffectManager.hasEffect(effectType)) {
+                Movement += playerData.EffectManager.getData(effectType).getDouble(0);
+            }
         }
-        player.setPlayerListName(classText + "§e| " + color + playerData.Nick);
-        player.setDisplayName(playerData.Nick);
 
         setCombatPower();
         MultiThread.TaskRunSynchronized(() -> {
@@ -288,10 +288,18 @@ public class Status {
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
         });
 
+        String color = "§f";
         String prefix = "";
-        if (player.hasPermission(Som7VIP)) prefix = "§e[V]";
-        if (player.hasPermission(Som7Premium)) prefix = "§b[P]";
-        playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+        if (player.hasPermission(Som7VIP)) prefix = "§aⓋ";
+        if (player.hasPermission(Som7Premium)) prefix = "§bⓅ";
+        if (playerData.PvPMode) color = "§c";
+        StringBuilder classText = new StringBuilder();
+        for (ClassData classData : playerData.Classes.classSlot) {
+            classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
+        }
+        player.setPlayerListName(classText + "§e| " + prefix + color + playerData.Nick);
+        player.setDisplayName(prefix + "§f" + playerData.Nick);
+        if (playerData.hologramLine[0] != null) playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
     }
 
     public double finalStatus(StatusParameter param) {

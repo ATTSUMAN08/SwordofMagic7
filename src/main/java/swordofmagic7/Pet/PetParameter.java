@@ -47,6 +47,7 @@ public class PetParameter implements Cloneable {
     public LivingEntity entity;
     public PetData petData;
 
+    public String Name;
     public int MaxLevel;
     public int Level;
     public int Exp;
@@ -92,6 +93,7 @@ public class PetParameter implements Cloneable {
         this.MaxLevel = MaxLevel;
         this.Exp = Exp;
         this.GrowthRate = GrowthRate;
+        this.Name = petData.Id;
         updateStatus();
         Stamina = MaxStamina;
         Health = MaxHealth;
@@ -470,6 +472,9 @@ public class PetParameter implements Cloneable {
             if (DataBase.PetList.containsKey(split[1])) {
                 petData = getPetData(split[1]);
                 for (String str : split) {
+                    if (str.contains("Name:")) {
+                        Name = str.replace("Name:", "");
+                    }
                     if (str.contains("Level:")) {
                         Level = Integer.parseInt(str.replace("Level:", ""));
                     }
@@ -510,6 +515,7 @@ public class PetParameter implements Cloneable {
         StringBuilder data = new StringBuilder(
                 petUUID
                 + ",petId:" + petData.Id
+                + ",petId:" + Name
                 + ",petLevel:" + Level
                 + ",petLevelMax:" + MaxLevel
                 + ",petExp:" + Exp

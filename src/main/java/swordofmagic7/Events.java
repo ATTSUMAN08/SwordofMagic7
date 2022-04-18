@@ -67,11 +67,21 @@ public class Events implements Listener {
     }
 
     @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (playerData(event.getPlayer()).isPlayDungeonQuest) {
+            if (event.getMessage().equalsIgnoreCase("/sit") || event.getMessage().equalsIgnoreCase("/gsit:sit")) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    private final String OverLogin = "som7.OverLogin";
+    @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
         if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!player.hasPermission(Som7Premium) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
+                if ((!player.hasPermission(Som7Premium) || isEventServer()) && !player.hasPermission(OverLogin) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
                     return;
                 }
@@ -84,7 +94,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         int playerCount = Bukkit.getOnlinePlayers().size();
         if (playerCount >= 45 && !isEventServer()) {
-            if (player.hasPermission("som7.OverLogin")) return;
+            if (player.hasPermission(OverLogin)) return;
             if (playerCount <= 50 && player.hasPermission(Som7VIP)) return;
             if (player.hasPermission(Som7Premium)) return;
             if (playerCount <= 45) {
