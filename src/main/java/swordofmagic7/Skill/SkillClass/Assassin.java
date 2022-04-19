@@ -6,7 +6,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
@@ -16,7 +15,7 @@ import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -32,18 +31,10 @@ import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
 
-public class Assassin {
-
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class Assassin extends BaseSkillClass {
 
     public Assassin(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void InstantAccel(SkillData skillData) {
@@ -167,21 +158,17 @@ public class Assassin {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.Invincible, time);
-            int i = 0;
             Location lastLocation = player.getEyeLocation();
-            while ((i += hitRate) < time) {
-                int wait = hitRate;
+            for (int i = 0; i <= time; i+=hitRate) {
                 Set<LivingEntity> victims = Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate());
                 for (LivingEntity victim : victims) {
                     ParticleManager.LineParticle(particleData, lastLocation, victim.getEyeLocation(), 1, 2);
-                    Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0)/100, count);
                     lastLocation = victim.getEyeLocation();
-                    wait--;
-                    MultiThread.sleepTick(1);
                 }
+                Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0)/100, count, 1);
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 10);
                 playSound(player, SoundList.Shun);
-                if (wait > 0) MultiThread.sleepTick(hitRate);
+                MultiThread.sleepTick(hitRate);
             }
             skillProcess.SkillRigid(skillData);
         }, "PeaceMaker");

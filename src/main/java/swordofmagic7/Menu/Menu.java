@@ -159,7 +159,7 @@ public class Menu {
                 case 39 -> playerData.Menu.StatusInfo.StatusInfoView(player);
             }
 
-            boolean viewAble = view.getType() != InventoryType.CRAFTING || equalInv(view, UserMenuDisplay);
+            boolean viewAble = view.getType() == InventoryType.CRAFTING || equalInv(view, UserMenuDisplay);
             if (playerData.ViewInventory.isItem()) {
                 switch (Slot) {
                     case 17 -> playerData.ItemInventory.upScrollTick();

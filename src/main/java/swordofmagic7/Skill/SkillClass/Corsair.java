@@ -12,7 +12,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -26,17 +26,10 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Corsair {
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class Corsair extends BaseSkillClass {
 
     public Corsair(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void Brutality(SkillData skillData) {
@@ -97,7 +90,7 @@ public class Corsair {
                 for (Player player : players) {
                     if (player.getLocation().distance(origin) < radius) {
                         PlayerData playerData = PlayerData.playerData(player);
-                        playerData.EffectManager.addEffect(EffectType.JollyRogerCombo, 30, this.playerData);
+                        playerData.EffectManager.addEffect(EffectType.JollyRogerCombo, 30, new Object[]{this.playerData});
                         playerData.EffectManager.getData(EffectType.JollyRogerCombo).stack = JollyRogerCombo;
                     }
                 }
@@ -153,7 +146,7 @@ public class Corsair {
 
             if (IronHookEntity != null && EffectManager.hasEffect(IronHookEntity, EffectType.IronHook)) {
                 EffectManager effectManager = EffectManager.getEffectManager(IronHookEntity);
-                effectManager.addEffect(EffectType.Keelhauling, time, player.getLocation());
+                effectManager.addEffect(EffectType.Keelhauling, time, new Object[]{player.getLocation()});
                 effectManager.removeEffect(EffectType.IronHook);
                 playSound(player, SoundList.DeBuff);
             } else {

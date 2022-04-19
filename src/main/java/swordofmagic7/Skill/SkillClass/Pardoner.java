@@ -12,7 +12,7 @@ import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -26,18 +26,10 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.RodAttack;
 
-public class Pardoner {
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
-
+public class Pardoner extends BaseSkillClass {
 
     public Pardoner(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void Indulgendia(SkillData skillData) {

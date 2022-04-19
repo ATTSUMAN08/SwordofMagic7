@@ -2,18 +2,16 @@ package swordofmagic7.Skill.SkillClass;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 
@@ -22,18 +20,10 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
 
-public class BulletMarker {
-
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class BulletMarker extends BaseSkillClass {
 
     public BulletMarker(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public double multiply() {
@@ -73,6 +63,7 @@ public class BulletMarker {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double value = skillData.ParameterValue(0)/100* multiply();
+            int time = skillData.ParameterValueInt(0)*20;
             MultiThread.sleepTick(skillData.CastTime);
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, true, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.CRIT);
@@ -82,7 +73,7 @@ public class BulletMarker {
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
                 Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, 1);
-                EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, 50, player);
+                EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, time, player);
             }
             playSound(player, GunAttack);
             skillProcess.SkillRigid(skillData);

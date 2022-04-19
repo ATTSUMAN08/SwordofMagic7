@@ -114,10 +114,13 @@ public class EffectManager {
                         }
                     }, "EffectManagerTimer");
                     MultiThread.TaskRun(() -> {
-                        if (isCrowdControl) for (int i = 0; i < period; i++) {
-                            if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) break;
-                            entity.setVelocity(Function.VectorDown);
-                            MultiThread.sleepTick(1);
+                        if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                            if (isCrowdControl) for (int i = 0; i < period; i++) {
+                                if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)
+                                    break;
+                                entity.setVelocity(Function.VectorDown);
+                                MultiThread.sleepTick(1);
+                            }
                         }
                     }, "EffectManagerCrowdControl");
                 }
@@ -138,12 +141,21 @@ public class EffectManager {
         return addEffect(effectType, time, null, 1);
     }
 
-    public boolean addEffect(EffectType effectType, int time, Object objectData) {
-        return addEffect(effectType, time, new Object[]{objectData}, 1);
+    public boolean addEffect(EffectType effectType, int time, double doubleData) {
+        return addEffect(effectType, time, new Object[]{doubleData}, 1);
     }
 
-    public boolean addEffect(EffectType effectType, int time, Object objectData, int stack) {
-        return addEffect(effectType, time, new Object[]{objectData}, stack);
+    public boolean addEffect(EffectType effectType, int time, int intData) {
+        return addEffect(effectType, time, new Object[]{intData}, 1);
+    }
+
+
+    public boolean addEffect(EffectType effectType, int time, double doubleData, int stack) {
+        return addEffect(effectType, time, new Object[]{doubleData}, stack);
+    }
+
+    public boolean addEffect(EffectType effectType, int time, Object[] objectData) {
+        return addEffect(effectType, time, objectData, 1);
     }
 
     public boolean addEffect(EffectType effectType, int time, Object[] objectData, int stack) {
@@ -176,13 +188,12 @@ public class EffectManager {
         if (Effect.containsKey(effectType)) {
             effectData = Effect.get(effectType);
             effectData.time = Math.max(effectData.time, time);
-            if (effectData.stack+stack >= effectType.MaxStack) {
-                effectData.stack = effectType.MaxStack;
-            } else effectData.stack += stack;
+            effectData.stack += stack;
         } else {
             effectData = new EffectData(effectType, time);
             effectData.stack = stack;
         }
+        effectData.stack = Math.min(effectData.stack, effectType.MaxStack);
         effectData.objectData = objectData;
         Effect.put(effectType, effectData);
         statusUpdate(effectType);
@@ -244,19 +255,23 @@ public class EffectManager {
         addEffect(entity, effectType, time, 1, player);
     }
 
-    public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, Object object) {
-        addEffect(entity, effectType, time, 1, player, object);
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, double doubleData) {
+        addEffect(entity, effectType, time, 1, player, new Object[]{doubleData});
     }
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player) {
         addEffect(entity, effectType, time, stack, player, null);
     }
 
-    public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player, Object object) {
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, Object[] objectData) {
+        addEffect(entity, effectType, time, 1, player, objectData);
+    }
+
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player, Object[] objectData) {
         EffectManager manager = getEffectManager(entity);
         if (manager != null) {
             boolean isSendMessage = !manager.hasEffect(effectType);
-            if (manager.addEffect(effectType, time, object, stack)) {
+            if (manager.addEffect(effectType, time, objectData, stack)) {
                 if (player != null && isSendMessage) addEffectMessage(player, entity, effectType);
             } else {
                 if (player != null) player.sendMessage(effectType.color() + "[" + effectType.Display + "]§aが無効化されました");

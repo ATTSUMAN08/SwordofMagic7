@@ -114,8 +114,8 @@ public class Symmore {
                         ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 10);
                         for (LivingEntity entity : list) {
                             ParticleManager.RandomVectorParticle(particleData1, entity.getLocation(), 10);
+                            Damage.makeDamage(Manager.enemyData.entity, entity, DamageCause.MAT, "MagicExplosion", 100, 1, 0.75, true);
                         }
-                        Damage.makeDamage(Manager.enemyData.entity, list, DamageCause.MAT, "MagicExplosion", 10, 1, 1);
                         playSound(Manager.enemyData.entity.getLocation(), SoundList.Explosion, 10, 1);
                     }
                     break;

@@ -257,7 +257,8 @@ public final class DataBase {
                 spawnerData.start();
             }
 
-            Damage.OutrageResetTime = (int) Math.round(DataBase.getSkillData("Outrage").ParameterValue(0)*20);
+            Damage.OutrageResetTime = DataBase.getSkillData("Outrage").ParameterValueInt(0)*20;
+            Damage.FrenzyResetTime = DataBase.getSkillData("Frenzy").ParameterValueInt(0)*20;
         });
     }
 

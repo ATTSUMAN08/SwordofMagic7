@@ -2,11 +2,9 @@ package swordofmagic7.Skill.SkillClass;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
@@ -14,7 +12,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -27,18 +25,10 @@ import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Highlander {
-
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class Highlander extends BaseSkillClass {
 
     public Highlander(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void CartarStroke(SkillData skillData) {
@@ -116,7 +106,7 @@ public class Highlander {
             }
 
             ParticleManager.RectangleParticle(particleActivate, player.getLocation(), length, width, 3);
-            Vector vector = player.getLocation().getDirection().clone().setY(1).normalize();
+            Vector vector = player.getLocation().getDirection().clone().normalize().setY(1.2);
             for (LivingEntity victim : RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false)) {
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                 victim.setVelocity(vector);

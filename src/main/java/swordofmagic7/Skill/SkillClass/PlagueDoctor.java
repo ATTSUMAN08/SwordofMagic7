@@ -16,7 +16,7 @@ import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.RayTrace;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -32,18 +32,10 @@ import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class PlagueDoctor {
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
-
+public class PlagueDoctor extends BaseSkillClass {
 
     public PlagueDoctor(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void HealingFactor(SkillData skillData) {
@@ -105,18 +97,21 @@ public class PlagueDoctor {
                             int perCount = 0;
                             for (EffectType effectType : effectManager.Effect.keySet()) {
                                 if (perCount >= count) break;
-                                if (effectType.Buff && effectType.effectRank.isNormal()) {
+                                if (effectType.Buff && !effectType.effectRank.isImpossible()) {
                                     effectManager.removeEffect(effectType, player);
                                     perCount++;
                                 }
                             }
                         }
                     }
-                    for (int i2 = 0; i2 <= hitRate; i2+=5) {
-                        ParticleManager.CirclePointLineParticle(particleData, origin, radius/1.5, 6, 0, 5);
-                        ParticleManager.CircleParticle(particleData, origin, radius, 24);
-                        MultiThread.sleepTick(5);
-                    }
+                    MultiThread.sleepTick(hitRate);
+                }
+            }, skillData.Id);
+            MultiThread.TaskRun(() -> {
+                for (int i = 0; i <= time; i+=5) {
+                    ParticleManager.CirclePointLineParticle(particleData, origin, radius/1.5, 6, 0, 5);
+                    ParticleManager.CircleParticle(particleData, origin, radius, 24);
+                    MultiThread.sleepTick(5);
                 }
             }, skillData.Id);
             skillProcess.SkillRigid(skillData);
@@ -133,7 +128,7 @@ public class PlagueDoctor {
                 MultiThread.sleepMillis(millis);
             }
 
-            Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.PredicateA()));
+            Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
             HashMap<EffectType, EffectData> effect = new HashMap<>();
             for (LivingEntity victim : victims) {
                 EffectManager effectManager = EffectManager.getEffectManager(victim);

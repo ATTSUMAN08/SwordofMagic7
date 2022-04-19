@@ -3,10 +3,8 @@ package swordofmagic7.Skill.SkillClass;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
@@ -14,7 +12,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.RayTrace.RayTrace;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -23,21 +21,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static swordofmagic7.Skill.Skill.millis;
-import static swordofmagic7.Skill.SkillProcess.*;
+import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
+import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Cryomancer {
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class Cryomancer extends BaseSkillClass {
 
     public Cryomancer(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void FrostPillar(SkillData skillData) {
@@ -60,17 +52,19 @@ public class Cryomancer {
 
             skillProcess.SkillRigid(skillData);
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
-            int time = (int) Math.round(skillData.ParameterValue(1)*20);
+            int time = skillData.ParameterValueInt(1)*20;
+            int time2 = skillData.ParameterValueInt(5)*20;
             double freezePercent = skillData.ParameterValue(3)/100;
             MultiThread.TaskRun(() -> {
                 for (int i = 0; i < time/hitRate; i++) {
                     ParticleManager.CircleParticle(particleData, origin, radius / 2, 10);
+                    ParticleManager.CylinderParticle(particleData, origin, 2, 5, 30, 5);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     MultiThread.TaskRun(() -> {
                         for (LivingEntity victim : victims) {
                             ParticleManager.LineParticle(particleData, victim.getLocation(), victim.getEyeLocation(), 1, 10);
                             Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
-                            if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, 20, player);
+                            if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, time2, player);
                             MultiThread.sleepTick(1);
                         }
                     }, skillData.Id);
@@ -85,7 +79,7 @@ public class Cryomancer {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double value = skillData.ParameterValue(0)/100;
-            double value2 = value * skillData.ParameterValue(2);
+            int count = 1 + skillData.ParameterValueInt(2);
             double radius = skillData.ParameterValue(1);
             Location origin = player.getLocation().clone().add(player.getLocation().getDirection().multiply(radius));
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.2f, Function.VectorUp);
@@ -97,7 +91,7 @@ public class Cryomancer {
 
             ParticleManager.CircleParticle(particleData, origin, radius, 20);
             for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
-                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, EffectManager.hasEffect(victim, EffectType.Freeze) ? value2 : value, 1);
+                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, EffectManager.hasEffect(victim, EffectType.Freeze) ? count : 1);
                 ParticleManager.LineParticle(particleData, player.getEyeLocation(), victim.getEyeLocation(), 1, 5);
             }
             playSound(player, SoundList.DeBuff);
@@ -110,6 +104,7 @@ public class Cryomancer {
             skill.setCastReady(false);
             double value = skillData.Parameter.get(0).Value / 100;
             double freezePercent = skillData.ParameterValue(1)/100;
+            int time = skillData.ParameterValueInt(2)*20;
             double length = 10;
             double width = 3;
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
@@ -121,7 +116,7 @@ public class Cryomancer {
 
             ParticleManager.RectangleParticle(particleData, player.getLocation(), length, width, 3);
             for (LivingEntity victim : RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false)) {
-                if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, 20, player);
+                if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, time, player);
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, 1);
                 MultiThread.sleepTick(1);
             }
@@ -134,11 +129,12 @@ public class Cryomancer {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
             double freezePercent  = skillData.ParameterValue(1)/100;
+            int time2 = skillData.ParameterValueInt(2)*20;
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            playerData.EffectManager.addEffect(EffectType.SubzeroShield, time, freezePercent);
+            playerData.EffectManager.addEffect(EffectType.SubzeroShield, time, new Object[]{freezePercent,time2});
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
@@ -153,6 +149,8 @@ public class Cryomancer {
             int hitRate = skillData.ParameterValueInt(2)*20;
             double radius  = skillData.ParameterValue(3);
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+
+            MultiThread.sleepTick(skillData.CastTime);
 
             Set<LivingEntity> victims = new HashSet<>();
             for (int i = 0; i < time; i += hitRate) {

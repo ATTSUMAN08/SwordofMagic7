@@ -33,6 +33,9 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
 
 public class SkillProcess {
+
+    public static final double BladeLength = 6.5;
+
     public final Player player;
     public final PlayerData playerData;
     public final Skill skill;
@@ -147,7 +150,7 @@ public class SkillProcess {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 Set<LivingEntity> victims = new HashSet<>();
                 switch (category) {
-                    case Blade -> victims = RectangleCollider(player.getLocation(), 6.5, 1.5, Predicate(), true);
+                    case Blade -> victims = RectangleCollider(player.getLocation(), SkillProcess.BladeLength, 1.5, Predicate(), true);
                     case Mace -> victims = RectangleCollider(player.getLocation(), 6, 1.25, Predicate(), true);
                     case Rod, ActGun -> {
                         Ray ray = rayLocationEntity(player.getEyeLocation(), 25, 0.75, Predicate());
@@ -180,7 +183,7 @@ public class SkillProcess {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 switch (category) {
                     case Blade -> {
-                        normalAttackParticle(victim, Particle.SWEEP_ATTACK, 0, 6.5);
+                        normalAttackParticle(victim, Particle.SWEEP_ATTACK, 0, SkillProcess.BladeLength);
                         normalAttackCoolTime = 7;
                     }
                     case Mace -> {

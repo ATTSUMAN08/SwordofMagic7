@@ -154,12 +154,12 @@ public class KingSlime {
                 MultiThread.sleepTick(Manager.period);
             }
 
-            for (LivingEntity victim : ParticleManager.FanShapedCollider(Manager.enemyData.entity.getLocation(), Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), 32), angle)) {
+            for (LivingEntity victim : ParticleManager.FanShapedCollider(Manager.enemyData.entity.getLocation(), Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), length), angle)) {
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), victim.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "InsaneRush", 10000, 1);
                 if (victim instanceof Player player) playSound(player, SoundList.Explosion);
             }
             Manager.CastSkill(false);
-        }, "SummonFamiliar");
+        }, "InsaneRush");
     }
 }

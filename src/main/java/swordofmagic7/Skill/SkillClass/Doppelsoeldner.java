@@ -2,16 +2,14 @@ package swordofmagic7.Skill.SkillClass;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -24,17 +22,10 @@ import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Doppelsoeldner {
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
+public class Doppelsoeldner extends BaseSkillClass {
 
     public Doppelsoeldner(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void DeedsOfValor(SkillData skillData) {

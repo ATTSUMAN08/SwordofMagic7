@@ -1,16 +1,17 @@
 package swordofmagic7.Data;
 
-import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
-import me.libraryaddict.disguise.disguisetypes.watchers.PhantomWatcher;
-import me.libraryaddict.disguise.disguisetypes.watchers.SlimeWatcher;
+import me.libraryaddict.disguise.disguisetypes.*;
+import me.libraryaddict.disguise.disguisetypes.watchers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Cat;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fox;
+import org.bukkit.entity.Horse;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
@@ -154,6 +155,7 @@ public class DataLoader {
                 }
                 ItemList.put(itemParameter.Id, itemParameter);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -180,6 +182,7 @@ public class DataLoader {
                 }
                 RuneList.put(runeData.Id, runeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -199,11 +202,7 @@ public class DataLoader {
                 petData.entityType = EntityType.fromName(data.getString("Type").toUpperCase());
                 if (data.isSet("Disguise.Type")) {
                     petData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
-                    if (petData.disguise.getType() == DisguiseType.SLIME) {
-                        SlimeWatcher slimeWatcher = new SlimeWatcher(petData.disguise);
-                        slimeWatcher.setSize(data.getInt("Disguise.Size"));
-                        petData.disguise.setWatcher(slimeWatcher);
-                    }
+                    disguiseLoader(petData.disguise, data);
                 }
                 petData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
                 petData.MaxStamina = data.getDouble("MaxStamina");
@@ -221,6 +220,7 @@ public class DataLoader {
                 petData.BossPet = data.getBoolean("BossPet", false);
                 PetList.put(fileName, petData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -245,6 +245,7 @@ public class DataLoader {
                 }
                 ItemRecipeList.put(fileName, itemRecipe);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -291,6 +292,7 @@ public class DataLoader {
                 }
                 MapList.put(fileName, mapData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -316,6 +318,7 @@ public class DataLoader {
                 }
                 MineDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -339,6 +342,7 @@ public class DataLoader {
                 }
                 LumberDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -362,6 +366,7 @@ public class DataLoader {
                 }
                 HarvestDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -384,6 +389,7 @@ public class DataLoader {
                 }
                 AnglerDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -406,6 +412,7 @@ public class DataLoader {
                 CookData lifeData = new CookData(cookItem, viewItem, viewAmount, ReqLevel, Exp, recipe);
                 CookDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -432,6 +439,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -448,6 +456,7 @@ public class DataLoader {
                 SmeltData lifeData = new SmeltData(item, Amount, ReqLevel, Exp, recipe);
                 SmeltDataList.put(fileName, lifeData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -489,6 +498,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -541,6 +551,7 @@ public class DataLoader {
                 SkillDataList.put(skillData.Id, skillData);
                 SkillDataDisplayList.put(skillData.Display, skillData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -579,6 +590,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -593,6 +605,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -624,15 +637,7 @@ public class DataLoader {
                 if (mobData.Icon == null) mobData.Icon = Material.PAPER;
                 if (data.isSet("Disguise.Type")) {
                     mobData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
-                    if (mobData.disguise.getType() == DisguiseType.SLIME) {
-                        SlimeWatcher slimeWatcher = new SlimeWatcher(mobData.disguise);
-                        slimeWatcher.setSize(data.getInt("Disguise.Size", 2));
-                        mobData.disguise.setWatcher(slimeWatcher);
-                    } else if (mobData.disguise.getType() == DisguiseType.PHANTOM) {
-                        PhantomWatcher phantomWatcher = new PhantomWatcher(mobData.disguise);
-                        phantomWatcher.setSize(data.getInt("Disguise.Size", 2));
-                        mobData.disguise.setWatcher(phantomWatcher);
-                    }
+                    disguiseLoader(mobData.disguise, data);
                 }
                 mobData.Health = data.getDouble("Health", 100);
                 mobData.ATK = data.getDouble("ATK", 10);
@@ -741,6 +746,7 @@ public class DataLoader {
 
                 MobList.put(fileName, mobData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -789,6 +795,7 @@ public class DataLoader {
                 }
                 ShopList.put(fileName, shopData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -862,6 +869,7 @@ public class DataLoader {
                 mobSpawnerData.location = new Location(Bukkit.getWorld(data.getString("Location.w", "world")), x, y, z);
                 MobSpawnerList.put(fileName, mobSpawnerData);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
             }
         }
@@ -932,7 +940,43 @@ public class DataLoader {
                 }
                 RewardBoxList.put(fileName, list);
             } catch (Exception e) {
+                e.printStackTrace();
                 loadError(file);
+            }
+        }
+    }
+
+    public static void disguiseLoader(MobDisguise disguise, FileConfiguration data) {
+        switch (disguise.getType()) {
+            case SLIME -> {
+                SlimeWatcher watcher = new SlimeWatcher(disguise);
+                watcher.setSize(data.getInt("Disguise.Size", 1));
+                disguise.setWatcher(watcher);
+            }
+            case PHANTOM -> {
+                PhantomWatcher watcher = new PhantomWatcher(disguise);
+                watcher.setSize(data.getInt("Disguise.Size", 1));
+                disguise.setWatcher(watcher);
+            }
+            case HORSE -> {
+                HorseWatcher watcher = new HorseWatcher(disguise);
+                watcher.setStyle(data.isSet("Disguise.HorseStyle") ? Horse.Style.valueOf(data.getString("Disguise.HorseStyle")) : Horse.Style.NONE);
+                disguise.setWatcher(watcher);
+            }
+            case RABBIT -> {
+                RabbitWatcher watcher = new RabbitWatcher(disguise);
+                watcher.setType(data.isSet("Disguise.RabbitType") ? RabbitType.valueOf(data.getString("Disguise.RabbitType")) : RabbitType.BROWN);
+                disguise.setWatcher(watcher);
+            }
+            case FOX -> {
+                FoxWatcher watcher = new FoxWatcher(disguise);
+                watcher.setType(data.isSet("Disguise.FoxType") ? Fox.Type.valueOf(data.getString("Disguise.FoxType")) : Fox.Type.RED);
+                disguise.setWatcher(watcher);
+            }
+            case CAT -> {
+                CatWatcher watcher = new CatWatcher(disguise);
+                watcher.setType(data.isSet("Disguise.CatType") ? Cat.Type.valueOf(data.getString("Disguise.CatType")) : Cat.Type.RED);
+                disguise.setWatcher(watcher);
             }
         }
     }

@@ -71,6 +71,8 @@ public class Skill {
     public final Kabbalist kabbalist;
     public final Cryomancer cryomancer;
     public final PlagueDoctor plagueDoctor;
+    public final Barbarian barbarian;
+    public final Matador matador;
 
     public Alchemist getAlchemist() {
         return alchemist;
@@ -107,6 +109,8 @@ public class Skill {
         kabbalist = new Kabbalist(SkillProcess);
         cryomancer = new Cryomancer(SkillProcess);
         plagueDoctor = new PlagueDoctor(SkillProcess);
+        barbarian = new Barbarian(SkillProcess);
+        matador = new Matador(SkillProcess);
 
         alchemist = new Alchemist(SkillProcess);
 
@@ -310,6 +314,17 @@ public class Skill {
                                             case "HealingFactor" -> plagueDoctor.HealingFactor(skillData);
                                             case "FumiGate" -> plagueDoctor.FumiGate(skillData);
                                             case "Pandemic" -> plagueDoctor.Pandemic(skillData);
+                                            //バーバリアン
+                                            case "Cleave" -> barbarian.Cleave(skillData);
+                                            case "Embowel" -> barbarian.Embowel(skillData);
+                                            case "StompingKick" -> barbarian.StompingKick(skillData);
+                                            case "Warcry" -> barbarian.Warcry(skillData);
+                                            //マタドール
+                                            case "Capote" -> matador.Capote(skillData);
+                                            case "Faena" -> matador.Faena(skillData);
+                                            case "Ole" -> matador.Ole(skillData);
+                                            case "CorridaFinale" -> matador.CorridaFinale(skillData);
+                                            case "Muleta" -> matador.Muleta(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
                                             player.showBossBar(playerData.BossBarSkillProgress);

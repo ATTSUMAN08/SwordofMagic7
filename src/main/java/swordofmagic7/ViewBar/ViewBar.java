@@ -198,8 +198,9 @@ public class ViewBar {
                         else HealthPercentColor = "§a§l";
                         player.setLevel(Level);
                         player.setExp(ExpPercent);
+                        String shield = status.Shield > 0 ? "§e+" + (int) Math.round(status.Shield) + "§c" : "";
                         player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
-                                "§c§l《§cHealth: " + (int) Math.round(status.Health) + "/" + (int) Math.round(status.MaxHealth) + "§c§l》" +
+                                "§c§l《§cHealth: " + (int) Math.round(status.Health) + shield + "/" + (int) Math.round(status.MaxHealth) + "§c§l》" +
                                 "§b§l《§bMana: " + (int) Math.round(status.Mana) + "/" + (int) Math.round(status.MaxMana) + "§b§l》" +
                                 "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
@@ -228,7 +229,7 @@ public class ViewBar {
             }
         }, "TickUpdate");
         MultiThread.TaskRunSynchronizedTimer(() -> {
-            player.setAbsorptionAmount(0);
+            player.setAbsorptionAmount(status.Shield/status.MaxHealth*20);
             player.setMaxHealth(status.MaxHealth);
             player.setHealth(Math.min(Math.max(status.Health, 0.5), status.MaxHealth));
             player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));

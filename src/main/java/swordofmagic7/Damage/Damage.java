@@ -10,6 +10,7 @@ import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.DamageLogType;
+import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
@@ -32,6 +33,7 @@ import static swordofmagic7.SomCore.random;
 public final class Damage {
 
     public static int OutrageResetTime;
+    public static int FrenzyResetTime;
     public static double PvPDecay = 100;
     public static double PvPHealDecay = 10;
 
@@ -126,6 +128,9 @@ public final class Damage {
             attackerLevel = playerData.Level;
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
+            if (playerData.Skill.hasSkill("Outrage")) {
+                attackerEffectManager.addEffect(EffectType.Outrage, OutrageResetTime);
+            }
             if (attackerEffectManager.hasEffect(EffectType.JollyRogerCombo)) {
                 PlayerData JollyRogerPlayerData = (PlayerData) attackerEffectManager.getData(EffectType.JollyRogerCombo).getObject(0);
                 JollyRogerPlayerData.Skill.corsair.JollyRogerCombo++;
@@ -169,12 +174,16 @@ public final class Damage {
                 Resistance = 1;
             }
             victimEffectManager = playerData.EffectManager;
+            if (playerData.Skill.hasSkill("Frenzy")) {
+                victimEffectManager.addEffect(EffectType.Frenzy, FrenzyResetTime);
+            }
             if (victimEffectManager.hasEffect(EffectType.Sevenfold)) {
                 victimEffectManager.removeEffect(EffectType.Sevenfold);
             }
             if (victimEffectManager.hasEffect(EffectType.SubzeroShield)) {
-                if (random.nextDouble() < victimEffectManager.getData(EffectType.SubzeroShield).getDouble(0)) {
-                    attackerEffectManager.addEffect(EffectType.Freeze, 20);
+                EffectData effectData = victimEffectManager.getData(EffectType.SubzeroShield);
+                if (random.nextDouble() < effectData.getDouble(0)) {
+                    attackerEffectManager.addEffect(EffectType.Freeze, effectData.getInt(1));
                 }
             }
         } else if (MobManager.isEnemy(victim)) {
@@ -240,6 +249,7 @@ public final class Damage {
 
         int hitCount = 0;
         int criCount = 0;
+        int missCount = 0;
         for (int i = 0; i < count; i++) {
             if (random.nextDouble() <= hitRate) {
                 if (random.nextDouble() <= criRate) {
@@ -252,6 +262,7 @@ public final class Damage {
                     randomHologram("§c§l❤" + String.format("%.1f", baseDamage), victim.getEyeLocation(), HoloView);
                 }
             } else {
+                missCount++;
                 randomHologram("§7§lMiss [" + String.format("%.0f", hitRate * 100) + "%]", victim.getEyeLocation(), HoloView);
                 if (victimEffectManager.hasEffect(EffectType.Bully)) victimEffectManager.addEffect(EffectType.Bully, DataBase.getSkillData("Bully").ParameterValueInt(0)*20, null, 1);
             }
@@ -270,8 +281,19 @@ public final class Damage {
             }
             PlayerData playerData = playerData(player);
             playerData.HealthRegenDelay = 40;
-            if (playerData.Status.Health - damage > 0) {
-                playerData.Status.Health -= damage;
+            double finalDamage = damage;
+            if (playerData.Status.Shield > 0) {
+                if (playerData.Status.Shield > finalDamage) {
+                    playerData.Status.Shield -= finalDamage;
+                    finalDamage = 0;
+                } else {
+                    finalDamage -= playerData.Status.Shield;
+                    playerData.Status.Shield = 0;
+                    playerData.stopShieldTask();
+                }
+            }
+            if (playerData.Status.Health - finalDamage > 0) {
+                playerData.Status.Health -= finalDamage;
             } else if (playerData.EffectManager.hasEffect(EffectType.Revive)) {
                 playerData.Status.Health = playerData.Status.MaxHealth/2;
                 playerData.EffectManager.removeEffect(EffectType.Revive);
@@ -354,13 +376,16 @@ public final class Damage {
         String damageText = "";
         if (hitCount > 0) damageText += "§e" + String.format("%.1f", baseDamage) + "§ax" + hitCount + " ";
         if (criCount > 0) damageText += "§b" + String.format("%.1f", baseDamage * CriticalMultiply) + "§ax" + criCount + " ";
+        if (missCount > 0) damageText += "§7Miss§ax" + missCount + " ";
         if (hitCount + criCount > 0) {
-            if (attacker instanceof Player player) {
-                if (playerData(player).Skill.hasSkill("Outrage")) {
-                    attackerEffectManager.addEffect(EffectType.Outrage, OutrageResetTime);
-                }
+
+        } else {
+            if (victimEffectManager.hasEffect(EffectType.Muleta)) {
+                Damage.makeDamage(victim, attacker, DamageCause.ATK, EffectType.Muleta.toString(), victimEffectManager.getData(EffectType.Muleta).getDouble(0), 1);
+                victimEffectManager.removeEffect(EffectType.Muleta);
+                if (victim instanceof Player player) sendMessage(player,"§e[" + EffectType.Muleta.Display + "]§aが発動しました", SoundList.Counter);
             }
-        } else damageText = "§7Miss";
+        }
 
         final String M = "§f[M:" + String.format("%.0f", damageMultiply * 100) + "%]";
         final String HP = " §c[HP:" + String.format("%.0f", victimHealth) + "/" + String.format("%.0f", victimMaxHealth) + "]";

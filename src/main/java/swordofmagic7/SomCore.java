@@ -142,7 +142,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
             PlayerData.getPlayerData().entrySet().removeIf(entry -> !entry.getKey().isOnline());
             for (PlayerData playerData : PlayerData.getPlayerData().values()) {
-                playerData.saveCloseInventory();
+                playerData.save();
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
             HologramSet.removeIf(Hologram::isDeleted);
@@ -467,7 +467,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("skillCTReset")) {
                     for (String skillData : playerData.Skill.SkillCoolTime.keySet()) {
-                        playerData.Skill.resetSkillCoolTime(skillData);
+                        MultiThread.TaskRunSynchronizedLater(() -> {
+                            playerData.Skill.resetSkillCoolTime(skillData);
+                        }, 1);
                     }
                     return true;
                 }

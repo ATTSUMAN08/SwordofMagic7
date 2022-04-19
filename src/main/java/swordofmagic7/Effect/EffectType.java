@@ -34,6 +34,7 @@ public enum EffectType {
     Gevura("ゲブラ", false, "被ダメージ耐性が減少します", true),
     ExcessiveTreatment("過剰な治療", false, "「過剰な治療は時に死ぬ招くこともあります」", false),
     UnpleasantOmen("周りが気になります", false, "「どこかから嫌な気配を感じます」", false),
+    Capote("カポーテ", false, "命中と回避が減少します", true),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動職度が上昇します", true),
@@ -86,6 +87,10 @@ public enum EffectType {
     BeakMask("ビークマスク", true, "[スタン]と[スロー]以外の一般解除可能デバフにかからなくなります", false),
     HealingFactor("ヒーリングファクター", true, "持続的に体力を回復します\n付与時以上には回復しません", false),
     Modafinil("モダフィニル", true, "移動速度が上昇します", true),
+    Warcry("ウォークライ", 20, true, "物理与ダメージが上昇します", true),
+    Frenzy("フレンジー", 20, true, "物理与ダメージが上昇します", true),
+    Ole("OLE", true, "クリティカル発生と移動速度が上昇します", true),
+    Muleta("ムレタ", true, "反撃します", true),
     ;
 
     public String Display;

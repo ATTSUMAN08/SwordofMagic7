@@ -257,32 +257,36 @@ public class EnemyData {
                         });
                     }
 
-                    double topPriority = 0;
                     Priority.entrySet().removeIf(entry -> (
                             entry.getKey() instanceof Player player && !Function.isAlive(player))
                             || entry.getKey().getLocation().distance(entity.getLocation()) > mobData.Search
                             || entry.getKey().isDead());
-                    for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
-                        double priorityValue = priority.getValue();
-                        LivingEntity priorityTarget = priority.getKey();
-                        if (priorityTarget instanceof Player player) {
-                            PlayerData targetData = playerData(player);
-                            if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
-                                priorityValue = 0;
-                                Priority.put(priority.getKey(), 0d);
+                    if (effectManager.hasEffect(EffectType.Capote)) {
+                        target = (LivingEntity) effectManager.getData(EffectType.Capote).getObject(0);
+                    } else {
+                        double topPriority = 0;
+                        for (Map.Entry<LivingEntity, Double> priority : Priority.entrySet()) {
+                            double priorityValue = priority.getValue();
+                            LivingEntity priorityTarget = priority.getKey();
+                            if (priorityTarget instanceof Player player) {
+                                PlayerData targetData = playerData(player);
+                                if (targetData.EffectManager.hasEffect(EffectType.Teleportation)) {
+                                    priorityValue = 0;
+                                    Priority.put(priority.getKey(), 0d);
+                                }
+                                if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
+                                    priorityValue = 0;
+                                    if (target == player) target = null;
+                                }
+                                if (targetData.EffectManager.hasEffect(EffectType.HatePriority)) {
+                                    target = player;
+                                    break;
+                                }
                             }
-                            if (targetData.EffectManager.hasEffect(EffectType.Covert)) {
-                                priorityValue = 0;
-                                if (target == player) target = null;
+                            if (topPriority < priorityValue) {
+                                target = priorityTarget;
+                                topPriority = priorityValue;
                             }
-                            if (targetData.EffectManager.hasEffect(EffectType.HatePriority)) {
-                                target = player;
-                                break;
-                            }
-                        }
-                        if (topPriority < priorityValue) {
-                            target = priorityTarget;
-                            topPriority = priorityValue;
                         }
                     }
 

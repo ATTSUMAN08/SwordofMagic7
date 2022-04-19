@@ -2,7 +2,6 @@ package swordofmagic7.Skill.SkillClass;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.MultiThread.MultiThread;
@@ -10,7 +9,7 @@ import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.Ray;
-import swordofmagic7.Skill.Skill;
+import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
@@ -19,22 +18,14 @@ import java.util.Set;
 
 import static swordofmagic7.Damage.Damage.makeHeal;
 import static swordofmagic7.Function.playerHandLocation;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Priest {
-
-    private final SkillProcess skillProcess;
-    private final Player player;
-    private final PlayerData playerData;
-    private final Skill skill;
-
+public class Priest extends BaseSkillClass {
 
     public Priest(SkillProcess skillProcess) {
-        this.skillProcess = skillProcess;
-        skill = skillProcess.skill;
-        player = skillProcess.player;
-        playerData = skillProcess.playerData;
+        super(skillProcess);
     }
 
     public void MassHeal(SkillData skillData) {
@@ -87,8 +78,7 @@ public class Priest {
                 EffectManager.addEffect(ray.HitEntity, EffectType.Monstrance, skillData.ParameterValueInt(0) * 20, player);
                 playSound(player, SoundList.DeBuff);
             } else {
-                player.sendMessage("§c対象§aがいません");
-                playSound(player, SoundList.Nope);
+                sendMessage(player, "§c対象§aがいません", SoundList.Nope);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);

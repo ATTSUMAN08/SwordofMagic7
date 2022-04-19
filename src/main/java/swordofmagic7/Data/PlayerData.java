@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
@@ -42,6 +43,8 @@ import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.MapManager;
 import swordofmagic7.Menu.Menu;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Party.PartyData;
 import swordofmagic7.Pet.PetEvolution;
 import swordofmagic7.Pet.PetManager;
@@ -75,7 +78,7 @@ import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
     private static final HashMap<Player, PlayerData> playerData = new HashMap<>();
-    public static PlayerData playerData(Player player) {
+    public synchronized static PlayerData playerData(Player player) {
         if (player.isOnline()) {
             if (!playerData.containsKey(player)) {
                 playerData.put(player, new PlayerData(player));
@@ -959,6 +962,15 @@ public class PlayerData {
         }
     }
 
+    public BukkitTask ShieldTask;
+    public void changeShield(double shield, int time) {
+        Status.Shield = shield;
+        ShieldTask = MultiThread.TaskRunLater(() -> Status.Shield = 0, time, "Shield");
+    }
+    public void stopShieldTask() {
+        if (ShieldTask != null) ShieldTask.cancel();
+    }
+
     public void setHealth(double health) {
         Status.Health = health;
         changeHealth(0);
@@ -1077,11 +1089,12 @@ public class PlayerData {
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
                 deadTime = 1200;
                 Hologram hologram = createHologram(player.getEyeLocation());
-                hologram.appendTextLine(Nick);
+                hologram.appendTextLine(hologramLine[0].getText());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
                 hologram.appendItemLine(head);
                 new BukkitRunnable() {
+                    final ParticleData particleData = new ParticleData(Particle.END_ROD, 0.1f);
                     @Override
                     public void run() {
                         deadTime -= 10;
@@ -1112,10 +1125,17 @@ public class PlayerData {
                             LastDeadLocation.setPitch(player.getLocation().getPitch());
                             LastDeadLocation.setYaw(player.getLocation().getYaw());
                             player.teleportAsync(LastDeadLocation);
+                            ParticleManager.RandomVectorParticle(particleData, Function.playerHipsLocation(player), 10);
+                            MultiThread.TaskRun(() -> {
+                                for (int i = 0; i < 10; i++) {
+                                    player.setVelocity(new Vector());
+                                    MultiThread.sleepTick(1);
+                                }
+                            }, "PlayerDeadTick");
                             if (deadTime < 1100) player.sendTitle("§4§lYou Are Dead", "§e§lスニークでリスポーン", 0, 20, 0);
                         }
                     }
-                }.runTaskTimer(plugin, 0, 15);
+                }.runTaskTimer(plugin, 0, 10);
             }, "PlayerDead");
         }
     }

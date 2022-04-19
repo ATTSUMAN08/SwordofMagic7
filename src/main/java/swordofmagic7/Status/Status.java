@@ -55,6 +55,7 @@ public class Status {
     public double SkillRigidTime;
     public double SkillCooltime;
     public double Movement;
+    public double Shield;
 
 
     public HashMap<StatusParameter, Double> BaseStatus = new HashMap<>();
@@ -276,6 +277,7 @@ public class Status {
         Collection<EffectType> movementEffect = new HashSet<>();
         movementEffect.add(EffectType.Cloaking);
         movementEffect.add(EffectType.Modafinil);
+        movementEffect.add(EffectType.Ole);
         for (EffectType effectType : movementEffect) {
             if (playerData.EffectManager.hasEffect(effectType)) {
                 Movement += playerData.EffectManager.getData(effectType).getDouble(0);
