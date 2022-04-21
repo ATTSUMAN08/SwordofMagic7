@@ -54,77 +54,81 @@ public class EffectManager {
             while (isRunnable && plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
                 || (ownerType.isEnemy() && enemyData.isAlive())
                 || (ownerType.isPet() && petParameter.player.isOnline()))) {
-                isCrowdControl = false;
-                isSkillsNotAvailable = false;
-                isInvincible = false;
-                isSlow = false;
-                isBlind = false;
-                isFixed = null;
-                if (Effect.size() > 0) {
-                    for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
-                        EffectType effectType = effect.getKey();
-                        EffectData effectData = effect.getValue();
-                        if (!effectType.isToggle) effectData.time -= period;
-                        if (effectType.isCrowdControl()) isCrowdControl = true;
-                        if (effectType.isSkillsNotAvailable()) isSkillsNotAvailable = true;
-                        if (effectType.isInvincible()) isInvincible = true;
-                        if (effectType.isSlow()) isSlow = true;
-                        if (effectType.isBlind()) isBlind = true;
-                        if (effectType.isFixed()) isFixed = (Location) effectData.getObject(0);
-                        if (entity instanceof Player player) {
-                            switch (effectType) {
-                                case Indulgendia -> {
-                                    if (Math.floorMod(effectData.time, 20) == 0) {
-                                        double health = effectData.getDouble(0);
-                                        if (playerData(player).PvPMode) health /= Damage.PvPHealDecay;
-                                        playerData.changeHealth(health);
+                try {
+                    isCrowdControl = false;
+                    isSkillsNotAvailable = false;
+                    isInvincible = false;
+                    isSlow = false;
+                    isBlind = false;
+                    isFixed = null;
+                    if (Effect.size() > 0) {
+                        for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
+                            EffectType effectType = effect.getKey();
+                            EffectData effectData = effect.getValue();
+                            if (!effectType.isToggle) effectData.time -= period;
+                            if (effectType.isCrowdControl()) isCrowdControl = true;
+                            if (effectType.isSkillsNotAvailable()) isSkillsNotAvailable = true;
+                            if (effectType.isInvincible()) isInvincible = true;
+                            if (effectType.isSlow()) isSlow = true;
+                            if (effectType.isBlind()) isBlind = true;
+                            if (effectType.isFixed()) isFixed = (Location) effectData.getObject(0);
+                            if (entity instanceof Player player) {
+                                switch (effectType) {
+                                    case Indulgendia -> {
+                                        if (Math.floorMod(effectData.time, 20) == 0) {
+                                            double health = effectData.getDouble(0);
+                                            if (playerData(player).PvPMode) health /= Damage.PvPHealDecay;
+                                            playerData.changeHealth(health);
+                                        }
                                     }
-                                }
-                                case Brutality -> {
-                                    double mana = effectData.getDouble(0)/20*period;
-                                    playerData.changeMana(-mana);
-                                    if (playerData.Status.Mana < mana) {
-                                        removeEffect(EffectType.Brutality);
-                                        sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.Tick);
+                                    case Brutality -> {
+                                        double mana = effectData.getDouble(0) / 20 * period;
+                                        playerData.changeMana(-mana);
+                                        if (playerData.Status.Mana < mana) {
+                                            removeEffect(EffectType.Brutality);
+                                            sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.Tick);
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (effectData.time <= 0 || effectData.stack < 1) {
-                            removeEffect(effectType);
+                            if (effectData.time <= 0 || effectData.stack < 1) {
+                                removeEffect(effectType);
+                            }
                         }
                     }
-                }
-                if (entity != null) {
-                    MultiThread.TaskRunSynchronized(() -> {
-                        if (isFixed != null) entity.teleportAsync(isFixed);
-                        if (isCrowdControl) {
-                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                    if (entity != null) {
+                        MultiThread.TaskRunSynchronized(() -> {
+                            if (isFixed != null) entity.teleportAsync(isFixed);
+                            if (isCrowdControl) {
+                                if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                                    entity.removePotionEffect(PotionEffectType.SLOW);
+                                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
+                                }
+                            }
+                            if (isSlow) {
                                 entity.removePotionEffect(PotionEffectType.SLOW);
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 2, false, false));
                             }
-                        }
-                        if (isSlow) {
-                            entity.removePotionEffect(PotionEffectType.SLOW);
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 2, false, false));
-                        }
-                        if (isBlind) {
-                            entity.removePotionEffect(PotionEffectType.BLINDNESS);
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
-                        }
-                    }, "EffectManagerTimer");
-                    MultiThread.TaskRun(() -> {
-                        if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                            if (isCrowdControl) for (int i = 0; i < period; i++) {
-                                if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)
-                                    break;
-                                entity.setVelocity(Function.VectorDown);
-                                MultiThread.sleepTick(1);
+                            if (isBlind) {
+                                entity.removePotionEffect(PotionEffectType.BLINDNESS);
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
                             }
-                        }
-                    }, "EffectManagerCrowdControl");
+                        }, "EffectManagerTimer");
+                        MultiThread.TaskRun(() -> {
+                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                                if (isCrowdControl) for (int i = 0; i < period; i++) {
+                                    if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)
+                                        break;
+                                    entity.setVelocity(Function.VectorDown);
+                                    MultiThread.sleepTick(1);
+                                }
+                            }
+                        }, "EffectManagerCrowdControl");
+                    }
+                    MultiThread.sleepTick(period);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                MultiThread.sleepTick(period);
             }
         }, "EffectManager");
     }

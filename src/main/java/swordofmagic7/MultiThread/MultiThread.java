@@ -84,28 +84,29 @@ public class MultiThread extends Thread {
         return null;
     }
 
-    public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick) {
-        TaskRunSynchronizedLater(runnable, tick, "未定義");
+    public static BukkitTask TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick) {
+        return TaskRunSynchronizedLater(runnable, tick, "未定義");
     }
 
-    public static void TaskRunTimer(MultiThreadRunnable runnable, int tick) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, tick);
+    public static BukkitTask TaskRunTimer(MultiThreadRunnable runnable, int tick) {
+        return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, tick);
     }
 
-    public static void TaskRunSynchronizedTimer(MultiThreadRunnable runnable, int tick, String ThreadTag) {
+    public static BukkitTask TaskRunSynchronizedTimer(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (log) Log("TaskRunSynchronizedTimer -> " + ThreadTag);
-        Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0, tick);
+        return Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0, tick);
     }
 
-    public static void TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
+    public static BukkitTask TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (plugin.isEnabled()) {
             try {
-                Bukkit.getScheduler().runTaskLater(plugin, runnable, tick);
+                return Bukkit.getScheduler().runTaskLater(plugin, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
             }
         }
+        return null;
     }
 
     public static void sleepMillis(long millis) {

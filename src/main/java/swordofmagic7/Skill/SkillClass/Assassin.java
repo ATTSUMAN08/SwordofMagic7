@@ -3,7 +3,6 @@ package swordofmagic7.Skill.SkillClass;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
@@ -12,7 +11,6 @@ import swordofmagic7.Function;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
-import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Skill.BaseSkillClass;
@@ -27,7 +25,6 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
-import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GunAttack;
 
@@ -128,22 +125,10 @@ public class Assassin extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.Covert, time);
             playerData.EffectManager.addEffect(EffectType.Cloaking, time, movement);
-            MultiThread.TaskRunSynchronized(() -> {
-                for (Player player : PlayerList.get()) {
-                    player.hidePlayer(plugin, playerData.player);
-                }
-            });
-            MultiThread.TaskRun(() -> {
-                MultiThread.sleepTick(time);
-                MultiThread.TaskRunSynchronized(() -> {
-                    for (Player player : PlayerList.get()) {
-                        player.showPlayer(plugin, playerData.player);
-                    }
-                });
-            }, "Cloaking");
+            playerData.showHide(time);
             playSound(player, SoundList.Shoot);
             skillProcess.SkillRigid(skillData);
-        }, "PeaceMaker");
+        }, skillData.Id);
     }
 
     public void Annihilation(SkillData skillData) {

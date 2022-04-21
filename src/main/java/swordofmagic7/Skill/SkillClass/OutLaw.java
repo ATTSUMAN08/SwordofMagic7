@@ -125,15 +125,14 @@ public class OutLaw extends BaseSkillClass {
             skill.setCastReady(false);
             double radius = skillData.ParameterValue(1);
             double value = skillData.ParameterValue(0)/100;
-            int time = skillData.ParameterValueInt(1)*20;
-            int count = skillData.ParameterValueInt(1);
+            int time = skillData.ParameterValueInt(2)*20;
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 18);
                 MultiThread.sleepMillis(millis);
             }
 
             for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate())) {
-                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, count);
+                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, 1);
                 victim.setVelocity(victim.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().setY(0.5));
                 if (EffectManager.hasEffect(victim, EffectType.Scary)) {
                     EffectManager.addEffect(victim, EffectType.Stun, 100, player);

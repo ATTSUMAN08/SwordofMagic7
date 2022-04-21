@@ -156,7 +156,7 @@ public class KingSlime {
 
             for (LivingEntity victim : ParticleManager.FanShapedCollider(Manager.enemyData.entity.getLocation(), Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), length), angle)) {
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), victim.getEyeLocation(), 1, 10);
-                Damage.makeDamage(entity, victim, DamageCause.ATK, "InsaneRush", 10000, 1);
+                Damage.makeDamage(entity, victim, DamageCause.ATK, "InsaneRush", 10000, 1, 0.5);
                 if (victim instanceof Player player) playSound(player, SoundList.Explosion);
             }
             Manager.CastSkill(false);

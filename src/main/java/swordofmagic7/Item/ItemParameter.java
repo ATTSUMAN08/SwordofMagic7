@@ -107,6 +107,8 @@ public class ItemParameter implements Cloneable {
                     Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param)) + " (" +String.format(format, this.itemEquipmentData.Parameter.get(param)) + ")");
                 }
             }
+            //if (itemEquipmentData.RuneMultiply != 1)
+            Lore.add(decoLore("ルーン性能") + String.format("%.0f", itemEquipmentData.RuneMultiply*100) + "%");
             Lore.add(decoLore("強化値") + itemEquipmentData.Plus);
             Lore.add(decoLore("耐久値") + itemEquipmentData.Durable + "/" + itemEquipmentData.MaxDurable);
             Lore.add(decoLore("必要レベル") + itemEquipmentData.ReqLevel);

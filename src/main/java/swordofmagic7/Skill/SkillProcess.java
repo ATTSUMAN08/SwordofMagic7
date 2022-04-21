@@ -173,6 +173,7 @@ public class SkillProcess {
     }
 
     public void normalAttack(Set<LivingEntity> victims) {
+        if (playerData.isAFK()) return;
         final String damageSource = "attack";
         if (playerData.Equipment.isWeaponEquip()) {
             if (0 >= normalAttackCoolTime) {

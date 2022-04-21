@@ -63,7 +63,7 @@ public class Priest extends BaseSkillClass {
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "HolyBuff");
+        }, skillData.Id);
     }
 
     public void Monstrance(SkillData skillData) {
@@ -82,6 +82,6 @@ public class Priest extends BaseSkillClass {
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
-        }, "Monstrance");
+        }, skillData.Id);
     }
 }

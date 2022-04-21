@@ -27,7 +27,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.Dungeon;
@@ -427,11 +426,7 @@ public class Events implements Listener {
                     attackerData.PetManager.PetSelect((LivingEntity) victim);
                 }
             } else if (event.getEntity() instanceof Player player) {
-                if (TagGame.isPlayer(attacker) || TagGame.isPlayer(player)) {
-                    if (!attacker.hasPotionEffect(PotionEffectType.BLINDNESS)) {
-                        TagGame.tagChange(attacker, player);
-                    }
-                }
+                TagGame.tagChange(attacker, player);
             } else if (PetManager.isPet(event.getEntity())) {
 
             }

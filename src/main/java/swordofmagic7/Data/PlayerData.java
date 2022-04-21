@@ -24,6 +24,7 @@ import swordofmagic7.Data.Type.StrafeType;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectOwnerType;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.Equipment;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Function;
@@ -964,12 +965,17 @@ public class PlayerData {
 
     public BukkitTask ShieldTask;
     public void changeShield(double shield, int time) {
-        Status.Shield = shield;
-        ShieldTask = MultiThread.TaskRunLater(() -> Status.Shield = 0, time, "Shield");
+        if (Status.Shield <= shield) {
+            stopShieldTask();
+            Status.Shield = shield;
+            ShieldTask = MultiThread.TaskRunLater(() -> Status.Shield = 0, time, "Shield");
+        }
     }
     public void stopShieldTask() {
         if (ShieldTask != null) ShieldTask.cancel();
     }
+
+
 
     public void setHealth(double health) {
         Status.Health = health;
@@ -1014,6 +1020,27 @@ public class PlayerData {
 
     public boolean isRightClickHold() {
         return RightClickHold || player.isHandRaised() || player.isBlocking();
+    }
+
+    public BukkitTask showHideTask;
+    public boolean hideFlag = false;
+    public void showHide(int time) {
+        showHideTask();
+        MultiThread.TaskRunSynchronized(() -> {
+            hideFlag = true;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.hidePlayer(plugin, this.player);
+            }
+        });
+        showHideTask = MultiThread.TaskRunSynchronizedLater(() -> {
+            hideFlag = false;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.showPlayer(plugin, this.player);
+            }
+        }, time);
+    }
+    public void showHideTask() {
+        if (showHideTask != null) showHideTask.cancel();
     }
 
     private double DPS = 0;
@@ -1076,6 +1103,10 @@ public class PlayerData {
 
     public int deadTime = 0;
     public void dead() {
+        if (EffectManager.hasEffect(EffectType.ShadowPool)) {
+            sendMessage(player, "§e[" + EffectType.ShadowPool.Display + "]§aの効果により§c死§aを防ぎました", SoundList.Tick);
+            return;
+        }
         if (!isDead) {
             isDead = true;
             final Location LastDeadLocation = player.getLocation();

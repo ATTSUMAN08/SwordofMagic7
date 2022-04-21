@@ -73,6 +73,7 @@ public class Skill {
     public final PlagueDoctor plagueDoctor;
     public final Barbarian barbarian;
     public final Matador matador;
+    public final Shadowmancer shadowmancer;
 
     public Alchemist getAlchemist() {
         return alchemist;
@@ -111,6 +112,7 @@ public class Skill {
         plagueDoctor = new PlagueDoctor(SkillProcess);
         barbarian = new Barbarian(SkillProcess);
         matador = new Matador(SkillProcess);
+        shadowmancer = new Shadowmancer(SkillProcess);
 
         alchemist = new Alchemist(SkillProcess);
 
@@ -143,7 +145,7 @@ public class Skill {
             if (!SkillStack.containsKey(skillDataBase.Id)) {
                 SkillStack.put(skillDataBase.Id, skillDataBase.Stack);
             }
-            if (CastReady && isAlive(player) && !player.isInsideVehicle()) {
+            if (CastReady && isAlive(player) && !player.isInsideVehicle() && !playerData.isAFK()) {
                 SkillData skillData = skillDataBase.clone();
                 if (CategoryCheck(skillData)) {
                     if (hasSkill(skillData.Id)) {
@@ -325,6 +327,12 @@ public class Skill {
                                             case "Ole" -> matador.Ole(skillData);
                                             case "CorridaFinale" -> matador.CorridaFinale(skillData);
                                             case "Muleta" -> matador.Muleta(skillData);
+                                            //シャドウマンサー
+                                            case "ShadowPool" -> shadowmancer.ShadowPool(skillData);
+                                            case "Hallucination" -> shadowmancer.Hallucination(skillData);
+                                            case "ShadowFatter" -> shadowmancer.ShadowFatter(skillData);
+                                            case "ShadowThorn" -> shadowmancer.ShadowThorn(skillData);
+                                            case "ShadowCondensation" -> shadowmancer.ShadowCondensation(skillData);
                                         }
                                         MultiThread.TaskRun(() -> {
                                             player.showBossBar(playerData.BossBarSkillProgress);
@@ -340,8 +348,6 @@ public class Skill {
                                                 MultiThread.sleepTick(1);
                                                 SkillCastProgress = 1f;
                                             }
-                                            playerData.BossBarSkillProgress.name(Component.text("§e硬直中"));
-                                            MultiThread.sleepTick(skillData.RigidTime);
                                             player.hideBossBar(playerData.BossBarSkillProgress);
                                             playerData.BossBarSkillProgress.progress(0);
                                         }, "CastTime");

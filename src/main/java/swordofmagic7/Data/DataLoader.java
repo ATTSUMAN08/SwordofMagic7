@@ -146,6 +146,7 @@ public class DataLoader {
                     itemParameter.itemEquipmentData.Durable = data.getInt("Durable");
                     itemParameter.itemEquipmentData.MaxDurable = itemParameter.itemEquipmentData.Durable;
                     itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
+                    itemParameter.itemEquipmentData.RuneMultiply = data.getDouble("RuneMultiply", 1);
                     double statusMultiply = data.getDouble("StatusMultiply", 1);
                     for (StatusParameter param : StatusParameter.values()) {
                         if (data.isSet(param.toString())) {
@@ -173,12 +174,25 @@ public class DataLoader {
                 runeData.Icon = Material.getMaterial(data.getString("Icon"));
                 runeData.Display = data.getString("Display");
                 runeData.Lore = data.getStringList("Lore");
+                runeData.isSpecial = data.getBoolean("isSpecial", false);
                 for (StatusParameter param : StatusParameter.values()) {
                     if (data.isSet(param.toString())) {
                         runeData.Parameter.put(param, data.getDouble(param.toString()));
                     } else {
                         runeData.Parameter.put(param, 0d);
                     }
+                }
+                int i = 0;
+                while (data.isSet("Parameter-" + i + ".Display")) {
+                    SkillParameter param = new SkillParameter();
+                    param.Display = data.getString("Parameter-" + i + ".Display");
+                    param.Value = data.getDouble("Parameter-" + i + ".Value");
+                    param.Increase = data.getDouble("Parameter-" + i + ".Increase");
+                    param.Prefix = data.getString("Parameter-" + i + ".Prefix");
+                    param.Suffix = data.getString("Parameter-" + i + ".Suffix");
+                    param.Format = data.getInt("Parameter-" + i + ".Format");
+                    runeData.AdditionParameter.add(param);
+                    i++;
                 }
                 RuneList.put(runeData.Id, runeData);
             } catch (Exception e) {

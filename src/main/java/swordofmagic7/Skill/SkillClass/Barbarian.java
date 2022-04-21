@@ -58,6 +58,7 @@ public class Barbarian extends BaseSkillClass {
             skill.setCastReady(false);
             double value = skillData.ParameterValue(0)/100 * skillData.ParameterValue(2);
             double radius = skillData.ParameterValue(1);
+            int time = skillData.ParameterValueInt(3)*20;
             ParticleData particleData = new ParticleData(Particle.CRIT);
 
             for (int i = 0; i < skillData.CastTime; i++) {
@@ -68,6 +69,7 @@ public class Barbarian extends BaseSkillClass {
             for (LivingEntity victim : Function.NearLivingEntity(player.getLocation().clone().add(0, radius/2, 0), radius, skillProcess.Predicate())) {
                 if (!victim.isOnGround()) {
                     Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, value, 1);
+                    EffectManager.addEffect(victim, EffectType.Stun, time, player);
                     ParticleManager.LineParticle(particleData, player.getEyeLocation(), victim.getEyeLocation(), 0.5, 2);
                 }
             }

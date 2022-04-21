@@ -21,6 +21,7 @@ public class ItemEquipmentData implements Cloneable {
     public HashMap<StatusParameter, Double> Parameter = new HashMap<>();
     public int RuneSlot = 0;
     public List<RuneParameter> Rune = new ArrayList<>();
+    public double RuneMultiply = 1;
 
     public HashMap<StatusParameter, Double> Parameter() {
         return Parameter(PlayerData.MaxLevel);
@@ -31,7 +32,7 @@ public class ItemEquipmentData implements Cloneable {
         for (StatusParameter statusParameter : StatusParameter.values()) {
             double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05+(Math.pow(Plus, 1.8)/100));
             for (RuneParameter rune : Rune) {
-                parameter += rune.Parameter(statusParameter, limit);
+                parameter += rune.Parameter(statusParameter, limit)*RuneMultiply;
             }
             Parameter.put(statusParameter, parameter);
         }

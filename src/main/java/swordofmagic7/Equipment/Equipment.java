@@ -6,13 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.ItemFlame;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -21,10 +20,14 @@ public class Equipment {
     private final Player player;
     private final PlayerData playerData;
     private final HashMap<EquipmentSlot, ItemParameter> EquipSlot = new HashMap<>();
+    private final HashMap<EquipmentSlot, Set<String>> EquipRune = new HashMap<>();
 
     public Equipment(Player player, PlayerData playerData) {
         this.player = player;
         this.playerData = playerData;
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+            EquipRune.put(equipmentSlot, new HashSet<>());
+        }
     }
 
     public boolean isEquip(EquipmentSlot slot) {
@@ -105,6 +108,9 @@ public class Equipment {
             }
 
             EquipSlot.put(slot, param.clone());
+            for (RuneParameter rune : param.itemEquipmentData.Rune) {
+                EquipRune.get(slot).add(rune.Id);
+            }
             playerData.ItemInventory.removeItemParameter(param, 1);
 
             player.sendMessage("§e[" + param.Display + "]§aを§e装備§aしました");
@@ -120,7 +126,28 @@ public class Equipment {
                 playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
                 player.sendMessage("§e[" + getEquip(slot).Display + "]§aを外しました");
                 EquipSlot.remove(slot);
+                EquipRune.get(slot).clear();
             }
         }
+    }
+
+    public Set<String> RuneList() {
+        Set<String> runes = new HashSet<>();
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+            runes.addAll(EquipRune.get(equipmentSlot));
+        }
+        return runes;
+    }
+
+    public Set<String> RuneList(EquipmentSlot slot) {
+        return EquipRune.get(slot);
+    }
+
+    public boolean equippedRune(String runeId) {
+        return RuneList().contains(runeId);
+    }
+
+    public boolean equippedRune(EquipmentSlot slot, String runeId) {
+        return RuneList(slot).contains(runeId);
     }
 }

@@ -134,6 +134,12 @@ public class Statistics {
         if (TotalEnemyKills >= 100000) titleManager.addTitle("エネミー討伐100000");
         if (TotalEnemyKills >= 250000) titleManager.addTitle("エネミー討伐250000");
         if (TotalEnemyKills >= 1000000) titleManager.addTitle("エネミー討伐1000000");
+
+        if (TotalBossEnemyKills >= 500) titleManager.addTitle("ボスエネミー討伐500");
+        if (TotalBossEnemyKills >= 1000) titleManager.addTitle("ボスエネミー討伐1000");
+        if (TotalBossEnemyKills >= 2500) titleManager.addTitle("ボスエネミー討伐2500");
+        if (TotalBossEnemyKills >= 5000) titleManager.addTitle("ボスエネミー討伐5000");
+        if (TotalBossEnemyKills >= 10000) titleManager.addTitle("ボスエネミー討伐10000");
     }
 
     public void enemyKill(MobData mobData) {

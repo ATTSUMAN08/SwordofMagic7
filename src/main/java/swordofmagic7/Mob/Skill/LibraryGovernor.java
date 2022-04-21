@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemySkillManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
@@ -119,7 +120,8 @@ public class LibraryGovernor {
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 Location location = null;
                 float yaw = player.getLocation().getYaw();
-                switch (Math.abs(player.getName().hashCode() % 4)) {
+                int hashInt = Function.StringToHashInt(player.getName(), 4);
+                switch (hashInt) {
                     case 0 -> {
                         if (player.getEyeLocation().getPitch() > -70) location = player.getEyeLocation().clone().add(0, 5, 0);
                     }
@@ -144,5 +146,18 @@ public class LibraryGovernor {
             MultiThread.sleepTick(10);
             Manager.CastSkill(false);
         }, "UnpleasantOmen");
+    }
+
+    public void DifferenceInInertia() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c「寂しがりやな人、一人でいたい人、それぞれ感性の違いというものがあります」", SoundList.DungeonTrigger);
+            MultiThread.sleepTick(80);
+            for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
+                EffectManager.addEffect(player, EffectType.Glory, 900, null);
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "ItsGlory");
     }
 }

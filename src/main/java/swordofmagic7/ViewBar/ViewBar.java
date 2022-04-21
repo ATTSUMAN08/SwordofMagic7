@@ -210,7 +210,7 @@ public class ViewBar {
                             int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
 
-                            if (!isAlive(player) || player.isSneaking() || playerData.EffectManager.hasEffect(EffectType.Cloaking) || playerData.Map.Id.equals("DefenseBattle")) {
+                            if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
                                 if (playerData.visibilityManager.isVisibleByDefault()) {
                                     playerData.visibilityManager.setVisibleByDefault(false);
                                 }
@@ -253,7 +253,7 @@ public class ViewBar {
             }
             setSideBar("Party", data);
         } else resetSideBar("Party");
-        if (TagGame.isPlayer(player)) {
+        if (TagGame.isJoinedPlayer(player)) {
             List<String> data = new ArrayList<>();
             data.add(decoText("鬼ごっこ"));
             data.addAll(List.of(TagGame.info()));

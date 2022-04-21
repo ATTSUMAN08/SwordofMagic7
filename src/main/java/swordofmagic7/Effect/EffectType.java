@@ -21,7 +21,7 @@ public enum EffectType {
     Confusion("混乱", false, "50%の確率で発動するスキルスロットが変更されます"),
     SequelaeReducedDistortion("縮小歪曲後遺症", false, "効果はありません"),
     Concussion("脳震盪", false, "[氷結]と同じ効果です"),
-    DeathVerdict("デスヴァーディクト", false, "[氷結]と同じ効果です", true),
+    DeathVerdict("デスヴァーディクト", false, "被ダメージ耐性が減少します", true),
     Adhesive("粘着", false, "攻撃力が低下します", true),
     Unconscious("無自覚", EffectRank.Impossible, false, "「自分では、自分が狂っていることはわからないものです」", false),
     Decay("崩壊", EffectRank.Impossible, false, "「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", false),
@@ -91,6 +91,8 @@ public enum EffectType {
     Frenzy("フレンジー", 20, true, "物理与ダメージが上昇します", true),
     Ole("OLE", true, "クリティカル発生と移動速度が上昇します", true),
     Muleta("ムレタ", true, "反撃します", true),
+    ShadowPool("シャドウプール", true, "あらゆる死を回避します", false),
+    ShadowFatter("シャドウファッター", EffectRank.High, true, "[固定]を同じ状態になります", false),
     ;
 
     public String Display;
@@ -189,7 +191,7 @@ public enum EffectType {
     }
 
     public boolean isFixed() {
-        return this == Fixed || this == Keelhauling;
+        return this == Fixed || this == Keelhauling || this == ShadowFatter;
     }
 
     public boolean isFreeze() {
@@ -201,11 +203,11 @@ public enum EffectType {
     }
 
     public boolean isSkillsNotAvailable() {
-        return this == Silence || isFreeze();
+        return this == Silence || this == ShadowPool || isFreeze();
     }
 
     public boolean isInvincible() {
-        return this == Invincible || this == Stop;
+        return this == Invincible || this == Stop || this == ShadowPool;
     }
 
     public boolean isSlow() {

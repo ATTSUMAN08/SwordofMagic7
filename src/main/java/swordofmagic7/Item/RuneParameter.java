@@ -3,6 +3,7 @@ package swordofmagic7.Item;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.DataBase;
+import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Status.StatusParameter;
 
 import java.util.ArrayList;
@@ -19,7 +20,9 @@ public class RuneParameter implements Cloneable {
     public List<String> Lore = new ArrayList<>();
     public double Quality = 0.5;
     public int Level = 0;
+    public boolean isSpecial = false;
     public HashMap<StatusParameter, Double> Parameter = new HashMap<>();
+    public List<SkillParameter> AdditionParameter = new ArrayList<>();
 
     public RuneParameter() {
         for (StatusParameter param : StatusParameter.values()) {
@@ -40,6 +43,18 @@ public class RuneParameter implements Cloneable {
         return Parameter.get(param) * (1+0.0125*Math.pow(Math.min(Level, limit), 1.5) * (Quality*2+1));
     }
 
+    public double AdditionParameterValue(int i) {
+        if (AdditionParameter.size() > i) {
+            return AdditionParameter.get(i).Value;
+        } else {
+            return -1;
+        }
+    }
+
+    public int AdditionParameterValueInt(int i) {
+        return Math.toIntExact(Math.round(AdditionParameterValue(i)));
+    }
+
     public ItemStack viewRune(String format) {
         List<String> Lore = loreText(this.Lore);
         Lore.add(decoText("§3§lパラメーター"));
@@ -47,6 +62,9 @@ public class RuneParameter implements Cloneable {
         Lore.add(decoLore("§e§l品質") + String.format(format, Quality*100) + "%");
         for (StatusParameter param : StatusParameter.values()) {
             if (isZero(Parameter.get(param))) Lore.add(param.DecoDisplay +  String.format(format, Parameter(param)));
+        }
+        for (SkillParameter param : AdditionParameter) {
+            Lore.add(decoLore(param.Display) + param.valueView());
         }
         ItemStack item = new ItemStackData(Icon, decoText(Display), Lore).view();
         item.setAmount(Math.min(DataBase.MaxStackAmount, Level));

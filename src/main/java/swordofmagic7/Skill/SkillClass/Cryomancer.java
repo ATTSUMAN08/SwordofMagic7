@@ -44,6 +44,7 @@ public class Cryomancer extends BaseSkillClass {
             particleData.randomOffset = true;
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.8f;
+            final ParticleData particleData2 = new ParticleData(Particle.FIREWORKS_SPARK).setRandomOffset(1);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
@@ -55,14 +56,15 @@ public class Cryomancer extends BaseSkillClass {
             int time = skillData.ParameterValueInt(1)*20;
             int time2 = skillData.ParameterValueInt(5)*20;
             double freezePercent = skillData.ParameterValue(3)/100;
+            final Location originTop = origin.clone().add(0,8,0);
             MultiThread.TaskRun(() -> {
                 for (int i = 0; i < time/hitRate; i++) {
-                    ParticleManager.CircleParticle(particleData, origin, radius / 2, 10);
-                    ParticleManager.CylinderParticle(particleData, origin, 2, 5, 30, 5);
+                    ParticleManager.CircleParticle(particleData, origin, radius/1.5, 30);
+                    ParticleManager.CylinderParticle(particleData2, origin, 1, 8, 5, 2);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     MultiThread.TaskRun(() -> {
                         for (LivingEntity victim : victims) {
-                            ParticleManager.LineParticle(particleData, victim.getLocation(), victim.getEyeLocation(), 1, 10);
+                            ParticleManager.LineParticle(particleData, originTop, victim.getEyeLocation(), 1, 10);
                             Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
                             if (random.nextDouble() < freezePercent) EffectManager.addEffect(victim, EffectType.Freeze, time2, player);
                             MultiThread.sleepTick(1);

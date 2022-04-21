@@ -140,9 +140,12 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
-            PlayerData.getPlayerData().entrySet().removeIf(entry -> !entry.getKey().isOnline());
             for (PlayerData playerData : PlayerData.getPlayerData().values()) {
-                playerData.save();
+                if (playerData.player.isOnline()) {
+                    playerData.save();
+                } else {
+                    MultiThread.TaskRunLater(playerData::remove, 1, "AutoSave");
+                }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
             HologramSet.removeIf(Hologram::isDeleted);
@@ -663,6 +666,17 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         TagGame.join(player);
                     } else if (args[0].equalsIgnoreCase("leave")) {
                         TagGame.leave(player);
+                    } else if (args[0].equalsIgnoreCase("start") && TagGame.Master == player) {
+                        TagGame.startTagGame();
+                    } else if (args[0].equalsIgnoreCase("reset") && TagGame.Master == player) {
+                        TagGame.resetTagGame();
+                    } else if (args[0].equalsIgnoreCase("master")) {
+                        if (TagGame.Master == null || !TagGame.Master.isOnline()) {
+                            TagGame.Master = player;
+                            sendMessage(player, "§eゲームマスター§aになりました");
+                        } else {
+                            sendMessage(player, TagGame.Master.getDisplayName() + "§aが§eゲームマスター§aです");
+                        }
                     }
                 } else {
                     for (String str : TagGame.info()) {
@@ -693,6 +707,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 playerData.PetInventory.PetInventorySortReverse();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("tutorial")) {
+                if (TagGame.isTagPlayerNonMessage(player)) return true;
                 Tutorial.tutorialHub(player);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("trade")) {
@@ -770,7 +785,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("itemInfo")) {
                 if (args.length == 1) {
-                    if (ItemList.containsKey(args[0])) {
+                    if (args[0].equalsIgnoreCase("Amount")) {
+                        sendMessage(player, "§aItemListSize: " + ItemList.size());
+                    } else if (ItemList.containsKey(args[0])) {
                         ItemParameter item = getItemParameter(args[0]);
                         List<String> list = new ArrayList<>();
                         list.add(decoText(item.Display));
@@ -783,7 +800,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("runeInfo")) {
                 if (args.length >= 1) {
-                    if (RuneList.containsKey(args[0])) {
+                    if (args[0].equalsIgnoreCase("Amount")) {
+                        sendMessage(player, "§aRuneListSize: " + RuneList.size());
+                    } else if (RuneList.containsKey(args[0])) {
                         RuneParameter rune = getRuneParameter(args[0]);
                         try {
                             if (args[1] != null) rune.Level = Math.min(Math.max(Integer.parseInt(args[1]), 1), PlayerData.MaxLevel);
@@ -889,6 +908,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 sendMessage(player, "EntityCount: " + player.getWorld().getEntityCount());
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("loadOnLiveServer")) {
+                if (TagGame.isTagPlayerNonMessage(player)) return true;
                 MultiThread.TaskRun(() -> {
                     if (ServerId.equalsIgnoreCase("Dev")) {
                         try {

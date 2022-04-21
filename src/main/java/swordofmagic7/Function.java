@@ -408,4 +408,12 @@ public final class Function {
         out.writeUTF(server);
         player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
     }
+
+    public static int StringToHashInt(String str) {
+        return Math.abs(str.hashCode());
+    }
+
+    public static int StringToHashInt(String str, int mod) {
+        return Math.abs(str.hashCode() % mod);
+    }
 }
