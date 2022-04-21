@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
@@ -63,6 +64,7 @@ public class Dungeon {
     public static void Initialize() {
         //TarnetEnter.reset();
         DefenseBattle.onLoad();
+        DimensionLibraryB1.onLoad();
         //createTouchHologram("§e§lアルターターネット", new Location(world, 3109, 132, 749.5), (Player player) -> TarnetEnter.start());
 
         //createTouchHologram("§e§l防衛戦", new Location(world, 1200.5, 86.2, 99.5), DefenseBattle::teleport);

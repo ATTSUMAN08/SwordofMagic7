@@ -357,7 +357,7 @@ public final class DataBase {
         }
     }
 
-    static MapData getMapData(String str) {
+    public static MapData getMapData(String str) {
         if (MapList.containsKey(str)) {
             return MapList.get(str);
         } else {

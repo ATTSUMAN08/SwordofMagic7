@@ -161,12 +161,19 @@ public class PetParameter implements Cloneable {
     public void updateStatus() {
         HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
         HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
+        boolean isNotDummy = !petData.Id.equals("訓練用ダミー");
         for (StatusParameter param : StatusParameter.values()) {
             MultiplyStatus.put(param, 1d);
             EquipmentStatus.put(param, 0d);
             FixedStatus.put(param, 0d);
             multiplyStatusRev.put(param, 1d);
             baseMultiplyStatusRev.put(param, 1d);
+        }
+        if (isNotDummy && playerData.Equipment.isWeaponEquip(EquipmentCategory.Baton)) {
+            ItemParameter item = playerData.Equipment.getEquip(EquipmentSlot.MainHand);
+            for (StatusParameter param : StatusParameter.values()) {
+                EquipmentStatus.put(param, item.itemEquipmentData.Parameter(playerData.Level).get(param));
+            }
         }
         for (DamageCause cause : DamageCause.values()) {
             DamageCauseMultiply.put(cause, 1d);
@@ -209,9 +216,9 @@ public class PetParameter implements Cloneable {
         SkillData basicTamer = getSkillData("BasicTamer");
         if (playerData.Skill.hasSkill("BasicTamer")) {
             Multiply *= 1+basicTamer.ParameterValue(1)/100;
-            if (playerData.Equipment.isEquip(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == EquipmentCategory.Baton) {
-                Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
-            }
+        }
+        if (isNotDummy && playerData.Equipment.isWeaponEquip(EquipmentCategory.Baton)) {
+            Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
         }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);
         MaxHealth = (petData.MaxHealth * Multiply + EquipmentStatus(StatusParameter.MaxHealth)) * MultiplyStatus(StatusParameter.MaxHealth);

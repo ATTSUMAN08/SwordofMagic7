@@ -215,7 +215,12 @@ public class DataLoader {
                 petData.Lore = data.getStringList("Lore");
                 petData.entityType = EntityType.fromName(data.getString("Type").toUpperCase());
                 if (data.isSet("Disguise.Type")) {
-                    petData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
+                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase());
+                    if (disguiseType == DisguiseType.PLAYER) {
+                        petData.disguise = new PlayerDisguise(data.getString("Disguise.Player"));
+                    } else {
+                        petData.disguise = new MobDisguise(disguiseType);
+                    }
                     disguiseLoader(petData.disguise, data);
                 }
                 petData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
@@ -650,7 +655,12 @@ public class DataLoader {
                 mobData.Icon = Material.getMaterial(data.getString("Icon", mobData.entityType + "_SPAWN_EGG"));
                 if (mobData.Icon == null) mobData.Icon = Material.PAPER;
                 if (data.isSet("Disguise.Type")) {
-                    mobData.disguise = new MobDisguise(DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase()));
+                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase());
+                    if (disguiseType == DisguiseType.PLAYER) {
+                        mobData.disguise = new PlayerDisguise(data.getString("Disguise.Player"));
+                    } else {
+                        mobData.disguise = new MobDisguise(disguiseType);
+                    }
                     disguiseLoader(mobData.disguise, data);
                 }
                 mobData.Health = data.getDouble("Health", 100);
@@ -960,7 +970,7 @@ public class DataLoader {
         }
     }
 
-    public static void disguiseLoader(MobDisguise disguise, FileConfiguration data) {
+    public static void disguiseLoader(Disguise disguise, FileConfiguration data) {
         switch (disguise.getType()) {
             case SLIME -> {
                 SlimeWatcher watcher = new SlimeWatcher(disguise);
@@ -990,6 +1000,11 @@ public class DataLoader {
             case CAT -> {
                 CatWatcher watcher = new CatWatcher(disguise);
                 watcher.setType(data.isSet("Disguise.CatType") ? Cat.Type.valueOf(data.getString("Disguise.CatType")) : Cat.Type.RED);
+                disguise.setWatcher(watcher);
+            }
+            case PLAYER -> {
+                PlayerWatcher watcher = new PlayerWatcher(disguise);
+                watcher.setSkin(data.getString("Disguise.Player", "MomiNeko"));
                 disguise.setWatcher(watcher);
             }
         }

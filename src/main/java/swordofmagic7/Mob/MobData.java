@@ -1,6 +1,6 @@
 package swordofmagic7.Mob;
 
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
+import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
@@ -12,7 +12,7 @@ public class MobData {
     public List<String> Lore;
     public String Display;
     public EntityType entityType;
-    public MobDisguise disguise;
+    public Disguise disguise;
     public Material Icon;
     public double ColliderSize;
     public boolean Glowing;

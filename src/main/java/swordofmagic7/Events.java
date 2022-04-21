@@ -29,6 +29,7 @@ import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Life.FishingCommand;
 import swordofmagic7.Mob.MobManager;
@@ -216,6 +217,7 @@ public class Events implements Listener {
             MultiThread.TaskRun(() -> {
                 if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
                     if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
+                        DimensionLibraryB1.use(player);
                         switch (action) {
                             case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
                                 if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {

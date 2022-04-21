@@ -402,6 +402,10 @@ public final class Function {
         player.sendMessage("§b[+]§e" + itemParameter.Display + "§ax" + amount);
     }
 
+    public static Predicate<LivingEntity> otherPredicate(Player player) {
+        return entity -> entity != player;
+    }
+
     public static void teleportServer(Player player, String server) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");

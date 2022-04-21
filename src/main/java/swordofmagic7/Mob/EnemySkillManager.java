@@ -75,11 +75,11 @@ public class EnemySkillManager {
             case "PileUpper" -> PullUpper(13, 160, 40);
 
             case "SkillLaser" -> basicSkills.SkillLaser();
-
+            //サイモア
             case "PileOut" -> symmore.PileOut(30);
             case "Howl" -> symmore.Howl(80);
             case "MagicExplosion" -> symmore.MagicExplosion(300);
-
+            //グリフィア
             case "SingleFlameCircle" -> griffia.SingleFlameCircle(20);
             case "AreaFlameCircle" -> griffia.AreaFlameCircle(20);
             case "FlamePile" -> griffia.FlamePile(100);
@@ -87,13 +87,13 @@ public class EnemySkillManager {
             case "Loyalty" -> griffia.Loyalty(100);
             case "Fluctuation" -> griffia.Fluctuation(250);
             case "FixedStar" -> griffia.FixedStar(150);
-
+            //リーライ
             case "Glitter" -> leeLai.Glitter(60);
             case "Flash" -> leeLai.Flash(60);
             case "Reflection" -> leeLai.Reflection();
             case "Glory" -> leeLai.Glory(60);
             case "Seiko" -> leeLai.Seiko();
-
+            //シノサス
             case "SynosasRangeAttack" -> synosas.RangeAttack(5);
             case "SynosasVerticalAttack" -> synosas.VerticalAttack(5);
             case "Forced" -> synosas.Forced(5);
@@ -102,19 +102,19 @@ public class EnemySkillManager {
             case "SynosasEffect" -> synosas.Effect(100);
             case "Quiet" -> synosas.Quiet(20);
             case "Distrust" -> synosas.Distrust(0);
-
+            //キングスライム
             case "SlimeLaser" -> kingSlime.SlimeLaser();
             case "Crush" -> kingSlime.Crush(50);
             case "Adhesive" -> kingSlime.Adhesive(50);
             case "SummonFamiliar" -> kingSlime.SummonFamiliar();
             case "InsaneRush" -> kingSlime.InsaneRush(100);
-
+            //エクスタ
             case "Launch" -> exta.Launch(50);
             case "Impact" -> exta.Impact(50);
             case "Starting" -> exta.Starting();
             case "Thought" -> exta.Thought(50);
             case "Acceleration" -> exta.Acceleration();
-
+            //ヴァノセト
             case "Tornado" -> vanoset.Tornado(50);
             case "Squall" -> vanoset.Squall(50);
             case "WrongedFaith" -> vanoset.WrongedFaith(50);
@@ -125,11 +125,12 @@ public class EnemySkillManager {
             case "Decay" -> vanoset.Decay();
             case "CantLook" -> vanoset.CantLook();
             case "JustHistory" -> vanoset.JustHistory(30);
-
+            //リブラリーガバナー
             case "ToBow" -> libraryGovernor.ToBow();
             case "ItsGlory" -> libraryGovernor.ItsGlory();
             case "ExcessiveTreatment" -> libraryGovernor.ExcessiveTreatment();
             case "UnpleasantOmen" -> libraryGovernor.UnpleasantOmen();
+            case "DifferenceInInertia" -> libraryGovernor.DifferenceInInertia();
 
 
         }

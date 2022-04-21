@@ -8,6 +8,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.LifeType;
+import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
@@ -36,6 +37,10 @@ public class Equipment {
 
     public boolean isWeaponEquip() {
         return EquipSlot.containsKey(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).Category.isEquipment();
+    }
+
+    public boolean isWeaponEquip(EquipmentCategory category) {
+        return isWeaponEquip() && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == category;
     }
 
     public ItemParameter getEquip(EquipmentSlot slot) {
@@ -72,6 +77,9 @@ public class Equipment {
         player.getInventory().setItem(37, ItemFlame);
         player.getInventory().setItem(38, ItemFlame);
         playerData.Status.StatusUpdate();
+        for (PetParameter pet : playerData.PetSummon) {
+            pet.updateStatus();
+        }
     }
 
     public boolean Equip(EquipmentSlot slot, ItemParameter param) {

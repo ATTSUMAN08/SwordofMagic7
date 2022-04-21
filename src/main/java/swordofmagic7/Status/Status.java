@@ -11,6 +11,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectDataBase;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Skill.Skill;
@@ -179,22 +180,24 @@ public class Status {
         }
         for (SkillData skillData : playerData.Classes.getPassiveSkillList()) {
             if (playerData.Skill.CategoryCheck(skillData)) {
+                double multiply = 1;
+                if (skillData.Id.equals("BasicDamageDown") && playerData.Equipment.isWeaponEquip(EquipmentCategory.Mace)) multiply = -1;
                 for (SkillParameter param : skillData.Parameter) {
                     for (StatusParameter statusParam : StatusParameter.values()) {
                         if (param.Display.equalsIgnoreCase("基礎" + statusParam.Display)) {
-                            BaseMultiplyStatusAdd(statusParam, param.Value / 100);
+                            BaseMultiplyStatusAdd(statusParam, param.Value / 100 * multiply);
                         } else if (param.Display.equalsIgnoreCase(statusParam.Display)) {
-                            MultiplyStatusAdd(statusParam, param.Value / 100);
+                            MultiplyStatusAdd(statusParam, param.Value / 100 * multiply);
                         }
                     }
                     if (param.Display.equalsIgnoreCase("物理与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                        DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100);
+                        DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100 * multiply);
                     } if (param.Display.equalsIgnoreCase("魔法与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                        DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100);
+                        DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100 * multiply);
                     } if (param.Display.equalsIgnoreCase("物理被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                        DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100);
+                        DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100 * multiply);
                     } if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                        DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
+                        DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100 * multiply);
                     }
                 }
             }

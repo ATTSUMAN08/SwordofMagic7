@@ -1,6 +1,6 @@
 package swordofmagic7.Pet;
 
-import me.libraryaddict.disguise.disguisetypes.MobDisguise;
+import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
@@ -9,7 +9,7 @@ import java.util.List;
 public class PetData {
     public String Id;
     public EntityType entityType;
-    public MobDisguise disguise;
+    public Disguise disguise;
 
     public String Display;
     public List<String> Lore;

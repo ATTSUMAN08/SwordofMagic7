@@ -217,6 +217,8 @@ public class Editor {
                 int radiusY = Integer.parseInt(args[4]);
                 int maxMob = Integer.parseInt(args[5]);
                 int perSpawn = Integer.parseInt(args[6]);
+                File dir = new File(DataBasePath, "Spawner/" + name + "/");
+                if (!dir.exists()) dir.mkdirs();
                 File file = new File(DataBasePath, "Spawner/" + name + "/" + name + "Lv" + level + "_" + index + ".yml");
                 if (!file.exists()) {
                     try {

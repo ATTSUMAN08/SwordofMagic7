@@ -98,9 +98,9 @@ public class EffectManager {
                     }
                     if (entity != null) {
                         MultiThread.TaskRunSynchronized(() -> {
-                            if (isFixed != null) entity.teleportAsync(isFixed);
-                            if (isCrowdControl) {
-                                if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                                if (isFixed != null) entity.teleportAsync(isFixed);
+                                if (isCrowdControl) {
                                     entity.removePotionEffect(PotionEffectType.SLOW);
                                     entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
                                 }
@@ -117,8 +117,7 @@ public class EffectManager {
                         MultiThread.TaskRun(() -> {
                             if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
                                 if (isCrowdControl) for (int i = 0; i < period; i++) {
-                                    if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR)
-                                        break;
+                                    if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) break;
                                     entity.setVelocity(Function.VectorDown);
                                     MultiThread.sleepTick(1);
                                 }

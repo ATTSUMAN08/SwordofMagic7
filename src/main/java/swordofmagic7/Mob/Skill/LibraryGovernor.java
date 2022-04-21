@@ -49,8 +49,8 @@ public class LibraryGovernor {
             MultiThread.sleepTick(50);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 if (!player.isSneaking() || player.getEyeLocation().getPitch() < 70) {
-                    PlayerData.playerData(player).dead();
-                    sendMessage(player, "§cルールや手順を誤ると待っているのは死です", SoundList.Nope);
+                    PlayerData.playerData(player).setHealth(1);
+                    sendMessage(player, "§cルールや手順を誤ると待っているのは死です。次からは気をつけましょう", SoundList.Nope);
                 } else {
                     sendMessage(player, "§c勝利の糸口はルールや手順を守ることです", SoundList.Nope);
                 }
@@ -154,10 +154,25 @@ public class LibraryGovernor {
             radiusMessage("§c「寂しがりやな人、一人でいたい人、それぞれ感性の違いというものがあります」", SoundList.DungeonTrigger);
             MultiThread.sleepTick(80);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
-                EffectManager.addEffect(player, EffectType.Glory, 900, null);
+                int hashInt = Function.StringToHashInt(player.getName(), 2);
+                if (hashInt == 0) {
+                    if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).size() > 0) {
+                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.Tick);
+                    } else {
+                        sendMessage(player, "§c「寂しさは、時に人を死に追いやります」", SoundList.Nope);
+                        PlayerData.playerData(player).dead();
+                    }
+                } else if (hashInt == 1) {
+                    if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).size() == 0) {
+                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.Tick);
+                    } else {
+                        sendMessage(player, "§c「一人でいたいときに、周りに人がいるのは不快です」", SoundList.Nope);
+                        PlayerData.playerData(player).dead();
+                    }
+                }
             }
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
-        }, "ItsGlory");
+        }, "DifferenceInInertia");
     }
 }
