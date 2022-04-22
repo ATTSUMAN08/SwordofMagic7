@@ -12,8 +12,8 @@ import swordofmagic7.Sound.SoundList;
 import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Function.playerWhileCheck;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
@@ -29,7 +29,7 @@ public class PetInventory extends BasicInventory {
 
     public void start() {
         MultiThread.TaskRun(() -> {
-            while (player.isOnline() && plugin.isEnabled()) {
+            while (playerWhileCheck(playerData)) {
                 if (List.size() > 0) {
                     for (PetParameter pet : List) {
                         if (!pet.Summoned) {

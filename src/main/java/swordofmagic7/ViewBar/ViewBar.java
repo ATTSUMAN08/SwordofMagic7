@@ -20,7 +20,6 @@ import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.plugin;
 
 public class ViewBar {
 
@@ -172,7 +171,7 @@ public class ViewBar {
         MultiThread.TaskRun(() -> {
             if (status.Health < 0) status.Health = status.MaxHealth;
             if (status.Mana < 0) status.Mana = status.MaxMana;
-            while (player.isOnline() && plugin.isEnabled()) {
+            while (playerWhileCheck(playerData)) {
                 try {
                     if (playerData.PlayMode && playerData.isLoaded) {
                         if (playerData.HealthRegenDelay > 0) {

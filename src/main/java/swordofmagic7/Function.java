@@ -131,6 +131,10 @@ public final class Function {
         return false;
     }
 
+    public static boolean playerWhileCheck(PlayerData playerData) {
+        return  PlayerData.playerData.containsValue(playerData) && playerData.player.isOnline() && plugin.isEnabled();
+    }
+
     public static String decoLore(String str) {
         return "§7・" + colored(str, "§e§l") + "§7: §a§l";
     }

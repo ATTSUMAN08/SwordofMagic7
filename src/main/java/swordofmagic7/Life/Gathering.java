@@ -26,8 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.ItemGetLog;
-import static swordofmagic7.Function.isAlive;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.plugin;
 import static swordofmagic7.SomCore.random;
@@ -220,7 +219,7 @@ public class Gathering {
                 for (int i = 0; i < requestFishingCommand.length; i++) {
                     requestFishingCommand[i] = FishingCommands[random.nextInt(FishingCommands.length)];
                 }
-                while (player.isOnline() && plugin.isEnabled() && isAlive(player) && inputProgress < requestFishingCommand.length && Function.isHoldFishingRod(player) && FishingMissCount < MissLeft) {
+                while (playerWhileCheck(playerData) && isAlive(player) && inputProgress < requestFishingCommand.length && Function.isHoldFishingRod(player) && FishingMissCount < MissLeft) {
                     if (!playerData.isAFK()) {
                         StringBuilder title = new StringBuilder();
                         StringBuilder preview = new StringBuilder();

@@ -140,15 +140,14 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
             PlayerList.ResetPlayer.clear();
-            Set<UUID> Players = PlayerData.getPlayerData().keySet();
-            for (UUID uuid : Players) {
-                Player player = Bukkit.getPlayer(uuid);
+            Collection<PlayerData> PlayerDataList = new HashSet<>(PlayerData.getPlayerData().values());
+            for (PlayerData playerData : PlayerDataList) {
+                Player player = playerData.player;
                 if (player != null) {
                     if (player.isOnline()) {
-                        PlayerData playerData = PlayerData.playerData(player);
                         playerData.save();
                     } else {
-                        PlayerData.getPlayerData().remove(player.getUniqueId());
+                        PlayerData.remove(player);
                     }
                 }
             }
@@ -158,20 +157,26 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         MultiThread.TaskRunTimer(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                PlayerData playerData = PlayerData.playerData(player);
-                if (PlayerLastLocation.containsKey(player)) {
-                    Location location = PlayerLastLocation.get(player);
-                    if (location.distance(player.getLocation()) < 2) {
-                        playerData.AFKTime += AFKTimePeriod;
-                        playerData.statistics.AFKTime += AFKTimePeriod;
-                        if (playerData.isAFK()) player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "", 0, AFKTimePeriod*20+5, 0);
+                if (!PlayerData.ContainPlayer(player)) {
+                    sendMessage(player, "§cプレイヤーデータが読み込まれていません");
+                    teleportServer(player, "Lobby");
+                } else {
+                    PlayerData playerData = PlayerData.playerData(player);
+                    if (PlayerLastLocation.containsKey(player)) {
+                        Location location = PlayerLastLocation.get(player);
+                        if (location.distance(player.getLocation()) < 2) {
+                            playerData.AFKTime += AFKTimePeriod;
+                            playerData.statistics.AFKTime += AFKTimePeriod;
+                            if (playerData.isAFK())
+                                player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "", 0, AFKTimePeriod * 20 + 5, 0);
+                        } else {
+                            PlayerLastLocation.put(player, player.getLocation().clone());
+                            playerData.AFKTime = 0;
+                        }
                     } else {
                         PlayerLastLocation.put(player, player.getLocation().clone());
                         playerData.AFKTime = 0;
                     }
-                } else {
-                    PlayerLastLocation.put(player, player.getLocation().clone());
-                    playerData.AFKTime = 0;
                 }
             }
             PlayerLastLocation.keySet().removeIf(player -> !player.isOnline());

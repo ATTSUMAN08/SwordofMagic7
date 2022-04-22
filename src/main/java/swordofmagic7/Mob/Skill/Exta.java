@@ -54,10 +54,9 @@ public class Exta {
                 Manager.CastSkillIgnoreAI(true);
                 ParticleData particleData = new ParticleData(Particle.REDSTONE, 0.05f);
                 ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
-                int i = 0;
-                while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
+
+                for (int i = 0; i < CastTime; i += Manager.period) {
                     ParticleManager.CircleParticle(particleData, target.getLocation(), 1, 24);
-                    i += Manager.period;
                     MultiThread.sleepTick(Manager.period);
                 }
 
@@ -82,14 +81,12 @@ public class Exta {
                 Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime+60);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f, Function.VectorUp);
                 ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
-                int i = 0;
-                while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
+                for (int i = 0; i < CastTime; i += Manager.period) {
                     ParticleManager.CircleParticle(particleData, entity.getLocation(), 1, 24);
-                    i += Manager.period;
                     MultiThread.sleepTick(Manager.period);
                 }
 
-                for (i = 0; i < 5; i++) {
+                for (int i = 0; i < 5; i++) {
                     double radius = i*5;
                     double radius2 = (i+1)*5;
                     Location origin = entity.getLocation();
@@ -158,13 +155,11 @@ public class Exta {
             radiusMessage("§c遠くにいる人を見つめています！", SoundList.DungeonTrigger);
             ParticleData particleData = new ParticleData(Particle.SMOKE_NORMAL, 0.05f);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
-            int i = 0;
             Location origin = Manager.enemyData.entity.getLocation();
             LivingEntity target = Function.FarthestLivingEntity(origin, Function.NearEntityByEnemy(origin, 64));
             if (target != null) {
-                while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
+                for (int i = 0; i < CastTime; i += Manager.period) {
                     ParticleManager.CircleParticle(particleData, target.getLocation(), 1, 24);
-                    i += Manager.period;
                     MultiThread.sleepTick(Manager.period);
                 }
 

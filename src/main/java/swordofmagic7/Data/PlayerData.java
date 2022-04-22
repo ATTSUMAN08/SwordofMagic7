@@ -78,28 +78,32 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
-    private static final HashMap<UUID, PlayerData> playerData = new HashMap<>();
+    public static final HashMap<Player, PlayerData> playerData = new HashMap<>();
     public synchronized static PlayerData playerData(Player player) {
         if (player.isOnline()) {
-            if (!playerData.containsKey(player.getUniqueId())) {
-                playerData.put(player.getUniqueId(), new PlayerData(player));
+            if (!playerData.containsKey(player)) {
+                playerData.put(player, new PlayerData(player));
             }
-            return playerData.get(player.getUniqueId());
+            return playerData.get(player);
         }
         Log("§c" + player.getName() + "§c, " + player.getUniqueId() + " is Offline or Npc", true);
-        return playerData.get(player.getUniqueId());
+        return playerData.get(player);
     }
 
     public static void remove(Player player) {
-        playerData.remove(player.getUniqueId());
+        playerData.remove(player);
     }
 
     public void remove() {
-        playerData.remove(player.getUniqueId());
+        playerData.remove(player);
     }
 
-    public static HashMap<UUID, PlayerData> getPlayerData() {
+    public static HashMap<Player, PlayerData> getPlayerData() {
         return playerData;
+    }
+
+    public static boolean ContainPlayer(Player player) {
+        return playerData.containsKey(player);
     }
 
     public final Player player;
@@ -221,7 +225,7 @@ public class PlayerData {
         InitializeBossBar();
 
         MultiThread.TaskRun(() -> {
-            while (player.isOnline() && plugin.isEnabled()) {
+            while (playerWhileCheck(this)) {
                 if (useCookCoolTime > 0) useCookCoolTime--;
                 for (Map.Entry<ItemPotionType, Integer> entry : PotionCoolTime.entrySet()) {
                     PotionCoolTime.merge(entry.getKey(), -1, Integer::sum);
@@ -248,7 +252,7 @@ public class PlayerData {
             hologramLine[0] = hologram.appendTextLine("NameTag");
             hologramLine[1] = hologram.appendTextLine("HealthBar");
             MultiThread.TaskRun(() -> {
-                while (plugin.isEnabled() && player.isOnline()) {
+                while (playerWhileCheck(this)) {
                     if (visibilityManager.isVisibleByDefault()) {
                         visibilityManager.resetVisibilityAll();
                         if (HoloSelfView && !isAFK()) visibilityManager.showTo(player);
@@ -266,7 +270,7 @@ public class PlayerData {
                 }
             }, "HologramViewDistance");
             MultiThread.TaskRun(() -> {
-                while (plugin.isEnabled() && player.isOnline()) {
+                while (playerWhileCheck(this)) {
                     if (titleManager.Title.flame > 1) {
                         if (titleManager.Title.flame - 1 > HoloAnim) {
                             HoloWait++;
@@ -310,7 +314,7 @@ public class PlayerData {
     public void InitializeBossBar() {
         player.showBossBar(BossBarTargetInfo);
         MultiThread.TaskRun(() -> {
-            while (plugin.isEnabled() && player.isOnline()) {
+            while (playerWhileCheck(this)) {
                 LivingEntity entity = overrideTargetEntity != null ? overrideTargetEntity : targetEntity;
                 if (entity != null && !entity.isDead()) {
                     player.showBossBar(BossBarTargetInfo);

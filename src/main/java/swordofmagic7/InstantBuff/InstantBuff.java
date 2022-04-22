@@ -8,7 +8,7 @@ import swordofmagic7.Status.StatusParameter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static swordofmagic7.SomCore.plugin;
+import static swordofmagic7.Function.playerWhileCheck;
 
 public class InstantBuff {
     private final Player player;
@@ -49,7 +49,7 @@ public class InstantBuff {
         player = playerData.player;
         this.playerData = playerData;
         MultiThread.TaskRun(() -> {
-            while (player.isOnline() && plugin.isEnabled()) {
+            while (playerWhileCheck(playerData)) {
                 if (InstantBuffs.size() > 0) {
                     for (Map.Entry<String, InstantBuffData> data : new HashMap<>(InstantBuffs).entrySet()) {
                         data.getValue().time--;

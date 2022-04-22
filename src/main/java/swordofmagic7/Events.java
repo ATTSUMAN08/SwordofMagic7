@@ -93,7 +93,7 @@ public class Events implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium);
-        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.getPlayerData().containsKey(player.getUniqueId()))) {
+        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player))) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
         }

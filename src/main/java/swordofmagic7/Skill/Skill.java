@@ -117,7 +117,7 @@ public class Skill {
         alchemist = new Alchemist(SkillProcess);
 
         MultiThread.TaskRun(() -> {
-            while (player.isOnline() && plugin.isEnabled()) {
+            while (playerWhileCheck(playerData)) {
                 for (Map.Entry<String, Integer> data : SkillCoolTime.entrySet()) {
                     String key = data.getKey();
                     int cooltime = data.getValue()-1;
