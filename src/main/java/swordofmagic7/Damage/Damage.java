@@ -90,7 +90,7 @@ public final class Damage {
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably) {
-        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably);
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably, false);
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably, boolean ignoreInvincible) {

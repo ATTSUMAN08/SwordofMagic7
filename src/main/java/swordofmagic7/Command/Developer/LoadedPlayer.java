@@ -6,6 +6,7 @@ import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Data.PlayerData;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class LoadedPlayer implements SomCommand {
     @Override
@@ -16,8 +17,8 @@ public class LoadedPlayer implements SomCommand {
     @Override
     public boolean Command(CommandSender sender, String[] args) {
         sender.sendMessage("Loaded PlayerData: ");
-        for (Map.Entry<Player, PlayerData> loopData : PlayerData.getPlayerData().entrySet()) {
-            sender.sendMessage(loopData.getKey().getUniqueId() + ": " + loopData.getValue().player.getName());
+        for (Map.Entry<UUID, PlayerData> loopData : PlayerData.getPlayerData().entrySet()) {
+            sender.sendMessage(loopData.getKey().toString() + ": " + loopData.getValue().player.getName());
         }
         return true;
     }

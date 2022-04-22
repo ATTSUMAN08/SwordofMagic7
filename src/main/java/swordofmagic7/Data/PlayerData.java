@@ -78,27 +78,27 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
-    private static final HashMap<Player, PlayerData> playerData = new HashMap<>();
+    private static final HashMap<UUID, PlayerData> playerData = new HashMap<>();
     public synchronized static PlayerData playerData(Player player) {
         if (player.isOnline()) {
-            if (!playerData.containsKey(player)) {
-                playerData.put(player, new PlayerData(player));
+            if (!playerData.containsKey(player.getUniqueId())) {
+                playerData.put(player.getUniqueId(), new PlayerData(player));
             }
-            return playerData.get(player);
+            return playerData.get(player.getUniqueId());
         }
         Log("§c" + player.getName() + "§c, " + player.getUniqueId() + " is Offline or Npc", true);
-        return playerData.get(player);
+        return playerData.get(player.getUniqueId());
     }
 
     public static void remove(Player player) {
-        playerData.remove(player);
+        playerData.remove(player.getUniqueId());
     }
 
     public void remove() {
-        playerData.remove(player);
+        playerData.remove(player.getUniqueId());
     }
 
-    public static HashMap<Player, PlayerData> getPlayerData() {
+    public static HashMap<UUID, PlayerData> getPlayerData() {
         return playerData;
     }
 

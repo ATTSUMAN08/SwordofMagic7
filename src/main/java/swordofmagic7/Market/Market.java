@@ -343,6 +343,7 @@ class MarketSort implements Comparator<MarketCache> {
     public int compare(MarketCache market, MarketCache market2) {
         ItemParameter item = market.marketData.itemParameterStack.itemParameter;
         ItemParameter item2 = market2.marketData.itemParameterStack.itemParameter;
+        if (item == null || item2 == null) return 0;
         if (item.Category == item2.Category) {
             return item.Id.compareTo(item2.Id);
         } else {

@@ -46,10 +46,7 @@ import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -143,13 +140,16 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
             PlayerList.ResetPlayer.clear();
-            Set<Player> Players = PlayerData.getPlayerData().keySet();
-            for (Player player : Players) {
-                if (player.isOnline()) {
-                    PlayerData playerData = PlayerData.playerData(player);
-                    playerData.save();
-                } else {
-                    PlayerData.getPlayerData().remove(player);
+            Set<UUID> Players = PlayerData.getPlayerData().keySet();
+            for (UUID uuid : Players) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) {
+                    if (player.isOnline()) {
+                        PlayerData playerData = PlayerData.playerData(player);
+                        playerData.save();
+                    } else {
+                        PlayerData.getPlayerData().remove(player.getUniqueId());
+                    }
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");

@@ -20,10 +20,7 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
@@ -93,7 +90,8 @@ public class PlagueDoctor extends BaseSkillClass {
                     for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
                         EffectManager effectManager = EffectManager.getEffectManager(victim);
                         int perCount = 0;
-                        for (EffectType effectType : effectManager.Effect.keySet()) {
+                        Set<EffectType> effects = effectManager.Effect.keySet();
+                        for (EffectType effectType : effects) {
                             if (perCount >= count) break;
                             if (effectType.Buff && !effectType.effectRank.isImpossible()) {
                                 effectManager.removeEffect(effectType, player);

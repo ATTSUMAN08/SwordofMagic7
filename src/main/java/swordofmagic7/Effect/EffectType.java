@@ -35,6 +35,7 @@ public enum EffectType {
     ExcessiveTreatment("過剰な治療", EffectRank.Impossible, false, "「過剰な治療は時に死ぬを招くこともあります」", false),
     UnpleasantOmen("周りが気になります", EffectRank.Impossible, false, "「どこかから嫌な気配を感じます」", false),
     Capote("カポーテ", false, "命中と回避が減少します", true),
+    ShadowFatter("シャドウファッター", EffectRank.High, false, "[固定]を同じ状態になります", false),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動職度が上昇します", true),
@@ -92,7 +93,6 @@ public enum EffectType {
     Ole("OLE", true, "クリティカル発生と移動速度が上昇します", true),
     Muleta("ムレタ", true, "反撃します", true),
     ShadowPool("シャドウプール", true, "あらゆる死を回避します", false),
-    ShadowFatter("シャドウファッター", EffectRank.High, true, "[固定]を同じ状態になります", false),
     ;
 
     public String Display;

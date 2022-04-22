@@ -396,8 +396,8 @@ public class EnemyData {
                 message.add("§7・§eTOPヘイト値§7: §e" + name + " §b-> §c" + String.format("%.0f", PriorityTable.get(0).getValue()));
                 int i = 1;
                 for (Map.Entry<LivingEntity, Double> entry : DamageTable) {
-                    name = PriorityTable.get(0).getKey().getName();
-                    if (PriorityTable.get(0).getKey() instanceof Player player) name = PlayerData.playerData(player).getNick();
+                    name = entry.getKey().getName();
+                    if (entry.getKey() instanceof Player player) name = PlayerData.playerData(player).getNick();
                     message.add("§7・§e" + i + "位§7: §e" + name + " §b-> §c" + String.format("%.0f", entry.getValue()));
                     if (i >= 5) break;
                     i++;

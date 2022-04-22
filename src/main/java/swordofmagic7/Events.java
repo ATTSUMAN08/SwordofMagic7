@@ -81,7 +81,7 @@ public class Events implements Listener {
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
         if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (((!player.hasPermission(OverLogin) || !player.hasPermission(Som7Premium)) || isEventServer()) && !player.hasPermission(OverLogin) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
+                if (((!player.hasPermission(OverLogin) && !player.hasPermission(Som7Premium)) || isEventServer()) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
                     return;
                 }
@@ -92,10 +92,8 @@ public class Events implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission(OverLogin) &&
-            //!player.hasPermission(Som7VIP) &&
-            !player.hasPermission(Som7Premium) &&
-            PlayerList.ResetPlayer.contains(player.getName())) {
+        boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium);
+        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.getPlayerData().containsKey(player.getUniqueId()))) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
         }

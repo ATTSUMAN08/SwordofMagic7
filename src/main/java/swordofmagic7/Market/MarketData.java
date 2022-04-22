@@ -57,7 +57,11 @@ public class MarketData {
         File file = new File(DataBasePath, "Market/" + Market.MarketPriceYml);
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         Lore.add(Function.decoText("§3§l出品情報"));
-        Lore.add(Function.decoLore("参考相場") + (data.isSet(itemPram.Id) ? data.getInt(itemPram.Id) : "§7§l過去取引無し"));
+        try {
+            Lore.add(Function.decoLore("参考相場") + (data.isSet(itemPram.Id) ? data.getInt(itemPram.Id) : "§7§l過去取引無し"));
+        } catch (Exception e) {
+            Lore.add(Function.decoLore("参考相場") + "§c§l読み込みに失敗しました");
+        }
         Lore.add(Function.decoLore("出品者") + MarketContainer.getOwnerNick(Owner));
         Lore.add(Function.decoLore("出品価格") + Mel + "メル/個");
         Lore.add(Function.decoLore("出品数") + itemParameterStack.Amount + "個");

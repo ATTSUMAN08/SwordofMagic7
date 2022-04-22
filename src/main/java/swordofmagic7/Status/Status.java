@@ -304,7 +304,7 @@ public class Status {
         }
         player.setPlayerListName(classText + "§e| " + prefix + color + playerData.Nick);
         player.setDisplayName(prefix + "§f" + playerData.Nick);
-        if (playerData.hologramLine[0] != null) playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+        if (playerData.hologram != null && !playerData.hologram.isDeleted() && playerData.hologramLine[0] != null) playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
     }
 
     public double finalStatus(StatusParameter param) {
