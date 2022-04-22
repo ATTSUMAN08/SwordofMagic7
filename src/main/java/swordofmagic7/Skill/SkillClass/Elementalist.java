@@ -8,6 +8,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -69,10 +70,11 @@ public class Elementalist extends BaseSkillClass {
             }
 
             skillProcess.SkillRigid(skillData);
-            int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
-            int time = (int) Math.round(skillData.ParameterValue(1)*20);
-            double freezePercent = skillData.ParameterValue(3)/100;
             MultiThread.TaskRun(() -> {
+                int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
+                int time = (int) Math.round(skillData.ParameterValue(1)*20);
+                RuneParameter rune = playerData.Equipment.equippedRune("ヘイルのルーン");
+                double freezePercent = skillData.ParameterValue(3)/100 * (rune != null ? rune.AdditionParameterValue(0) : 1);
                 for (int i = 0; i <= time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin.clone().add(0, 6, 0), radius / 2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));

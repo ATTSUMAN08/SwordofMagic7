@@ -15,6 +15,7 @@ public class MapData implements Cloneable {
     public int Level = 0;
     public boolean Safe;
     public double ReqCombatPower = 0;
+    public boolean isRaid = false;
     public HashMap<String, String> GatheringData = new HashMap<>();
 
     public boolean isGathering(Material material) {

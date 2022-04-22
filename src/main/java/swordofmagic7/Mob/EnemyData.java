@@ -391,10 +391,14 @@ public class EnemyData {
                 PriorityTable.sort((obj1, obj2) -> obj2.getValue().compareTo(obj1.getValue()));
                 List<String> message = new ArrayList<>();
                 message.add(decoText("ダメージランキング"));
-                message.add("§7・§eTOPヘイト値§7: §e" + PriorityTable.get(0).getKey().getName() + " §b-> §c" + String.format("%.0f", PriorityTable.get(0).getValue()));
+                String name = PriorityTable.get(0).getKey().getName();
+                if (PriorityTable.get(0).getKey() instanceof Player player) name = PlayerData.playerData(player).getNick();
+                message.add("§7・§eTOPヘイト値§7: §e" + name + " §b-> §c" + String.format("%.0f", PriorityTable.get(0).getValue()));
                 int i = 1;
                 for (Map.Entry<LivingEntity, Double> entry : DamageTable) {
-                    message.add("§7・§e" + i + "位§7: §e" + entry.getKey().getName() + " §b-> §c" + String.format("%.0f", entry.getValue()));
+                    name = PriorityTable.get(0).getKey().getName();
+                    if (PriorityTable.get(0).getKey() instanceof Player player) name = PlayerData.playerData(player).getNick();
+                    message.add("§7・§e" + i + "位§7: §e" + name + " §b-> §c" + String.format("%.0f", entry.getValue()));
                     if (i >= 5) break;
                     i++;
                 }
@@ -457,8 +461,13 @@ public class EnemyData {
                             if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
                                 if (random.nextDouble() <= dropData.Percent * percentMultiply) {
                                     RuneParameter runeParameter = dropData.runeParameter.clone();
-                                    runeParameter.Quality = random.nextDouble();
-                                    runeParameter.Level = Level;
+                                    if (runeParameter.isSpecial) {
+                                        runeParameter.Level = 1;
+                                        runeParameter.Quality = 1;
+                                    } else {
+                                        runeParameter.Level = Level;
+                                        runeParameter.Quality = random.nextDouble();
+                                    }
                                     if (!mobData.enemyType.isBoss() && (playerData.RuneQualityFilter > runeParameter.Quality || playerData.RuneIdFilter.contains(runeParameter.Id))) {
                                         playerData.RuneShop.addRuneCrashed(runeParameter);
                                         playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);

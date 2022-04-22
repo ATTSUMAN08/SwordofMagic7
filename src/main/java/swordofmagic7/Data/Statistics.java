@@ -96,12 +96,18 @@ public class Statistics {
         if (UpgradeUseCostCount >= 10000) titleManager.addTitle("強化石消費10000");
         if (UpgradeUseCostCount >= 30000) titleManager.addTitle("強化石消費30000");
         if (UpgradeUseCostCount >= 50000) titleManager.addTitle("強化石消費50000");
+        if (UpgradeUseCostCount >= 100000) titleManager.addTitle("強化石消費100000");
+        if (UpgradeUseCostCount >= 200000) titleManager.addTitle("強化石消費200000");
+        if (UpgradeUseCostCount >= 300000) titleManager.addTitle("強化石消費300000");
 
         if (StrafeCount >= 1000) titleManager.addTitle("ストレイフ回数1000");
         if (StrafeCount >= 5000) titleManager.addTitle("ストレイフ回数5000");
         if (StrafeCount >= 10000) titleManager.addTitle("ストレイフ回数10000");
         if (StrafeCount >= 30000) titleManager.addTitle("ストレイフ回数30000");
         if (StrafeCount >= 50000) titleManager.addTitle("ストレイフ回数50000");
+        if (StrafeCount >= 100000) titleManager.addTitle("ストレイフ回数100000");
+        if (StrafeCount >= 200000) titleManager.addTitle("ストレイフ回数200000");
+        if (StrafeCount >= 300000) titleManager.addTitle("ストレイフ回数300000");
 
         for (ClassData classData : DataBase.ClassList.values()) {
             if (playerData.Classes.getClassLevel(classData) >= 15) {

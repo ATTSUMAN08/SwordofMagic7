@@ -120,6 +120,17 @@ public final class Function {
         return (entity instanceof ItemFrame || entity.getType() == EntityType.ARMOR_STAND || entity instanceof Minecart || CitizensAPI.getNPCRegistry().isNPC(entity));
     }
 
+    public static boolean StringEqual(String str, String str2) {
+        return str.equalsIgnoreCase(str2);
+    }
+
+    public static boolean StringEqual(String str, String[] str2) {
+        for (String strData : str2) {
+            if (str.equalsIgnoreCase(strData)) return true;
+        }
+        return false;
+    }
+
     public static String decoLore(String str) {
         return "§7・" + colored(str, "§e§l") + "§7: §a§l";
     }

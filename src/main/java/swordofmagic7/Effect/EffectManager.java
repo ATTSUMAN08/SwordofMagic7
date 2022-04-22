@@ -144,6 +144,11 @@ public class EffectManager {
         return addEffect(effectType, time, null, 1);
     }
 
+    public boolean addEffect(EffectType effectType, int time, Location locationData) {
+        return addEffect(effectType, time, new Object[]{locationData}, 1);
+    }
+
+
     public boolean addEffect(EffectType effectType, int time, double doubleData) {
         return addEffect(effectType, time, new Object[]{doubleData}, 1);
     }
@@ -260,6 +265,10 @@ public class EffectManager {
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, double doubleData) {
         addEffect(entity, effectType, time, 1, player, new Object[]{doubleData});
+    }
+
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, Location locationData) {
+        addEffect(entity, effectType, time, 1, player, new Object[]{locationData});
     }
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, int stack, Player player) {

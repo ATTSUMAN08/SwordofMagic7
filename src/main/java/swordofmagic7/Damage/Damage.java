@@ -37,7 +37,7 @@ public final class Damage {
     public static double PvPDecay = 100;
     public static double PvPHealDecay = 10;
 
-    public static void makeHeal(Player healer, Player victim, double healMultiply) {
+    public static void makeHeal(Player healer, Player victim, String source, double healMultiply) {
         PlayerData healerData = playerData(healer);
         PlayerData victimData = playerData(victim);
         if (victimData.EffectManager.hasEffect(EffectType.RecoveryInhibition)) {
@@ -75,21 +75,25 @@ public final class Damage {
     public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably, int wait) {
         MultiThread.TaskRun(() -> {
             for (LivingEntity victim : victims) {
-                makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably);
+                makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably, false);
                 MultiThread.sleepTick(wait);
             }
         }, "MakeDamage");
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count) {
-        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, 0, false);
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, 0, false, false);
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate) {
-        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, false);
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, false, false);
     }
 
     public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably) {
+        makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably);
+    }
+
+    public static void makeDamage(LivingEntity attacker, LivingEntity victim, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably, boolean ignoreInvincible) {
         if (victim.isDead()) return;
 
         double ATK;
@@ -208,7 +212,7 @@ public final class Damage {
         } else return;
 
         victim.playEffect(EntityEffect.HURT);
-        if (victimEffectManager.isInvincible()) {
+        if (victimEffectManager.isInvincible() && !ignoreInvincible) {
             String log = "§b§l" + EffectType.Invincible.Display;
             randomHologram(log, victim.getEyeLocation());
             if (attacker instanceof Player player) {

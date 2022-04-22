@@ -46,6 +46,7 @@ public class MobInfo {
         int slot = 0;
         int index = scroll * 8;
         List<MobData> list = new ArrayList<>(DataBase.MobList.values());
+        list.removeIf(mob -> mob.isHide);
         list.sort(new MobInfoSort());
         ItemStack[] itemStacks = new ItemStack[54];
         for (int i = 0; i < 48; i++) {

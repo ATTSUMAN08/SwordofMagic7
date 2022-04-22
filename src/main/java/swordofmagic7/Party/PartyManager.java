@@ -189,7 +189,7 @@ public class PartyManager {
                 player.sendMessage(decoLore("/party promote <Player>") + "リーダー権を譲渡します");
                 player.sendMessage(decoLore("/party kick <Player>") + "プレイヤーをパーティから追放します");
                 player.sendMessage(decoLore("/party lore <Text>") + "パーティの説明文を設定ます");
-                player.sendMessage(decoLore("/party toggle <Player>") + "パーティの公開設定を切り替えます");
+                player.sendMessage(decoLore("/party toggle") + "パーティの公開設定を切り替えます");
             }
         }
     }

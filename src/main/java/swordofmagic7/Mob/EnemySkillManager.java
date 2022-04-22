@@ -131,7 +131,9 @@ public class EnemySkillManager {
             case "ExcessiveTreatment" -> libraryGovernor.ExcessiveTreatment();
             case "UnpleasantOmen" -> libraryGovernor.UnpleasantOmen();
             case "DifferenceInInertia" -> libraryGovernor.DifferenceInInertia();
-
+            case "GovernorSave" -> libraryGovernor.GovernorSave();
+            case "GovernorLoad" -> libraryGovernor.GovernorLoad();
+            case "NecessarySacrifice" -> libraryGovernor.NecessarySacrifice();
 
         }
         MultiThread.TaskRun(() -> {

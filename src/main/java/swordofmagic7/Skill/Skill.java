@@ -172,6 +172,16 @@ public class Skill {
                                     skillData.CastTime = (int) Math.floor(skillData.CastTime * (1 / playerData.Status.SkillCastTime));
                                     skillData.RigidTime = (int) Math.floor(skillData.RigidTime * (1 / playerData.Status.SkillRigidTime));
                                     skillData.CoolTime = (int) Math.floor(skillData.CoolTime * (1 / playerData.Status.SkillCooltime));
+                                    int coolTime = skillData.CoolTime;
+                                    if (playerData.Map.isRaid) {
+                                        switch (skillData.Id) {
+                                            case "Resurrection" -> coolTime = 20 * 60 * 5;
+                                            case "BackMasking" -> {
+                                                sendMessage(player, "§a現在の§eマップ§aでは使用できません", SoundList.Nope);
+                                                return;
+                                            }
+                                        }
+                                    }
                                     try {
                                         switch (skillData.Id) {
                                             //ノービス
@@ -353,7 +363,7 @@ public class Skill {
                                         }, "CastTime");
                                         playerData.changeMana(-skillData.Mana);
                                         useStack(skillData);
-                                        setSkillCoolTime(skillData);
+                                        setSkillCoolTime(skillData, coolTime);
                                     }  catch (NoClassDefFoundError e) {
                                         e.printStackTrace();
                                         sendMessage(player, "§cNoClassDefFoundErrorが発生しました。別CHへ移動してください", SoundList.Nope);
@@ -378,6 +388,10 @@ public class Skill {
                 }
             }
         }, "SkillCast");
+    }
+
+    void setSkillCoolTime(SkillData skillData, int time) {
+        SkillCoolTime.put(skillData.Id, time);
     }
 
     void setSkillCoolTime(SkillData skillData) {

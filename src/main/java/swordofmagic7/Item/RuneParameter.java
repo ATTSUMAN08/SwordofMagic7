@@ -21,6 +21,8 @@ public class RuneParameter implements Cloneable {
     public double Quality = 0.5;
     public int Level = 0;
     public boolean isSpecial = false;
+    public boolean isHide = false;
+    public boolean isLoreHide = false;
     public HashMap<StatusParameter, Double> Parameter = new HashMap<>();
     public List<SkillParameter> AdditionParameter = new ArrayList<>();
 
@@ -45,7 +47,7 @@ public class RuneParameter implements Cloneable {
 
     public double AdditionParameterValue(int i) {
         if (AdditionParameter.size() > i) {
-            return AdditionParameter.get(i).Value;
+            return AdditionParameter.get(i).Value + (AdditionParameter.get(i).Increase*(Level-1));
         } else {
             return -1;
         }
@@ -56,7 +58,13 @@ public class RuneParameter implements Cloneable {
     }
 
     public ItemStack viewRune(String format) {
-        List<String> Lore = loreText(this.Lore);
+        return viewRune(format, false);
+    }
+
+    public ItemStack viewRune(String format, boolean isLoreHide) {
+        List<String> Lore = new ArrayList<>();
+        if (isLoreHide) Lore.add("§c§lこの情報へのアクセス権限がありません");
+        else Lore.addAll(loreText(this.Lore));
         Lore.add(decoText("§3§lパラメーター"));
         Lore.add(decoLore("§e§lレベル") + Level);
         Lore.add(decoLore("§e§l品質") + String.format(format, Quality*100) + "%");

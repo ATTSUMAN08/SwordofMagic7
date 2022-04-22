@@ -2,7 +2,10 @@ package swordofmagic7.Mob.Skill;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import swordofmagic7.Damage.Damage;
+import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
@@ -14,11 +17,13 @@ import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class LibraryGovernor {
@@ -26,6 +31,7 @@ public class LibraryGovernor {
     private final EnemySkillManager Manager;
     private final Location[] location = new Location[5];
     private final double radius = 64;
+    private final HashMap<Player, Location> saveLoad = new HashMap<>();
     public LibraryGovernor(EnemySkillManager manager) {
         this.Manager = manager;
         location[0] = new Location(world,5396, 115, 2402);
@@ -75,7 +81,7 @@ public class LibraryGovernor {
     public void ExcessiveTreatment() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c「治療は適度に行うべきです。過剰な治療は時に死ぬ招くこともあります」", SoundList.DungeonTrigger);
+            radiusMessage("§c「治療は適度に行うべきです。過剰な治療は時に死ぬを招くこともあります」", SoundList.DungeonTrigger);
             MultiThread.sleepTick(50);
             Set<PlayerData> playerDataSet = new HashSet<>();
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
@@ -174,5 +180,67 @@ public class LibraryGovernor {
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
         }, "DifferenceInInertia");
+    }
+
+    public void GovernorSave() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c記録を開始します", SoundList.DungeonTrigger);
+            for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
+                EffectManager.addEffect(player, EffectType.Fixed, 30, null, player.getLocation());
+            }
+            MultiThread.sleepTick(30);
+            radiusMessage("§c記録が完了しました", SoundList.Tick);
+            for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
+                saveLoad.put(player, player.getLocation().clone());
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "GovernorSave");
+    }
+
+    public void GovernorLoad() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c記録から読込を開始します", SoundList.DungeonTrigger);
+            MultiThread.sleepTick(100);
+            radiusMessage("§c読込が完了しました", SoundList.Tick);
+            for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
+                if (!saveLoad.containsKey(player) || saveLoad.get(player).distance(player.getLocation()) > 2) {
+                    PlayerData.playerData(player).dead();
+                    sendMessage(player, "§c情報が一致しないため該当データを破棄します", SoundList.Tick);
+                }
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "GovernorLoad");
+    }
+
+    public void NecessarySacrifice() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c「必要な犠牲はいつしも付きまといます」", SoundList.DungeonTrigger);
+            double radius = 2.5;
+            double x = random.nextDouble()*5;
+            double z = random.nextDouble()*5;
+            LivingEntity entity = Manager.enemyData.entity;
+            Location origin = entity.getLocation().clone().add(x, 0, z);
+            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+            for (int i = 0; i < 20; i++) {
+                ParticleManager.CircleParticle(particleData, origin, radius, 12);
+                MultiThread.sleepTick(5);
+            }
+            Set<Player> players = PlayerList.getNearNonDead(origin, radius);
+            if (players.size() > 0) for (Player player : players) {
+                Damage.makeDamage(entity, player, DamageCause.ATK, "NecessarySacrifice", 5, 1, 0, true, true);
+            } else {
+                for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), this.radius)) {
+                    sendMessage(player, "§c「なにも犠牲にしないことは出来ないのです」", SoundList.Nope);
+                    PlayerData.playerData(player).dead();
+                }
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "NecessarySacrifice");
     }
 }

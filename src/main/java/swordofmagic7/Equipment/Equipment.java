@@ -21,7 +21,7 @@ public class Equipment {
     private final Player player;
     private final PlayerData playerData;
     private final HashMap<EquipmentSlot, ItemParameter> EquipSlot = new HashMap<>();
-    private final HashMap<EquipmentSlot, Set<String>> EquipRune = new HashMap<>();
+    private final HashMap<EquipmentSlot, Set<RuneParameter>> EquipRune = new HashMap<>();
 
     public Equipment(Player player, PlayerData playerData) {
         this.player = player;
@@ -117,7 +117,7 @@ public class Equipment {
 
             EquipSlot.put(slot, param.clone());
             for (RuneParameter rune : param.itemEquipmentData.Rune) {
-                EquipRune.get(slot).add(rune.Id);
+                EquipRune.get(slot).add(rune);
             }
             playerData.ItemInventory.removeItemParameter(param, 1);
 
@@ -139,23 +139,29 @@ public class Equipment {
         }
     }
 
-    public Set<String> RuneList() {
-        Set<String> runes = new HashSet<>();
+    public Set<RuneParameter> RuneList() {
+        Set<RuneParameter> runes = new HashSet<>();
         for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             runes.addAll(EquipRune.get(equipmentSlot));
         }
         return runes;
     }
 
-    public Set<String> RuneList(EquipmentSlot slot) {
+    public Set<RuneParameter> RuneList(EquipmentSlot slot) {
         return EquipRune.get(slot);
     }
 
-    public boolean equippedRune(String runeId) {
-        return RuneList().contains(runeId);
+    public RuneParameter equippedRune(String runeId) {
+        for (RuneParameter rune : RuneList()) {
+            if (rune.Id.equals(runeId)) return rune;
+        }
+        return null;
     }
 
-    public boolean equippedRune(EquipmentSlot slot, String runeId) {
-        return RuneList(slot).contains(runeId);
+    public RuneParameter equippedRune(EquipmentSlot slot, String runeId) {
+        for (RuneParameter rune : RuneList(slot)) {
+            if (rune.Id.equals(runeId)) return rune;
+        }
+        return null;
     }
 }

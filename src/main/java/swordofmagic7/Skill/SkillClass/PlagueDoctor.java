@@ -14,7 +14,6 @@ import swordofmagic7.Function;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
-import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Skill.BaseSkillClass;
 import swordofmagic7.Skill.SkillData;
@@ -59,7 +58,7 @@ public class PlagueDoctor extends BaseSkillClass {
                     for (int i = 0; i < time; i += hitRate) {
                         if (targetData.EffectManager.hasEffect(EffectType.HealingFactor)) {
                             if (targetData.Status.Health < maxHealth) {
-                                Damage.makeHeal(player, target, value);
+                                Damage.makeHeal(player, target, skillData.Id, value);
                             }
                             MultiThread.sleepTick(hitRate);
                         } else break;
@@ -91,16 +90,14 @@ public class PlagueDoctor extends BaseSkillClass {
 
             MultiThread.TaskRun(() -> {
                 for (int i = 0; i <= time; i+=hitRate) {
-                    for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
-                        if (skillProcess.Predicate().test(victim)) {
-                            EffectManager effectManager = EffectManager.getEffectManager(victim);
-                            int perCount = 0;
-                            for (EffectType effectType : effectManager.Effect.keySet()) {
-                                if (perCount >= count) break;
-                                if (effectType.Buff && !effectType.effectRank.isImpossible()) {
-                                    effectManager.removeEffect(effectType, player);
-                                    perCount++;
-                                }
+                    for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
+                        EffectManager effectManager = EffectManager.getEffectManager(victim);
+                        int perCount = 0;
+                        for (EffectType effectType : effectManager.Effect.keySet()) {
+                            if (perCount >= count) break;
+                            if (effectType.Buff && !effectType.effectRank.isImpossible()) {
+                                effectManager.removeEffect(effectType, player);
+                                perCount++;
                             }
                         }
                     }

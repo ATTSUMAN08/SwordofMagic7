@@ -38,7 +38,7 @@ public class Priest extends BaseSkillClass {
             ParticleManager.CircleParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getLocation(), radius, 30);
             for (Player target : PlayerList.getNearNonDead(player.getLocation(), radius)) {
                 if (skillProcess.isAllies(target) || target == player) {
-                    makeHeal(player, target, skillData.ParameterValue(0) / 100);
+                    makeHeal(player, target, skillData.Id, skillData.ParameterValue(0) / 100);
                     playSound(target, SoundList.Heal);
                 }
             }

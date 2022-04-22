@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
@@ -26,16 +27,21 @@ public class TextViewManager {
             PlayerData playerData = PlayerData.playerData(player);
             ItemStack itemView = null;
             int amount = 1;
+            boolean isLoreHide = false;
             if (type.equalsIgnoreCase("MainHand")) {
                 itemView = player.getInventory().getItemInMainHand();
+                isLoreHide = playerData.Equipment.getEquip(EquipmentSlot.MainHand).isLoreHide;
             } else if (type.equalsIgnoreCase("OffHand")) {
                 itemView = player.getInventory().getItemInOffHand();
+                isLoreHide = playerData.Equipment.getEquip(EquipmentSlot.OffHand).isLoreHide;
             } else if (type.equalsIgnoreCase("Armor")) {
                 itemView = player.getInventory().getChestplate();
+                isLoreHide = playerData.Equipment.getEquip(EquipmentSlot.Armor).isLoreHide;
             } else if (index > -1 && type.equalsIgnoreCase("Item") && playerData.ItemInventory.getList().size() > index) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
                 itemView = stack.viewItem(playerData.ViewFormat());
                 amount = stack.Amount;
+                isLoreHide = stack.itemParameter.isLoreHide;
             } else if (index > -1 && type.equalsIgnoreCase("Rune") && playerData.RuneInventory.getList().size() > index) {
                 itemView = playerData.RuneInventory.getRuneParameter(index).viewRune(playerData.ViewFormat());
             } else if (index > -1 && type.equalsIgnoreCase("Pet") && playerData.PetInventory.getList().size() > index) {
@@ -43,7 +49,7 @@ public class TextViewManager {
             }
             if (itemView != null) {
                 itemView.setAmount(amount);
-                player.chat(itemDecoString(itemView));
+                player.chat(itemDecoString(itemView, isLoreHide));
                 return;
             }
         }
@@ -55,34 +61,36 @@ public class TextViewManager {
         player.sendMessage(decoLore("/textView Pet <SlotId>") + "ペットをチャットに表示します");
     }
 
-    public static String itemDecoString(ItemParameterStack stack, String format) {
+    public static String itemDecoString(ItemParameterStack stack, String format, boolean isLoreHide) {
         ItemStack itemView = stack.itemParameter.viewItem(stack.Amount, format);
         itemView.setAmount(stack.Amount);
-        return itemDecoString(itemView);
+        return itemDecoString(itemView, isLoreHide);
     }
 
 
-    public static String itemDecoString(ItemParameter itemParameter, String format) {
-        return itemDecoString(itemParameter.viewItem(1, format));
+    public static String itemDecoString(ItemParameter itemParameter, String format, boolean isLoreHide) {
+        return itemDecoString(itemParameter.viewItem(1, format), isLoreHide);
     }
 
-    public static String itemDecoString(RuneParameter runeParameter, String format) {
-        return itemDecoString(runeParameter.viewRune(format));
+    public static String itemDecoString(RuneParameter runeParameter, String format, boolean isLoreHide) {
+        return itemDecoString(runeParameter.viewRune(format), isLoreHide);
     }
 
-    public static String itemDecoString(PetParameter petParameter, String format) {
-        return itemDecoString(petParameter.viewPet(format));
+    public static String itemDecoString(PetParameter petParameter, String format, boolean isLoreHide) {
+        return itemDecoString(petParameter.viewPet(format), isLoreHide);
     }
 
-    public static String itemDecoString(ItemStack itemView) {
+    public static String itemDecoString(ItemStack itemView, boolean isLoreHide) {
         String decoString = "[None]";
         if (itemView.getType() != Material.AIR && itemView.hasItemMeta()) {
             ItemMeta meta = itemView.getItemMeta();
             if (meta != null && meta.hasDisplayName() && meta.hasLore()) {
                 String Display = unDecoText(meta.getDisplayName());
                 StringBuilder Lore = new StringBuilder(meta.getDisplayName());
-                for (String str : meta.getLore()) {
+                if (!isLoreHide) for (String str : meta.getLore()) {
                     Lore.append("<nl>").append(str);
+                } else {
+                    Lore.append("<nl>").append("§c§lこの情報へのアクセス権限がありません");
                 }
                 String txt = "";
                 if (itemView.getAmount() > 1) txt = "§ax" + itemView.getAmount();

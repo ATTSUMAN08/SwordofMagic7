@@ -25,7 +25,7 @@ public class AusMineB1 {
     private static int Time;
     private static final int StartTime = 300;
     private static int Count;
-    private static final int StartCount = 15;
+    private static final int StartCount = 30;
     private static final Location EventLocation = new Location(world,1145, 141, 1293);
     private static final Set<EnemyData> EnemyList = new HashSet<>();
     private static Set<Player> Players = new HashSet<>();
@@ -58,7 +58,7 @@ public class AusMineB1 {
                     }
                     if (Count > 0) {
                         Time--;
-                        if (EnemyList.size() < 3) {
+                        if (EnemyList.size() < 5) {
                             Location loc = EventLocation.clone().add(random.nextDouble() * 20, 0, random.nextDouble() * 20);
                             MultiThread.TaskRunSynchronized(() -> EnemyList.add(MobManager.mobSpawn(getMobData("ゴブリン"), 15, loc)));
                         }

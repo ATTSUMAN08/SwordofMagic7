@@ -37,4 +37,5 @@ public class MobData {
     public List<Double> HPStop = new ArrayList<>();
     public EnemyType enemyType = EnemyType.Normal;
     public int Size;
+    public boolean isHide = false;
 }

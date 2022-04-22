@@ -45,7 +45,7 @@ public class Cleric extends BaseSkillClass {
             PlayerData targetData = playerData(target);
             if (targetData.Status.Health < targetData.Status.MaxHealth) {
                 ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), target.getLocation(), 1, 2, 3, 3);
-                makeHeal(player, target, skillData.Parameter.get(0).Value/100);
+                makeHeal(player, target, skillData.Id, skillData.Parameter.get(0).Value/100);
                 playSound(player, SoundList.Heal);
                 playSound(target, SoundList.Heal);
             } else {

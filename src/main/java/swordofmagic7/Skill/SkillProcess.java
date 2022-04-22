@@ -211,6 +211,7 @@ public class SkillProcess {
                 double damageMultiply = 1;
                 if (playerData.EffectManager.hasEffect(EffectType.CoveringFire)) damageMultiply += playerData.EffectManager.getData(EffectType.CoveringFire).getDouble(0);
                 if (victim != null) {
+                    if (category == EquipmentCategory.Mace) damageMultiply /= 2;
                     switch (category) {
                         case Blade, Mace -> Damage.makeDamage(player, victim, DamageCause.ATK, damageSource, damageMultiply, 1);
                         case Rod, ActGun -> Damage.makeDamage(player, victim, DamageCause.MAT, damageSource, damageMultiply, 1);

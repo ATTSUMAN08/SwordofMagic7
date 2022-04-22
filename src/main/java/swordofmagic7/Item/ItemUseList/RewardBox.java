@@ -27,6 +27,12 @@ public class RewardBox {
                 if (rewardBoxData.id.equals("メル")) {
                     playerData.Mel += rewardBoxData.amount;
                     message.add("§7・§e" + rewardBoxData.amount + "メル");
+                    if (rewardBoxData.percent <= 0.001) {
+                        TextView textView = new TextView(playerData.getNick() + "§aさんが");
+                        textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aから").addText("§e[" + rewardBoxData.amount + "メル]").addText("§aを§b獲得§aしました");
+                        textView.setSound(SoundList.Tick);
+                        Client.BroadCast(textView);
+                    }
                 } else if (DataBase.ItemList.containsKey(rewardBoxData.id)) {
                     ItemParameter getItem = getItemParameter(rewardBoxData.id);
                     playerData.ItemInventory.addItemParameter(getItem, rewardBoxData.amount);

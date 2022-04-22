@@ -6,48 +6,50 @@ import com.comphenix.protocol.ProtocolManager;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.handler.TouchHandler;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.Command.Builder.FlySpeed;
+import swordofmagic7.Command.Builder.GameModeChange;
+import swordofmagic7.Command.Builder.PlayMode;
+import swordofmagic7.Command.Developer.*;
+import swordofmagic7.Command.Player.*;
+import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.DataLoader;
 import swordofmagic7.Data.Editor;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Dungeon.Dungeon;
-import swordofmagic7.Effect.EffectType;
-import swordofmagic7.Equipment.EquipmentCategory;
-import swordofmagic7.Inventory.ItemParameterStack;
-import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Item.RuneParameter;
-import swordofmagic7.Life.LifeStatus;
 import swordofmagic7.Map.WarpGateParameter;
-import swordofmagic7.Market.Market;
 import swordofmagic7.Mob.EnemyData;
-import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Sound.SoundList;
-import swordofmagic7.TextView.TextView;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -140,11 +142,14 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
-            for (PlayerData playerData : PlayerData.getPlayerData().values()) {
-                if (playerData.player.isOnline()) {
+            PlayerList.ResetPlayer.clear();
+            Set<Player> Players = PlayerData.getPlayerData().keySet();
+            for (Player player : Players) {
+                if (player.isOnline()) {
+                    PlayerData playerData = PlayerData.playerData(player);
                     playerData.save();
                 } else {
-                    MultiThread.TaskRunLater(playerData::remove, 1, "AutoSave");
+                    PlayerData.getPlayerData().remove(player);
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
@@ -182,6 +187,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 playerData(player).load();
             }
         }, 20);
+
+        commandRegister();
     }
 
     @Override
@@ -212,239 +219,47 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         Log("CleanEnemy: " + count);
     }
 
+    public void commandRegister() {
+        //Developer
+        SomCommand.register("SomReload", new SomReload());
+        SomCommand.register("SendData", new SendData());
+        SomCommand.register("getItem", new GetItem());
+        SomCommand.register("getRune", new GetRune());
+        SomCommand.register("mobSpawn", new MobSpawn());
+        SomCommand.register("setNick", new SetNick());
+        SomCommand.register("save", new Save());
+        SomCommand.register("load", new Load());
+        SomCommand.register("loadedPlayer", new LoadedPlayer());
+        SomCommand.register("getExp", new GetExp());
+        SomCommand.register("getLevel", new GetLevel());
+        SomCommand.register("getClassExp", new GetClassExp());
+        SomCommand.register("getEffect", new GetEffect());
+        SomCommand.register("bukkitTasks", new BukkitTasks());
+        SomCommand.register("classSelect", new ClassSelect());
+        SomCommand.register("skillCTReset", new ClassSelect());
+        //Builder
+        SomCommand.register("gm", new GameModeChange());
+        SomCommand.register("playMode", new PlayMode());
+        SomCommand.register("flySpeed", new FlySpeed());
+        //Player
+        SomCommand.register("reqExp", new ReqExp());
+        SomCommand.register("reqLifeExp", new ReqLifeExp());
+        SomCommand.register("tagGame", new TagGameCommand());
+        SomCommand.register("playerInfo", new playerInfo());
+        SomCommand.register("party", new Party());
+        SomCommand.register("effectInfo", new EffectInfo());
+        SomCommand.register("itemInfo", new ItemInfo());
+        SomCommand.register("runeInfo", new RuneInfo());
+        SomCommand.register("mobInfo", new MobInfo());
+        SomCommand.register("market", new MarketCommand());
+        SomCommand.register("auction", new AuctionCommand());
+    }
+
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("SomReload")) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                playerData(player).saveCloseInventory();
-            }
-            for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
-                if (!hologram.isDeleted()) hologram.delete();
-            }
-            Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7"), 5);
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("sendData")) {
-            if (args.length == 1) {
-                Client.send(args[0]);
-            } else {
-                Log("/sendData <text>");
-            }
-            return true;
-        } else if (cmd.getName().equalsIgnoreCase("get")) {
-            PlayerData targetData = null;
-            if (args.length == 2) {
-                Player target = Bukkit.getPlayer(args[0]);
-                if (target.isOnline()) targetData = playerData(target);
-            } else if (args.length == 1 && sender instanceof Player player) {
-                targetData = playerData(player);
-            }
-            if (targetData != null) {
-                if (getItemList().containsKey(args[0])) {
-                    int amount = 1;
-                    if (args.length == 2) amount = Integer.parseInt(args[1]);
-                    ItemParameterStack stack = new ItemParameterStack(getItemParameter(args[0]));
-                    stack.Amount = amount;
-                    targetData.ItemInventory.addItemParameter(stack);
-                    targetData.ItemInventory.viewInventory();
-                    TextView textView = stack.itemParameter.getTextView(stack.Amount, targetData.ViewFormat());
-                    textView.addText("§aを§e獲得§aしました");
-                    sendMessage(targetData.player, textView.toComponent());
-                    return true;
-                }
-            } else {
-                sender.sendMessage("§c無効なプレイヤーです");
-            }
-            for (Map.Entry<String, ItemParameter> str : getItemList().entrySet()) {
-                sender.sendMessage(str.getKey());
-            }
-            return true;
-        }
         if (sender instanceof Player player) {
             PlayerData playerData = playerData(player);
             if (player.hasPermission("som7.developer")) {
-                if (cmd.getName().equalsIgnoreCase("test")) {
-                    MultiThread.TaskRun(() -> {
-
-                    }, "RayTest");
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("getRune")) {
-                    if (args.length >= 1) {
-                        if (getRuneList().containsKey(args[0])) {
-                            RuneParameter rune = getRuneParameter(args[0]);
-                            rune.Level = 1;
-                            if (args.length >= 2) rune.Level = Integer.parseInt(args[1]);
-                            if (args.length >= 3) rune.Quality = Double.parseDouble(args[2]);
-                            playerData.RuneInventory.addRuneParameter(rune);
-                            playerData.RuneInventory.viewRune();
-                            return true;
-                        }
-                    }
-                    for (Map.Entry<String, RuneParameter> str : DataBase.getRuneList().entrySet()) {
-                        player.sendMessage(str.getKey());
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("mobSpawn")) {
-                    if (args.length >= 1) {
-                        if (getMobList().containsKey(args[0])) {
-                            int level = 1;
-                            int perSpawn = 1;
-                            if (args.length == 2) level = Integer.parseInt(args[1]);
-                            if (args.length == 3) perSpawn = Integer.parseInt(args[2]);
-                            for (int i = 0; i < perSpawn; i++){
-                                MobManager.mobSpawn(getMobData(args[0]), level, player.getLocation());
-                            }
-                            return true;
-                        }
-                    }
-                    for (Map.Entry<String, MobData> str : getMobList().entrySet()) {
-                        player.sendMessage(str.getKey());
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("save")) {
-                    Player target = player;
-                    if (args.length == 1) {
-                        target = Bukkit.getPlayer(args[0]);
-                    }
-                    if (target.isOnline()) {
-                        playerData(target).save();
-                    } else {
-                        player.sendMessage("§c無効なプレイヤーです");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("load")) {
-                    Player target = player;
-                    if (args.length == 1) {
-                        target = Bukkit.getPlayer(args[0]);
-                    }
-                    if (target.isOnline()) {
-                        playerData(target).load();
-                    } else {
-                        player.sendMessage("§c無効なプレイヤーです");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("setNick")) {
-                    Player target = player;
-                    if (args.length == 2) {
-                        target = Bukkit.getPlayer(args[1]);
-                    }
-                    if (target.isOnline()) {
-                        PlayerData targetData = playerData(target);
-                        targetData.Nick = args[0];
-                        player.sendMessage(targetData.Nick);
-                        targetData.Status.StatusUpdate();
-                    } else {
-                        player.sendMessage("§c無効なプレイヤーです");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("loadFromFileServer")) {
-                    Player target = player;
-                    if (args.length == 1) {
-                        target = Bukkit.getPlayer(args[0]);
-                    }
-                    if (target.isOnline()) {
-                        FileClient.requestPlayerData(playerData);
-                    } else {
-                        player.sendMessage("§c無効なプレイヤーです");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("bukkitTasks")) {
-                    HashMap<String, Integer> sync = new HashMap<>();
-                    HashMap<String, Integer> async = new HashMap<>();
-                    if (BukkitTaskTag != null) {
-                        BukkitTaskTag.keySet().removeIf(BukkitTask::isCancelled);
-                        for (Map.Entry<BukkitTask, String> task : BukkitTaskTag.entrySet()) {
-                            String[] split = task.getValue().split(":");
-                            if (task.getKey().isSync()) sync.merge(task.getValue(), 1, Integer::sum);
-                            else async.merge(task.getValue(), 1, Integer::sum);
-                        }
-                    }
-                    player.sendMessage("PendingTask: " + Bukkit.getScheduler().getPendingTasks().size());
-                    player.sendMessage("TaggedTask: " + BukkitTaskTag.size());
-                    player.sendMessage("AsyncTask: " + async.size());
-                    for (Map.Entry<String, Integer> tagCount : async.entrySet()) {
-                        player.sendMessage("・" + tagCount.getKey() + ": " + tagCount.getValue());
-                    }
-                    player.sendMessage("SyncTask: " + sync.size());
-                    for (Map.Entry<String, Integer> tagCount : sync.entrySet()) {
-                        player.sendMessage("・" + tagCount.getKey() + ": " + tagCount.getValue());
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("loadedPlayer")) {
-                    player.sendMessage("Loaded PlayerData: ");
-                    for (Map.Entry<Player, PlayerData> loopData : PlayerData.getPlayerData().entrySet()) {
-                        player.sendMessage(loopData.getKey().getUniqueId() + ": " + loopData.getValue().player.getName());
-                    }
-                    return true;
-                }  else if (cmd.getName().equalsIgnoreCase("getExp")) {
-                    if (args.length >= 1) {
-                        try {
-                            playerData.addPlayerExp(Integer.parseInt(args[0]));
-                        } catch (Exception e) {
-                            player.sendMessage("§c" + "/getExp <exp>");
-                        }
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("getLevel")) {
-                    if (args.length >= 1) {
-                        try {
-                            playerData.addPlayerLevel(Integer.parseInt(args[0]));
-                        } catch (Exception e) {
-                            player.sendMessage("§c" + "/getLevel <exp>");
-                        }
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("getClassExp")) {
-                    if (args.length == 2 && getClassList().containsKey(args[1])) {
-                        try {
-                            playerData.Classes.addClassExp(getClassData(args[1]), Integer.parseInt(args[0]));
-                        } catch (Exception e) {
-                            player.sendMessage("§c" + "/getClassExp <exp> <class>");
-                        }
-                    } else {
-                        player.sendMessage("§c" + "/getClassExp <exp> <class>");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("getLevel")) {
-                    if (args.length == 2 && getClassList().containsKey(args[1])) {
-                        try {
-                            playerData.Classes.addClassLevel(getClassData(args[1]), Integer.parseInt(args[0]));
-                        } catch (Exception e) {
-                            player.sendMessage("§c" + "/getLevel <level> <class>");
-                        }
-                    } else {
-                        player.sendMessage("§c" + "/getLevel <level> <class>");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("getEffect")) {
-                    if (args.length >= 1) {
-                        try {
-                            int time = 200;
-                            if (args.length >= 2) {
-                                time = Integer.parseInt(args[1]);
-                            }
-                            playerData.EffectManager.addEffect(EffectType.valueOf(args[0]), time);
-                        } catch (Exception e) {
-                            player.sendMessage("§c" + "/getEffect <effect> [<time=200>]");
-                        }
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("setItemEquipmentStatusMultiply")) {
-                    if (args.length == 2) {
-                        try {
-                            for (EquipmentCategory category : EquipmentCategory.values()) {
-                                String itemId = args[0] + category.Display2;
-                                if (DataBase.ItemList.containsKey(itemId)) {
-                                    File file = getItemParameter(itemId).File;
-                                    FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                                    data.set("StatusMultiply", Double.parseDouble(args[1]));
-                                    data.save(file);
-                                    player.sendMessage(itemId + " Change to Saved");
-                                }
-                            }
-                        } catch (Exception e) {
-                            player.sendMessage("/setItemEquipmentStatusMultiply <Series> <StatusMultiply>");
-                        }
-                    }
-                } else if (cmd.getName().equalsIgnoreCase("itemDataEdit")) {
+                if (cmd.getName().equalsIgnoreCase("itemDataEdit")) {
                     Editor.itemDataEditCommand(player, args);
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataEdit")) {
@@ -461,20 +276,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 } else if (cmd.getName().equalsIgnoreCase("defenseBattleEndWave")) {
                     DefenseBattle.endWave();
                     return true;
-                } else if (cmd.getName().equalsIgnoreCase("classSelect")) {
-                    try {
-                        playerData.Classes.classSlot[Integer.parseInt(args[0])] = getClassData(args[1]);
-                    } catch (Exception e) {
-                        player.sendMessage("/classSelect <slot> <class>");
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("skillCTReset")) {
-                    for (String skillData : playerData.Skill.SkillCoolTime.keySet()) {
-                        MultiThread.TaskRunSynchronizedLater(() -> {
-                            playerData.Skill.resetSkillCoolTime(skillData);
-                        }, 1);
-                    }
-                    return true;
                 }
             }
 
@@ -487,48 +288,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     for (Player loopPlayer : Bukkit.getOnlinePlayers()) {
                         playerData(loopPlayer).load();
                     }
-                    return true;
-                }
-            }
-
-            if (player.hasPermission("som7.builder")) {
-                if (cmd.getName().equalsIgnoreCase("gm")) {
-                    if (args.length == 0) {
-                        if (player.getGameMode().equals(GameMode.CREATIVE)) {
-                            player.setGameMode(GameMode.SURVIVAL);
-                        } else {
-                            player.setGameMode(GameMode.CREATIVE);
-                        }
-                    } else {
-                        if (args[0].equalsIgnoreCase("0")) {
-                            player.setGameMode(GameMode.SURVIVAL);
-                        } else if (args[0].equalsIgnoreCase("1")) {
-                            player.setGameMode(GameMode.CREATIVE);
-                        } else if (args[0].equalsIgnoreCase("2")) {
-                            player.setGameMode(GameMode.ADVENTURE);
-                        } else if (args[0].equalsIgnoreCase("3")) {
-                            player.setGameMode(GameMode.SPECTATOR);
-                        }
-                    }
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("playMode")) {
-                    playerData.PlayMode = !playerData.PlayMode;
-                    if (playerData.PlayMode) {
-                        player.setGameMode(GameMode.SURVIVAL);
-                        player.closeInventory();
-                    } else {
-                        player.setGameMode(GameMode.CREATIVE);
-                        player.getInventory().clear();
-                    }
-                    player.sendMessage("§ePlayMode: " + playerData.PlayMode);
-                    return true;
-                } else if (cmd.getName().equalsIgnoreCase("flySpeed")) {
-                    if (args.length == 1) {
-                        player.setFlySpeed(Float.parseFloat(args[0]));
-                    } else {
-                        player.setFlySpeed(0.2f);
-                    }
-                    player.sendMessage("FlySpeed: " + player.getFlySpeed());
                     return true;
                 }
             }
@@ -588,101 +347,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 if (playerData.isPvPModeNonMessage()) return true;
                 spawnPlayer(player);
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("info")) {
-                Player target = player;
-                if (args.length == 1 && Bukkit.getPlayer(args[0]) != null) {
-                    target = Bukkit.getPlayer(args[0]);
-                }
-                playerData.Menu.StatusInfo.StatusInfoView(target);
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("tickTime")) {
+            } if (cmd.getName().equalsIgnoreCase("tickTime")) {
                 for (World world : Bukkit.getWorlds()) {
                     player.sendMessage("§e" + world.getName() + "§7: §a" + world.getFullTime());
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("reqExp")) {
-                if (args.length == 1) {
-                    try {
-                        int level = Integer.parseInt(args[0]);
-                        int reqExp = Classes.ReqExp(level);
-                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
-                    } catch (Exception ignored) {
-                        player.sendMessage("§e/reqExp <Level>");
-                    }
-                } else {
-                    player.sendMessage("§e/reqExp <Level>");
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("reqExpAll")) {
-                if (args.length == 1) {
-                    try {
-                        int level = Integer.parseInt(args[0]);
-                        if (level > PlayerData.MaxLevel) level = PlayerData.MaxLevel;
-                        int reqExp = 0;
-                        for (int i = 1; i < level; i++) {
-                            reqExp += Classes.ReqExp(level);
-                        }
-                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
-                    } catch (Exception ignored) {
-                        player.sendMessage("§e/reqExpAll <Level>");
-                    }
-                } else {
-                    player.sendMessage("§e/reqExpAll <Level>");
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("reqLifeExp")) {
-                if (args.length == 1) {
-                    try {
-                        int level = Integer.parseInt(args[0]);
-                        int reqExp = LifeStatus.LifeReqExp(level);
-                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
-                    } catch (Exception ignored) {
-                        player.sendMessage("§e/reqLifeExp <Level>");
-                    }
-                } else {
-                    player.sendMessage("§e/reqLifeExp <Level>");
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("reqLifeExpAll")) {
-                if (args.length == 1) {
-                    try {
-                        int level = Integer.parseInt(args[0]);
-                        if (level > LifeStatus.MaxLifeLevel) level = LifeStatus.MaxLifeLevel;
-                        int reqExp = 0;
-                        for (int i = 1; i < level; i++) {
-                            reqExp += LifeStatus.LifeReqExp(level);
-                        }
-                        player.sendMessage("§eLv" + level + "§7: §a" + reqExp);
-                    } catch (Exception ignored) {
-                        player.sendMessage("§e/reqLifeExpAll <Level>");
-                    }
-                } else {
-                    player.sendMessage("§e/reqLifeExpAll <Level>");
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("tagGame")) {
-                if (args.length >= 1) {
-                    if (args[0].equalsIgnoreCase("join")) {
-                        TagGame.join(player);
-                    } else if (args[0].equalsIgnoreCase("leave")) {
-                        TagGame.leave(player);
-                    } else if (args[0].equalsIgnoreCase("start") && TagGame.Master == player) {
-                        TagGame.startTagGame();
-                    } else if (args[0].equalsIgnoreCase("reset") && TagGame.Master == player) {
-                        TagGame.resetTagGame();
-                    } else if (args[0].equalsIgnoreCase("master")) {
-                        if (TagGame.Master == null || !TagGame.Master.isOnline()) {
-                            TagGame.Master = player;
-                            sendMessage(player, "§eゲームマスター§aになりました");
-                        } else {
-                            sendMessage(player, TagGame.Master.getDisplayName() + "§aが§eゲームマスター§aです");
-                        }
-                    }
-                } else {
-                    for (String str : TagGame.info()) {
-                        player.sendMessage(str);
-                    }
-                    player.sendMessage("§e/tagGame [join/leave]");
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("party")) {
@@ -728,20 +395,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 }
                 player.sendMessage(target.getName() + ": " + target.getUniqueId());
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("effectInfo")) {
-                if (args.length == 1) {
-                    for (EffectType effectType : EffectType.values()) {
-                        if (effectType.Display.equals(args[0])) {
-                            player.sendMessage(decoText(effectType.Display));
-                            for (String str : effectType.Lore) {
-                                player.sendMessage("§a" + str);
-                            }
-                            return true;
-                        }
-                    }
-                }
-                sendMessage(player, "§e/effectInfo <効果名>");
-                return true;
             } else if (cmd.getName().equalsIgnoreCase("sideBarToDo")) {
                 playerData.SideBarToDo.SideBarToDoCommand(args);
                 return true;
@@ -757,65 +410,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     playerData.titleManager.Title = TitleDataList.get("称号無し");
                     player.sendMessage("§a称号を外しました");
                     playSound(player, SoundList.Tick);
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("auction")) {
-                Auction.auctionCommand(playerData, args);
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("market")) {
-                Market.marketCommand(playerData, args);
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("mobInfo")) {
-                if (args.length >= 1) {
-                    if (MobList.containsKey(args[0])) {
-                        MobData mobData = getMobData(args[0]);
-                        List<String> message = new ArrayList<>();
-                        message.add(decoText(mobData.Display));
-                        message.addAll(playerData.Menu.mobInfo.toStringList(mobData));
-                        if (args.length == 2) {
-                            message.addAll(EnemyData.enemyLore(mobData, Integer.parseInt(args[1])));
-                        }
-                        sendMessage(player, message, SoundList.Nope);
-                    } else {
-                        sendMessage(player, "§a存在しない§cエネミー§aです", SoundList.Nope);
-                    }
-                } else {
-                    playerData.Menu.mobInfo.MobInfoView();
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("itemInfo")) {
-                if (args.length == 1) {
-                    if (args[0].equalsIgnoreCase("Amount")) {
-                        sendMessage(player, "§aItemListSize: " + ItemList.size());
-                    } else if (ItemList.containsKey(args[0])) {
-                        ItemParameter item = getItemParameter(args[0]);
-                        List<String> list = new ArrayList<>();
-                        list.add(decoText(item.Display));
-                        list.addAll(ItemInfoData.get(item.Id));
-                        sendMessage(player, list);
-                    } else player.sendMessage("§a存在しない§eアイテム§aです");
-                } else {
-                    player.sendMessage("§e/itemInfo <ItemID>");
-                }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("runeInfo")) {
-                if (args.length >= 1) {
-                    if (args[0].equalsIgnoreCase("Amount")) {
-                        sendMessage(player, "§aRuneListSize: " + RuneList.size());
-                    } else if (RuneList.containsKey(args[0])) {
-                        RuneParameter rune = getRuneParameter(args[0]);
-                        try {
-                            if (args[1] != null) rune.Level = Math.min(Math.max(Integer.parseInt(args[1]), 1), PlayerData.MaxLevel);
-                            if (args[2] != null) rune.Quality = Math.min(Math.max(Double.parseDouble(args[2])/100f, 0), 200);
-                        } catch (Exception ignore) {}
-                        ItemStack itemStack = rune.viewRune(playerData.ViewFormat());
-                        List<String> list = new ArrayList<>();
-                        list.add(itemStack.getItemMeta().getDisplayName());
-                        list.addAll(itemStack.getLore());
-                        sendMessage(player, list);
-                    } else player.sendMessage("§a存在しない§eルーン§aです");
-                } else {
-                    player.sendMessage("§e/runeInfo <RuneID> [<Level>] [<0~200>]");
                 }
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("serverInfo")) {

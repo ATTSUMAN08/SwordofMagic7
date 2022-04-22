@@ -93,8 +93,10 @@ public class DataLoader {
                 itemParameter.Display = data.getString("Display");
                 itemParameter.Lore = data.getStringList("Lore");
                 itemParameter.Sell = data.getInt("Sell");
-                itemParameter.Category = ItemCategory.Item.getItemCategory(data.getString("Category"));
+                itemParameter.Category = ItemCategory.getItemCategory(data.getString("Category", "None"));
                 itemParameter.CustomModelData = data.getInt("Model", 0);
+                itemParameter.isHide = data.getBoolean("isHide", false);
+                itemParameter.isLoreHide = data.getBoolean("isLoreHide", false);
                 if (data.isSet("Materialization")) {
                     itemParameter.Materialization = data.getString("Materialization");
                     if (!MaterializationMap.containsKey(itemParameter.Materialization)) MaterializationMap.put(itemParameter.Materialization, new ArrayList<>());
@@ -284,6 +286,7 @@ public class DataLoader {
                 mapData.Level = data.getInt("Level");
                 mapData.Safe = data.getBoolean("Safe");
                 mapData.ReqCombatPower = data.getDouble("ReqCombatPower", mapData.Level*10);
+                mapData.isRaid = data.getBoolean("isRaid", false);
                 if (data.isSet("Life.Mine")) {
                     for (String str : data.getStringList("Life.Mine")) {
                         String[] split = str.split(",");
@@ -645,6 +648,7 @@ public class DataLoader {
                 mobData.NoAI = data.getBoolean("NoAI", false);
                 mobData.ColliderSize = data.getDouble("ColliderSize", 0);
                 mobData.Glowing = data.getBoolean("Glowing", false);
+                mobData.isHide = data.getBoolean("isHide", false);
                 String entityType = data.getString("Type").toUpperCase();
                 if (EntityType.fromName(entityType) != null) {
                     mobData.entityType = EntityType.valueOf(entityType);
@@ -902,7 +906,8 @@ public class DataLoader {
     public static void ItemInfoDataLoad() {
         for (ItemParameter itemData : ItemList.values()) {
             ItemInfoData.put(itemData.Id, new ArrayList<>());
-            ItemInfoData.get(itemData.Id).addAll(itemData.viewItem(1, "%.0f").getLore());
+            if (itemData.isLoreHide) ItemInfoData.get(itemData.Id).add("§c§lこの情報へのアクセス権限がありません");
+            else ItemInfoData.get(itemData.Id).addAll(itemData.viewItem(1, "%.0f").getLore());
             ItemInfoData.get(itemData.Id).add(decoText("§3§l入手方法"));
         }
         for (MobData mobData : MobList.values()) {

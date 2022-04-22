@@ -7,7 +7,7 @@ description: Swordofmagic7
 depend: [ HolographicDisplays, Citizens, LibsDisguises, ProtocolLib ]
 
 commands:
-  get:
+  getItem:
     permission: som7.developer
     description: description
     usage: /<command>
@@ -24,10 +24,6 @@ commands:
     description: description
     usage: /<command>
   getClassExp:
-    permission: som7.developer
-    description: description
-    usage: /<command>
-  getClassLevel:
     permission: som7.developer
     description: description
     usage: /<command>
@@ -48,10 +44,6 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
-  loadFromFileServer:
-    permission: som7.developer
-    description: description
-    usage: /<command>
   bukkitTasks:
     permission: som7.developer
     description: description
@@ -65,10 +57,6 @@ commands:
     description: description
     usage: /<command>
   test:
-    permission: som7.developer
-    description: description
-    usage: /<command>
-  setItemEquipmentStatusMultiply:
     permission: som7.developer
     description: description
     usage: /<command>
@@ -175,8 +163,8 @@ commands:
   spawn:
     description: description
     usage: /<command>
-  info:
-    aliases: i
+  playerInfo:
+    aliases: [info, i]
     description: description
     usage: /<command>
   tickTime:

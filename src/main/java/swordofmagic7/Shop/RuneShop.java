@@ -319,7 +319,8 @@ public class RuneShop {
             }
             if (RuneUpgradeCache[0] != null && RuneUpgradeCache[1] != null) {
                 RuneUpgradeCache[2] = getRuneParameter(RuneUpgradeCache[0].Id);
-                RuneUpgradeCache[2].Level = Math.min(RuneUpgradeCache[0].Level+1, PlayerData.MaxLevel);
+                if (RuneUpgradeCache[2].isSpecial) RuneUpgradeCache[2].Level = Math.min(RuneUpgradeCache[0].Level+1, 10);
+                else RuneUpgradeCache[2].Level = Math.min(RuneUpgradeCache[0].Level+1, PlayerData.MaxLevel);
                 RuneUpgradeCache[2].Quality = Math.max(Math.min(2, (RuneUpgradeCache[0].Quality + RuneUpgradeCache[1].Quality)*0.55), RuneUpgradeCache[0].Quality);
                 inv.setItem(AnvilUISlot[2], RuneUpgradeCache[2].viewRune(format));
             } else {

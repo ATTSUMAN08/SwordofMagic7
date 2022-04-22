@@ -30,7 +30,7 @@ public class ItemParameter implements Cloneable {
     public Material Icon = Material.BARRIER;
     public String IconData;
     public Color color = Color.BLACK;
-    public ItemCategory Category;
+    public ItemCategory Category = ItemCategory.None;
     public int CustomModelData = 0;
     public int Sell = 0;
     public ItemEquipmentData itemEquipmentData = new ItemEquipmentData();
@@ -39,6 +39,8 @@ public class ItemParameter implements Cloneable {
     public ItemPetFood itemPetFood = new ItemPetFood();
     public ItemCook itemCook = new ItemCook();
     public String Materialization;
+    public boolean isHide = false;
+    public boolean isLoreHide = false;
     public java.io.File File;
 
     Material getIcon() {

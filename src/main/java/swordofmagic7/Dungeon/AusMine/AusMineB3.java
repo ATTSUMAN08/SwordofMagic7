@@ -53,7 +53,7 @@ public class AusMineB3 {
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);
                     spawnWait++;
-                    if (spawnWait > 3 || EnemyList.size() < 15) {
+                    if (spawnWait > 2 || EnemyList.size() < 15) {
                         spawnWait = 0;
                         Location spawnLoc = EventLocation.clone();
                         double randomLoc = 2 * Math.PI * random.nextDouble();

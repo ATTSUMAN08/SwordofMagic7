@@ -170,7 +170,7 @@ public class Menu {
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
                                 if (viewAble && clickType.isShiftClick() && clickType.isRightClick()) {
-                                    player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat()));
+                                    player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat(), clickedItem.isLoreHide));
                                 } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
                                     playSound(player, SoundList.Click);
@@ -200,7 +200,7 @@ public class Menu {
                     default -> {
                         if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
-                            player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat()));
+                            player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat(), runeParameter.isLoreHide));
                         }
                     }
                 }
@@ -211,7 +211,7 @@ public class Menu {
                     default -> {
                         if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
                             PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
-                            player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat()));
+                            player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat(), false));
                         } else if (EquipAble() && index > -1) {
                             PetParameter pet = playerData.PetInventory.getPetParameter(index);
                             if (pet != null) pet.spawn();

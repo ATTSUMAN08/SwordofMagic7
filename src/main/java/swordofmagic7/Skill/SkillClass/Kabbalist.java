@@ -71,7 +71,7 @@ public class Kabbalist extends BaseSkillClass {
             MultiThread.TaskRun(() -> {
                 for (double i = 0; i < time; i+=hitRate) {
                     for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
-                        Damage.makeHeal(player, victim, value);
+                        Damage.makeHeal(player, victim, skillData.Id, value);
                     }
                     for (int i2 = 0; i2 < hitRate; i2+=5) {
                         ParticleManager.CirclePointLineParticle(particleData, origin, radius, 3, 0, 5);

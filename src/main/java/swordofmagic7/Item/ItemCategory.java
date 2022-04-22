@@ -10,6 +10,7 @@ public enum ItemCategory {
     Material("素材"),
     PetEgg("ペットエッグ"),
     PetFood("ペットフード"),
+    None("未設定"),
     ;
     String Display;
 
@@ -17,7 +18,7 @@ public enum ItemCategory {
         this.Display = Display;
     }
 
-    public ItemCategory getItemCategory(String str) {
+    public static ItemCategory getItemCategory(String str) {
         for (ItemCategory loop : ItemCategory.values()) {
             if (loop.toString().equalsIgnoreCase(str)) {
                 return loop;
