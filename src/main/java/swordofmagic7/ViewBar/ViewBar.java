@@ -206,8 +206,11 @@ public class ViewBar {
                         );
 
                         if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
-                            int x = (int) Math.min(20, Math.floor(HealthPercent * 20));
-                            playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(Math.max(0, x)) + "§7§l" + "|".repeat(Math.max(0, 20 - x)));
+                            int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
+                            int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
+                            int x2 = 20 - x;
+                            if (s > 0) x2 = 0;
+                            playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
 
                             if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
                                 if (playerData.visibilityManager.isVisibleByDefault()) {
@@ -259,7 +262,7 @@ public class ViewBar {
             setSideBar("TagGame", data);
         } else resetSideBar("TagGame");
         List<String> EffectList = new ArrayList<>();
-        HashMap<EffectType, EffectData> effectMap = (HashMap<EffectType, EffectData>) playerData.EffectManager.Effect.clone();
+        HashMap<EffectType, EffectData> effectMap = new HashMap<>(playerData.EffectManager.Effect);
         for (Map.Entry<EffectType, EffectData> effect : effectMap.entrySet()) {
             String amount = "";
             if (effect.getKey().view) {

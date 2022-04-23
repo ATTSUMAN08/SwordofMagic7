@@ -7,6 +7,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -82,12 +83,21 @@ public class Sheriff extends BaseSkillClass {
                 MultiThread.sleepMillis(millis);
             }
 
-            for (int i = 0; i <= time; i+=hitRate) {
+            RuneParameter rune = playerData.Equipment.equippedRune("機関銃のルーン");
+            if (rune != null) {
                 Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
+                count = rune.AdditionParameterValueInt(0);
                 Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, value, count, 1);
                 ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);
                 playSound(player, GunAttack, 5, 1);
-                MultiThread.sleepTick(hitRate);
+            } else {
+                for (int i = 0; i < time; i += hitRate) {
+                    Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
+                    Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, value, count, 1);
+                    ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);
+                    playSound(player, GunAttack, 5, 1);
+                    MultiThread.sleepTick(hitRate);
+                }
             }
             skillProcess.SkillRigid(skillData);
         }, "Fanning");

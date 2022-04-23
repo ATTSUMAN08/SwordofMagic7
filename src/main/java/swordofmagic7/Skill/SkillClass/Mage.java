@@ -7,6 +7,7 @@ import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -39,24 +40,31 @@ public class Mage extends BaseSkillClass {
             double length = skillData.ParameterValue(0);
             playerData.EffectManager.addEffect(EffectType.Invincible, skillData.ParameterValueInt(1) * 20);
             playerData.EffectManager.addEffect(EffectType.Teleportation, skillData.ParameterValueInt(2) * 20);
-            Location origin;
-            Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), length, false);
-            origin = ray.HitPosition;
-            origin.add(player.getEyeLocation().getDirection().multiply(-1));
-            origin.add(0, 0.2, 0);
-            final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+            RuneParameter rune = playerData.Equipment.equippedRune("無尽蔵のルーン");
+            if (rune != null) {
+                int time = rune.AdditionParameterValueInt(0)*20;
+                double value = rune.AdditionParameterValue(1)/100;
+                playerData.EffectManager.addEffect(EffectType.Inexhaustible, time, value);
+            } else {
+                Location origin;
+                Ray ray = RayTrace.rayLocationBlock(player.getEyeLocation(), length, false);
+                origin = ray.HitPosition;
+                origin.add(player.getEyeLocation().getDirection().multiply(-1));
+                origin.add(0, 0.2, 0);
+                final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
 
 
-            for (int i = 0; i < skillData.CastTime; i++) {
+                for (int i = 0; i < skillData.CastTime; i++) {
+                    ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
+                    ParticleManager.CircleParticle(particleData, origin, 1, 10);
+                    MultiThread.sleepMillis(millis);
+                }
+
                 ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
                 ParticleManager.CircleParticle(particleData, origin, 1, 10);
-                MultiThread.sleepMillis(millis);
+                origin.setDirection(player.getLocation().getDirection());
+                MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
             }
-
-            ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
-            ParticleManager.CircleParticle(particleData, origin, 1, 10);
-            origin.setDirection(player.getLocation().getDirection());
-            MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
             playSound(player, SoundList.Warp);
             skillProcess.SkillRigid(skillData);
         }, "Teleportation");

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -31,6 +32,7 @@ public class Cleric extends BaseSkillClass {
     public void Heal(SkillData skillData, double length) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            double value = skillData.ParameterValue(0)/100;
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -45,7 +47,7 @@ public class Cleric extends BaseSkillClass {
             PlayerData targetData = playerData(target);
             if (targetData.Status.Health < targetData.Status.MaxHealth) {
                 ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), target.getLocation(), 1, 2, 3, 3);
-                makeHeal(player, target, skillData.Id, skillData.Parameter.get(0).Value/100);
+                makeHeal(player, target, skillData.Id, value);
                 playSound(player, SoundList.Heal);
                 playSound(target, SoundList.Heal);
             } else {
@@ -123,10 +125,20 @@ public class Cleric extends BaseSkillClass {
             Ray ray = rayLocationEntity(player.getEyeLocation(), length, 1, skillProcess.PredicateA2());
             if (ray.isHitEntity()) {
                 Player target = (Player) ray.HitEntity;
+                PlayerData targetData = playerData(target);
                 ParticleManager.LineParticle(new ParticleData(Particle.END_ROD), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.END_ROD), target.getLocation(), 1, 2, 3, 3);
-                playerData(target).revival();
+                targetData.revival();
                 playSound(target.getLocation(), Heal);
+                RuneParameter rune = playerData.Equipment.equippedRune("再生促進のルーン");
+                if (rune != null) {
+                    double value = rune.AdditionParameterValue(1)/100;
+                    int time = rune.AdditionParameterValueInt(0)*20;
+                    targetData.Status.Health = targetData.Status.MaxHealth;
+                    targetData.changeShield(targetData.Status.MaxHealth*value, time);
+                } else {
+                    targetData.Status.Health = targetData.Status.MaxHealth/2;
+                }
             } else {
                 player.sendMessage("§b[蘇生対象]§aを選択してください");
                 playSound(player, SoundList.Nope);

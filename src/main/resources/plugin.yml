@@ -116,6 +116,22 @@ commands:
     permission: som7.data.reload
     description: description
     usage: /<command>
+  itemReload:
+    permission: som7.data.reload
+    description: description
+    usage: /<command>
+  runeReload:
+    permission: som7.data.reload
+    description: description
+    usage: /<command>
+  skillReload:
+    permission: som7.data.reload
+    description: description
+    usage: /<command>
+  shopReload:
+    permission: som7.data.reload
+    description: description
+    usage: /<command>
   titleReload:
     aliases: tr
     permission: som7.title.editor

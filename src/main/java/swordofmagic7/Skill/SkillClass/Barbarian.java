@@ -7,6 +7,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -40,12 +41,13 @@ public class Barbarian extends BaseSkillClass {
             ParticleManager.LineParticle(particleData, playerHandLocation(player), length, 0, 3);
             Ray ray = rayLocationEntity(player.getEyeLocation(), length, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
-                Damage.makeDamage(player, ray.HitEntity, DamageCause.ATK, skillData.Id, value, 1);
-                EffectManager.addEffect(ray.HitEntity, EffectType.Stun, 10, player);
+                LivingEntity victim = ray.HitEntity;
+                Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, value, 1);
+                EffectManager.addEffect(victim, EffectType.Stun, 10, player);
                 EffectManager.addEffect(player, EffectType.Stun, 10, null);
                 MultiThread.TaskRunLater(() -> {
-                    ray.HitEntity.setVelocity(ray.HitEntity.getLocation().getDirection().setY(0).normalize().multiply(-1).setY(0.5));
-                    player.setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(-1).setY(0.5));
+                    Function.setVelocity(victim, victim.getLocation().getDirection().setY(0).normalize().multiply(-1).setY(0.5));
+                    Function.setVelocity(player, player.getLocation().getDirection().setY(0).normalize().multiply(-1).setY(0.5));
                 }, 15, skillData.Id);
             }
             playSound(player, SoundList.AttackSweep);
@@ -115,7 +117,10 @@ public class Barbarian extends BaseSkillClass {
             }
 
             int stack = 0;
-            for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate())) {
+            RuneParameter rune = playerData.Equipment.equippedRune("タイマン上等のルーン");
+            if (rune != null) {
+                stack = rune.AdditionParameterValueInt(0);
+            } else for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate())) {
                 particleData.spawn(victim.getEyeLocation());
                 stack++;
             }

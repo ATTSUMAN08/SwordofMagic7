@@ -11,6 +11,7 @@ import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -86,11 +87,11 @@ public class PlagueDoctor extends BaseSkillClass {
             }
 
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i <= time; i+=hitRate) {
+                for (int i = 0; i < time; i+=hitRate) {
                     for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
                         EffectManager effectManager = EffectManager.getEffectManager(victim);
                         int perCount = 0;
-                        Set<EffectType> effects = effectManager.Effect.keySet();
+                        Set<EffectType> effects = new HashSet<>(effectManager.Effect.keySet());
                         for (EffectType effectType : effects) {
                             if (perCount >= count) break;
                             if (effectType.Buff && !effectType.effectRank.isImpossible()) {
@@ -125,8 +126,12 @@ public class PlagueDoctor extends BaseSkillClass {
 
             Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
             HashMap<EffectType, EffectData> effect = new HashMap<>();
+            RuneParameter rune = playerData.Equipment.equippedRune("免疫低下のルーン");
+            boolean bool = rune != null;
+            int time = bool ? rune.AdditionParameterValueInt(0)*20 : 0;
             for (LivingEntity victim : victims) {
                 EffectManager effectManager = EffectManager.getEffectManager(victim);
+                if (bool) EffectManager.addEffect(victim, EffectType.ImmuneDepression, time, player);
                 for (Map.Entry<EffectType, EffectData> data : effectManager.Effect.entrySet()) {
                     if (!data.getKey().Buff && data.getKey().effectRank.isNormal()) {
                         if (effect.containsKey(data.getKey())) {
@@ -152,7 +157,6 @@ public class PlagueDoctor extends BaseSkillClass {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
-            double movement = skillData.ParameterValue(1)/100;
             ParticleData particleData = new ParticleData(Particle.ELECTRIC_SPARK);
 
             MultiThread.sleepTick(skillData.CastTime);
@@ -161,7 +165,7 @@ public class PlagueDoctor extends BaseSkillClass {
             players.add(player);
             if (playerData.Party != null) players.addAll(playerData.Party.Members);
             for (Player player : players) {
-                EffectManager.addEffect(player, EffectType.Modafinil, time, this.player, movement);
+                EffectManager.addEffect(player, EffectType.Modafinil, time, this.player);
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
                 playSound(player, SoundList.Heal);
             }

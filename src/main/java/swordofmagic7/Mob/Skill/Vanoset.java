@@ -121,7 +121,7 @@ public class Vanoset {
                     Set<LivingEntity> victims = Function.NearEntityByEnemy(origin, radius2);
                     victims.removeAll(Function.NearEntityByEnemy(origin, radius));
                     for (LivingEntity victim : victims) {
-                        victim.setVelocity(Function.VectorUp.clone().setY(2));
+                        Function.setVelocity(victim, Function.VectorUp.clone().setY(2));
                         Damage.makeDamage(entity, victim, DamageCause.ATK, "Tornado", 4, 1);
                         if (victim instanceof Player player) playSound(player, SoundList.Explosion);
                     }
@@ -155,7 +155,7 @@ public class Vanoset {
             ParticleManager.CircleParticle(particleData2, origin, radius, 12);
             for (LivingEntity victim : Function.NearEntityByEnemy(origin, radius)) {
                 Vector vector = victim.getLocation().toVector().subtract(origin.toVector()).setY(1);
-                victim.setVelocity(vector);
+                Function.setVelocity(victim, vector);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "Squall", 6, 1);
                 if (victim instanceof Player player) playSound(player, SoundList.Explosion);
             }
@@ -314,7 +314,7 @@ public class Vanoset {
                 victims.remove(Manager.enemyData.target);
                 for (LivingEntity victim : victims) {
                     ParticleManager.LineParticle(particleData, victim.getEyeLocation(), entity.getEyeLocation(), 1, 10);
-                    victim.setVelocity(entity.getLocation().toVector().subtract(victim.getLocation().toVector()).multiply(0.3));
+                    Function.setVelocity(victim,entity.getLocation().toVector().subtract(victim.getLocation().toVector()).multiply(0.3));
                 }
                 MultiThread.sleepTick(5);
             }

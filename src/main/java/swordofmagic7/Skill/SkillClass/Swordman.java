@@ -21,14 +21,16 @@ public class Swordman extends BaseSkillClass {
     public void PainBarrier(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            int time = skillData.ParameterValueInt(0)*20;
 
             MultiThread.sleepMillis(skillData.CastTime);
 
-            playerData.EffectManager.addEffect(EffectType.PainBarrier, (int) skillData.Parameter.get(0).Value * 20);
+            playerData.EffectManager.addEffect(EffectType.PainBarrier, time);
+            if (playerData.Equipment.isEquipRune("仁王立ちのルーン")) playerData.EffectManager.addEffect(EffectType.NonKnockBack, time);
             ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
-        }, "PainBarrier");
+        }, skillData.Id);
     }
 
     public void Feint(SkillData skillData) {

@@ -58,12 +58,15 @@ public class EffectDataBase {
                     DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
                 }
             }
-        } else {
-            switch (effectType) {
-                case CrossGuardCounter -> DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
-                case InsufficientFilling -> MultiplyStatusAdd(StatusParameter.ATK, -0.9);
-                case Adhesive -> MultiplyStatusAdd(StatusParameter.ATK, -0.5);
+        }
+        switch (effectType) {
+            case CrossGuardCounter -> DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
+            case InsufficientFilling -> MultiplyStatusAdd(StatusParameter.ATK, -0.9);
+            case Adhesive -> MultiplyStatusAdd(StatusParameter.ATK, -0.5);
+            case ImmuneDepression -> {
+                for (DamageCause cause : DamageCause.values()) DamageCauseResistanceAdd(cause, DataBase.getRuneParameter("免疫低下のルーン").AdditionParameterValue(1)/100);
             }
+            case HitAndGuard -> MultiplyStatusAdd(StatusParameter.DEF, DataBase.getRuneParameter("ヒットアンドガードのルーン").AdditionParameterValue(1)/100);
         }
     }
 }

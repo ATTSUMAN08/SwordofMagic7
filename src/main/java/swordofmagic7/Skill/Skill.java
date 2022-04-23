@@ -13,6 +13,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Pet.PetAIState;
@@ -164,18 +165,21 @@ public class Skill {
                                             return;
                                         }
                                     }
+                                    skillData.Mana = IncreasedConsumptionMana(skillData.Mana, playerData.Level);
                                     if (playerData.EffectManager.hasEffect(EffectType.ArcaneEnergy)) skillData.Mana = 0;
                                     if (hasSkill("MagicEfficiently")) {
                                         SkillData MagicEfficiently = getSkillData("MagicEfficiently");
-                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100) * (1+playerData.Level/100f));
+                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100));
+                                    }
+                                    if (playerData.EffectManager.hasEffect(EffectType.Inexhaustible)) {
+                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - playerData.EffectManager.getData(EffectType.Inexhaustible).getDouble(0)/100));
                                     }
                                     skillData.CastTime = (int) Math.floor(skillData.CastTime * (1 / playerData.Status.SkillCastTime));
                                     skillData.RigidTime = (int) Math.floor(skillData.RigidTime * (1 / playerData.Status.SkillRigidTime));
                                     skillData.CoolTime = (int) Math.floor(skillData.CoolTime * (1 / playerData.Status.SkillCooltime));
-                                    int coolTime = skillData.CoolTime;
                                     if (playerData.Map.isRaid) {
                                         switch (skillData.Id) {
-                                            case "Resurrection" -> coolTime = 20 * 60 * 5;
+                                            case "Resurrection" -> skillData.CoolTime = 20 * 60 * 5;
                                             case "BackMasking" -> {
                                                 sendMessage(player, "§a現在の§eマップ§aでは使用できません", SoundList.Nope);
                                                 return;
@@ -206,7 +210,17 @@ public class Skill {
                                             case "Teleportation" -> mage.Teleportation(skillData);
                                             case "MagicMissile" -> mage.MagicMissile(skillData);
                                             //クレシック
-                                            case "Heal" -> cleric.Heal(skillData, 30);
+                                            case "Heal" -> {
+                                                RuneParameter rune = playerData.Equipment.equippedRune("気配り上手のルーン");
+                                                if (rune != null) {
+                                                    double value = rune.AdditionParameterValue(0)/100;
+                                                    skillData.Parameter.get(0).Value *= value;
+                                                    skillData.CastTime = Math.toIntExact(Math.round(skillData.CastTime * value));
+                                                    skillData.RigidTime = Math.toIntExact(Math.round(skillData.RigidTime * value));
+                                                    skillData.CoolTime  = Math.toIntExact(Math.round(skillData.CoolTime * value));
+                                                }
+                                                cleric.Heal(skillData, 30);
+                                            }
                                             case "Cure" -> cleric.Cure(skillData, 30);
                                             case "Fade" -> cleric.Fade(skillData);
                                             case "Resurrection" -> cleric.Resurrection(skillData, 30);
@@ -261,7 +275,13 @@ public class Skill {
                                             case "Fanning" -> sheriff.Fanning(skillData);
                                             case "HeadShot" -> sheriff.HeadShot(skillData);
                                             case "PeaceMaker" -> sheriff.PeaceMaker(skillData);
-                                            case "Redemption" -> sheriff.Redemption(skillData);
+                                            case "Redemption" -> {
+                                                RuneParameter rune = playerData.Equipment.equippedRune("屈服のルーン");
+                                                if (rune != null) {
+                                                    skillData.CoolTime = getSkillData("PeaceMaker").CoolTime;
+                                                    resetSkillCoolTime("PeaceMaker");
+                                                } else sheriff.Redemption(skillData);
+                                            }
                                             //アサシン
                                             case "InstantAccel" -> assassin.InstantAccel(skillData);
                                             case "HallucinationSmoke" -> assassin.HallucinationSmoke(skillData);
@@ -289,7 +309,10 @@ public class Skill {
                                             case "CrossCut" -> highlander.CrossCut(skillData);
                                             case "Crown" -> highlander.Crown(skillData);
                                             case "WagonWheel" -> highlander.WagonWheel(skillData);
-                                            case "CrossGuard" -> highlander.CrossGuard(skillData);
+                                            case "CrossGuard" -> {
+                                                if (playerData.Equipment.isEquipRune("反転切りのルーン")) skillData.CoolTime = skillData.ParameterValueInt(1)*20;
+                                                highlander.CrossGuard(skillData);
+                                            }
                                             //オラクル
                                             case "CounterSpell" -> oracle.CounterSpell(skillData);
                                             case "ArcaneEnergy" -> oracle.ArcaneEnergy(skillData);
@@ -310,7 +333,11 @@ public class Skill {
                                             case "Rampage" -> outLaw.Rampage(skillData);
                                             //カバリスト
                                             case "Ayinsof" -> SkillProcess.PartyBuffApply(skillData, EffectType.Ayinsof, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
-                                            case "Sevenfold" -> SkillProcess.PartyBuffApply(skillData, EffectType.Sevenfold, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "Sevenfold" -> {
+                                                EffectType effectType = playerData.Equipment.isEquipRune("ラストチャンスのルーン") ? EffectType.LastChance : EffectType.Sevenfold;
+                                                SkillProcess.PartyBuffApply(skillData, effectType, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                                skillData.CoolTime = 120*20;
+                                            }
                                             case "Gevura" -> kabbalist.Gevura(skillData);
                                             case "Nachash" -> kabbalist.Nachash(skillData);
                                             case "TreeOfSepiroth" -> kabbalist.TreeOfSepiroth(skillData);
@@ -363,7 +390,7 @@ public class Skill {
                                         }, "CastTime");
                                         playerData.changeMana(-skillData.Mana);
                                         useStack(skillData);
-                                        setSkillCoolTime(skillData, coolTime);
+                                        setSkillCoolTime(skillData, skillData.CoolTime);
                                     }  catch (NoClassDefFoundError e) {
                                         e.printStackTrace();
                                         sendMessage(player, "§cNoClassDefFoundErrorが発生しました。別CHへ移動してください", SoundList.Nope);

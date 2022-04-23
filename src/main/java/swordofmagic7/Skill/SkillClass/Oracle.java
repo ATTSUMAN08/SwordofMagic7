@@ -90,7 +90,7 @@ public class Oracle extends BaseSkillClass {
             }
 
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i <= time; i++) {
+                for (int i = 0; i < time; i++) {
                     for (Player victim : PlayerList.getNearNonDead(origin, radius)) {
                         if (player != victim && playerData.Party != null && playerData.Party == playerData(victim).Party) {
                             EffectManager.addEffect(victim, EffectType.Invincible, 25, null);
@@ -116,23 +116,26 @@ public class Oracle extends BaseSkillClass {
             ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.AQUA, 1));
             particleData.setVector(Function.VectorDown);
 
-            for (int i = 0; i <= skillData.CastTime; i++) {
-                ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
-                MultiThread.sleepMillis(millis);
-            }
-
-            MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time; i++) {
-                    for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.PredicateA_ME())) {
-                        EffectManager.addEffect(victim, EffectType.Foretell, 25, null);
-                    }
-                    for (int i2 = 0; i2 < 4; i2++) {
-                        ParticleManager.CirclePointLineParticle(particleData, origin, radius*0.7, 6, 0, 5);
-                        ParticleManager.CircleParticle(particleData, origin, radius, 24);
-                        MultiThread.sleepTick(5);
-                    }
+            if (playerData.Equipment.isEquipRune("追尾魔法陣のルーン")) {
+                skillProcess.PartyBuffApply(skillData, EffectType.Foretell, particleData, time*20);
+            } else {
+                for (int i = 0; i <= skillData.CastTime; i++) {
+                    ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
+                    MultiThread.sleepMillis(millis);
                 }
-            }, skillData.Id);
+                MultiThread.TaskRun(() -> {
+                    for (int i = 0; i < time; i++) {
+                        for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.PredicateA_ME())) {
+                            EffectManager.addEffect(victim, EffectType.Foretell, 25, null);
+                        }
+                        for (int i2 = 0; i2 < 4; i2++) {
+                            ParticleManager.CirclePointLineParticle(particleData, origin, radius*0.7, 6, 0, 5);
+                            ParticleManager.CircleParticle(particleData, origin, radius, 24);
+                            MultiThread.sleepTick(5);
+                        }
+                    }
+                }, skillData.Id);
+            }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

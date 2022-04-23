@@ -59,7 +59,6 @@ public class Matador extends BaseSkillClass {
             skill.setCastReady(false);
             double length = 20;
             int time = skillData.ParameterValueInt(0)*20;
-            double movement = skillData.ParameterValue(2)/100;
             ParticleData particleData = new ParticleData(Particle.REDSTONE);
 
             MultiThread.sleepTick(skillData.CastTime);
@@ -76,7 +75,7 @@ public class Matador extends BaseSkillClass {
                         return;
                     }
                 }
-                playerData.EffectManager.addEffect(EffectType.Ole, time, movement);
+                playerData.EffectManager.addEffect(EffectType.Ole, time);
             } else {
                 sendMessage(player, "§c対象§aがいません", SoundList.Nope);
                 skill.resetSkillCoolTimeWaited(skillData);
@@ -117,6 +116,7 @@ public class Matador extends BaseSkillClass {
 
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
             playerData.EffectManager.addEffect(EffectType.Muleta, time, value);
+            if (playerData.Equipment.isEquipRune("ボルテージのルーン")) playerData.EffectManager.addEffect(EffectType.AbsolutelyEVA, time);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

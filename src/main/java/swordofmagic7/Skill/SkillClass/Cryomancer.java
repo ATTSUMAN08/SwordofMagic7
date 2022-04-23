@@ -58,7 +58,7 @@ public class Cryomancer extends BaseSkillClass {
             double freezePercent = skillData.ParameterValue(3)/100;
             final Location originTop = origin.clone().add(0,8,0);
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time/hitRate; i++) {
+                for (int i = 0; i < time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin, radius/1.5, 30);
                     ParticleManager.CylinderParticle(particleData2, origin, 1, 8, 5, 2);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
@@ -154,6 +154,9 @@ public class Cryomancer extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
+            boolean bool = playerData.Equipment.isEquipRune("自動回転雪玉のルーン");
+            if (bool) skillProcess.SkillRigid(skillData);
+
             Set<LivingEntity> victims = new HashSet<>();
             for (int i = 0; i < time; i += hitRate) {
                 victims.addAll(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
@@ -164,7 +167,7 @@ public class Cryomancer extends BaseSkillClass {
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), radius, 3, 3, 3);
                 for (int i2 = 0; i2 < hitRate; i2++) {
                     for (LivingEntity victim : victims) {
-                        victim.setVelocity(player.getLocation().toVector().subtract(victim.getLocation().toVector()).normalize());
+                        Function.setVelocity(victim, player.getLocation().toVector().subtract(victim.getLocation().toVector()).normalize());
                     }
                     MultiThread.sleepTick(1);
                 }
@@ -172,7 +175,7 @@ public class Cryomancer extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            skillProcess.SkillRigid(skillData);
+            if (!bool) skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
 }

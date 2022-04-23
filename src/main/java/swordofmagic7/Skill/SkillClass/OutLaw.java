@@ -132,12 +132,14 @@ public class OutLaw extends BaseSkillClass {
             }
 
             for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate())) {
-                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, 1);
-                victim.setVelocity(victim.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().setY(0.5));
+                Function.setVelocity(victim, victim.getLocation().toVector().subtract(player.getLocation().toVector()).normalize().setY(0.5));
+                int count = 1;
                 if (EffectManager.hasEffect(victim, EffectType.Scary)) {
                     EffectManager.addEffect(victim, EffectType.Stun, 100, player);
                     EffectManager.addEffect(victim, EffectType.Silence, 100, player);
+                    if (playerData.Equipment.isEquipRune("大激怒のルーン")) count++;
                 }
+                Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, count);
                 MultiThread.sleepTick(1);
             }
             EffectManager.addEffect(player, EffectType.Rampage, time, player);

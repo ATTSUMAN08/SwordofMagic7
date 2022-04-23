@@ -2,6 +2,7 @@ package swordofmagic7.Skill.SkillClass;
 
 import org.bukkit.Particle;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -34,10 +35,13 @@ public class Gunner extends BaseSkillClass {
     public void Rolling(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            int time = skillData.ParameterValueInt(0)*20;
+            RuneParameter rune = playerData.Equipment.equippedRune("トリプルアクセルのルーン");
+            if (rune != null) time = rune.AdditionParameterValueInt(0)*20;
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            playerData.EffectManager.addEffect(EffectType.Invincible, (int) skillData.Parameter.get(0).Value*20);
+            playerData.EffectManager.addEffect(EffectType.Invincible, time);
             ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT_MAGIC), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             player.setVelocity(player.getLocation().getDirection().clone().setY(0.5).normalize().multiply(-1));

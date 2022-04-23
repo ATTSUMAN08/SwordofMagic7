@@ -77,7 +77,7 @@ public class KingSlime {
                 ParticleData particleData = new ParticleData(Particle.SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, target, DamageCause.ATK, "Crush", 4, 1);
-                target.setVelocity(entity.getLocation().getDirection().setY(1));
+                Function.setVelocity(target, entity.getLocation().getDirection().setY(1));
                 if (target instanceof Player player) playSound(player, SoundList.Slime);
             }
             MultiThread.sleepTick(10);

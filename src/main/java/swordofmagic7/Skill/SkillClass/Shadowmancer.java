@@ -8,6 +8,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -102,10 +103,14 @@ public class Shadowmancer extends BaseSkillClass {
             }
 
             int i = 0;
+            RuneParameter rune = playerData.Equipment.equippedRune("影の世界のルーン");
+            boolean bool = rune != null;
+            int time = bool ? rune.AdditionParameterValueInt(0)*20 : 0;
             for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, player -> player != this.player)) {
                 ParticleManager.CircleParticle(particleData, victim.getLocation(), radius2, 12);
                 for (LivingEntity victim2 : Function.NearLivingEntity(victim.getLocation(), radius2, skillProcess.Predicate())) {
-                    Damage.makeDamage(player, victim2, DamageCause.MAT, skillData.Id, value, 1);
+                    if (bool) EffectManager.addEffect(victim2, EffectType.ShadowFatter, time, player, victim2.getLocation());
+                    else Damage.makeDamage(player, victim2, DamageCause.MAT, skillData.Id, value, 1);
                     MultiThread.sleepTick(2);
                 }
                 i++;

@@ -157,7 +157,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
         MultiThread.TaskRunTimer(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!PlayerData.ContainPlayer(player)) {
+                if (!PlayerData.ContainPlayer(player) && !isDevServer()) {
                     sendMessage(player, "§cプレイヤーデータが読み込まれていません");
                     teleportServer(player, "Lobby");
                 } else {
@@ -241,7 +241,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         SomCommand.register("getEffect", new GetEffect());
         SomCommand.register("bukkitTasks", new BukkitTasks());
         SomCommand.register("classSelect", new ClassSelect());
-        SomCommand.register("skillCTReset", new ClassSelect());
+        SomCommand.register("skillCTReset", new SkillCTReset());
         //Builder
         SomCommand.register("gm", new GameModeChange());
         SomCommand.register("playMode", new PlayMode());
@@ -294,13 +294,26 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         playerData(loopPlayer).load();
                     }
                     return true;
+                } else if (cmd.getName().equalsIgnoreCase("itemReload")) {
+                    DataLoader.ItemDataLoad();
+                    DataLoader.ItemInfoDataLoad();
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("runeReload")) {
+                    DataLoader.RuneDataLoad();
+                    DataLoader.RuneInfoDataLoad();
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("skillReload")) {
+                    DataLoader.SkillDataLoad();
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("shopReload")) {
+                    DataLoader.ShopDataLoad();
+                    return true;
                 }
             }
 
             if (player.hasPermission("som7.title.editor")) {
                 if (cmd.getName().equalsIgnoreCase("titleReload")) {
                     DataLoader.TitleDataLoad();
-                    Log("§aDataLoader -> TitleLoad");
                     return true;
                 }
             }

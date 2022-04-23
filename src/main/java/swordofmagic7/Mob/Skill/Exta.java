@@ -61,7 +61,7 @@ public class Exta {
                 }
 
                 Damage.makeDamage(Manager.enemyData.entity, target, DamageCause.ATK, "Launch", 2, 1);
-                target.setVelocity(new Vector(0, 2, 0));
+                Function.setVelocity(target, new Vector(0, 2, 0));
                 particleData2.spawn(target.getLocation());
                 playSound(target.getLocation(), SoundList.Explosion);
 
@@ -96,7 +96,7 @@ public class Exta {
                     victims.removeAll(Function.NearEntityByEnemy(origin, radius));
                     for (LivingEntity victim : victims) {
                         Vector vector = victim.getLocation().toVector().subtract(origin.toVector()).setY(1);
-                        victim.setVelocity(vector);
+                        Function.setVelocity(victim, vector);
                         Damage.makeDamage(entity, victim, DamageCause.ATK, "Impact", 4, 1);
                         EffectManager.addEffect(victim, EffectType.Concussion, 60, null);
                         if (victim instanceof Player player) playSound(player, SoundList.Explosion);

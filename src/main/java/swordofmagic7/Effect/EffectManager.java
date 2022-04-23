@@ -183,9 +183,11 @@ public class EffectManager {
             if (hasEffect(EffectType.Indulgence)) {
                 Effect.get(EffectType.Indulgence).stack--;
                 if (Effect.get(EffectType.Indulgence).stack < 1) Effect.remove(EffectType.Indulgence);
-                if (entity instanceof Player player)
-                    sendMessage(player, "§e[" + EffectType.Indulgence.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.Indulgence.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
                 return false;
+            }
+            if (hasEffect(EffectType.Profesy)) {
+                if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.Profesy.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
             }
             if (hasEffect(EffectType.BeakMask) && effectType != EffectType.Stun && effectType != EffectType.Slow) {
                 if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.BeakMask.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);

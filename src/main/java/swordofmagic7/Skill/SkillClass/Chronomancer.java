@@ -8,6 +8,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Mob.EnemySkillManager;
 import swordofmagic7.Mob.MobManager;
@@ -27,6 +28,7 @@ import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.playerHandLocation;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
@@ -70,10 +72,15 @@ public class Chronomancer extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
-            if (ray.isHitEntity()) {
+            RuneParameter rune = playerData.Equipment.equippedRune("休憩時間のルーン");
+            if (rune != null) {
+                time = rune.AdditionParameterValueInt(0)*20;
+                playerData.EffectManager.addEffect(EffectType.Stop, time, player.getLocation());
+                playSound(player, SoundList.Heal);
+            } else if (ray.isHitEntity()) {
                 ParticleManager.LineParticle(particleData, playerHandLocation(player), ray.HitPosition, 0, 10);
                 ParticleManager.RandomVectorParticle(particleData, ray.HitPosition, 30);
-                EffectManager.addEffect(ray.HitEntity, EffectType.Stop, time, player);
+                EffectManager.addEffect(ray.HitEntity, EffectType.Stop, time, player, ray.HitEntity.getLocation());
                 playSound(player, RodAttack);
             } else {
                 player.sendMessage("§e対象§aがいません");
@@ -95,7 +102,10 @@ public class Chronomancer extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             Targets.add(player);
-            if (playerData.Party != null) Targets.addAll(playerData.Party.Members);
+            RuneParameter rune = playerData.Equipment.equippedRune("時間集中のルーン");
+            if (rune != null) {
+                multiply = 1-(rune.AdditionParameterValue(0)/100);
+            } else if (playerData.Party != null) Targets.addAll(playerData.Party.Members);
             for (Player target : Targets) {
                 if (skillProcess.isAllies(target) || target == player) {
                     PlayerData targetData = playerData(target);
@@ -129,14 +139,19 @@ public class Chronomancer extends BaseSkillClass {
             ParticleManager.CircleParticle(new ParticleData(Particle.SMOKE_LARGE, 0.2f, Function.VectorUp), origin, radius, 20);
             Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
             Set<LivingEntity> forwards = new HashSet<>();
+            RuneParameter rune = playerData.Equipment.equippedRune("タイムアウトのルーン");
+            int maxCount = rune != null ? rune.AdditionParameterValueInt(0) * rune.AdditionParameterValueInt(1) : 3;
             for (LivingEntity target : Targets) {
+                int count = 0;
                 if (target instanceof Player player) {
                     PlayerData playerData = playerData(player);
                     for (Map.Entry<String, Integer> data : playerData.Skill.SkillCoolTime.entrySet()) {
                         if (data.getValue() > 0) {
                             playerData.Skill.SkillCoolTime.put(data.getKey(), data.getValue()+time);
+                            sendMessage(player, "§c" + playerData.Nick + "§aの§b" + data.getKey() + "§aを§c延長§aしました");
                             forwards.add(target);
-                            break;
+                            count++;
+                            if (rune == null || count >= 3) break;
                         }
                     }
                 } else if (MobManager.isEnemy(target)) {
@@ -145,14 +160,16 @@ public class Chronomancer extends BaseSkillClass {
                         for (Map.Entry<String, Integer> data : manager.CoolTime.entrySet()) {
                             int cooltime = manager.getCoolTime(data.getKey());
                             if (cooltime > 0) {
-                                manager.CoolTime.put(data.getKey(), cooltime);
+                                manager.CoolTime.put(data.getKey(), cooltime+time);
                                 forwards.add(target);
-                                break;
+                                sendMessage(player, "§c" + manager.enemyData.mobData.Display + "§aの§b" + data.getKey() + "§aを§c延長§aしました");
+                                count++;
+                                if (rune == null || count >= 3) break;
                             }
                         }
                     }
                 }
-                if (forwards.size() >= 3) break;
+                if (forwards.size() >= maxCount) break;
             }
             if (forwards.size() > 0) {
                 playSound(player, SoundList.DeBuff);

@@ -109,7 +109,7 @@ public class Highlander extends BaseSkillClass {
             Vector vector = player.getLocation().getDirection().clone().normalize().setY(1.2);
             for (LivingEntity victim : RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false)) {
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
-                victim.setVelocity(vector);
+                Function.setVelocity(victim, vector);
             }
             playSound(player, SoundList.AttackSweep);
             skillProcess.SkillRigid(skillData);

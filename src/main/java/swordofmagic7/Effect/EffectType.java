@@ -36,6 +36,7 @@ public enum EffectType {
     UnpleasantOmen("周りが気になります", EffectRank.Impossible, false, "「どこかから嫌な気配を感じます」", false),
     Capote("カポーテ", false, "命中と回避が減少します", true),
     ShadowFatter("シャドウファッター", EffectRank.High, false, "[固定]を同じ状態になります", false),
+    ImmuneDepression("免疫低下", false, "[被ダメージ耐性]が減少します", true),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動職度が上昇します", true),
@@ -51,7 +52,9 @@ public enum EffectType {
     HolyDefense("ホーリーディフェンス", true, "物理防御力が上昇します", true),
     HolyAttack("ホーリーアタック", true, "物理与ダメージが上昇します", true),
     Revive("リバイブ", EffectRank.High, true, "致死量ダメージを受けた際HPが50%まで回復します"),
+    LastChance("ラストチャンス", true, "[リバイブ]と同じ効果です"),
     HighGuard("ハイガート", true, "防御力が上昇します", true),
+    HitAndGuard("ヒットアンドガード", true, "[ハイガード]の性能が変更されます", false),
     SwashBaring("スワッシュバリング", true, "ヘイト増加量が上昇します"),
     HatePriority("ヘイト優先", true, "ノーマルターゲットが自身になります"),
     ElementalBurst("エレメンタルバースト", true, "魔法与ダメージが上昇します", true),
@@ -64,6 +67,7 @@ public enum EffectType {
     Indulgendia("インダルゲンディア", true, "効果中は体力が回復します"),
     IncreaseMagicDef("インクリースマジックDEF", true, "魔法防御力が上昇します", true),
     Indulgence("インダルジェンス", 5, true, "[一般]デバフを付与されるのを防ぎます"),
+    Profesy("プロフェシー", true, "[一般]デバフを付与されるのを防ぎます"),
     HeadShot("ヘッドショット", true, "[クリティカル発生]が上昇します", true),
     RedemptionAble("リデンプション発動可能", true, "[リデンプション]を使用できます"),
     Redemption("リデンプション", true, "回避が上昇します", true),
@@ -93,6 +97,9 @@ public enum EffectType {
     Ole("OLE", true, "クリティカル発生と移動速度が上昇します", true),
     Muleta("ムレタ", true, "反撃します", true),
     ShadowPool("シャドウプール", true, "あらゆる死を回避します", false),
+    NonKnockBack("ノックバック阻止", true, "ノックバックしなくなります", false),
+    AbsolutelyEVA("絶対回避", true, "最終回避率が100%になります", false),
+    Inexhaustible("無尽蔵", true, "消費マナが減少します", false),
     ;
 
     public String Display;
@@ -191,11 +198,11 @@ public enum EffectType {
     }
 
     public boolean isFixed() {
-        return this == Fixed || this == Keelhauling || this == ShadowFatter;
+        return this == Fixed || this == Keelhauling || this == ShadowFatter || this == Stop;
     }
 
     public boolean isFreeze() {
-        return this == Freeze || this == Stop || this == PeaceMaker || this == Concussion || this == IronHook || this == Keelhauling;
+        return this == Freeze || this == PeaceMaker || this == Concussion || this == IronHook || this == Keelhauling;
     }
 
     public boolean isCrowdControl() {

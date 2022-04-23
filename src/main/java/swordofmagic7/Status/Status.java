@@ -18,14 +18,11 @@ import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import static swordofmagic7.Attribute.AttributeType.*;
-import static swordofmagic7.Data.DataBase.Som7Premium;
-import static swordofmagic7.Data.DataBase.Som7VIP;
+import static swordofmagic7.Data.DataBase.*;
 
 public class Status {
     private final Player player;
@@ -37,7 +34,12 @@ public class Status {
         this.playerData = playerData;
         this.classes = classes;
         this.skill = skill;
+        movementEffect.put(EffectType.Cloaking, getSkillData("Cloaking").ParameterValue(1)/100);
+        movementEffect.put(EffectType.Modafinil, getSkillData("Modafinil").ParameterValue(1)/100);
+        movementEffect.put(EffectType.Ole, getSkillData("Ole").ParameterValue(2)/100);
     }
+
+    public HashMap<EffectType, Double> movementEffect = new HashMap<>();
 
     public double MaxHealth;
     public double HealthRegen;
@@ -277,13 +279,9 @@ public class Status {
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
         Movement = 0.24f;
-        Collection<EffectType> movementEffect = new HashSet<>();
-        movementEffect.add(EffectType.Cloaking);
-        movementEffect.add(EffectType.Modafinil);
-        movementEffect.add(EffectType.Ole);
-        for (EffectType effectType : movementEffect) {
-            if (playerData.EffectManager.hasEffect(effectType)) {
-                Movement += playerData.EffectManager.getData(effectType).getDouble(0);
+        for (Map.Entry<EffectType, Double> entry : movementEffect.entrySet()) {
+            if (playerData.EffectManager.hasEffect(entry.getKey())) {
+                Movement += entry.getValue();
             }
         }
 

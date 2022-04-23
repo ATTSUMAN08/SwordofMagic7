@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -98,6 +99,11 @@ public class Kabbalist extends BaseSkillClass {
 
             for (LivingEntity victim : FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false)) {
                 double multiply = Math.abs(victim.getName().hashCode() % 44)/100f;
+                RuneParameter rune = playerData.Equipment.equippedRune("最低保証のルーン");
+                if (rune != null) {
+                    double value = rune.AdditionParameterValue(0)/100;
+                    multiply = Math.max(multiply, value);
+                }
                 EffectManager.getEffectManager(victim).addEffect(EffectType.Gevura, time, multiply);
                 EffectManager.addEffectMessage(player, victim, EffectType.Gevura, "§c[" + String.format("%.0f", multiply*100) + "%]");
                 MultiThread.sleepTick(1);

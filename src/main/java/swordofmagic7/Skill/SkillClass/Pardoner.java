@@ -135,6 +135,7 @@ public class Pardoner extends BaseSkillClass {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0) * 20;
             int stack = skillData.ParameterValueInt(1);
+            EffectType effectType = playerData.Equipment.isEquipRune("プロフェシーのルーン") ? EffectType.Profesy : EffectType.Indulgence;
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -146,7 +147,8 @@ public class Pardoner extends BaseSkillClass {
             } else {
                 target = player;
             }
-            EffectManager.addEffect(target, EffectType.Indulgence, time, stack, player);
+
+            EffectManager.addEffect(target, effectType, time, stack, player);
             playSound(target, RodAttack);
             skillProcess.SkillRigid(skillData);
         }, "Indulgence");

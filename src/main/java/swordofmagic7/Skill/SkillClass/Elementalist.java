@@ -73,9 +73,9 @@ public class Elementalist extends BaseSkillClass {
             MultiThread.TaskRun(() -> {
                 int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
                 int time = (int) Math.round(skillData.ParameterValue(1)*20);
-                RuneParameter rune = playerData.Equipment.equippedRune("ヘイルのルーン");
+                RuneParameter rune = playerData.Equipment.equippedRune("極寒のルーン");
                 double freezePercent = skillData.ParameterValue(3)/100 * (rune != null ? rune.AdditionParameterValue(0) : 1);
-                for (int i = 0; i <= time; i+=hitRate) {
+                for (int i = 0; i < time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin.clone().add(0, 6, 0), radius / 2, 10);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     MultiThread.TaskRun(() -> {
@@ -133,6 +133,7 @@ public class Elementalist extends BaseSkillClass {
     public void Electrocute(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             double length = 20;
+            double value = skillData.ParameterValue(0)/100;
             skill.setCastReady(false);
 
             MultiThread.sleepTick(skillData.CastTime);
@@ -151,7 +152,7 @@ public class Elementalist extends BaseSkillClass {
                     nextTargets.removeAll(Hit);
                     if (nextTargets.size() > 0) {
                         target = SkillProcess.Nearest(target.getLocation(), nextTargets).get(0);
-                        Damage.makeDamage(player, target, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1);
+                        Damage.makeDamage(player, target, DamageCause.MAT, skillData.Id, value, 1);
                         ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), lastTarget.getEyeLocation(), target.getEyeLocation(), 0.5, 10);
                         Hit.add(target);
                         lastTarget = target;
@@ -185,10 +186,13 @@ public class Elementalist extends BaseSkillClass {
             int hitRate = (int) Math.round(skillData.ParameterValue(2)*20);
             final int time = (int) Math.round(skillData.ParameterValue(1)*20);
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i <= time; i+=hitRate) {
+                for (int i = 0; i < time; i+=hitRate) {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 10);
-                    Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
-                    Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 2);
+                    for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
+                        int hitCount = 1;
+                        if (EffectManager.hasEffect(victim, EffectType.Freeze) && playerData.Equipment.isEquipRune("ブリザードストームのルーン")) hitCount++;
+                        Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, hitCount);
+                    }
                     MultiThread.sleepTick(hitRate);
                 }
             }, "MagicCircleStormDust");

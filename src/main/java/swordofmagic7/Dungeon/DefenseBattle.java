@@ -167,7 +167,7 @@ public class DefenseBattle {
             EnemyList.clear();
             if (Health > 0 && time > 0) {
                 for (Player player : Players) {
-                    playerData(player).ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/2f));
+                    playerData(player).ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave));
                 }
                 Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LevelUp);
                 MultiThread.sleepTick(200);

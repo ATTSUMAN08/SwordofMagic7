@@ -211,14 +211,24 @@ public class RuneShop {
                         playSound(player, SoundList.Click);
                     } else if (playerData.ViewInventory.isRune()) {
                         if (RuneCache != null) {
-                            if (RuneCache.itemEquipmentData.getRuneSize() < RuneCache.itemEquipmentData.RuneSlot) {
-                                RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
-                                playerData.RuneInventory.removeRuneParameter(index);
-                                RuneCache.itemEquipmentData.addRune(runeParameter);
-                                playSound(player, SoundList.Click);
+                            RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
+                            boolean isSetSpecial = false;
+                            if (rune.isSpecial) for (RuneParameter rune2 : RuneCache.itemEquipmentData.Rune) {
+                                if (rune.Id.equals(rune2.Id)) {
+                                    isSetSpecial = true;
+                                    break;
+                                }
+                            }
+                            if (isSetSpecial) {
+                                sendMessage(player, "§e特殊ルーン§aは§c重複§aしません", SoundList.Nope);
                             } else {
-                                player.sendMessage("§eルーンスロット§aに空きがありません");
-                                playSound(player, SoundList.Nope);
+                                if (RuneCache.itemEquipmentData.getRuneSize() < RuneCache.itemEquipmentData.RuneSlot) {
+                                    playerData.RuneInventory.removeRuneParameter(index);
+                                    RuneCache.itemEquipmentData.addRune(rune);
+                                    playSound(player, SoundList.Click);
+                                } else {
+                                    sendMessage(player, "§eルーンスロット§aに空きがありません", SoundList.Nope);
+                                }
                             }
                         } else {
                             player.sendMessage("§e装備§aを§eセット§aしてください");
@@ -291,23 +301,27 @@ public class RuneShop {
                     }
                 }
             } else if (index > -1) {
-                if (RuneUpgradeCache[0] == null) {
-                    RuneUpgradeCache[0] = playerData.RuneInventory.getRuneParameter(index).clone();
-                    playerData.RuneInventory.removeRuneParameter(index);
-                    playSound(player, SoundList.Click);
-                } else if (RuneUpgradeCache[1] == null) {
-                    RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
-                    if (RuneUpgradeCache[0].Id.equals(rune.Id)) {
-                        if (RuneUpgradeCache[0].Level >= rune.Level) {
-                            RuneUpgradeCache[1] = rune.clone();
-                            playerData.RuneInventory.removeRuneParameter(index);
-                            playSound(player, SoundList.Click);
+                RuneParameter rune = playerData.RuneInventory.getRuneParameter(index).clone();
+                if (!rune.isSpecial) {
+                    if (RuneUpgradeCache[0] == null) {
+                        RuneUpgradeCache[0] = rune;
+                        playerData.RuneInventory.removeRuneParameter(index);
+                        playSound(player, SoundList.Click);
+                    } else if (RuneUpgradeCache[1] == null) {
+                        if (RuneUpgradeCache[0].Id.equals(rune.Id)) {
+                            if (RuneUpgradeCache[0].Level >= rune.Level) {
+                                RuneUpgradeCache[1] = rune.clone();
+                                playerData.RuneInventory.removeRuneParameter(index);
+                                playSound(player, SoundList.Click);
+                            } else {
+                                sendMessage(player, "§e素体ルーン§aより§e高レベル§aな§eルーン§aは素材に出来ません", SoundList.Nope);
+                            }
                         } else {
-                            sendMessage(player, "§e素体ルーン§aより§e高レベル§aな§eルーン§aは素材に出来ません", SoundList.Nope);
+                            sendMessage(player, "§e[同名]§aの§e[ルーン]§aを選択してください", SoundList.Nope);
                         }
-                    } else {
-                        sendMessage(player, "§e[同名]§aの§e[ルーン]§aを選択してください", SoundList.Nope);
                     }
+                } else {
+                    sendMessage(player, "§e[特殊ルーン]§aは§b合成§a出来ません", SoundList.Nope);
                 }
             }
             for (int i = 0; i < 2; i++) {

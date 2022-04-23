@@ -10,6 +10,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -85,16 +86,21 @@ public class Sage extends BaseSkillClass {
 
             Location top = origin.clone().add(0, 2.5,0);
             MultiThread.TaskRun(() -> {
-                for (int i = 0; i < time/4; i++) {
+                RuneParameter rune = playerData.Equipment.equippedRune("ホールオブダークネスのルーン");
+                boolean bool = rune != null;
+                double value = bool ? (rune.AdditionParameterValue(0)/100) / (20/5f) : 0;
+                int period = 5;
+                for (int i = 0; i < time; i+=period) {
                     ParticleManager.CircleParticle(particleData, origin, radius, 36);
                     ParticleManager.RandomVectorParticle(particleData, top, 36);
-                    for (LivingEntity entity : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
-                        Vector vector = origin.toVector().subtract(entity.getLocation().toVector()).multiply(0.25);
+                    for (LivingEntity victim : Function.NearLivingEntity(origin, radius, skillProcess.Predicate())) {
+                        Vector vector = origin.toVector().subtract(victim.getLocation().toVector()).multiply(0.25);
                         if (vector.length() > 1) vector.normalize();
-                        entity.setVelocity(entity.getVelocity().add(vector));
-                        ParticleManager.LineParticle(particleData2, entity.getEyeLocation(), top, 0.5, 5);
+                        Function.setVelocity(victim, victim.getVelocity().add(vector));
+                        ParticleManager.LineParticle(particleData2, victim.getEyeLocation(), top, 0.5, 5);
+                        if (bool) Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, 1);
                     }
-                    MultiThread.sleepTick(5);
+                    MultiThread.sleepTick(period);
                 }
             }, skillData.Id);
             skillProcess.SkillRigid(skillData);

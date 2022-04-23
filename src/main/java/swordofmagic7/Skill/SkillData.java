@@ -10,8 +10,7 @@ import swordofmagic7.Equipment.EquipmentCategory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Function.decoLore;
-import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.*;
 
 public class SkillData implements Cloneable {
     public String Id;
@@ -42,7 +41,7 @@ public class SkillData implements Cloneable {
         Lore.add(decoText("§3§lスキル情報"));
         Lore.add(decoLore("スキルタイプ") + SkillType.Display);
         if (SkillType.isActive()) {
-            Lore.add(decoLore("消費マナ") + String.format(playerData.ViewFormat(), Mana * (1+playerData.Level/100f)));
+            Lore.add(decoLore("消費マナ") + IncreasedConsumptionMana(Mana, playerData.Level));
             Lore.add(decoLore("詠唱時間") + (double) CastTime / 20 + "秒");
             Lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
             Lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");
@@ -87,7 +86,11 @@ public class SkillData implements Cloneable {
     public SkillData clone() {
         try {
             SkillData clone = (SkillData) super.clone();
-            // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
+            List<SkillParameter> params = new ArrayList<>();
+            for (SkillParameter param : Parameter) {
+                params.add(param.clone());
+            }
+            clone.Parameter = params;
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

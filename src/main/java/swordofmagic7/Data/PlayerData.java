@@ -1106,7 +1106,7 @@ public class PlayerData {
     }
 
     public int deadTime = 0;
-    public void dead() {
+    public synchronized void dead() {
         if (EffectManager.hasEffect(EffectType.ShadowPool)) {
             sendMessage(player, "§e[" + EffectType.ShadowPool.Display + "]§aの効果により§c死§aを防ぎました", SoundList.Tick);
             return;
@@ -1152,7 +1152,6 @@ public class PlayerData {
                             RevivalReady = false;
                             player.teleportAsync(LastDeadLocation);
                             player.setGameMode(GameMode.SURVIVAL);
-                            Status.Health = Status.MaxHealth / 2;
                             player.resetTitle();
                             hologram.delete();
                             statistics.RevivalCount++;

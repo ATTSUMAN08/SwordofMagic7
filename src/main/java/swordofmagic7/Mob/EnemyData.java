@@ -114,7 +114,11 @@ public class EnemyData {
     }
 
     public static double StatusMultiply(int level) {
-        return Math.pow(0.74+(level/3f), 1.45);
+        double value = Math.pow(0.74+(level/3f), 1.45);
+        for (int i = 0; i < Math.ceil((level-50)/10f); i++) {
+            value = Math.pow(value, 1.03);
+        }
+        return value;
     }
     public static double StatusMultiply2(int level) {
         return level >= 30 ? Math.pow(StatusMultiply(level), 1.1) : StatusMultiply(level);
@@ -480,6 +484,13 @@ public class EnemyData {
                                         Holo.add("§b§l[+]§e§l" + runeParameter.Display);
                                         if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
                                             player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                        }
+                                        if (runeParameter.isSpecial) {
+                                            TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                            text.addView(dropData.runeParameter.getTextView(playerData.ViewFormat()));
+                                            text.addText("§aを§e獲得§aしました");
+                                            text.setSound(SoundList.Tick);
+                                            Client.BroadCast(text);
                                         }
                                     }
                                 }

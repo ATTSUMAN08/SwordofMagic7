@@ -11,6 +11,7 @@ import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RuneInfo;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Cook.Cook;
 import swordofmagic7.Life.Smith.Smelt;
@@ -55,6 +56,7 @@ public class Menu {
     public final SmithEquipment SmithEquipment;
     public final SmithMake smithMake;
     public final MobInfo mobInfo;
+    public final RuneInfo runeInfo;
 
     public Menu(Player player, PlayerData playerData) {
         this.player = player;
@@ -70,6 +72,7 @@ public class Menu {
         SmithEquipment = new SmithEquipment(playerData);
         smithMake = new SmithMake(playerData);
         mobInfo = new MobInfo(playerData);
+        runeInfo = new RuneInfo(playerData);
     }
 
     public void UserMenuView() {
@@ -274,6 +277,7 @@ public class Menu {
                 Market.MarketMenuClick(view, currentItem, Slot);
                 smithMake.MakeMenuClick(view, currentItem, Slot);
                 mobInfo.MobInfoClick(view, currentItem, Slot);
+                runeInfo.RuneInfoClick(view, currentItem, Slot);
                 playerData.Skill.getAlchemist().AlchemyClick(view, currentItem, Slot);
             } else if (ClickInventory == view.getBottomInventory()) {
 

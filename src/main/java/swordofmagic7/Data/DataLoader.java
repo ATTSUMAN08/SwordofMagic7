@@ -75,6 +75,7 @@ public class DataLoader {
         NpcDataLoad();
         MobSpawnerDataLoad();
         ItemInfoDataLoad();
+        RuneInfoDataLoad();
         DefenseBattleMobListLoad();
         RewardBoxListLoad();
         Log("§aDataLoader -> AllLoad");
@@ -162,6 +163,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> ItemData");
     }
 
     public static void RuneDataLoad() {
@@ -202,6 +204,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> RuneData");
     }
 
     public static void PetDataLoad() {
@@ -245,6 +248,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> PetData");
     }
 
     public static void RecipeDataLoad() {
@@ -270,6 +274,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> RecipeData");
     }
 
     public static void MapDataLoad() {
@@ -318,6 +323,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> MapData");
     }
 
     public static void LifeDataLoad() {
@@ -524,6 +530,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> LifeData");
     }
     public static int MaxMakeSlot = 0;
 
@@ -577,6 +584,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> SkillData");
     }
 
     public static void ClassDataLoad() {
@@ -631,6 +639,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> ClassData");
     }
 
     public static void MobDataLoad() {
@@ -778,6 +787,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> EnemyData");
     }
 
     public static void ShopDataLoad() {
@@ -827,6 +837,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> ShopData");
     }
 
     public static int MaxTitleSlot = 0;
@@ -862,6 +873,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> TitleData");
     }
 
     public static void NpcDataLoad() {
@@ -874,6 +886,7 @@ public class DataLoader {
             npcData.Message = data.getStringList("Message");
             NpcList.put(Integer.valueOf(fileName), npcData);
         }
+        Log("§aDataLoader -> NpcData");
     }
 
     public static void MobSpawnerDataLoad() {
@@ -901,6 +914,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> MobSpawnerData");
     }
 
     public static void ItemInfoDataLoad() {
@@ -942,6 +956,20 @@ public class DataLoader {
                 ItemInfoData.get(stack.itemParameter.Id).add("§7・§e§l" + recipe.getKey());
             }
         }
+        Log("§aDataLoader -> ItemInfoData");
+    }
+
+    public static void RuneInfoDataLoad() {
+        for (RuneParameter runeData : RuneList.values()) {
+            RuneInfoData.put(runeData.Id, new ArrayList<>(runeData.viewRune("%.0f", runeData.isLoreHide).getLore()));
+            RuneInfoData.get(runeData.Id).add(decoText("§3§l入手方法"));
+        }
+        for (MobData mobData : MobList.values()) {
+            for (DropRuneData dropData : mobData.DropRuneTable) {
+                RuneInfoData.get(dropData.runeParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
+            }
+        }
+        Log("§aDataLoader -> RuneInfoData");
     }
 
     public static void DefenseBattleMobListLoad() {
@@ -951,6 +979,7 @@ public class DataLoader {
         for (String name : data.getStringList("MobList")) {
             DefenseBattle.MobList.add(DataBase.getMobData(name));
         }
+        Log("§aDataLoader -> DefenseBattleMobList");
     }
 
     public static void RewardBoxListLoad() {
@@ -973,6 +1002,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
+        Log("§aDataLoader -> RewardBoxList");
     }
 
     public static void disguiseLoader(Disguise disguise, FileConfiguration data) {

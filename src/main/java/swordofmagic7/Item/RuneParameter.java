@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Status.StatusParameter;
+import swordofmagic7.TextView.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,11 +73,20 @@ public class RuneParameter implements Cloneable {
             if (isZero(Parameter.get(param))) Lore.add(param.DecoDisplay +  String.format(format, Parameter(param)));
         }
         for (SkillParameter param : AdditionParameter) {
-            Lore.add(decoLore(param.Display) + param.valueView());
+            Lore.add(decoLore(param.Display) + param.valueView(Level));
         }
         ItemStack item = new ItemStackData(Icon, decoText(Display), Lore).view();
         item.setAmount(Math.min(DataBase.MaxStackAmount, Level));
         return item;
+    }
+
+    public TextView getTextView(String format) {
+        ItemStack rune = viewRune(format, isLoreHide);
+        StringBuilder hoverText = new StringBuilder(rune.getItemMeta().getDisplayName());
+        for (String str : rune.getLore()) {
+            hoverText.append("\n").append(str);
+        }
+        return new TextView().addText("§e[" + Display + "§e]").addHover(hoverText.toString()).reset();
     }
 
     @Override

@@ -63,7 +63,7 @@ public class BulletMarker extends BaseSkillClass {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             double value = skillData.ParameterValue(0)/100* multiply();
-            int time = skillData.ParameterValueInt(0)*20;
+            int time = skillData.ParameterValueInt(1)*20;
             MultiThread.sleepTick(skillData.CastTime);
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, true, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.CRIT);
@@ -72,8 +72,10 @@ public class BulletMarker extends BaseSkillClass {
             ParticleManager.LineParticle(particleData, playerHandLocation(player), 20, 0, 10);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
-                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, 1);
-                EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, time, player);
+                int count = 1;
+                if (playerData.Equipment.isEquipRune("凍傷のルーン")) count++;
+                else EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, time, player);
+                Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, count);
             }
             playSound(player, GunAttack);
             skillProcess.SkillRigid(skillData);

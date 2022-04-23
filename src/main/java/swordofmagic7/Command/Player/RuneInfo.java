@@ -12,8 +12,8 @@ import swordofmagic7.Item.RuneParameter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.RuneList;
-import static swordofmagic7.Data.DataBase.getRuneParameter;
+import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.sendMessage;
 
 public class RuneInfo implements SomCommand, SomTabComplete {
@@ -30,12 +30,13 @@ public class RuneInfo implements SomCommand, SomTabComplete {
                 } catch (Exception ignore) {}
                 ItemStack itemStack = rune.viewRune(playerData.ViewFormat(), rune.isLoreHide);
                 List<String> list = new ArrayList<>();
-                list.add(itemStack.getItemMeta().getDisplayName());
+                list.add(decoText(rune.Display));
                 list.addAll(itemStack.getLore());
+                list.addAll(RuneInfoData.get(rune.Id));
                 sendMessage(player, list);
             } else player.sendMessage("§a存在しない§eルーン§aです");
         } else {
-            player.sendMessage("§e/runeInfo <RuneID> [<Level>] [<0~200>]");
+            playerData.Menu.runeInfo.RuneInfoView();
         }
         return true;
     }

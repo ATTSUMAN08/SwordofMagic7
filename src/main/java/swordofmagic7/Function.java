@@ -96,9 +96,11 @@ public final class Function {
 
     }
     public static void setVelocity(LivingEntity entity, Vector vector) {
-        if (!EffectManager.hasEffect(entity, EffectType.PainBarrier)) {
+        if (!EffectManager.hasEffect(entity, EffectType.NonKnockBack)) entity.setVelocity(vector);
+    }
 
-        }
+    public static int IncreasedConsumptionMana(int mana, int level) {
+        return Math.round(mana * (1+level/75f));
     }
 
     public static String decoText(String str) {
@@ -294,13 +296,6 @@ public final class Function {
             }
         }
         return null;
-    }
-
-    public static void Push(LivingEntity entity, Vector vector) {
-        EffectManager manager = EffectManager.getEffectManager(entity);
-        if (!manager.hasEffect(EffectType.PainBarrier)) {
-            entity.setVelocity(vector);
-        }
     }
 
     public static Set<LivingEntity> NearEntityByEnemy(Location location, double radius) {

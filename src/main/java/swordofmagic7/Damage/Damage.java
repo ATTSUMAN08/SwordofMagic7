@@ -14,6 +14,7 @@ import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.Mob.MobSkillData;
@@ -34,7 +35,7 @@ public final class Damage {
 
     public static int OutrageResetTime;
     public static int FrenzyResetTime;
-    public static double PvPDecay = 100;
+    public static double PvPDecay = 500;
     public static double PvPHealDecay = 10;
 
     public static void makeHeal(Player healer, Player victim, String source, double healMultiply) {
@@ -45,7 +46,16 @@ public final class Damage {
             return;
         }
         double heal = healerData.Status.HLP * healMultiply;
-        if (playerData(victim).PvPMode) heal /= PvPHealDecay;
+        if (source.equals("MassHeal")) {
+            RuneParameter rune = healerData.Equipment.equippedRune("過剰回復のルーン");
+            if (rune != null) {
+                int time  = rune.AdditionParameterValueInt(0)*20;
+                double value = rune.AdditionParameterValue(1)/100;
+                double shield = Math.min(heal-(victimData.Status.MaxHealth-victimData.Status.Health),victimData.Status.MaxHealth*value);
+                victimData.changeShield(shield, time);
+            }
+        }
+        if (victimData.PvPMode) heal /= PvPHealDecay;
         victimData.changeHealth(heal);
         String Text = "§b≫§e" + String.format("%.1f", heal);
         String M = " §f[M:" + String.format("%.0f", healMultiply*100) + "%]";
@@ -254,6 +264,7 @@ public final class Damage {
         int hitCount = 0;
         int criCount = 0;
         int missCount = 0;
+        if (victimEffectManager.hasEffect(EffectType.AbsolutelyEVA)) hitRate = 0;
         for (int i = 0; i < count; i++) {
             if (random.nextDouble() <= hitRate) {
                 if (random.nextDouble() <= criRate) {
@@ -277,13 +288,15 @@ public final class Damage {
 
         boolean victimDead = false;
         if (victim instanceof Player player) {
+            PlayerData playerData = playerData(player);
             if (victimEffectManager.hasEffect(EffectType.CrossGuard)) {
                 int time = victimEffectManager.getData(EffectType.CrossGuard).getInt(0);
                 victimEffectManager.addEffect(EffectType.CrossGuardCounter, time);
                 victimEffectManager.removeEffect(EffectType.CrossGuard);
                 sendMessage(player,"§e[" + EffectType.CrossGuardCounter.Display + "]§aが発動しました", SoundList.Counter);
+                RuneParameter rune = playerData.Equipment.equippedRune("反転切りのルーン");
+                if (rune != null) makeDamage(victim, attacker, DamageCause.ATK, rune.Id, rune.AdditionParameterValue(0)/100, 1);
             }
-            PlayerData playerData = playerData(player);
             playerData.HealthRegenDelay = 40;
             double finalDamage = damage;
             if (playerData.Status.Shield > 0) {
@@ -298,16 +311,24 @@ public final class Damage {
             }
             if (playerData.Status.Health - finalDamage > 0) {
                 playerData.Status.Health -= finalDamage;
-            } else if (playerData.EffectManager.hasEffect(EffectType.Revive)) {
-                playerData.Status.Health = playerData.Status.MaxHealth/2;
-                playerData.EffectManager.removeEffect(EffectType.Revive);
-                player.sendMessage("§e[" + EffectType.Revive.Display + "]§aが発動しました");
             } else {
-                victimDead = true;
-                playerData.dead();
-                if (attacker instanceof Player player2) {
-                    PlayerData playerData2 = playerData(player2);
-                    playerData2.Status.Health += playerData.Status.MaxHealth/5;
+                boolean isRevive = false;
+                for (EffectType effectType : new EffectType[]{EffectType.Revive, EffectType.LastChance}) {
+                    if (playerData.EffectManager.hasEffect(effectType)) {
+                        playerData.Status.Health = playerData.Status.MaxHealth / 2;
+                        playerData.EffectManager.removeEffect(effectType);
+                        player.sendMessage("§e[" + effectType.Display + "]§aが発動しました");
+                        isRevive = true;
+                        break;
+                    }
+                }
+                if (!isRevive) {
+                    victimDead = true;
+                    playerData.dead();
+                    if (attacker instanceof Player player2) {
+                        PlayerData playerData2 = playerData(player2);
+                        playerData2.Status.Health += playerData.Status.MaxHealth / 5;
+                    }
                 }
             }
 

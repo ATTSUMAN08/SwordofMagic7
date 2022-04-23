@@ -115,7 +115,9 @@ public class Equipment {
                 playerData.ItemInventory.addItemParameter(EquipSlot.get(slot), 1);
             }
 
+
             EquipSlot.put(slot, param.clone());
+            EquipRune.get(slot).clear();
             for (RuneParameter rune : param.itemEquipmentData.Rune) {
                 EquipRune.get(slot).add(rune);
             }
@@ -163,5 +165,13 @@ public class Equipment {
             if (rune.Id.equals(runeId)) return rune;
         }
         return null;
+    }
+
+    public boolean isEquipRune(String runeId) {
+        return equippedRune(runeId) != null;
+    }
+
+    public boolean isEquipRune(EquipmentSlot slot, String runeId) {
+        return equippedRune(slot, runeId) != null;
     }
 }
