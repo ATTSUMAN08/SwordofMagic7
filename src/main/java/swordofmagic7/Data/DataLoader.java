@@ -98,6 +98,7 @@ public class DataLoader {
                 itemParameter.CustomModelData = data.getInt("Model", 0);
                 itemParameter.isHide = data.getBoolean("isHide", false);
                 itemParameter.isLoreHide = data.getBoolean("isLoreHide", false);
+                itemParameter.isNonTrade = data.getBoolean("isNonTrade", false);
                 if (data.isSet("Materialization")) {
                     itemParameter.Materialization = data.getString("Materialization");
                     if (!MaterializationMap.containsKey(itemParameter.Materialization)) MaterializationMap.put(itemParameter.Materialization, new ArrayList<>());
@@ -179,6 +180,8 @@ public class DataLoader {
                 runeData.Display = data.getString("Display");
                 runeData.Lore = data.getStringList("Lore");
                 runeData.isSpecial = data.getBoolean("isSpecial", false);
+                runeData.isLoreHide = data.getBoolean("isLoreHide", false);
+                runeData.isNonTrade = data.getBoolean("isNonTrade", false);
                 for (StatusParameter param : StatusParameter.values()) {
                     if (data.isSet(param.toString())) {
                         runeData.Parameter.put(param, data.getDouble(param.toString()));
@@ -218,6 +221,7 @@ public class DataLoader {
                 petData.Id = fileName;
                 petData.Display = data.getString("Display");
                 petData.Lore = data.getStringList("Lore");
+                petData.isNonTrade = data.getBoolean("isNonTrade", false);
                 petData.entityType = EntityType.fromName(data.getString("Type").toUpperCase());
                 if (data.isSet("Disguise.Type")) {
                     DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase());

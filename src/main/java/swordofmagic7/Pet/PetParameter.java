@@ -170,7 +170,7 @@ public class PetParameter implements Cloneable {
             multiplyStatusRev.put(param, 1d);
             baseMultiplyStatusRev.put(param, 1d);
         }
-        if (isNotDummy && playerData.Equipment.isWeaponEquip(EquipmentCategory.Baton)) {
+        if (isNotDummy && playerData.Equipment.isMainHandEquip(EquipmentCategory.Baton)) {
             ItemParameter item = playerData.Equipment.getEquip(EquipmentSlot.MainHand);
             for (StatusParameter param : StatusParameter.values()) {
                 EquipmentStatus.put(param, item.itemEquipmentData.Parameter(playerData.Level).get(param));
@@ -218,7 +218,7 @@ public class PetParameter implements Cloneable {
         if (playerData.Skill.hasSkill("BasicTamer")) {
             Multiply *= 1+basicTamer.ParameterValue(1)/100;
         }
-        if (isNotDummy && playerData.Equipment.isWeaponEquip(EquipmentCategory.Baton)) {
+        if (isNotDummy && playerData.Equipment.isMainHandEquip(EquipmentCategory.Baton)) {
             Multiply *= (1+playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.Plus/100f);
         }
         MaxStamina = petData.MaxStamina * (Level/50f + 0.98);

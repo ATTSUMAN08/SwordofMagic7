@@ -15,6 +15,8 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.PlayerList;
+import swordofmagic7.RayTrace.Ray;
+import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
@@ -242,5 +244,78 @@ public class LibraryGovernor {
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
         }, "NecessarySacrifice");
+    }
+
+    public void LetsShutUp() {
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c「すこし黙りましょう」", SoundList.DungeonTrigger);
+            for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
+                int time = Function.StringToHashInt(player.getName(), 200) + 100;
+                EffectManager.addEffect(player, EffectType.Silence, time, null);
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, "LetsShutUp");
+    }
+
+    public void IndividualityConcrete() {
+        String id = "IndividualityConcrete";
+        MultiThread.TaskRun(() -> {
+            Manager.CastSkillIgnoreAI(true);
+            radiusMessage("§c「人には全く違うものや似通った個性があります」", SoundList.DungeonTrigger);
+            LivingEntity entity = Manager.enemyData.entity;
+            EffectType effectType = EffectType.IndividualityConcrete;
+            for (Player player : PlayerList.getNearNonDead(entity.getLocation(), radius)) {
+                MultiThread.TaskRun(() -> {
+                    int time = 0;
+                    switch (Function.StringToHashInt(player.getName(), 3)) {
+                        case 0 -> {
+                            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+                            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+                            double radius = 8;
+                            int x = 25;
+                            time = x*20;
+                            for (int i = 0; i < x; i++) {
+                                Location loc = player.getLocation().clone().add(random.nextDouble()*5, 0, random.nextDouble()*5);
+                                ParticleManager.CircleParticle(particleData, loc, radius, 12);
+                                MultiThread.sleepTick(20);
+                                particleData2.spawn(loc);
+                                for (LivingEntity victim : Function.NearEntityByEnemy(loc, radius)) {
+                                    double value = radius-loc.distance(victim.getLocation());
+                                    Damage.makeDamage(entity, victim, DamageCause.ATK, id, value, 1);
+                                }
+                            }
+                        }
+                        case 1 -> {
+                            int x = 100;
+                            time = x*5;
+                            for (int i = 0; i < x; i++) {
+                                Ray ray = RayTrace.rayLocationEntity(entity.getEyeLocation(), 100, 1, Manager.enemyData.EnemyPredicate);
+                                if (ray.isHitEntity()) {
+                                    LivingEntity victim = ray.HitEntity;
+                                    Damage.makeDamage(entity, victim, DamageCause.ATK, id, 1, 1);
+                                }
+                                MultiThread.sleepTick(5);
+                            }
+                        }
+                        case 2 -> {
+                            int x = 12;
+                            time = x*40;
+                            for (int i = 0; i < 12; i++) {
+                                if (!RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 0, entityPre -> entityPre == entity).isHitEntity()) {
+                                    Damage.makeDamage(entity, player, DamageCause.MAT, id, 100, 1, 0.5, true);
+                                    sendMessage(player, "§c[" + effectType.Display + "]により致死ダメージを受けました", SoundList.Nope);
+                                }
+                                MultiThread.sleepTick(40);
+                            }
+                        }
+                    }
+                    EffectManager.addEffect(player, effectType, time, null);
+                }, id);
+            }
+            MultiThread.sleepTick(10);
+            Manager.CastSkillIgnoreAI(false);
+        }, id);
     }
 }

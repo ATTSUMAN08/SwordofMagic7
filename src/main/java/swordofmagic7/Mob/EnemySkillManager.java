@@ -134,6 +134,8 @@ public class EnemySkillManager {
             case "GovernorSave" -> libraryGovernor.GovernorSave();
             case "GovernorLoad" -> libraryGovernor.GovernorLoad();
             case "NecessarySacrifice" -> libraryGovernor.NecessarySacrifice();
+            case "LetsShutUp" -> libraryGovernor.LetsShutUp();
+            case "IndividualityConcrete" -> libraryGovernor.IndividualityConcrete();
 
         }
         MultiThread.TaskRun(() -> {

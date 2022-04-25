@@ -8,6 +8,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
@@ -88,6 +89,9 @@ public class EffectManager {
                                             removeEffect(EffectType.Brutality);
                                             sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.Tick);
                                         }
+                                    }
+                                    case SubzeroShield -> {
+                                        if (!playerData.Equipment.isOffHandEquip(EquipmentCategory.Shield)) removeEffect(effectType);
                                     }
                                 }
                             }

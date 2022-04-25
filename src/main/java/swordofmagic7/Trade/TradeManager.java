@@ -13,14 +13,33 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static swordofmagic7.Function.CheckBlockPlayer;
-import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class TradeManager {
     public static HashMap<UUID, TradeData> TradeList = new HashMap<>();
     public static HashMap<Player, TradeData> TradeRequest = new HashMap<>();
+
+    public static final String nonTradeMessage = "§cトレード不可§aです";
+    public static boolean nonTrade(Player player, ItemParameter param) {
+        if (param.isNonTrade) {
+            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            return true;
+        } else return false;
+    }
+    public static boolean nonTrade(Player player, RuneParameter param) {
+        if (param.isNonTrade) {
+            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            return true;
+        } else return false;
+    }
+    public static boolean nonTrade(Player player, PetParameter param) {
+        if (param.petData.isNonTrade) {
+            sendMessage(player, "§e[" + param.petData.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            return true;
+        } else return false;
+    }
 
     public static void tradeCommand(Player player, PlayerData playerData, String[] args) {
         if (args.length > 0) {
@@ -39,6 +58,7 @@ public class TradeManager {
                         if (args[1].equalsIgnoreCase("sendItem") || args[1].equalsIgnoreCase("sI")) {
                             if (playerData.ItemInventory.getList().size() > index) {
                                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
+                                if (nonTrade(player, stack.itemParameter)) return;
                                 int Amount = args.length == 4 ? Integer.parseInt(args[3]) : stack.Amount;
                                 if (Amount > 0 ) {
                                     ItemParameter item = stack.itemParameter;
@@ -69,6 +89,7 @@ public class TradeManager {
                                 int toIndex = args.length == 4 ? Integer.parseInt(args[3]) : index;
                                 for (int i = index; i <= toIndex; i++) {
                                     RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
+                                    if (nonTrade(player, rune)) return;
                                     targetData.RuneInventory.addRuneParameter(rune);
                                     playerData.RuneInventory.removeRuneParameter(index);
                                     player.sendMessage(targetData.getNick() + "§aさんに§e[" + rune.Display + "§e]§aを送りました");
@@ -86,6 +107,7 @@ public class TradeManager {
                         } else if (args[1].equalsIgnoreCase("sendPet") || args[1].equalsIgnoreCase("sP")) {
                             if (playerData.PetInventory.getList().size() > index) {
                                 PetParameter pet = playerData.PetInventory.getPetParameter(index);
+                                if (nonTrade(player, pet)) return;
                                 if (!pet.Summoned) {
                                     pet.player = target;
                                     pet.playerData = targetData;

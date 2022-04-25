@@ -24,6 +24,7 @@ public class RuneParameter implements Cloneable {
     public boolean isSpecial = false;
     public boolean isHide = false;
     public boolean isLoreHide = false;
+    public boolean isNonTrade = false;
     public HashMap<StatusParameter, Double> Parameter = new HashMap<>();
     public List<SkillParameter> AdditionParameter = new ArrayList<>();
 

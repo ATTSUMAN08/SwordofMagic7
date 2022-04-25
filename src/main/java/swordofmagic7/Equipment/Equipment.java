@@ -35,13 +35,32 @@ public class Equipment {
         return EquipSlot.containsKey(slot);
     }
 
-    public boolean isWeaponEquip() {
-        return EquipSlot.containsKey(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).Category.isEquipment();
+    public boolean isEquip(EquipmentSlot slot, EquipmentCategory category) {
+        return isEquip(slot) && playerData.Equipment.getEquip(slot).itemEquipmentData.EquipmentCategory == category;
+    }
+    public boolean isMainHandEquip() {
+        return isEquip(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).Category.isEquipment();
     }
 
-    public boolean isWeaponEquip(EquipmentCategory category) {
-        return isWeaponEquip() && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == category;
+    public boolean isMainHandEquip(EquipmentCategory category) {
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == category;
     }
+    public boolean isOffHandEquip() {
+        return isEquip(EquipmentSlot.OffHand) && playerData.Equipment.getEquip(EquipmentSlot.OffHand).Category.isEquipment();
+    }
+
+    public boolean isOffHandEquip(EquipmentCategory category) {
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.OffHand).itemEquipmentData.EquipmentCategory == category;
+    }
+
+    public boolean isArmorEquip() {
+        return isEquip(EquipmentSlot.Armor) && playerData.Equipment.getEquip(EquipmentSlot.Armor).Category.isEquipment();
+    }
+
+    public boolean isArmorEquip(EquipmentCategory category) {
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.Armor).itemEquipmentData.EquipmentCategory == category;
+    }
+
 
     public ItemParameter getEquip(EquipmentSlot slot) {
         return EquipSlot.getOrDefault(slot, new ItemParameter());

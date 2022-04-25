@@ -151,7 +151,7 @@ public class ItemInventory extends BasicInventory {
         addItemParameter(stack.itemParameter, stack.Amount);
     }
 
-    public void addItemParameter(ItemParameter param, int addAmount) {
+    public synchronized void addItemParameter(ItemParameter param, int addAmount) {
         if (List.size() < MaxSlot) {
             if (List.size() >= MaxSlot-10) {
                 sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);

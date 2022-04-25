@@ -9,6 +9,7 @@ import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -87,6 +88,17 @@ public class Oracle extends BaseSkillClass {
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
                 MultiThread.sleepMillis(millis);
+            }
+
+            RuneParameter rune = playerData.Equipment.equippedRune("魔法障壁のルーン");
+            if (rune != null) {
+                int time2 = rune.AdditionParameterValueInt(0)*20;
+                Set<Player> players = new HashSet<>();
+                players.add(player);
+                if (playerData.Party != null) players.addAll(playerData.Party.Members);
+                for (Player player : players) {
+                    playerData(player).EffectManager.addEffect(EffectType.MagicBarrier, time2);
+                }
             }
 
             MultiThread.TaskRun(() -> {

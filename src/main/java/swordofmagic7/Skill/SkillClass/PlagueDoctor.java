@@ -164,7 +164,12 @@ public class PlagueDoctor extends BaseSkillClass {
             Set<Player> players = new HashSet<>();
             players.add(player);
             if (playerData.Party != null) players.addAll(playerData.Party.Members);
+            RuneParameter rune = playerData.Equipment.equippedRune("良薬のルーン");
+            boolean bool  = rune != null;
+            int time2 = 0;
+            if (bool) time2 = rune.AdditionParameterValueInt(0)*20;
             for (Player player : players) {
+                if (bool) EffectManager.addEffect(player, EffectType.NonKnockBack, time2, this.player);
                 EffectManager.addEffect(player, EffectType.Modafinil, time, this.player);
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
                 playSound(player, SoundList.Heal);

@@ -27,4 +27,5 @@ public class PetData {
     public double CriticalRate;
     public double CriticalResist;
     public boolean BossPet;
+    public boolean isNonTrade = false;
 }

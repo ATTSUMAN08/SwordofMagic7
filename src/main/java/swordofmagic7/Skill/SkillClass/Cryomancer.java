@@ -136,7 +136,9 @@ public class Cryomancer extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            playerData.EffectManager.addEffect(EffectType.SubzeroShield, time, new Object[]{freezePercent,time2});
+            if (playerData.Equipment.isEquipRune("氷の棘")) {
+                playerData.EffectManager.addEffect(EffectType.IceThorns, time);
+            } else playerData.EffectManager.addEffect(EffectType.SubzeroShield, time, new Object[]{freezePercent, time2});
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);

@@ -25,6 +25,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetData;
+import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Quest.QuestData;
@@ -35,6 +36,7 @@ import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
@@ -213,7 +215,7 @@ public class EnemyData {
         return (mobData.Hostile ? "§c§l" : "§6§l") + "《" + mobData.Display + " Lv" + Level + "》";
     }
 
-    private final java.util.function.Predicate<LivingEntity> Predicate = entity -> entity.getType() == EntityType.PLAYER;
+    public final Predicate<LivingEntity> EnemyPredicate = entity -> entity.getType() == EntityType.PLAYER || PetManager.isPet(entity);
 
     private boolean runAITask = true;
 

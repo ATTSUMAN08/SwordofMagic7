@@ -41,6 +41,7 @@ public class ItemParameter implements Cloneable {
     public String Materialization;
     public boolean isHide = false;
     public boolean isLoreHide = false;
+    public boolean isNonTrade = false;
     public java.io.File File;
 
     Material getIcon() {

@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
@@ -85,7 +86,7 @@ public class Events implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium);
+        boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium) || player.hasPermission(Som7VIP);
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
         if ((!bypass || isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
             for (Player player2 : Bukkit.getOnlinePlayers()) {
@@ -100,13 +101,16 @@ public class Events implements Listener {
             return;
         }
         int playerCount = Bukkit.getOnlinePlayers().size();
-        if (playerCount >= 45 && !isEventServer()) {
+        int normal = isEventServer() ? 80 : 40;
+        int vip = isEventServer() ? 85 : 45;
+        int premium = isEventServer() ? 90 : 50;
+        if (playerCount >= normal) {
             if (player.hasPermission(OverLogin)) return;
-            if (playerCount <= 50 && player.hasPermission(Som7VIP)) return;
-            if (player.hasPermission(Som7Premium)) return;
-            if (playerCount <= 45) {
+            if (playerCount <= vip && player.hasPermission(Som7VIP)) return;
+            if (playerCount <= premium && player.hasPermission(Som7Premium)) return;
+            if (playerCount <= vip) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§eVIP枠は開いています");
-            } else if (playerCount <= 50) {
+            } else if (playerCount <= premium) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§ePremium枠は開いています");
             }  else {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e全ての枠が埋まっています");
@@ -206,6 +210,7 @@ public class Events implements Listener {
         PlayerData playerData = playerData(player);
         Block block = event.getClickedBlock();
         Action action = event.getAction();
+        ItemStack item = event.getItem();
         if (player.getGameMode() != GameMode.CREATIVE) {
             if (block != null) {
                 if (block.getType() != Material.LECTERN && !playerData.Map.isGathering(block.getType())) {
@@ -219,7 +224,7 @@ public class Events implements Listener {
                 event.setCancelled(true);
             }
         }
-        if (block == null && Function.isHoldFishingRod(player) && action.isRightClick()) {
+        if (block == null && item != null && Function.isHoldFishingRod(player) && action.isRightClick()) {
             playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
             event.setCancelled(false);
         }
@@ -377,8 +382,6 @@ public class Events implements Listener {
                     case 1 -> playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
                     case 2 -> playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
                 }
-                player.getInventory().setHeldItemSlot(8);
-                event.setCancelled(true);
             }
             if (playerData.CastMode.isRenewed() && event.getNewSlot() < 8) {
                 int x = 0;

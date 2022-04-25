@@ -145,7 +145,7 @@ public class SkillProcess {
     }
 
     public void normalAttackTargetSelect() {
-        if (playerData.Equipment.isWeaponEquip()) {
+        if (playerData.Equipment.isMainHandEquip()) {
             if (0 >= normalAttackCoolTime) {
                 EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
                 Set<LivingEntity> victims = new HashSet<>();
@@ -175,7 +175,7 @@ public class SkillProcess {
     public void normalAttack(Set<LivingEntity> victims) {
         if (playerData.isAFK()) return;
         final String damageSource = "attack";
-        if (playerData.Equipment.isWeaponEquip()) {
+        if (playerData.Equipment.isMainHandEquip()) {
             if (0 >= normalAttackCoolTime) {
                 LivingEntity victim = null;
                 for (LivingEntity entity : victims) {

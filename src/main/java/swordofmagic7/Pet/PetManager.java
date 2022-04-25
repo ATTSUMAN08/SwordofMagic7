@@ -72,7 +72,7 @@ public class PetManager {
 
     public boolean usingBaton() {
         PlayerData playerData = playerData(player);
-        if (playerData.Equipment.isWeaponEquip()) {
+        if (playerData.Equipment.isMainHandEquip()) {
             EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
             return category == EquipmentCategory.Baton;
         }

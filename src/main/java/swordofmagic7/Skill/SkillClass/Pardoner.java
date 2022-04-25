@@ -59,6 +59,10 @@ public class Pardoner extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             int min = skillData.ParameterValueInt(0) * 20;
+            int max = Integer.MAX_VALUE;
+            if (playerData.Equipment.isEquipRune("相対効果のルーン")) {
+                max = 200;
+            }
             double multiply = skillData.ParameterValue(1);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
@@ -66,11 +70,13 @@ public class Pardoner extends BaseSkillClass {
                 LivingEntity target = ray.HitEntity;
                 for (Map.Entry<EffectType, EffectData> data : EffectManager.getEffectManager(target).Effect.entrySet()) {
                     if (!data.getKey().Buff && !data.getKey().isStatic && !data.getValue().flags) {
+                        int addTime;
                         if (data.getValue().time > min) {
-                            data.getValue().time *= multiply;
+                            addTime = Math.toIntExact(Math.round(data.getValue().time * (1 - multiply)));
                         } else {
-                            data.getValue().time += min;
+                            addTime = min;
                         }
+                        data.getValue().time += Math.min(addTime, max);
                         data.getValue().flags = true;
                         sendMessage(player, "§c[" + data.getKey().Display + "]§aを延長しました");
                     }

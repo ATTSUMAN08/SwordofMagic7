@@ -42,6 +42,7 @@ public class DefenseBattle {
     public static double Health = 10000;
     public static int startTime = 1200;
     public static int time = startTime;
+    public static boolean isStarted = false;
     private static final int Radius = 96;
     private static final String sidebarId = "DefenseBattle";
     public static boolean last = false;
@@ -92,6 +93,7 @@ public class DefenseBattle {
     private static final Location bossLocation = new Location(world, 2232, 72, 2379);
     public static void startWave(int i) {
         if (i == 1) time = startTime;
+        isStarted = true;
         Client.sendBroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
         MultiThread.TaskRun(() -> {
             wave = i;
@@ -167,13 +169,14 @@ public class DefenseBattle {
             EnemyList.clear();
             if (Health > 0 && time > 0) {
                 for (Player player : Players) {
-                    playerData(player).ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave));
+                    playerData(player).ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/1.5));
                 }
                 Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LevelUp);
                 MultiThread.sleepTick(200);
                 wave++;
                 startWave(wave);
             } else {
+                isStarted = false;
                 Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DungeonTrigger);
                 Client.sendBroadCast(new TextView("§c防衛戦§aが終了しました"));
             }

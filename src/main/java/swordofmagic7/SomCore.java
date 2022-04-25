@@ -166,8 +166,10 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                         if (location.distance(player.getLocation()) < 2) {
                             playerData.AFKTime += AFKTimePeriod;
                             playerData.statistics.AFKTime += AFKTimePeriod;
-                            if (playerData.isAFK())
+                            if (playerData.isAFK()) {
                                 player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "", 0, AFKTimePeriod * 20 + 5, 0);
+                                if (DefenseBattle.isStarted) teleportServer(player, "Lobby");
+                            }
                         } else {
                             PlayerLastLocation.put(player, player.getLocation().clone());
                             playerData.AFKTime = 0;

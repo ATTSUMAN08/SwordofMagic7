@@ -183,7 +183,7 @@ public class Status {
         for (SkillData skillData : playerData.Classes.getPassiveSkillList()) {
             if (playerData.Skill.CategoryCheck(skillData)) {
                 double multiply = 1;
-                if (skillData.Id.equals("BasicDamageDown") && playerData.Equipment.isWeaponEquip(EquipmentCategory.Mace)) multiply = -1;
+                if (skillData.Id.equals("BasicDamageDown") && playerData.Equipment.isMainHandEquip(EquipmentCategory.Mace)) multiply = -1;
                 for (SkillParameter param : skillData.Parameter) {
                     for (StatusParameter statusParam : StatusParameter.values()) {
                         if (param.Display.equalsIgnoreCase("基礎" + statusParam.Display)) {
@@ -296,7 +296,7 @@ public class Status {
         if (player.hasPermission(Som7VIP)) prefix = "§aⓋ";
         if (player.hasPermission(Som7Premium)) prefix = "§bⓅ";
         if (playerData.PvPMode) color = "§c";
-        if (playerData.isAFK()) color = "§8";
+        if (playerData.isAFK()) color = "§7";
         StringBuilder classText = new StringBuilder();
         for (ClassData classData : playerData.Classes.classSlot) {
             classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");

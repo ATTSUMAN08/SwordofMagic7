@@ -37,6 +37,7 @@ public enum EffectType {
     Capote("カポーテ", false, "命中と回避が減少します", true),
     ShadowFatter("シャドウファッター", EffectRank.High, false, "[固定]を同じ状態になります", false),
     ImmuneDepression("免疫低下", false, "[被ダメージ耐性]が減少します", true),
+    IndividualityConcrete("個性具象", EffectRank.Impossible, false, "「人には全く違うものや似通った個性があります」", false),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動速度が上昇します", true),
@@ -101,6 +102,8 @@ public enum EffectType {
     AbsolutelyEVA("絶対回避", true, "最終回避率が100%になります", false),
     Inexhaustible("無尽蔵", true, "消費マナが減少します", false),
     LuxuryLiquor("高級酒", true, "[ブルタリティ]と同じ効果です", true),
+    MagicBarrier("魔法障壁", true, "魔法被ダメージ耐性が上昇します", true),
+    IceThorns("氷の棘", true, "魔法与ダメージが上昇します", true),
     ;
 
     public String Display;

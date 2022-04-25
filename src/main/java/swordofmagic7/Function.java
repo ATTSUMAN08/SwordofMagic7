@@ -17,7 +17,6 @@ import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
-import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.EnemyData;
@@ -368,7 +367,7 @@ public final class Function {
     }
 
     public static boolean isHoldFishingRod(Player player) {
-        return playerData(player).Equipment.getEquip(EquipmentSlot.MainHand).Icon == Material.FISHING_ROD;
+        return player.getInventory().getItemInMainHand().getType() == Material.FISHING_ROD;
     }
 
     public static String decoDoubleToString(double i, String format) {

@@ -15,6 +15,10 @@ public class EffectData {
         return (int) objectData[i];
     }
 
+    public boolean getBoolean(int i) {
+        return (boolean) objectData[i];
+    }
+
     public Object getObject(int i) {
         return objectData[i];
     }
