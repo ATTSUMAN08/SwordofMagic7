@@ -8,8 +8,12 @@ import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Command.SomTabComplete;
 import swordofmagic7.Command.TabComplete.PlayerTabComplete;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Sound.SoundList;
 
 import java.util.List;
+
+import static swordofmagic7.Function.CheckBlockPlayer;
+import static swordofmagic7.Function.sendMessage;
 
 public class playerInfo implements SomCommand, SomTabComplete {
     @Override
@@ -18,7 +22,12 @@ public class playerInfo implements SomCommand, SomTabComplete {
         if (args.length == 1 && Bukkit.getPlayer(args[0]) != null) {
             target = Bukkit.getPlayer(args[0]);
         }
-        playerData.Menu.StatusInfo.StatusInfoView(target);
+        if (target != null && target.isOnline()) {
+            if (CheckBlockPlayer(player, target)) return true;
+            playerData.Menu.StatusInfo.StatusInfoView(target);
+        } else {
+            sendMessage(player, "§c無効なプレイヤーです", SoundList.Nope);
+        }
         return true;
     }
 

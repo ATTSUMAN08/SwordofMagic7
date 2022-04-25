@@ -111,7 +111,7 @@ public class Shadowmancer extends BaseSkillClass {
                 for (LivingEntity victim2 : Function.NearLivingEntity(victim.getLocation(), radius2, skillProcess.Predicate())) {
                     if (bool) EffectManager.addEffect(victim2, EffectType.ShadowFatter, time, player, victim2.getLocation());
                     else Damage.makeDamage(player, victim2, DamageCause.MAT, skillData.Id, value, 1);
-                    MultiThread.sleepTick(2);
+                    MultiThread.sleepMillis(25);
                 }
                 i++;
                 if (i >= max) break;

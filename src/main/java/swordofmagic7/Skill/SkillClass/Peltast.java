@@ -88,7 +88,7 @@ public class Peltast extends BaseSkillClass {
             playerData.EffectManager.addEffect(EffectType.HatePriority, 200);
             RuneParameter rune = playerData.Equipment.equippedRune("追加攻撃のルーン");
             if (rune != null) {
-                double value2 = rune.AdditionParameterValue(0);
+                double value2 = rune.AdditionParameterValue(0)/100;
                 double radius = rune.AdditionParameterValue(1);
                 Damage.makeDamage(player, Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()), DamageCause.ATK, skillData.Id, value2, 1, 1);
             }

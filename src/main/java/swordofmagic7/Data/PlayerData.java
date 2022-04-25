@@ -91,11 +91,11 @@ public class PlayerData {
     }
 
     public static void remove(Player player) {
-        playerData.remove(player);
+        playerData.keySet().removeIf(key -> key.getName().equals(player.getName()));
     }
 
     public void remove() {
-        playerData.remove(player);
+        playerData.keySet().removeIf(key -> key.getName().equals(player.getName()));
     }
 
     public static HashMap<Player, PlayerData> getPlayerData() {
@@ -177,6 +177,7 @@ public class PlayerData {
     public boolean interactTick = false;
     public boolean EffectLog = true;
     public boolean isPlayDungeonQuest = false;
+    public Collection<String> BlockList = new HashSet<>();
 
     public boolean isAFK() {
         return AFKTime > SomCore.AFKTime;
@@ -259,6 +260,7 @@ public class PlayerData {
                         else visibilityManager.hideTo(player);
                         Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
                         nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
+                        nonViewer.addAll(BlockListAtPlayer());
                         if (Party != null) for (Player player : Party.Members) {
                             if (!playerData(player).isAFK()) nonViewer.remove(player);
                         }
@@ -344,6 +346,54 @@ public class PlayerData {
         return loc;
     }
 
+    public boolean isBlockPlayer(Player player) {
+        return BlockList.contains(player.getUniqueId().toString());
+    }
+
+    public boolean isBlockFromPlayer(Player player) {
+        return PlayerData.playerData(player).BlockList.contains(this.player.getUniqueId().toString());
+    }
+
+    public Collection<String> BlockListFromOther = new HashSet<>();
+    private boolean nextUpdateBlockPlayer = false;
+    public synchronized void updateBlockPlayer() {
+        if (nextUpdateBlockPlayer) return;
+        nextUpdateBlockPlayer = true;
+        MultiThread.TaskRunSynchronizedLater(() -> {
+            for (Player player2 : PlayerList.get()) {
+                String uuid = player.getUniqueId().toString();
+                PlayerData targetData = PlayerData.playerData(player2);
+                if (isBlockPlayer(player2) && !Skill.SkillProcess.Predicate().test(player2)) {
+                    player.hidePlayer(plugin, player2);
+                    player2.hidePlayer(plugin, player);
+                    targetData.BlockListFromOther.add(uuid);
+                } else if (!isBlockFromPlayer(player2) && !targetData.hideFlag) {
+                    player.showPlayer(plugin, player2);
+                    player2.showPlayer(plugin, player);
+                    targetData.BlockListFromOther.remove(uuid);
+                }
+            }
+            nextUpdateBlockPlayer = false;
+        }, 5);
+    }
+
+    public Set<String> BlockListAtString() {
+        Set<String> list = new HashSet<>();
+        list.addAll(BlockList);
+        list.addAll(BlockListFromOther);
+        return list;
+    }
+
+    public Set<Player> BlockListAtPlayer() {
+        Set<Player> list = new HashSet<>();
+        for (Player player : PlayerList.get()) {
+            String uuid = player.getUniqueId().toString();
+            if (BlockList.contains(uuid)) list.add(player);
+            if (BlockListFromOther.contains(uuid)) list.add(player);
+        }
+        return list;
+    }
+
     public String getNick() {
         return getNick(false);
     }
@@ -408,6 +458,7 @@ public class PlayerData {
         PvPMode = bool;
         String msg = "§e[PvPモード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
         Status.StatusUpdate();
+        updateBlockPlayer();
         sendMessage(player, msg, SoundList.Click);
     }
 
@@ -533,7 +584,7 @@ public class PlayerData {
         } else {
             changeHealth(Status.MaxHealth);
             changeMana(Status.MaxMana);
-            BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました", false);
+            BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました", true);
             Attribute.addPoint(addLevel * 5);
             if (Level == MaxLevel) Exp = 0;
             playSound(player, SoundList.LevelUp);
@@ -542,7 +593,7 @@ public class PlayerData {
 
     public static final int MaxLevel = 65;
 
-    public void addPlayerExp(int addExp) {
+    public synchronized void addPlayerExp(int addExp) {
         Exp += addExp;
         if (ReqExp(Level) <= Exp) {
             int addLevel = 0;
@@ -643,7 +694,7 @@ public class PlayerData {
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.NaturalMessage", NaturalMessage);
         data.set("Setting.RuneFilter.Quality", RuneQualityFilter);
-        data.set("Setting.RuneFilter.Id", RuneIdFilter);
+        data.set("Setting.RuneFilter.Id", new ArrayList<>(RuneIdFilter));
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -651,6 +702,7 @@ public class PlayerData {
         data.set("Setting.Inventory.ItemInventorySortReverse", ItemInventory.SortReverse);
         data.set("Setting.Inventory.RuneInventorySortReverse", RuneInventory.SortReverse);
         data.set("Setting.Inventory.PetInventorySortReverse", PetInventory.SortReverse);
+        data.set("BlockList", BlockList);
 
         data.set("Title.List", new ArrayList<>(titleManager.TitleList));
         data.set("Title.Select", titleManager.Title.Id);
@@ -764,7 +816,7 @@ public class PlayerData {
             ExpLog = data.getBoolean("Setting.ExpLog", false);
             DropLog = DropLogType.fromString(data.getString("Setting.DropLog"));
             CastMode = CastType.valueOf(data.getString("Setting.CastMode", "Renewed"));
-            EffectLog = data.getBoolean("EffectLog", true);
+            EffectLog = data.getBoolean("Setting.EffectLog", true);
             StrafeMode = StrafeType.fromString(data.getString("Setting.StrafeMode"));
             Shop.AmountReset = data.getBoolean("Setting.ShopAmountReset");
             PvPMode = data.getBoolean("Setting.PvPMode", false);
@@ -778,7 +830,7 @@ public class PlayerData {
             NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
             RuneQualityFilter = data.getDouble("Setting.RuneFilter.Quality",0d);
             RuneIdFilter = new HashSet<>(data.getStringList("Setting.RuneFilter.Id"));
-            RuneIdFilter.removeIf(runeId -> !DataBase.getRuneList().containsKey(runeId));
+            RuneIdFilter.removeIf(runeId -> !RuneList.containsKey(runeId));
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));
@@ -786,6 +838,7 @@ public class PlayerData {
             ItemInventory.SortReverse = data.getBoolean("Setting.Inventory.ItemInventorySortReverse",false);
             RuneInventory.SortReverse = data.getBoolean("Setting.Inventory.RuneInventorySortReverse",false);
             PetInventory.SortReverse = data.getBoolean("Setting.Inventory.PetInventorySortReverse",false);
+            BlockList = data.getStringList("BlockList");
 
             titleManager.TitleList = new HashSet<>(data.getStringList("Title.List"));
             titleManager.TitleList.removeIf(title -> !TitleDataList.containsKey(title));
@@ -891,10 +944,12 @@ public class PlayerData {
                 Tutorial.tutorialTrigger(player, 0);
             }, 10, "TutorialTrigger");
         }
-        Status.StatusUpdate();
-        ViewBar.tickUpdate();
         MultiThread.TaskRunSynchronizedLater(() -> {
             isLoaded = true;
+            MultiThread.TaskRunSynchronizedLater(() -> {
+                Status.StatusUpdate();
+                ViewBar.tickUpdate();
+            }, 20, "LoadUpdate");
         }, 5);
     }
 

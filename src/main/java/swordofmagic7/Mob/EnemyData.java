@@ -419,125 +419,127 @@ public class EnemyData {
             for (Player player : Involved) {
                 if (player.isOnline()) {
                     PlayerData playerData = playerData(player);
-                    double percentMultiply = 1; //playerData.isAFK() ? 0.3 : 1;
-                    playerData.statistics.enemyKill(mobData);
-                    Classes classes = playerData.Classes;
-                    List<ClassData> classList = new ArrayList<>();
-                    for (ClassData classData : classes.classSlot) {
-                        if (classData != null && !classData.ProductionClass) {
-                            classList.add(classData);
-                        }
-                    }
-                    playerData.addPlayerExp(decayExp(exp, playerData.Level, Level));
-                    for (ClassData classData : classList) {
-                        classes.addClassExp(classData, classExp);
-                    }
-                    for (PetParameter pet : playerData.PetSummon) {
-                        pet.addExp(decayExp(exp, pet.Level, Level));
-                    }
-                    List<String> Holo = new ArrayList<>();
-                    Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp/ReqExp(Level)*100) + "%)");
-                    if (!isDefenseBattle) {
-                        for (DropItemData dropData : DropItemTable) {
-                            if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                                if (random.nextDouble() <= dropData.Percent * percentMultiply) {
-                                    int amount;
-                                    if (dropData.MaxAmount != dropData.MinAmount) {
-                                        amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
-                                    } else {
-                                        amount = dropData.MinAmount;
-                                    }
-                                    playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
-                                    Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
-                                    if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare()))
-                                        ItemGetLog(player, dropData.itemParameter, amount);
-                                    if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
-                                        TextView text = new TextView(playerData.getNick() + "§aさんが");
-                                        text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
-                                        text.addText("§aを§e獲得§aしました");
-                                        text.setSound(SoundList.Tick);
-                                        Client.BroadCast(text);
-                                    }
-                                }
+                    if (!isEventServer() || !playerData.isAFK()) {
+                        double percentMultiply = 1; //playerData.isAFK() ? 0.3 : 1;
+                        playerData.statistics.enemyKill(mobData);
+                        Classes classes = playerData.Classes;
+                        List<ClassData> classList = new ArrayList<>();
+                        for (ClassData classData : classes.classSlot) {
+                            if (classData != null && !classData.ProductionClass) {
+                                classList.add(classData);
                             }
                         }
-                        for (DropRuneData dropData : mobData.DropRuneTable) {
-                            if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
-                                if (random.nextDouble() <= dropData.Percent * percentMultiply) {
-                                    RuneParameter runeParameter = dropData.runeParameter.clone();
-                                    if (runeParameter.isSpecial) {
-                                        runeParameter.Level = 1;
-                                        runeParameter.Quality = 1;
-                                    } else {
-                                        runeParameter.Level = Level;
-                                        runeParameter.Quality = random.nextDouble();
-                                    }
-                                    if (!mobData.enemyType.isBoss() && (playerData.RuneQualityFilter > runeParameter.Quality || playerData.RuneIdFilter.contains(runeParameter.Id))) {
-                                        playerData.RuneShop.addRuneCrashed(runeParameter);
-                                        playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
-                                        Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
-                                        if (playerData.DropLog.isItem()) {
-                                            ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
+                        playerData.addPlayerExp(decayExp(exp, playerData.Level, Level));
+                        for (ClassData classData : classList) {
+                            classes.addClassExp(classData, classExp);
+                        }
+                        for (PetParameter pet : playerData.PetSummon) {
+                            pet.addExp(decayExp(exp, pet.Level, Level));
+                        }
+                        List<String> Holo = new ArrayList<>();
+                        Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp / ReqExp(Level) * 100) + "%)");
+                        if (!isDefenseBattle) {
+                            for (DropItemData dropData : DropItemTable) {
+                                if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                                    if (random.nextDouble() <= dropData.Percent * percentMultiply) {
+                                        int amount;
+                                        if (dropData.MaxAmount != dropData.MinAmount) {
+                                            amount = random.nextInt(dropData.MaxAmount - dropData.MinAmount) + dropData.MinAmount;
+                                        } else {
+                                            amount = dropData.MinAmount;
                                         }
-                                    } else {
-                                        playerData.RuneInventory.addRuneParameter(runeParameter);
-                                        Holo.add("§b§l[+]§e§l" + runeParameter.Display);
-                                        if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
-                                            player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
-                                        }
-                                        if (runeParameter.isSpecial) {
+                                        playerData.ItemInventory.addItemParameter(dropData.itemParameter.clone(), amount);
+                                        Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
+                                        if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare()))
+                                            ItemGetLog(player, dropData.itemParameter, amount);
+                                        if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
                                             TextView text = new TextView(playerData.getNick() + "§aさんが");
-                                            text.addView(dropData.runeParameter.getTextView(playerData.ViewFormat()));
+                                            text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
                                             text.addText("§aを§e獲得§aしました");
                                             text.setSound(SoundList.Tick);
-                                            Client.BroadCast(text);
+                                            Client.sendDisplay(player, text);
                                         }
                                     }
                                 }
                             }
-                        }
-                        for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
-                            QuestData questData = data.getKey();
-                            if (questData.type.isEnemy()) {
-                                for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
-                                    QuestReqContentKey key = reqContent.getKey();
-                                    if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
-                                        playerData.QuestManager.processQuest(questData, key, 1);
+                            for (DropRuneData dropData : mobData.DropRuneTable) {
+                                if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {
+                                    if (random.nextDouble() <= dropData.Percent * percentMultiply) {
+                                        RuneParameter runeParameter = dropData.runeParameter.clone();
+                                        if (runeParameter.isSpecial) {
+                                            runeParameter.Level = 1;
+                                            runeParameter.Quality = 1;
+                                        } else {
+                                            runeParameter.Level = Level;
+                                            runeParameter.Quality = random.nextDouble();
+                                        }
+                                        if (!mobData.enemyType.isBoss() && (playerData.RuneQualityFilter > runeParameter.Quality || playerData.RuneIdFilter.contains(runeParameter.Id))) {
+                                            playerData.RuneShop.addRuneCrashed(runeParameter);
+                                            playerData.ItemInventory.addItemParameter(playerData.RuneShop.RunePowder, 1);
+                                            Holo.add("§b§l[+]§e§l" + playerData.RuneShop.RunePowder.Display);
+                                            if (playerData.DropLog.isItem()) {
+                                                ItemGetLog(player, playerData.RuneShop.RunePowder, 1);
+                                            }
+                                        } else {
+                                            playerData.RuneInventory.addRuneParameter(runeParameter);
+                                            Holo.add("§b§l[+]§e§l" + runeParameter.Display);
+                                            if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
+                                                player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                            }
+                                            if (runeParameter.isSpecial) {
+                                                TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                                text.addView(dropData.runeParameter.getTextView(playerData.ViewFormat()));
+                                                text.addText("§aを§e獲得§aしました");
+                                                text.setSound(SoundList.Tick);
+                                                Client.sendDisplay(player, text);
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
-                            PetData petData = getPetData(mobData.Id);
-                            if (petData.BossPet) {
-                                if (random.nextDouble() <= 0.0005 * percentMultiply) {
-                                    PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
-                                    playerData.PetInventory.addPetParameter(pet);
-                                    TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
-                                    text.setSound(SoundList.Tick);
-                                    Client.BroadCast(text);
-                                }
-                            } else {
-                                if (random.nextDouble() <= 0.01 * percentMultiply) {
-                                    PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
-                                    playerData.PetInventory.addPetParameter(pet);
-                                    Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                            for (Map.Entry<QuestData, QuestProcess> data : playerData.QuestManager.QuestList.entrySet()) {
+                                QuestData questData = data.getKey();
+                                if (questData.type.isEnemy()) {
+                                    for (Map.Entry<QuestReqContentKey, Integer> reqContent : questData.ReqContent.entrySet()) {
+                                        QuestReqContentKey key = reqContent.getKey();
+                                        if (key.mainKey.equalsIgnoreCase(mobData.Id) && Level >= key.intKey[0]) {
+                                            playerData.QuestManager.processQuest(questData, key, 1);
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        if (!playerData.isAFK()) {
-                            playerData.viewUpdate();
-                            Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-                            MultiThread.TaskRunSynchronized(() -> {
-                                Hologram hologram = createHologram(loc);
-                                VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                                visibilityManager.setVisibleByDefault(false);
-                                visibilityManager.showTo(player);
-                                for (String holo : Holo) {
-                                    hologram.appendTextLine(holo);
+                            if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
+                                PetData petData = getPetData(mobData.Id);
+                                if (petData.BossPet) {
+                                    if (random.nextDouble() <= 0.0005 * percentMultiply) {
+                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
+                                        playerData.PetInventory.addPetParameter(pet);
+                                        TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
+                                        text.setSound(SoundList.Tick);
+                                        Client.sendDisplay(player, text);
+                                    }
+                                } else {
+                                    if (random.nextDouble() <= 0.01 * percentMultiply) {
+                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
+                                        playerData.PetInventory.addPetParameter(pet);
+                                        Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                                    }
                                 }
-                                MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
-                            }, "EnemyKillRewardHolo");
+                            }
+                            if (!playerData.isAFK()) {
+                                playerData.viewUpdate();
+                                Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
+                                MultiThread.TaskRunSynchronized(() -> {
+                                    Hologram hologram = createHologram(loc);
+                                    VisibilityManager visibilityManager = hologram.getVisibilityManager();
+                                    visibilityManager.setVisibleByDefault(false);
+                                    visibilityManager.showTo(player);
+                                    for (String holo : Holo) {
+                                        hologram.appendTextLine(holo);
+                                    }
+                                    MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
+                                }, "EnemyKillRewardHolo");
+                            }
                         }
                     }
                 }

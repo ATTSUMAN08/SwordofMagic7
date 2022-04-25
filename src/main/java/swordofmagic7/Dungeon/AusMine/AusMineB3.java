@@ -25,7 +25,7 @@ public class AusMineB3 {
     private static int Time;
     private static int Health;
     private static final int StartTime = 60;
-    private static final int StartHealth = 7000;
+    private static final int StartHealth = 12000;
     private static final Location EventLocation = new Location(world,945, 121, 1709);
     private static final Set<EnemyData> EnemyList = new HashSet<>();
     private static Set<Player> Players = new HashSet<>();
@@ -47,23 +47,22 @@ public class AusMineB3 {
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DungeonTrigger);
-                int spawnWait = 0;
                 while (Time > 0 && Health > 0 && list.size() > 0 && plugin.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);
-                    spawnWait++;
-                    if (spawnWait > 2 || EnemyList.size() < 15) {
-                        spawnWait = 0;
-                        Location spawnLoc = EventLocation.clone();
-                        double randomLoc = 2 * Math.PI * random.nextDouble();
-                        spawnLoc.add(Math.cos(randomLoc) * SpawnRadius, 0, Math.sin(randomLoc) * SpawnRadius);
-                        int MobSelect = random.nextInt(MobList.length);
-                        MultiThread.TaskRunSynchronized(() -> {
-                            EnemyData enemyData = MobManager.mobSpawn(getMobData(MobList[MobSelect]), 20, spawnLoc);
-                            enemyData.overrideTargetLocation = EventLocation;
-                            EnemyList.add(enemyData);
-                        });
+                    for (int i = 0; i < 4; i++) {
+                        if (EnemyList.size() < 30) {
+                            Location spawnLoc = EventLocation.clone();
+                            double randomLoc = 2 * Math.PI * random.nextDouble();
+                            spawnLoc.add(Math.cos(randomLoc) * SpawnRadius, 0, Math.sin(randomLoc) * SpawnRadius);
+                            int MobSelect = random.nextInt(MobList.length);
+                            MultiThread.TaskRunSynchronized(() -> {
+                                EnemyData enemyData = MobManager.mobSpawn(getMobData(MobList[MobSelect]), 20, spawnLoc);
+                                enemyData.overrideTargetLocation = EventLocation;
+                                EnemyList.add(enemyData);
+                            });
+                        } else break;
                     }
                     for (EnemyData enemyData : new HashSet<>(EnemyList)) {
                         if (enemyData.entity.getLocation().distance(EventLocation) < 3 && enemyData.isAlive()) {

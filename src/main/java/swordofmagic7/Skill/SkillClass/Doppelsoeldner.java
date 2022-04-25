@@ -53,28 +53,32 @@ public class Doppelsoeldner extends BaseSkillClass {
             ParticleData particleData = new ParticleData(Particle.CRIT, 0.5f, Function.VectorUp);
             particleData.randomOffset = true;
             particleData.randomOffsetMultiply = (float) (radius/2);
-            Location origin = player.getLocation();
 
             for (int i = 0; i < skillData.CastTime; i++) {
-                ParticleManager.CircleParticle(particleCasting,origin, radius, 15);
+                ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 15);
                 MultiThread.sleepMillis(millis);
             }
 
-            boolean bool = playerData.Equipment.isEquipRune("竜巻生成のルーン");
-            if (bool) {
-                origin = origin.clone();
+            if (playerData.Equipment.isEquipRune("竜巻生成のルーン")) {
+                skillProcess.SkillRigid(skillData);
+                Location origin = player.getLocation().clone();
+                for (int i = 0; i < time; i+=hitRate) {
+                    ParticleManager.CircleParticle(particleData, origin, radius/2, 15);
+                    Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
+                    Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id,  value,1, 2);
+                    playSound(player, SoundList.AttackWeak);
+                    MultiThread.sleepTick(hitRate);
+                }
+            } else {
+                for (int i = 0; i < time; i+=hitRate) {
+                    ParticleManager.CircleParticle(particleData, player.getLocation(), radius/2, 15);
+                    Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
+                    Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id,  value,1, 2);
+                    playSound(player, SoundList.AttackWeak);
+                    MultiThread.sleepTick(hitRate);
+                }
                 skillProcess.SkillRigid(skillData);
             }
-
-            for (int i = 0; i < time; i+=hitRate) {
-                ParticleManager.CircleParticle(particleData, origin, radius/2, 15);
-                Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
-                Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id,  value,1, 2);
-                playSound(player, SoundList.AttackWeak);
-                MultiThread.sleepTick(hitRate);
-            }
-
-            if (!bool) skillProcess.SkillRigid(skillData);
         }, "Cyclone");
     }
 

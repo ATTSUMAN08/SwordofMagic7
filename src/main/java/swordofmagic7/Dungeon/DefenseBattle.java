@@ -66,7 +66,7 @@ public class DefenseBattle {
             switch (display) {
                 case "13:55", "18:55", "21:55", "23:55" -> {
                     if (!isAlarm) {
-                        Client.BroadCast(new TextView("§aまもなく§c防衛戦§aが開始されます"));
+                        Client.sendBroadCast(new TextView("§aまもなく§c防衛戦§aが開始されます"));
                         isAlarm = true;
                     }
                 }
@@ -92,7 +92,7 @@ public class DefenseBattle {
     private static final Location bossLocation = new Location(world, 2232, 72, 2379);
     public static void startWave(int i) {
         if (i == 1) time = startTime;
-        Client.BroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
+        Client.sendBroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
         MultiThread.TaskRun(() -> {
             wave = i;
             Health = 10000 + 1000*(i-1);
@@ -175,7 +175,7 @@ public class DefenseBattle {
                 startWave(wave);
             } else {
                 Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DungeonTrigger);
-                Client.BroadCast(new TextView("§c防衛戦§aが終了しました"));
+                Client.sendBroadCast(new TextView("§c防衛戦§aが終了しました"));
             }
         }, "DefenseBattle");
     }

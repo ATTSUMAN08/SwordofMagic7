@@ -28,6 +28,7 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
+import swordofmagic7.TextView.TextView;
 
 import java.util.*;
 
@@ -367,6 +368,14 @@ public class PetParameter implements Cloneable {
         return item;
     }
 
+    public TextView getTextView(String format) {
+        ItemStack item = viewPet(format);
+        StringBuilder hoverText = new StringBuilder(item.getItemMeta().getDisplayName());
+        for (String str : item.getLore()) {
+            hoverText.append("\n").append(str);
+        }
+        return new TextView().addText("§e[" + petData.Display + "§bLv" + Level + "§e]").addHover(hoverText.toString()).reset();
+    }
 
     private boolean runAITask;
 

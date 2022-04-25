@@ -69,6 +69,24 @@ public final class Function {
         }
     }
 
+    public static boolean CheckBlockPlayer(Player player, Player target) {
+        return CheckBlockPlayer(playerData(player), playerData(target));
+    }
+
+    public static boolean CheckBlockPlayer(PlayerData playerData, PlayerData targetData) {
+        Player player = playerData.player;
+        Player target = targetData.player;
+        if (targetData.isBlockFromPlayer(player)) {
+            sendMessage(player, "§c" + playerData.Nick + "§aから§4Block§aされています", SoundList.Nope);
+            return true;
+        }
+        if (playerData.isBlockPlayer(target)) {
+            sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしています", SoundList.Nope);
+            return true;
+        }
+        return false;
+    }
+
     public static String unColored(String string) {
         return string
                 .replace("§0", "")
@@ -167,18 +185,18 @@ public final class Function {
     }
 
     public static void BroadCast(String str) {
-        BroadCast(str, null, true);
+        BroadCast(str, null, false);
     }
 
     public static void BroadCast(String str, SoundList sound) {
-        BroadCast(str, sound, true);
+        BroadCast(str, sound, false);
     }
 
     public static void BroadCast(String str, SoundList sound, boolean isNatural) {
         for (Player player : PlayerList.get()) {
             if (player.isOnline()) {
                 PlayerData playerData = PlayerData.playerData(player);
-                if (playerData.NaturalMessage || isNatural) {
+                if (playerData.NaturalMessage || !isNatural) {
                     player.sendMessage(str);
                     if (sound != null) playSound(player, sound);
                 }

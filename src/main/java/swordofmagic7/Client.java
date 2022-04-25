@@ -4,6 +4,8 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.entity.Player;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
@@ -11,8 +13,9 @@ import swordofmagic7.TextView.TextView;
 import java.io.*;
 import java.net.Socket;
 
-import static swordofmagic7.Data.DataBase.DataBasePath;
+import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.plugin;
 
 public class Client {
@@ -63,8 +66,30 @@ public class Client {
         }, "Client");
     }
 
-    public static void BroadCast(TextView textView) {
+    public static void sendBroadCast(TextView textView) {
         send("BroadCast," + textView.toString());
+    }
+
+    public static void sendPlayerChat(Player player, TextView textView) {
+        send("Chat," + new TextView()
+                .addView(textView)
+                .setSender(Function.unColored(player.getDisplayName()))
+                .setUUID(player.getUniqueId())
+                .setSender(player.getName())
+                .setDisplay(player.getDisplayName())
+                .setFrom(ServerId)
+                .toString());
+    }
+
+    public static void sendDisplay(Player player, TextView textView) {
+        send("Display," + new TextView()
+                .addView(textView)
+                .setSender(Function.unColored(player.getDisplayName()))
+                .setUUID(player.getUniqueId())
+                .setSender(player.getName())
+                .setDisplay(player.getDisplayName())
+                .setFrom(ServerId)
+                .toString());
     }
 
     public static void send(String str) {
@@ -80,51 +105,73 @@ public class Client {
     private static final TextComponent newLine = new TextComponent(ComponentSerializer.parse("{text: \"\n\"}"));
     public static void Trigger(String packet) {
         String[] data = packet.split(",");
-        if (data[0].equalsIgnoreCase("BroadCast")) {
-            TextComponent finalText = new TextComponent();
-            TextComponent text = new TextComponent();
-            TextComponent hover = new TextComponent();
-            SoundList sound = null;
-            boolean isNatural = false;
-            for (int i = 1; i < data.length; i++) {
-                String[] split = data[i].split(":", 2);
-                if (split[0].equalsIgnoreCase("Reset")) {
-                    finalText.addExtra(text);
-                    text = new TextComponent();
-                } else if (split[0].equalsIgnoreCase("Text")) {
-                    text.addExtra(split[1]);
-                } else if (split[0].equalsIgnoreCase("Hover")) {
-                    boolean first = true;
-                    for (String str : split[1].split("\n")) {
-                        if (!first) hover.addExtra(newLine);
-                        hover.addExtra(str);
-                        first = false;
+        switch (data[0]) {
+            case "BroadCast" -> {
+                SoundList sound = null;
+                boolean isNatural = false;
+                for (int i = 1; i < data.length; i++) {
+                    String[] split = data[i].split(":", 2);
+                    if (split[0].equalsIgnoreCase("Sound")) {
+                        sound = SoundList.valueOf(split[1]);
+                    } else if (split[0].equalsIgnoreCase("isNatural")) {
+                        isNatural = true;
                     }
-                    text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create()));
-                    hover = new TextComponent();
-                } else if (split[0].equalsIgnoreCase("Sound")) {
-                    sound = SoundList.valueOf(split[1]);
-                } else if (split[0].equalsIgnoreCase("isNatural")) {
-                    isNatural = true;
+                }
+                Function.BroadCast(textComponentFromPacket(data), sound, isNatural);
+            }
+            case "Chat", "Display" -> {
+                TextComponent text = new TextComponent();
+                String from = "";
+                String display = "";
+                String uuid = "";
+                for (int i = 1; i < data.length; i++) {
+                    String[] split = data[i].split(":", 2);
+                    if (split[0].equalsIgnoreCase("UUID")) {
+                        uuid = split[1];
+                    } else if (split[0].equalsIgnoreCase("Display")) {
+                        display = split[1];
+                    } else if (split[0].equalsIgnoreCase("From")) {
+                        from = split[1];
+                    }
+                }
+                if (data[0].equals("Chat")) text.addExtra("§b[" + from + "] §r" + display + "§a: §r");
+                if (data[0].equals("Display")) text.addExtra("§b[" + from + "] §r");
+                text.addExtra(textComponentFromPacket(data));
+                for (Player player : PlayerList.get()) {
+                    if (player.isOnline()) {
+                        PlayerData playerData = PlayerData.playerData(player);
+                        if (uuid == null || !playerData.BlockListAtString().contains(uuid)) sendMessage(player, text);
+                    }
                 }
             }
-            finalText.addExtra(text);
-            Function.BroadCast(finalText, sound, isNatural);
-        }  else if (data[0].equalsIgnoreCase("resultPlayerData")) {
-            try {
-                File file = new File(DataBasePath, "PlayerData/" + data[1] + ".yml");
-                String[] fileData = data[2].split("<newLine>");
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                for (String str : fileData) {
-                    writer.write(str);
-                    writer.newLine();
-                    Log(str);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (!data[0].equalsIgnoreCase("Check")) {
-            Log("無効なパケット -> " + packet);
+            case "Check" -> {}
+            default -> Log("§c無効なパケット -> " + packet);
         }
+    }
+
+    public static TextComponent textComponentFromPacket(String[] data) {
+        TextComponent finalText = new TextComponent();
+        TextComponent text = new TextComponent();
+        TextComponent hover = new TextComponent();
+        for (int i = 1; i < data.length; i++) {
+            String[] split = data[i].split(":", 2);
+            if (split[0].equalsIgnoreCase("Reset")) {
+                finalText.addExtra(text);
+                text = new TextComponent();
+            } else if (split[0].equalsIgnoreCase("Text")) {
+                text.addExtra(split[1]);
+            } else if (split[0].equalsIgnoreCase("Hover")) {
+                boolean first = true;
+                for (String str : split[1].split("\n")) {
+                    if (!first) hover.addExtra(newLine);
+                    hover.addExtra(str);
+                    first = false;
+                }
+                text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create()));
+                hover = new TextComponent();
+            }
+        }
+        finalText.addExtra(text);
+        return finalText;
     }
 }

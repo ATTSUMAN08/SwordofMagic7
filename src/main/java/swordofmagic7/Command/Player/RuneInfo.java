@@ -32,7 +32,6 @@ public class RuneInfo implements SomCommand, SomTabComplete {
                 List<String> list = new ArrayList<>();
                 list.add(decoText(rune.Display));
                 list.addAll(itemStack.getLore());
-                list.addAll(RuneInfoData.get(rune.Id));
                 sendMessage(player, list);
             } else player.sendMessage("§a存在しない§eルーン§aです");
         } else {

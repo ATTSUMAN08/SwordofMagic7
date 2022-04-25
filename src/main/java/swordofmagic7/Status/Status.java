@@ -296,6 +296,7 @@ public class Status {
         if (player.hasPermission(Som7VIP)) prefix = "§aⓋ";
         if (player.hasPermission(Som7Premium)) prefix = "§bⓅ";
         if (playerData.PvPMode) color = "§c";
+        if (playerData.isAFK()) color = "§8";
         StringBuilder classText = new StringBuilder();
         for (ClassData classData : playerData.Classes.classSlot) {
             classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
@@ -303,6 +304,7 @@ public class Status {
         player.setPlayerListName(classText + "§e| " + prefix + color + playerData.Nick);
         player.setDisplayName(prefix + "§f" + playerData.Nick);
         if (playerData.hologram != null && !playerData.hologram.isDeleted() && playerData.hologramLine[0] != null) playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+        playerData.updateBlockPlayer();
     }
 
     public double finalStatus(StatusParameter param) {

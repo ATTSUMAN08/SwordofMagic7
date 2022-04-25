@@ -6,6 +6,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import swordofmagic7.Sound.SoundList;
 
+import java.util.UUID;
+
 public class TextView {
     String data = "Reset";
     SoundList sound = null;
@@ -16,6 +18,10 @@ public class TextView {
         addText(str);
     }
 
+    public boolean isEmpty() {
+        return data.equals("Reset");
+    }
+
     @Override
     public String toString() {
         if (isNatural) data += ",isNatural";
@@ -24,8 +30,7 @@ public class TextView {
     }
 
     public TextView addText(String str) {
-        if (data == null) data = "Text:" + str;
-        else data += ",Text:" + str;
+        data += ",Text:" + str;
         return this;
     }
 
@@ -53,6 +58,27 @@ public class TextView {
         this.isNatural = true;
         return this;
     }
+
+    public TextView setUUID(UUID uuid) {
+        data += ",UUID:" + uuid;
+        return this;
+    }
+
+    public TextView setSender(String sender) {
+        data += ",Sender:" + sender;
+        return this;
+    }
+
+    public TextView setDisplay(String display) {
+        data += ",Display:" + display;
+        return this;
+    }
+
+    public TextView setFrom(String from) {
+        data += ",From:" + from;
+        return this;
+    }
+
 
     private static final TextComponent newLine = new TextComponent(ComponentSerializer.parse("{text: \"\n\"}"));
     public TextComponent toComponent() {

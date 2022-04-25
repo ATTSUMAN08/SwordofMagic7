@@ -6,6 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import swordofmagic7.Client;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -173,7 +174,7 @@ public class Menu {
                             ItemParameter clickedItem = playerData.ItemInventory.getItemParameter(index);
                             if (clickedItem != null) {
                                 if (viewAble && clickType.isShiftClick() && clickType.isRightClick()) {
-                                    player.chat(TextViewManager.itemDecoString(clickedItemStack, playerData.ViewFormat(), clickedItem.isLoreHide));
+                                    Client.sendPlayerChat(player, clickedItem.getTextView(clickedItemStack.Amount, playerData.ViewFormat()));
                                 } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
                                     playSound(player, SoundList.Click);
@@ -202,8 +203,8 @@ public class Menu {
                     case 35 -> playerData.RuneInventory.downScrollTick(playerData.RuneInventory.getList().size());
                     default -> {
                         if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
-                            RuneParameter runeParameter = playerData.RuneInventory.getRuneParameter(index);
-                            player.chat(TextViewManager.itemDecoString(runeParameter, playerData.ViewFormat(), runeParameter.isLoreHide));
+                            RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
+                            Client.sendPlayerChat(player, rune.getTextView(playerData.ViewFormat()));
                         }
                     }
                 }
@@ -213,8 +214,8 @@ public class Menu {
                     case 35 -> playerData.PetInventory.downScrollTick(playerData.PetInventory.getList().size());
                     default -> {
                         if (viewAble && index > -1 && clickType.isShiftClick() && clickType.isRightClick() && Slot != 26) {
-                            PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
-                            player.chat(TextViewManager.itemDecoString(petParameter, playerData.ViewFormat(), false));
+                            PetParameter pet = playerData.PetInventory.getPetParameter(index);
+                            Client.sendPlayerChat(player, pet.getTextView(playerData.ViewFormat()));
                         } else if (EquipAble() && index > -1) {
                             PetParameter pet = playerData.PetInventory.getPetParameter(index);
                             if (pet != null) pet.spawn();

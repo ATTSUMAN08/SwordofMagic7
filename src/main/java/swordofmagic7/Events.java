@@ -42,6 +42,7 @@ import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,24 +76,25 @@ public class Events implements Listener {
         }
     }
 
-    private final String OverLogin = "som7.OverLogin";
+    private static final String OverLogin = "som7.OverLogin";
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
-        if (!IgnoreIPList.contains(event.getUniqueId().toString())) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (((!player.hasPermission(OverLogin) && !player.hasPermission(Som7Premium)) || isEventServer()) && getIP(player.getAddress()).equals(getIP(event.getAddress()))) {
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
-                    return;
-                }
-            }
-        }
+
     }
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium);
+        IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
+        if ((!bypass || isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
+            for (Player player2 : Bukkit.getOnlinePlayers()) {
+                if (getIP(player2.getAddress()).equals(getIP(event.getAddress()))) {
+                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                    return;
+                }
+            }
+        }
         if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player))) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
@@ -119,6 +121,10 @@ public class Events implements Listener {
         playerData.load();
         PlayerList.load();
         PartyManager.rejoinCheck(player);
+
+        for (Player player2 : Bukkit.getOnlinePlayers()) {
+            PlayerData.playerData(player2).updateBlockPlayer();
+        }
     }
 
     @EventHandler
@@ -489,15 +495,15 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     void onChat(AsyncPlayerChatEvent event) {
+        event.setCancelled(true);
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         if (playerData.isPTChat) {
             playerData.Party.chat(playerData, event.getMessage());
-            event.setMessage("$cancel");
+            return;
         }
-        if (event.getMessage().contains("${")) {
-            event.setCancelled(true);
-        }
+        String message = event.getMessage();
+        Client.sendPlayerChat(player, new TextView(message));
     }
 
     @EventHandler

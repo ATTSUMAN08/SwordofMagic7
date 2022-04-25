@@ -63,14 +63,26 @@ public class Upgrade {
     private boolean isClickTick = false;
     public final ItemParameter[] UpgradeCache = new ItemParameter[2];
     public static final ItemParameter UpgradeStone = getItemParameter("強化石");
+    public static final ItemParameter UpgradeProtect = getItemParameter("強化保護結晶");
     public int fastUpgrade = 15;
+    private Material upgradeIcon = UpgradeStone.Icon;
     public synchronized void UpgradeClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
         if (equalInv(view, UpgradeDisplay)) {
             if (view.getTopInventory() == ClickInventory) {
                 if (isClickTick) return;
                 isClickTick = true;
                 MultiThread.TaskRunSynchronizedLater(() -> isClickTick = false, 2);
-                if (Slot == AnvilUISlot[2]) {
+                if (Slot == AnvilUISlot[1]) {
+                    if (upgradeIcon == UpgradeStone.Icon) {
+                        if (playerData.ItemInventory.hasItemParameter(UpgradeProtect, 1)) {
+                            upgradeIcon = UpgradeProtect.Icon;
+                            sendMessage(player, "§e強化値保護§aを§b有効§aにしました", SoundList.Tick);
+                        }
+                    } else {
+                        upgradeIcon = UpgradeStone.Icon;
+                        sendMessage(player, "§e強化値保護§aを§c無効§aにしました", SoundList.Tick);
+                    }
+                } else if (Slot == AnvilUISlot[2]) {
                     if (UpgradeCache[0] != null) {
                         int cost = UpgradeCost(UpgradeCache[0]);
                         int minCost = UpgradeMinCost(UpgradeCache[0]);
@@ -101,11 +113,17 @@ public class Upgrade {
                                     suffix = "§aの強化に§c失敗§aしました " + perText;
                                     player.sendMessage(itemText + suffix);
                                     if (UpgradeCache[0].itemEquipmentData.Plus > 10) {
-                                        UpgradeCache[0].itemEquipmentData.Plus = 10;
-                                        player.sendMessage("§e[" + UpgradeCache[0].Display + "]§aの§e強化値§aが§e+10§aに落ちました");
+                                        if (upgradeIcon == UpgradeProtect.Icon) {
+                                            playerData.ItemInventory.removeItemParameter(UpgradeProtect, 1);
+                                            sendMessage(player, "§e[" + UpgradeProtect.Display + "]§aの効果により§e強化値§aが§b保護§aされました");
+                                        } else {
+                                            UpgradeCache[0].itemEquipmentData.Plus = 10;
+                                            sendMessage(player, "§e[" + UpgradeCache[0].Display + "]§aの§e強化値§aが§e+10§aに落ちました");
+                                        }
                                     }
                                     playSound(player, SoundList.Tick);
                                 }
+                                upgradeIcon = UpgradeStone.Icon;
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
 
@@ -114,7 +132,7 @@ public class Upgrade {
                                         TextView text = new TextView(playerData.getNick() + "§aさんが");
                                         text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
                                         text.addText(suffix);
-                                        Client.BroadCast(text);
+                                        Client.sendDisplay(player, text);
                                     }
                                 }
                             } else {
@@ -157,7 +175,7 @@ public class Upgrade {
                 Lore.add(decoLore("必要メル") + UpgradeMel(UpgradeCache[0]));
                 Lore.add(decoLore("消費強化石") + minCost + "～" + cost + "個 §7(" + playerData.ItemInventory.getItemParameterStack(UpgradeStone).Amount + ")");
                 Lore.add(decoLore("強化成功率") + String.format("%.0f", UpgradePercent(UpgradeCache[0].itemEquipmentData.Plus)*100) + "%");
-                ItemStack viewCost = new ItemStackData(Material.AMETHYST_SHARD, decoText("強化コスト"), Lore).view();
+                ItemStack viewCost = new ItemStackData(upgradeIcon, decoText("強化コスト"), Lore).view();
                 inv.setItem(AnvilUISlot[1], viewCost);
                 UpgradeCache[1] = UpgradeCache[0].clone();
                 UpgradeCache[1].itemEquipmentData.Plus++;

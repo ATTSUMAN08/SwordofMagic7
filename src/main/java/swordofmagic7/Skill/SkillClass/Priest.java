@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -80,6 +81,31 @@ public class Priest extends BaseSkillClass {
             } else {
                 sendMessage(player, "§c対象§aがいません", SoundList.Nope);
                 skill.resetSkillCoolTimeWaited(skillData);
+            }
+            skillProcess.SkillRigid(skillData);
+        }, skillData.Id);
+    }
+
+    public void Revive(SkillData skillData) {
+        MultiThread.TaskRun(() -> {
+            skill.setCastReady(false);
+            ParticleData particleData = new ParticleData(Particle.VILLAGER_HAPPY);
+            int time = skillData.ParameterValueInt(0)*20;
+            int time2 = 0;
+            RuneParameter rune = playerData.Equipment.equippedRune("祝福のルーン");
+            if (rune != null) time2 = rune.AdditionParameterValueInt(0)*20;
+
+            MultiThread.sleepTick(skillData.CastTime);
+
+            double radius = skillData.ParameterValue(1);
+            ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 30);
+            Set<Player> Targets = PlayerList.getNearNonDead(player.getLocation(), radius);
+            if (playerData.Party != null) Targets.addAll(playerData.Party.Members);
+            for (Player target : Targets) {
+                if (skillProcess.isAllies(target) || target == player) {
+                    EffectManager.addEffect(target, EffectType.Revive, time, player, time2);
+                    playSound(target, SoundList.Heal);
+                }
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

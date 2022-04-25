@@ -172,7 +172,7 @@ public class Skill {
                                         skillData.Mana = (int) Math.floor(skillData.Mana * (1 - MagicEfficiently.ParameterValue(0) / 100));
                                     }
                                     if (playerData.EffectManager.hasEffect(EffectType.Inexhaustible)) {
-                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - playerData.EffectManager.getData(EffectType.Inexhaustible).getDouble(0)/100));
+                                        skillData.Mana = (int) Math.floor(skillData.Mana * (1 - playerData.EffectManager.getData(EffectType.Inexhaustible).getDouble(0)));
                                     }
                                     skillData.CastTime = (int) Math.floor(skillData.CastTime * (1 / playerData.Status.SkillCastTime));
                                     skillData.RigidTime = (int) Math.floor(skillData.RigidTime * (1 / playerData.Status.SkillRigidTime));
@@ -233,7 +233,7 @@ public class Skill {
                                             case "Monstrance" -> priest.Monstrance(skillData);
                                             case "HolyDefense" -> priest.HolyBuff(skillData, new ParticleData(Particle.FIREWORKS_SPARK), EffectType.HolyDefense);
                                             case "HolyAttack" -> priest.HolyBuff(skillData, new ParticleData(Particle.REDSTONE), EffectType.HolyAttack);
-                                            case "Revive" -> priest.HolyBuff(skillData, new ParticleData(Particle.VILLAGER_HAPPY), EffectType.Revive);
+                                            case "Revive" -> priest.Revive(skillData);
                                             //ペルタスト
                                             case "RimBlow" -> novice.Slash(skillData, 4, 160);
                                             case "ShieldBash" -> peltast.ShieldBash(skillData, 12, 5);
@@ -332,7 +332,15 @@ public class Skill {
                                             case "FireBlindly" -> outLaw.FireBlindly(skillData);
                                             case "Rampage" -> outLaw.Rampage(skillData);
                                             //カバリスト
-                                            case "Ayinsof" -> SkillProcess.PartyBuffApply(skillData, EffectType.Ayinsof, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "Ayinsof" -> {
+                                                ParticleData particleData = new ParticleData(Particle.SPELL_WITCH);
+                                                int time = skillData.ParameterValueInt(0) * 20;
+                                                if (playerData.Equipment.isEquipRune("単体魔法陣のルーン")) {
+                                                    SkillProcess.PartyBuffApply(skillData, EffectType.Ayinsof, particleData, time);
+                                                } else {
+                                                    SkillProcess.BuffApply(skillData, EffectType.Ayinsof, particleData, time * 2);
+                                                }
+                                            }
                                             case "Sevenfold" -> {
                                                 EffectType effectType = playerData.Equipment.isEquipRune("ラストチャンスのルーン") ? EffectType.LastChance : EffectType.Sevenfold;
                                                 SkillProcess.PartyBuffApply(skillData, effectType, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);

@@ -13,6 +13,7 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static swordofmagic7.Function.CheckBlockPlayer;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
@@ -25,6 +26,8 @@ public class TradeManager {
         if (args.length > 0) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target != null && target.isOnline() && target != player) {
+                PlayerData targetData = PlayerData.playerData(target);
+                if (CheckBlockPlayer(playerData, targetData)) return;
                 if (false && args.length == 1) {
                     TradeData tradeData = new TradeData(player, target);
                     tradeData.requestTrade();
@@ -32,7 +35,6 @@ public class TradeManager {
                     return;
                 } else if (args.length >= 3) {
                     try {
-                        PlayerData targetData = PlayerData.playerData(target);
                         int index = Integer.parseInt(args[2]);
                         if (args[1].equalsIgnoreCase("sendItem") || args[1].equalsIgnoreCase("sI")) {
                             if (playerData.ItemInventory.getList().size() > index) {

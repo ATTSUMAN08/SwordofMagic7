@@ -51,7 +51,7 @@ public final class Damage {
             if (rune != null) {
                 int time  = rune.AdditionParameterValueInt(0)*20;
                 double value = rune.AdditionParameterValue(1)/100;
-                double shield = Math.min(heal-(victimData.Status.MaxHealth-victimData.Status.Health),victimData.Status.MaxHealth*value);
+                double shield = Math.min(heal-victimData.Status.MaxHealth, victimData.Status.MaxHealth*value);
                 victimData.changeShield(shield, time);
             }
         }

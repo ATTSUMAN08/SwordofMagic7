@@ -1,22 +1,25 @@
 package swordofmagic7.Command.Developer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import swordofmagic7.Command.SomCommand;
+import swordofmagic7.Command.SomTabComplete;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.TextView.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.getItemList;
-import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
 
-public class GetItem implements SomCommand {
+public class GetItem implements SomCommand, SomTabComplete {
     @Override
     public boolean PlayerCommand(Player player, PlayerData playerData, String[] args) {
         return false;
@@ -51,5 +54,19 @@ public class GetItem implements SomCommand {
             sender.sendMessage(str.getKey());
         }
         return true;
+    }
+
+    @Override
+    public List<String> PlayerTabComplete(Player player, PlayerData playerData, Command command, String[] args) {
+        return null;
+    }
+
+    @Override
+    public List<String> TabComplete(CommandSender sender, Command command, String[] args) {
+        List<String> complete = new ArrayList<>();
+        if (args.length == 1) for (ItemParameter item : ItemList.values()) {
+            complete.add(item.Id);
+        }
+        return complete;
     }
 }

@@ -80,7 +80,7 @@ public class ItemInventory extends BasicInventory {
                 while (i < List.size()) {
                     ItemParameterStack stack = List.get(i);
                     if (wordSearch == null || stack.itemParameter.Id.contains(wordSearch)) {
-                        ItemStack item = stack.itemParameter.viewItem(stack.Amount, playerData.ViewFormat());
+                        ItemStack item = stack.itemParameter.viewItem(stack.Amount, playerData.ViewFormat(), false);
                         ItemMeta meta = item.getItemMeta();
                         List<String> Lore = new ArrayList<>(meta.getLore());
                         Lore.add(itemStack);

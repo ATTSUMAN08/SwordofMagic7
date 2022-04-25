@@ -87,7 +87,7 @@ public class Classes {
         ClassExp.put(classData, exp);
     }
 
-    public void addClassExp(ClassData classData, int addExp) {
+    public synchronized void addClassExp(ClassData classData, int addExp) {
         if (getClassLevel(classData) >= MaxLevel) {
             ClassExp.put(classData, 0);
             addExp = 0;

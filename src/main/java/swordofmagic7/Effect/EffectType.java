@@ -39,7 +39,7 @@ public enum EffectType {
     ImmuneDepression("免疫低下", false, "[被ダメージ耐性]が減少します", true),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
-    Cloaking("クローキング", true, "移動職度が上昇します", true),
+    Cloaking("クローキング", true, "移動速度が上昇します", true),
     Invincible("無敵", EffectRank.Impossible, true, "ダメージを受け無くなります", false, true),
     Teleportation("テレポーテーション", true, "ヘイト値がリセットされます"),
     PetBoost("ペトブースト", true, "攻撃力と防御力上昇します", true),
@@ -100,6 +100,7 @@ public enum EffectType {
     NonKnockBack("ノックバック阻止", true, "ノックバックしなくなります", false),
     AbsolutelyEVA("絶対回避", true, "最終回避率が100%になります", false),
     Inexhaustible("無尽蔵", true, "消費マナが減少します", false),
+    LuxuryLiquor("高級酒", true, "[ブルタリティ]と同じ効果です", true),
     ;
 
     public String Display;

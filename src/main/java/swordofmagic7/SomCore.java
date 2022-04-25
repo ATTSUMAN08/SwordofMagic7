@@ -25,7 +25,6 @@ import swordofmagic7.Command.Builder.PlayMode;
 import swordofmagic7.Command.Developer.*;
 import swordofmagic7.Command.Player.*;
 import swordofmagic7.Command.SomCommand;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.DataLoader;
 import swordofmagic7.Data.Editor;
 import swordofmagic7.Data.PlayerData;
@@ -258,6 +257,8 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         SomCommand.register("mobInfo", new MobInfo());
         SomCommand.register("market", new MarketCommand());
         SomCommand.register("auction", new AuctionCommand());
+        SomCommand.register("blockPlayer", new BlockPlayer());
+        SomCommand.register("runeFilter", new RuneFilter());
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -488,33 +489,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("skillSlot")) {
                 playerData.HotBar.SkillSlotCommand(args);
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("runeFilter")) {
-                try {
-                    if (args[0].equalsIgnoreCase("Quality") || args[0].equalsIgnoreCase("Q")) {
-                        double value = Double.parseDouble(args[1])/100;
-                        if (0 <= value && value <= 100) {
-                            playerData.RuneQualityFilter = value;
-                            sendMessage(player, "§eルーンフィルター[品質] §b-> §a" + value*100 + "%");
-                            return true;
-                        }
-                    } else if (args[0].equalsIgnoreCase("Id")) {
-                        String runeId = args[1];
-                        if (DataBase.getRuneList().containsKey(runeId)) {
-                            if (playerData.RuneIdFilter.contains(runeId)) {
-                                playerData.RuneIdFilter.remove(runeId);
-                            } else {
-                                playerData.RuneIdFilter.add(runeId);
-                            }
-                            sendMessage(player, "§eルーンフィルター[ID:" + runeId + "] §b-> §a" + (playerData.RuneIdFilter.contains(runeId) ? "§b有効" : "§c無効"));
-                            return true;
-                        } else {
-                            sendMessage(player, "§a存在しない§eルーン§aです");
-                        }
-                    }
-                } catch (Exception ignored) {}
-                sendMessage(player, "§e/runeFilter Quality <0~100>");
-                sendMessage(player, "§e/runeFilter Id <RuneId>");
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("entities")) {
                 sendMessage(player, "EntityCount: " + player.getWorld().getEntityCount());

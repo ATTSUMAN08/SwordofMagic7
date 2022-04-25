@@ -1,18 +1,21 @@
 package swordofmagic7.Command.Developer;
 
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import swordofmagic7.Command.SomCommand;
+import swordofmagic7.Command.SomTabComplete;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Item.RuneParameter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.getRuneList;
-import static swordofmagic7.Data.DataBase.getRuneParameter;
+import static swordofmagic7.Data.DataBase.*;
 
-public class GetRune implements SomCommand {
+public class GetRune implements SomCommand, SomTabComplete {
     @Override
     public boolean PlayerCommand(Player player, PlayerData playerData, String[] args) {
         if (args.length >= 1) {
@@ -35,5 +38,19 @@ public class GetRune implements SomCommand {
     @Override
     public boolean Command(CommandSender sender, String[] args) {
         return false;
+    }
+
+    @Override
+    public List<String> PlayerTabComplete(Player player, PlayerData playerData, Command command, String[] args) {
+        return null;
+    }
+
+    @Override
+    public List<String> TabComplete(CommandSender sender, Command command, String[] args) {
+        List<String> complete = new ArrayList<>();
+        if (args.length == 1) for (RuneParameter rune : RuneList.values()) {
+            complete.add(rune.Id);
+        }
+        return complete;
     }
 }

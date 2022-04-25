@@ -332,3 +332,6 @@ commands:
     aliases: ps
     description: description
     usage: /<command>
+  blockPlayer:
+    description: description
+    usage: /<command>

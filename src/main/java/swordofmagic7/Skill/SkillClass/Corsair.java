@@ -8,6 +8,7 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -37,12 +38,18 @@ public class Corsair extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            if (playerData.EffectManager.hasEffect(EffectType.Brutality)) {
-                playerData.EffectManager.removeEffect(EffectType.Brutality);
-                Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§c無効化§aしました", SoundList.Tick);
+            RuneParameter rune = playerData.Equipment.equippedRune("高級酒のルーン");
+            if (rune != null) {
+                int time = rune.AdditionParameterValueInt(0)*20;
+                playerData.EffectManager.addEffect(EffectType.LuxuryLiquor, time);
             } else {
-                playerData.EffectManager.addEffect(EffectType.Brutality, 1, mana);
-                Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§b有効化§aしました", SoundList.Tick);
+                if (playerData.EffectManager.hasEffect(EffectType.Brutality)) {
+                    playerData.EffectManager.removeEffect(EffectType.Brutality);
+                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§c無効化§aしました", SoundList.Tick);
+                } else {
+                    playerData.EffectManager.addEffect(EffectType.Brutality, 1, mana);
+                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§b有効化§aしました", SoundList.Tick);
+                }
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
@@ -73,6 +80,8 @@ public class Corsair extends BaseSkillClass {
             int time = skillData.ParameterValueInt(0);
             double radius = skillData.ParameterValue(2);
             int time2 = skillData.ParameterValueInt(3)*20;
+            RuneParameter rune = playerData.Equipment.equippedRune("大きな旗のルーン");
+            if (rune != null) time += rune.AdditionParameterValueInt(0)*20;
 
             MultiThread.sleepTick(skillData.CastTime);
 

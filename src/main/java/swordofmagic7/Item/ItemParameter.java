@@ -57,7 +57,12 @@ public class ItemParameter implements Cloneable {
     public boolean isEmpty() {
         return this.Icon == Material.BARRIER || Icon == null;
     }
+
     public ItemStack viewItem(int amount, String format) {
+        return viewItem(amount, format, true);
+    }
+
+    public ItemStack viewItem(int amount, String format, boolean isLoreHide) {
         final HashMap<StatusParameter, Double> Parameter = itemEquipmentData.Parameter();
         final ItemStack item = new ItemStack(getIcon());
         final ItemMeta meta = item.getItemMeta();
@@ -67,7 +72,9 @@ public class ItemParameter implements Cloneable {
         }
         meta.setDisplayName(decoText(Display));
         meta.setCustomModelData(CustomModelData);
-        List<String> Lore = loreText(this.Lore);
+        List<String> Lore = new ArrayList<>();
+        if (isLoreHide && this.isLoreHide) Lore.add("§c§lこの情報へのアクセス権限がありません");
+        else Lore.addAll(loreText(this.Lore));
         Lore.add(itemInformation);
         Lore.add(decoLore("カテゴリ") + Category.Display);
         Lore.add(decoLore("売値") + Sell);
@@ -158,7 +165,11 @@ public class ItemParameter implements Cloneable {
     }
 
     public TextView getTextView(int amount, String format) {
-        ItemStack item = viewItem(amount, format);
+        return getTextView(amount, format, true);
+    }
+
+    public TextView getTextView(int amount, String format, boolean isLoreHide) {
+        ItemStack item = viewItem(amount, format, isLoreHide);
         String suffix = "";
         if (amount > 1) suffix = "§ax" + amount;
         if (Category.isEquipment()) suffix = "§b+" + itemEquipmentData.Plus;

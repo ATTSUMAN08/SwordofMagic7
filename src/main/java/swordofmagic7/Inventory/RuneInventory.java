@@ -100,7 +100,7 @@ public class RuneInventory extends BasicInventory {
                 while (i < List.size()) {
                     RuneParameter rune = List.get(i);
                     if (wordSearch == null || rune.Id.contains(wordSearch)) {
-                        ItemStack item = rune.viewRune(playerData.ViewFormat());
+                        ItemStack item = rune.viewRune(playerData.ViewFormat(), false);
                         ItemMeta meta = item.getItemMeta();
                         List<String> Lore = new ArrayList<>(meta.getLore());
                         Lore.add("§8SlotID:" + i);
