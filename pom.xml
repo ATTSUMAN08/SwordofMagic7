@@ -88,6 +88,11 @@
             <id>everything</id>
             <url>https://repo.citizensnpcs.co/</url>
         </repository>
+
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -133,5 +138,6 @@
             <version>4.8.0</version>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 </project>

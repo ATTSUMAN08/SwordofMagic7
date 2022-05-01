@@ -95,7 +95,8 @@ public class MobInfo {
         for (DropRuneData runeData : mobData.DropRuneTable) {
             list.add("§7・§e§l" + runeData.runeParameter.Display + "§b§l -> §e§l" + String.format(playerData.ViewFormat(), runeData.Percent*100) + "%");
         }
-        list.add(getPetList().containsKey(mobData.Id) ? "§b§l懐柔可能" : "§c§l懐柔不可");
+        list.add(getPetList().containsKey(mobData.Id) ? "§b§lペットデータ有" : "§c§lペットデータ無");
+        list.add(getPetList().containsKey(mobData.Id) && !mobData.NonTame ? "§b§l懐柔可能" : "§c§l懐柔不可");
         return list;
     }
 }

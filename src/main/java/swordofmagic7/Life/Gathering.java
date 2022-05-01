@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.Statistics.FishingComboStatisticsList;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.plugin;
@@ -298,23 +299,17 @@ public class Gathering {
                             player.sendMessage("§b最高CPS§aを§e更新§aしました！");
                         }
                         if (timePerSecond >= 5) {
+                            boolean nonMiss = FishingMissCount == 0;
+                            boolean cps6 = timePerSecond >= 6;
+                            for (int combo2 : FishingComboStatisticsList) {
+                                if (combo >= combo2) {
+                                    playerData.titleManager.addTitle("釣獲コンボ" + combo2 + "CPS5");
+                                    if (nonMiss) playerData.titleManager.addTitle("釣獲コンボ" + combo2 + "CPS5Miss0");
+                                    if (cps6) playerData.titleManager.addTitle("釣獲コンボ" + combo2 + "CPS6");
+                                }
+                            }
                             if (timePerSecond >= 10) {
                                 playerData.titleManager.addTitle("釣獲CPS10");
-                            }
-                            if (combo >= 100) {
-                                playerData.titleManager.addTitle("釣獲コンボ100CPS5");
-                                if (FishingMissCount == 0) playerData.titleManager.addTitle("釣獲コンボ100CPS5Miss0");
-                                if (timePerSecond >= 6) playerData.titleManager.addTitle("釣獲コンボ100CPS6");
-                            }
-
-                            if (combo >= 200) {
-                                playerData.titleManager.addTitle("釣獲コンボ200CPS5");
-                                if (FishingMissCount == 0) playerData.titleManager.addTitle("釣獲コンボ200CPS5Miss0");
-                            }
-
-                            if (combo >= 300) {
-                                playerData.titleManager.addTitle("釣獲コンボ300CPS5");
-                                if (FishingMissCount == 0) playerData.titleManager.addTitle("釣獲コンボ300CPS5Miss0");
                             }
                         }
                     }

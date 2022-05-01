@@ -23,11 +23,10 @@ import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.random;
 
-public class Griffia {
-    private final EnemySkillManager Manager;
+public class Griphia extends EnemySkillBase {
     final Location[] Candle = new Location[4];
-    public Griffia(EnemySkillManager manager) {
-        this.Manager = manager;
+    public Griphia(EnemySkillManager manager) {
+        super(manager);
         Candle[0] = new Location(world, 649.5, 123, 2031.5);
         Candle[1] = new Location(world, 652.5, 123, 1923.5);
         Candle[2] = new Location(world, 760.5, 123, 1927.5);
@@ -36,19 +35,19 @@ public class Griffia {
 
     public void SingleFlameCircle(int CastTime) {
         MultiThread.TaskRun(() -> {
-            final Set<Player> list = PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 32);
+            final Set<Player> list = PlayerList.getNearNonDead(entity().getLocation(), 32);
             Player target = (Player) Function.GetRandom(list);
             if (target != null) {
                 Manager.CastSkillIgnoreAI(true);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f);
                 int i = 0;
-                while (Manager.enemyData.isAlive() && !Manager.setCancel) {
+                while (isRunnableAI()) {
                     Location loc = target.getEyeLocation().clone().add(0, 2, 0);
                     if (i < CastTime) {
                         ParticleManager.RandomVectorParticle(particleData, loc, 30);
                     } else {
                         ParticleManager.LineParticle(particleData, loc, target.getLocation(), 0.5, 10);
-                        Damage.makeDamage(Manager.enemyData.entity, target, DamageCause.MAT, "SingleFlameCircle", 1.5, 1);
+                        Damage.makeDamage(entity(), target, DamageCause.MAT, "SingleFlameCircle", 1.5, 1);
                         break;
                     }
                     i += Manager.period;
@@ -65,13 +64,13 @@ public class Griffia {
             Manager.CastSkillIgnoreAI(true);
             ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f);
             int i = 0;
-            while (Manager.enemyData.isAlive() && !Manager.setCancel) {
+            while (isRunnableAI()) {
                 if (i < CastTime) {
-                    ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), 5, 30);
+                    ParticleManager.CircleParticle(particleData, entity().getLocation(), 5, 30);
                 } else {
-                    ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), 5, 30);
-                    final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 32);
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "AreaFlameCircle", 1.2, 1, 2);
+                    ParticleManager.CircleParticle(particleData, entity().getLocation(), 5, 30);
+                    final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(entity().getLocation(), 32);
+                    Damage.makeDamage(entity(), victims, DamageCause.MAT, "AreaFlameCircle", 1.2, 1, 2);
                     break;
                 }
                 i += Manager.period;
@@ -87,23 +86,23 @@ public class Griffia {
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.FLAME, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
-            final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 32);
+            final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(entity().getLocation(), 32);
             int i = 0;
-            while (Manager.enemyData.isAlive() && !Manager.setCancel) {
+            while (isRunnableAI()) {
                 if (i < CastTime) {
                     for (LivingEntity player : victims) {
                         ParticleManager.RandomVectorParticle(particleData, player.getEyeLocation().clone().add(0,3,0), 10);
                     }
-                    ParticleManager.RandomVectorParticle(particleData, Manager.enemyData.entity.getLocation(), 30);
+                    ParticleManager.RandomVectorParticle(particleData, entity().getLocation(), 30);
                 } else {
-                    ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 30);
-                    final Set<LivingEntity> victims2 = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 2);
+                    ParticleManager.RandomVectorParticle(particleData1, entity().getLocation(), 30);
+                    final Set<LivingEntity> victims2 = PlayerList.getNearLivingEntity(entity().getLocation(), 2);
                     victims.removeAll(victims2);
                     for (LivingEntity player : victims) {
                         ParticleManager.LineParticle(particleData, player.getEyeLocation().clone().add(0,3,0), player.getLocation(), 1, 30);
                     }
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "FlamePile", 1.2, 1, 2);
-                    Damage.makeDamage(Manager.enemyData.entity, victims2, DamageCause.MAT, "FlamePile", 2, 1, 2);
+                    Damage.makeDamage(entity(), victims, DamageCause.MAT, "FlamePile", 1.2, 1, 2);
+                    Damage.makeDamage(entity(), victims2, DamageCause.MAT, "FlamePile", 2, 1, 2);
                     break;
                 }
                 i += Manager.period;
@@ -119,18 +118,18 @@ public class Griffia {
             Manager.CastSkillIgnoreAI(true);
             ParticleData particleData = new ParticleData(Particle.SMOKE_NORMAL, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
-            Set<Player> victims = PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64);
+            Set<Player> victims = PlayerList.getNearNonDead(entity().getLocation(), 64);
             LivingEntity target = null;
             double distance = 0;
             for (Player player : victims) {
-                double distance2 = Manager.enemyData.entity.getLocation().distance(player.getLocation());
+                double distance2 = entity().getLocation().distance(player.getLocation());
                 if (distance2 > distance) {
                     distance = distance2;
                     target = player;
                 }
             }
             int i = 0;
-            while (Manager.enemyData.isAlive() && !Manager.setCancel && target != null) {
+            while (isRunnableAI() && target != null) {
                 if (i < CastTime) {
                     ParticleManager.CircleParticle(particleData, target.getLocation(), 5, 50);
                 } else {
@@ -155,18 +154,18 @@ public class Griffia {
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
             int i = 0;
-            while (Manager.enemyData.isAlive() && !Manager.setCancel) {
+            while (isRunnableAI()) {
                 if (i < CastTime) {
-                    ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), 7, 15);
-                    ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), 25, 45);
+                    ParticleManager.CircleParticle(particleData, entity().getLocation(), 7, 15);
+                    ParticleManager.CircleParticle(particleData, entity().getLocation(), 25, 45);
                 } else {
-                    ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 10);
-                    final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 25);
-                    victims.removeAll(PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 7));
+                    ParticleManager.RandomVectorParticle(particleData1, entity().getLocation(), 10);
+                    final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(entity().getLocation(), 25);
+                    victims.removeAll(PlayerList.getNearLivingEntity(entity().getLocation(), 7));
                     for (LivingEntity player : victims) {
                         ParticleManager.RandomVectorParticle(particleData1, player.getLocation(), 10);
                     }
-                    Damage.makeDamage(Manager.enemyData.entity, victims, DamageCause.MAT, "Loyalty", 2.5, 1, 0.5, true, 2);
+                    Damage.makeDamage(entity(), victims, DamageCause.MAT, "Loyalty", 2.5, 1, 0.5, true, 2);
                     break;
                 }
                 i += Manager.period;
@@ -182,7 +181,7 @@ public class Griffia {
     public void Fluctuation(int CastTime) {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
+            effectManager().addEffect(EffectType.Invincible, CastTime);
             final Location TargetCandle = Candle[random.nextInt(Candle.length)];
             ParticleData particleData = new ParticleData(Particle.END_ROD);
             ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);

@@ -51,12 +51,10 @@ public class InstantBuff {
         MultiThread.TaskRun(() -> {
             while (playerWhileCheck(playerData)) {
                 if (InstantBuffs.size() > 0) {
-                    for (Map.Entry<String, InstantBuffData> data : new HashMap<>(InstantBuffs).entrySet()) {
+                    for (Map.Entry<String, InstantBuffData> data : InstantBuffs.entrySet()) {
                         data.getValue().time--;
-                        if (data.getValue().time < 1) {
-                            InstantBuffs.remove(data.getKey());
-                        }
                     }
+                    InstantBuffs.entrySet().removeIf(entry -> entry.getValue().time < 1);
                 }
                 MultiThread.sleepTick(20);
             }

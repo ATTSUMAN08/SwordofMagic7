@@ -44,6 +44,8 @@ public class Chronomancer extends BaseSkillClass {
     public void Slow(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            RuneParameter rune = playerData.Equipment.equippedRune("エンチャントスローのルーン");
+            boolean bool = rune != null;
             double radius = skillData.ParameterValue(1);
             int time = skillData.ParameterValueInt(0) * 20;
             Location origin = player.getLocation().clone().add(player.getLocation().getDirection().multiply(radius));
@@ -52,13 +54,19 @@ public class Chronomancer extends BaseSkillClass {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
                 MultiThread.sleepMillis(millis);
             }
-
-            ParticleManager.CircleParticle(new ParticleData(Particle.SMOKE_LARGE, 0.2f, Function.VectorUp), origin, radius, 20);
-            Set<LivingEntity> Targets = Function.NearLivingEntity(origin, radius, skillProcess.Predicate());
-            for (LivingEntity target : Targets) {
-                EffectManager.addEffect(target, EffectType.Slow, time, player);
+            if (bool) {
+                int time2 = rune.AdditionParameterValueInt(0)*20;
+                double percent = rune.AdditionParameterValue(1)/100;
+                playerData.EffectManager.addEffect(EffectType.EnchantSlow, time2, new Object[]{percent,time});
+                playSound(player, SoundList.Heal);
+            } else {
+                ParticleManager.CircleParticle(new ParticleData(Particle.SMOKE_LARGE, 0.2f, Function.VectorUp), origin, radius, 20);
+                Set<LivingEntity> Targets = Function.NearLivingEntity(origin, radius, skillProcess.Predicate());
+                for (LivingEntity target : Targets) {
+                    EffectManager.addEffect(target, EffectType.Slow, time, player);
+                }
+                playSound(player, SoundList.DeBuff);
             }
-            playSound(player, SoundList.DeBuff);
             skillProcess.SkillRigid(skillData);
         }, "Slow");
     }

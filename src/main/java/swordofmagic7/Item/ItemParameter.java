@@ -99,10 +99,10 @@ public class ItemParameter implements Cloneable {
             if (itemCook.Mana > 0) Lore.add(decoLore("マナ回復") + itemCook.Mana);
             for (StatusParameter param : StatusParameter.values()) {
                 if (itemCook.Fixed.containsKey(param)) {
-                    Lore.add(decoLore(param.Display) + Function.decoDoubleToString(Math.round(itemCook.Fixed.get(param)), "%.0f"));
+                    Lore.add(decoLore(param.Display) + "+" + Function.decoDoubleToString(Math.round(itemCook.Fixed.get(param)), format));
                 }
                 if (itemCook.Multiply.containsKey(param)) {
-                    Lore.add(decoLore(param.Display) + Function.decoDoubleToString(Math.round(itemCook.Multiply.get(param)), "%.0f") + "%");
+                    Lore.add(decoLore(param.Display) + "+" + Function.decoDoubleToString(Math.round(itemCook.Multiply.get(param)*100), format) + "%");
                 }
             }
             if (itemCook.isBuff) Lore.add(decoLore("効果時間") + itemCook.BuffTime + "秒");

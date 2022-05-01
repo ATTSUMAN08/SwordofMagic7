@@ -81,7 +81,7 @@ public class Corsair extends BaseSkillClass {
             double radius = skillData.ParameterValue(2);
             int time2 = skillData.ParameterValueInt(3)*20;
             RuneParameter rune = playerData.Equipment.equippedRune("大きな旗のルーン");
-            if (rune != null) time += rune.AdditionParameterValueInt(0)*20;
+            if (rune != null) time2 += rune.AdditionParameterValueInt(0)*20;
 
             MultiThread.sleepTick(skillData.CastTime);
 

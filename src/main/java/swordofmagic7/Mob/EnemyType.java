@@ -18,7 +18,7 @@ public enum EnemyType {
     }
 
     public boolean isIgnoreCrowdControl() {
-        return this == RaidBoss;
+        return isBoss() ;
     }
 
     public boolean isNormal() {
@@ -27,5 +27,9 @@ public enum EnemyType {
 
     public boolean isBoss() {
         return this != Normal;
+    }
+
+    public boolean isRaidBoss() {
+        return this == RaidBoss;
     }
 }

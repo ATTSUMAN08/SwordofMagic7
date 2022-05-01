@@ -10,10 +10,12 @@ import swordofmagic7.Command.TabComplete.PlayerTabComplete;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.Som7Premium;
 import static swordofmagic7.Data.DataBase.Som7VIP;
+import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.sendMessage;
 
 public class BlockPlayer implements SomCommand, SomTabComplete {
@@ -21,16 +23,24 @@ public class BlockPlayer implements SomCommand, SomTabComplete {
     public boolean PlayerCommand(Player player, PlayerData playerData, String[] args) {
         Player target = null;
         if (args.length == 1) {
-            target = Bukkit.getPlayer(args[0]);
+            if (args[0].equalsIgnoreCase("list")) {
+                List<String> message = new ArrayList<>();
+                message.add(decoText("§cBlockList"));
+                for (String uuid : playerData.BlockList) {
+                    message.add("§7・§e" + uuid);
+                }
+                if (message.size() == 1) message.add("§7・§7なし");
+                sendMessage(player, message);
+            } else target = Bukkit.getPlayer(args[0]);
         }
-        if (target != null && target.isOnline()) {
+        if (target != null && target.isOnline() && target != player) {
             String uuid = target.getUniqueId().toString();
             PlayerData targetData = PlayerData.playerData(target);
             int limit = 10;
             if (player.hasPermission(Som7VIP)) limit = 25;
             if (player.hasPermission(Som7Premium)) limit = 50;
             if (!playerData.BlockList.contains(uuid)) {
-                if (playerData.BlockList.size() >= limit) {
+                if (playerData.BlockList.size() < limit) {
                     playerData.BlockList.add(uuid);
                     sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしました", SoundList.Tick);
                 } else {

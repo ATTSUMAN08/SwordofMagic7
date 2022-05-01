@@ -4,7 +4,7 @@ main: swordofmagic7.SomCore
 api-version: 1.18
 authors: [ MomiNeko ]
 description: Swordofmagic7
-depend: [ HolographicDisplays, Citizens, LibsDisguises, ProtocolLib ]
+depend: [ HolographicDisplays, Citizens, LibsDisguises, ProtocolLib, Votifier ]
 
 commands:
   getItem:
@@ -72,6 +72,10 @@ commands:
     permission: som7.developer
     description: description
     usage: /<command>
+  mobDropItemCreate:
+    permission: som7.developer
+    description: description
+    usage: /<command>
   defenseBattleStartWave:
     permission: som7.developer
     description: description
@@ -93,6 +97,14 @@ commands:
     description: description
     usage: /<command>
   setNick:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  addTitle:
+    permission: som7.developer
+    description: description
+    usage: /<command>
+  killMob:
     permission: som7.developer
     description: description
     usage: /<command>
@@ -333,5 +345,9 @@ commands:
     description: description
     usage: /<command>
   blockPlayer:
+    description: description
+    usage: /<command>
+  damageSimulator:
+    aliases: ds
     description: description
     usage: /<command>

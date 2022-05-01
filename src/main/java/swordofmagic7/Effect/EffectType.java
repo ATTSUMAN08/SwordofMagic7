@@ -23,21 +23,27 @@ public enum EffectType {
     Concussion("脳震盪", false, "[氷結]と同じ効果です"),
     DeathVerdict("デスヴァーディクト", false, "被ダメージ耐性が減少します", true),
     Adhesive("粘着", false, "攻撃力が低下します", true),
-    Unconscious("無自覚", EffectRank.Impossible, false, "「自分では、自分が狂っていることはわからないものです」", false),
-    Decay("崩壊", EffectRank.Impossible, false, "「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", false),
-    CantLook("見堪", EffectRank.Impossible, false, "「ときに同調圧力は、文明を滅ぼします」", false),
     IronHook("アイアンフック", EffectRank.Impossible, false, "[氷結]と同じ状態になります", false),
     Keelhauling("キールハウリング", EffectRank.Impossible, false, "[氷結]と[固定]を合わせた効果です", false),
     SprinkleSand("スプリンクルサンド", false, "命中が下がります", true),
     BreakBrick("ブレイクブリック", false, "クリティカル発生が下がります", true),
     Scary("恐怖", false, "怖いです", false),
     Gevura("ゲブラ", false, "被ダメージ耐性が減少します", true),
-    ExcessiveTreatment("過剰な治療", EffectRank.Impossible, false, "「過剰な治療は時に死ぬを招くこともあります」", false),
-    UnpleasantOmen("周りが気になります", EffectRank.Impossible, false, "「どこかから嫌な気配を感じます」", false),
     Capote("カポーテ", false, "命中と回避が減少します", true),
     ShadowFatter("シャドウファッター", EffectRank.High, false, "[固定]を同じ状態になります", false),
     ImmuneDepression("免疫低下", false, "[被ダメージ耐性]が減少します", true),
+    AttackProhibited("攻撃禁止", EffectRank.High, false, "攻撃できなくなります", false),
+
+    Unconscious("無自覚", EffectRank.Impossible, false, "「自分では、自分が狂っていることはわからないものです」", false),
+    Decay("崩壊", EffectRank.Impossible, false, "「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", false),
+    CantLook("見堪", EffectRank.Impossible, false, "「ときに同調圧力は、文明を滅ぼします」", false),
+    ExcessiveTreatment("過剰な治療", EffectRank.Impossible, false, "「過剰な治療は時に死ぬを招くこともあります」", false),
+    UnpleasantOmen("周りが気になります", EffectRank.Impossible, false, "「どこかから嫌な気配を感じます」", false),
     IndividualityConcrete("個性具象", EffectRank.Impossible, false, "「人には全く違うものや似通った個性があります」", false),
+    Regret("未練", EffectRank.Impossible, false, "「あなたは過去を振り返ったことがありますか？」", false),
+    Execution("執行", EffectRank.Impossible, false, "「嫌だ...」", false),
+    DoNotStop("止まるな", EffectRank.Impossible, false, "「あの人が帰ってきますように」", false),
+    CanBeSedated("鎮静可能", EffectRank.Impossible, false, "「あの人は優しかった」", false),
 
     Covert("隠密", true, "ノーマルターゲット判定を受けません"),
     Cloaking("クローキング", true, "移動速度が上昇します", true),
@@ -104,6 +110,7 @@ public enum EffectType {
     LuxuryLiquor("高級酒", true, "[ブルタリティ]と同じ効果です", true),
     MagicBarrier("魔法障壁", true, "魔法被ダメージ耐性が上昇します", true),
     IceThorns("氷の棘", true, "魔法与ダメージが上昇します", true),
+    EnchantSlow("エンチャントスロー", true, "この状態で敵を攻撃すると確率でスローが入るようになります", false),
     ;
 
     public String Display;
@@ -214,7 +221,7 @@ public enum EffectType {
     }
 
     public boolean isSkillsNotAvailable() {
-        return this == Silence || this == ShadowPool || isFreeze();
+        return this == Silence || this == ShadowPool || this == Stop || isFreeze();
     }
 
     public boolean isInvincible() {

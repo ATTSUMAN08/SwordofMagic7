@@ -47,6 +47,7 @@ public class Classes {
                 if (level >= 30) reqExp *= 2;
                 if (level >= 50) reqExp *= 4;
                 if (level >= 60) reqExp *= 4;
+                if (level >= 65) reqExp *= 2;
                 ReqExp[level] = (int) Math.round(reqExp);
             }
         }

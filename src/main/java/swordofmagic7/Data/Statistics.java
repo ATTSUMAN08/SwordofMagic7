@@ -55,6 +55,9 @@ public class Statistics {
     public int StrafeCount = 0;
     public int WallJumpCount = 0;
 
+    public static final int[] FishingComboStatisticsList = new int[]{100,200,300,400,500,700,1000};
+    public static final int[] UpgradeStoneStrafeStatisticsList = new int[]{1000,5000,10000,30000,50000,100000,200000,300000};
+
     public List<String> getStringList() {
         List<String> list = new ArrayList<>();
         list.add(decoLore("プレイ時間") + String.format("%.2f", playTime/3600f) + "時間");
@@ -87,27 +90,14 @@ public class Statistics {
         if (playerData.Level >= 60) titleManager.addTitle("プレイヤーレベル60");
 
         if (MaxFishingCPS >= 10) titleManager.addTitle("釣獲CPS10");
-        if (MaxFishingCombo >= 100) titleManager.addTitle("釣獲コンボ100");
-        if (MaxFishingCombo >= 200) titleManager.addTitle("釣獲コンボ200");
-        if (MaxFishingCombo >= 300) titleManager.addTitle("釣獲コンボ300");
+        for (int combo : FishingComboStatisticsList) {
+            if (MaxFishingCombo >= combo) titleManager.addTitle("釣獲コンボ" + combo);
+        }
 
-        if (UpgradeUseCostCount >= 1000) titleManager.addTitle("強化石消費1000");
-        if (UpgradeUseCostCount >= 5000) titleManager.addTitle("強化石消費5000");
-        if (UpgradeUseCostCount >= 10000) titleManager.addTitle("強化石消費10000");
-        if (UpgradeUseCostCount >= 30000) titleManager.addTitle("強化石消費30000");
-        if (UpgradeUseCostCount >= 50000) titleManager.addTitle("強化石消費50000");
-        if (UpgradeUseCostCount >= 100000) titleManager.addTitle("強化石消費100000");
-        if (UpgradeUseCostCount >= 200000) titleManager.addTitle("強化石消費200000");
-        if (UpgradeUseCostCount >= 300000) titleManager.addTitle("強化石消費300000");
-
-        if (StrafeCount >= 1000) titleManager.addTitle("ストレイフ回数1000");
-        if (StrafeCount >= 5000) titleManager.addTitle("ストレイフ回数5000");
-        if (StrafeCount >= 10000) titleManager.addTitle("ストレイフ回数10000");
-        if (StrafeCount >= 30000) titleManager.addTitle("ストレイフ回数30000");
-        if (StrafeCount >= 50000) titleManager.addTitle("ストレイフ回数50000");
-        if (StrafeCount >= 100000) titleManager.addTitle("ストレイフ回数100000");
-        if (StrafeCount >= 200000) titleManager.addTitle("ストレイフ回数200000");
-        if (StrafeCount >= 300000) titleManager.addTitle("ストレイフ回数300000");
+        for (int count : UpgradeStoneStrafeStatisticsList) {
+            if (UpgradeUseCostCount >= count) titleManager.addTitle("強化石消費" + count);
+            if (StrafeCount >= count) titleManager.addTitle("ストレイフ回数" + count);
+        }
 
         for (ClassData classData : DataBase.ClassList.values()) {
             if (playerData.Classes.getClassLevel(classData) >= 15) {

@@ -168,7 +168,8 @@ public class Elementalist extends BaseSkillClass {
     public void StormDust(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            final double radius = skillData.ParameterValue(3);
+            RuneParameter rune = playerData.Equipment.equippedRune("大型台風のルーン");
+            final double radius = rune != null ? rune.AdditionParameterValue(0) : skillData.ParameterValue(3);
             final double distance = 16;
             final Location loc = RayTrace.rayLocationBlock(player.getEyeLocation(), distance, false).HitPosition;
             loc.setPitch(90);

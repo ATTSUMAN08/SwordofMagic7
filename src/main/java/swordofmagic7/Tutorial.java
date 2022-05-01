@@ -47,7 +47,7 @@ public class Tutorial {
             for (TutorialData data : TutorialList) {
                 if (data.start == i) {
                     BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§b開始§aしました", false);
-                    if (playerData.Level == 1) player.sendMessage(TutorialNonSave);
+                    //if (playerData.Level == 1) player.sendMessage(TutorialNonSave);
                     start = true;
                 }
             }

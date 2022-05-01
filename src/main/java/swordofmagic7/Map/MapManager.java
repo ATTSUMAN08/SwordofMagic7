@@ -30,9 +30,10 @@ public class MapManager {
     public void WarpGateSelector() {
         Location pLoc = player.getLocation();
         for (Map.Entry<String, WarpGateParameter> entry : WarpGateList.entrySet()) {
-            if (entry.getValue().getLocation().distance(pLoc) < 2) {
+            WarpGateParameter warp = entry.getValue();
+            if (warp.getLocation().distance(pLoc) < 2) {
                 if (TagGame.isTagPlayerNonMessage(player)) return;
-                if (WarpGateList.containsKey(entry.getValue().Target) || entry.getValue().TargetLocation != null) {
+                if (warp.isTrigger || WarpGateList.containsKey(warp.Target) || warp.TargetLocation != null) {
                     entry.getValue().usePlayer(player);
                 } else {
                     Log("§cError NotFundWarpGate: " + entry.getValue().Target + " at " + entry.getKey());

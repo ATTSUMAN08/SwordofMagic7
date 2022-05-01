@@ -27,18 +27,19 @@ public class GetItem implements SomCommand, SomTabComplete {
 
     @Override
     public boolean Command(CommandSender sender, String[] args) {
-        PlayerData targetData = null;
-        if (args.length == 2) {
+        PlayerData targetData = sender instanceof Player player ? playerData(player) : null;
+        if (args.length >= 3) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target.isOnline()) targetData = playerData(target);
-        } else if (args.length == 1 && sender instanceof Player player) {
-            targetData = playerData(player);
         }
         if (targetData != null) {
             if (getItemList().containsKey(args[0])) {
-                int amount = 1;
-                if (args.length == 2) amount = Integer.parseInt(args[1]);
                 ItemParameterStack stack = new ItemParameterStack(getItemParameter(args[0]));
+                int amount = 1;
+                if (args.length >= 2) amount = Integer.parseInt(args[1]);
+                if (args.length >= 3 && stack.itemParameter.Category.isEquipment()) {
+                    stack.itemParameter.itemEquipmentData.Plus = Integer.parseInt(args[2]);
+                }
                 stack.Amount = amount;
                 targetData.ItemInventory.addItemParameter(stack);
                 targetData.ItemInventory.viewInventory();

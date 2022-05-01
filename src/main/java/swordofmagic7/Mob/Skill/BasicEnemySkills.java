@@ -18,11 +18,10 @@ import java.util.List;
 import static swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class BasicEnemySkills {
+public class BasicEnemySkills extends EnemySkillBase {
 
-    private final EnemySkillManager Manager;
     public BasicEnemySkills(EnemySkillManager manager) {
-        this.Manager = manager;
+        super(manager);
     }
 
     public void SkillLaser() {

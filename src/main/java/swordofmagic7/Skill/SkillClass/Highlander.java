@@ -8,6 +8,7 @@ import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -119,8 +120,9 @@ public class Highlander extends BaseSkillClass {
     public void CrossGuard(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
+            RuneParameter rune = playerData.Equipment.equippedRune("手慣れたカウンターのルーン");
             int time = skillData.ParameterValueInt(0)*20;
-            int time2 = skillData.ParameterValueInt(1)*20;
+            int time2 = (rune != null ? rune.AdditionParameterValueInt(0) : skillData.ParameterValueInt(1))*20;
 
             MultiThread.sleepTick(skillData.CastTime);
 

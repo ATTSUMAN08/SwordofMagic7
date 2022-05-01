@@ -693,6 +693,7 @@ public class DataLoader {
                 mobData.Search = data.getDouble("Search", 32);
                 mobData.Hostile = data.getBoolean("Hostile", false);
                 mobData.Size = data.getInt("Size", 0);
+                mobData.NonTame = data.getBoolean("NonTame", false);
                 if (data.isSet("EnemyType")) mobData.enemyType = EnemyType.valueOf(data.getString("EnemyType"));
                 mobData.DamageRanking = data.getBoolean("DamageRanking", mobData.enemyType.isBoss());
                 if (data.isSet("Skill")) {
@@ -996,8 +997,13 @@ public class DataLoader {
                     String[] split = str.split(",");
                     RewardBoxData rewardBoxData = new RewardBoxData();
                     rewardBoxData.id = split[0];
-                    rewardBoxData.amount = Integer.parseInt(split[1]);
-                    rewardBoxData.percent = Double.parseDouble(split[2]);
+                    for (String meta : split) {
+                        if (meta.contains("Amount:")) rewardBoxData.amount = Integer.parseInt(meta.replace("Amount:", ""));
+                        if (meta.contains("Percent:")) rewardBoxData.percent = Double.parseDouble(meta.replace("Percent:", ""));
+                        if (meta.contains("Level:")) rewardBoxData.Level = Integer.parseInt(meta.replace("Level:", ""));
+                        if (meta.contains("MaxLevel:")) rewardBoxData.MaxLevel = Integer.parseInt(meta.replace("MaxLevel:", ""));
+                        if (meta.contains("GrowthRate:")) rewardBoxData.GrowthRate = Double.parseDouble(meta.replace("GrowthRate:", ""));
+                    }
                     list.add(rewardBoxData);
                 }
                 RewardBoxList.put(fileName, list);
@@ -1011,7 +1017,7 @@ public class DataLoader {
 
     public static void disguiseLoader(Disguise disguise, FileConfiguration data) {
         switch (disguise.getType()) {
-            case SLIME -> {
+            case SLIME, MAGMA_CUBE -> {
                 SlimeWatcher watcher = new SlimeWatcher(disguise);
                 watcher.setSize(data.getInt("Disguise.Size", 1));
                 disguise.setWatcher(watcher);

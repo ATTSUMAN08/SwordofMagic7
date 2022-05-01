@@ -62,7 +62,7 @@ public final class PlayerList {
     public static Set<Player> getNearNonDead(Location loc, double radius) {
         Set<Player> List = new HashSet<>();
         for (Player player : get()) {
-            if (player.isOnline() && player.getGameMode() != GameMode.SPECTATOR) {
+            if (player.isOnline() && player.getGameMode() == GameMode.SURVIVAL) {
                 if (player.getLocation().distance(loc) <= radius) List.add(player);
             }
         }

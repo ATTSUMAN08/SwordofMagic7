@@ -50,7 +50,6 @@ import java.util.*;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.Party.PartyManager.partyCommand;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class SomCore extends JavaPlugin implements PluginMessageListener {
@@ -96,6 +95,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         ServerId = getConfig().getString("ServerId");
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+        //getServer().getPluginManager().registerEvents(new Som7Vote(), this);
 
         Client.Host = getConfig().getString("Host", "localhost");
         Client.connect();
@@ -243,6 +243,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         SomCommand.register("bukkitTasks", new BukkitTasks());
         SomCommand.register("classSelect", new ClassSelect());
         SomCommand.register("skillCTReset", new SkillCTReset());
+        SomCommand.register("addTitle", new AddTitle());
         //Builder
         SomCommand.register("gm", new GameModeChange());
         SomCommand.register("playMode", new PlayMode());
@@ -276,6 +277,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 } else if (cmd.getName().equalsIgnoreCase("mobSpawnerDataCreate")) {
                     Editor.mobSpawnerDataCreateCommand(player, args);
                     return true;
+                } else if (cmd.getName().equalsIgnoreCase("mobDropItemCreate")) {
+                    Editor.mobDropItemCreateCommand(player, args);
+                    return true;
                 } else if (cmd.getName().equalsIgnoreCase("defenseBattleStartWave")) {
                     int wave = 1;
                     if (args.length == 1) wave = Integer.parseInt(args[0]);
@@ -283,6 +287,23 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     return true;
                 } else if (cmd.getName().equalsIgnoreCase("defenseBattleEndWave")) {
                     DefenseBattle.endWave();
+                    return true;
+                } else if (cmd.getName().equalsIgnoreCase("killMob")) {
+                    if (args.length == 1) {
+                        try {
+                            double radius = Double.parseDouble(args[0]);
+                            int count = 0;
+                            for (EnemyData enemyData : MobManager.getEnemyList()) {
+                                if (enemyData.entity.getLocation().distance(player.getLocation()) < radius) {
+                                    enemyData.dead();
+                                    count++;
+                                }
+                            }
+                            player.sendMessage("KillMob: " + count);
+                        } catch (Exception e) {
+                            player.sendMessage("§e/killMob <radius>");
+                        }
+                    }
                     return true;
                 }
             }
@@ -372,9 +393,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 for (World world : Bukkit.getWorlds()) {
                     player.sendMessage("§e" + world.getName() + "§7: §a" + world.getFullTime());
                 }
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("party")) {
-                partyCommand(player, playerData, args);
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("itemInventorySort")) {
                 playerData.ItemInventory.ItemInventorySort();
@@ -510,8 +528,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                             if (httpStatusCode != HttpURLConnection.HTTP_OK) {
                                 throw new Exception("HTTP Status " + httpStatusCode);
                             }
-                            String contentType = conn.getContentType();
-                            System.out.println("Content-Type: " + contentType);
                             DataInputStream dataInStream = new DataInputStream(conn.getInputStream());
                             DataOutputStream dataOutStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(DataBasePath + "PlayerData\\" + player.getUniqueId() + ".yml")));
                             byte[] b = new byte[4096];
@@ -580,6 +596,21 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                     playerData.PetInventory.wordSearch = null;
                 }
                 playerData.viewUpdate();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("damageSimulator")) {
+                if (args.length >= 2) {
+                    String format = "%.1f";
+                    double multiply = args.length == 3 ? Double.parseDouble(args[2]) : 1;
+                    double perforate = args.length == 4 ? Double.parseDouble(args[3]) : 0;
+                    double atk = Double.parseDouble(args[0]);
+                    double def = Double.parseDouble(args[1]);
+                    double damage = Math.pow(atk, 2) / (atk + def * 2) * (1-perforate);
+                    damage += atk*perforate;
+                    String log = "§cDamageSimulator§7: §a" + String.format(format, damage * multiply) + " §8(" + String.format(format, damage) + ") §f[" + multiply*100 + "]";
+                    sendMessage(player, log);
+                } else {
+                    sendMessage(player, "§e/damageSimulator <atk> <def> [<multiply>] [<perforate>]");
+                }
                 return true;
             }
         }

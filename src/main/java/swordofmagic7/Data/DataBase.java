@@ -163,6 +163,21 @@ public final class DataBase {
         return list;
     }
 
+    public static File searchFile(File dir, String search) {
+        List<File> list = new ArrayList<>();
+        File[] files = dir.listFiles();
+        for (File tmpFile : files) {
+            if (tmpFile.getName().equals(search)) {
+                return tmpFile;
+            }
+            if (tmpFile.isDirectory()) {
+                File file = searchFile(tmpFile, search);
+                if (file != null) return file;
+            }
+        }
+        return null;
+    }
+
     static void loadError(File file) {
         Log("§c[" + file.getName() + "]のロード中にエラーが発生しました");
     }
@@ -194,7 +209,7 @@ public final class DataBase {
                     warp.setLocation(loc.clone());
                     if (data.isSet("Target")) {
                         warp.Target = data.getString("Target");
-                    } else {
+                    } else if (data.isSet("TargetLocation")) {
                         double xT = data.getDouble("TargetLocation.x");
                         double yT = data.getDouble("TargetLocation.y");
                         double zT = data.getDouble("TargetLocation.z");
@@ -202,8 +217,16 @@ public final class DataBase {
                         float pitchT = (float) data.getDouble("TargetLocation.pitch");
                         warp.TargetLocation = new Location(world, xT, yT, zT, yawT, pitchT);
                     }
-                    warp.NextMap = MapList.get(data.getString("NextMap"));
                     warp.Trigger = data.getString("Trigger");
+                    warp.isTrigger = data.getBoolean("isTrigger", false);
+                    if (warp.isTrigger) {
+                        warp.Display = data.getString("Display");
+                        warp.Lore = data.getString("Lore");
+                    } else {
+                        warp.NextMap = MapList.get(data.getString("NextMap"));
+                        warp.Display = warp.NextMap.Color + "§l《" + warp.NextMap.Display + "》";
+                        warp.Lore = warp.NextMap.Color + "§c必要戦闘力 " + String.format("%.0f", warp.NextMap.ReqCombatPower);
+                    }
                     warp.start();
                     if (data.getBoolean("Default", true)) {
                         warp.Active();

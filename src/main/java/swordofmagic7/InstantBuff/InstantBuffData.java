@@ -5,8 +5,8 @@ import swordofmagic7.Status.StatusParameter;
 import java.util.HashMap;
 
 public class InstantBuffData {
-    public HashMap<StatusParameter, Double> Fixed = new HashMap<>();
-    public HashMap<StatusParameter, Double> Multiply = new HashMap<>();
+    public HashMap<StatusParameter, Double> Fixed;
+    public HashMap<StatusParameter, Double> Multiply;
     public int time;
 
     public InstantBuffData(HashMap<StatusParameter, Double> Fixed, HashMap<StatusParameter, Double> Multiply, int time) {

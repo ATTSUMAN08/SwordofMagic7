@@ -113,7 +113,9 @@ public final class Function {
 
     }
     public static void setVelocity(LivingEntity entity, Vector vector) {
-        if (!EffectManager.hasEffect(entity, EffectType.NonKnockBack)) entity.setVelocity(vector);
+        if (EffectManager.hasEffect(entity, EffectType.NonKnockBack)) return;
+        if (MobManager.isEnemy(entity) && MobManager.EnemyTable(entity.getUniqueId()).mobData.enemyType.isIgnoreCrowdControl()) return;
+        entity.setVelocity(vector);
     }
 
     public static int IncreasedConsumptionMana(int mana, int level) {

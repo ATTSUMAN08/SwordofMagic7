@@ -55,8 +55,7 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.EnemyTable;
-import static swordofmagic7.SomCore.isEventServer;
-import static swordofmagic7.SomCore.spawnPlayer;
+import static swordofmagic7.SomCore.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
@@ -96,7 +95,7 @@ public class Events implements Listener {
                 }
             }
         }
-        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player))) {
+        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !isDevServer()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
         }
@@ -348,7 +347,6 @@ public class Events implements Listener {
                     player.setVelocity(player.getLocation().getDirection().multiply(0.4).setY(0.5));
                 } else if (Under1 == Material.GOLD_BLOCK || Under2 == Material.GOLD_BLOCK) {
                     event.setCancelled(true);
-                    player.setGravity(false);
                     MultiThread.TaskRun(() -> {
                         double y = 1;
                         while (y > -1 && !player.isSneaking()) {
@@ -356,7 +354,6 @@ public class Events implements Listener {
                             player.setVelocity(player.getLocation().getDirection().multiply(2).setY(y));
                             MultiThread.sleepTick(1);
                         }
-                        player.setGravity(true);
                     }, "PressurePlate");
                     playSound(player, SoundList.Shoot);
 
@@ -382,6 +379,8 @@ public class Events implements Listener {
                     case 1 -> playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
                     case 2 -> playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
                 }
+                player.getInventory().setHeldItemSlot(8);
+                event.setCancelled(true);
             }
             if (playerData.CastMode.isRenewed() && event.getNewSlot() < 8) {
                 int x = 0;
@@ -480,7 +479,7 @@ public class Events implements Listener {
         PlayerData playerData = playerData(player);
         if (playerData.PlayMode) {
             event.setCancelled(true);
-            if (isHoldFishingRod(player)) {
+            if (isHoldFishingRod(player) || event.getItemDrop().getItemStack().getType() == Material.FISHING_ROD) {
                 playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
             }
             if (playerData.CastMode.isLegacy()) {

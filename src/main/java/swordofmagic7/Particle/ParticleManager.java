@@ -16,7 +16,7 @@ import static swordofmagic7.SomCore.random;
 
 public final class ParticleManager {
 
-    private static final int maxParticle = 5000;
+    private static final int maxParticle = 30000;
     private static final int decParticle = Math.round(maxParticle/20f);
     public static void onLoad() {
         MultiThread.TaskRunTimer(() -> {
@@ -101,16 +101,8 @@ public final class ParticleManager {
 
     private static int particleCount = 0;
     private static int particleCountTick = 0;
-    private static final int particleDecay = 1;
+
     public static void spawnParticle(ParticleData particleData, Location location) {
-        if (particleCount > maxParticle) {
-            particleCountTick++;
-            if (particleCountTick > particleDecay) {
-                particleCountTick = 0;
-                return;
-            }
-        }
-        particleCount++;
         float speed;
         Vector vector;
         Vector offset;
@@ -124,14 +116,17 @@ public final class ParticleManager {
             offset = new Vector(random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2), random.nextFloat()*rom-(rom/2));
         }
         Set<Player> Players = PlayerList.getNearNonAFK(location, 32);
-        if (particleData.particle != Particle.REDSTONE) {
-            for (Player player : Players) {
+        for (Player player : Players) {
+            if (particleCount > maxParticle) {
+                if (particleCountTick < (double) particleCount/maxParticle) {
+                    particleCountTick++;
+                    return;
+                } else particleCountTick = 0;
+            }
+            particleCount++;
+            if (particleData.particle != Particle.REDSTONE) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);
-            }
-        } else {
-            for (Player player : Players) {
-                player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
-            }
+            } else player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
         }
     }
 

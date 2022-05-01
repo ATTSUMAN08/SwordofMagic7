@@ -46,6 +46,7 @@ public final class Damage {
             return;
         }
         double heal = healerData.Status.HLP * healMultiply;
+        if (victimData.PvPMode) heal /= PvPHealDecay;
         if (source.equals("MassHeal")) {
             RuneParameter rune = healerData.Equipment.equippedRune("過剰回復のルーン");
             if (rune != null) {
@@ -55,7 +56,6 @@ public final class Damage {
                 victimData.changeShield(shield, time);
             }
         }
-        if (victimData.PvPMode) heal /= PvPHealDecay;
         victimData.changeHealth(heal);
         String Text = "§b≫§e" + String.format("%.1f", heal);
         String M = " §f[M:" + String.format("%.0f", healMultiply*100) + "%]";
@@ -172,6 +172,12 @@ public final class Damage {
             petParameter.DecreaseStamina(1, 1);
             attackerEffectManager = petParameter.getEffectManager();
         } else return;
+
+        if (attackerEffectManager.hasEffect(EffectType.AttackProhibited)) {
+            if (attacker instanceof Player player) sendMessage(player, "§c[" + EffectType.AttackProhibited.Display + "]§aの効果により§cダメージ§aが§c無効化§aされました");
+            return;
+        }
+
         if (victim instanceof Player player) {
             HoloView.add(player);
             if (!Function.isAlive(player)) return;
@@ -247,6 +253,7 @@ public final class Damage {
         baseDamage /= Resistance;
         if (!invariably) {
             hitRate = Math.min(1, Math.pow(ACC, 1.6) / Math.pow(EVA, 1.6));
+            if (victimEffectManager.hasEffect(EffectType.AbsolutelyEVA)) hitRate = 0;
         } else hitRate = 1;
         if (CriticalRate > CriticalResist) {
             criRate = (CriticalRate-CriticalResist/2)/((CriticalRate*2+CriticalResist)/3);
@@ -261,10 +268,16 @@ public final class Damage {
             baseDamage /= PvPDecay;
         }
 
+        if (victimLevel - attackerLevel > 30) {
+            baseDamage /= 1+(victimLevel - attackerLevel)/10f;
+        }
+
+        if (victimEffectManager.hasEffect(EffectType.Glory)) baseDamage *= 2;
+        if (victimEffectManager.hasEffect(EffectType.Seiko)) baseDamage /= 2;
+
         int hitCount = 0;
         int criCount = 0;
         int missCount = 0;
-        if (victimEffectManager.hasEffect(EffectType.AbsolutelyEVA)) hitRate = 0;
         for (int i = 0; i < count; i++) {
             if (random.nextDouble() <= hitRate) {
                 if (random.nextDouble() <= criRate) {
@@ -282,8 +295,19 @@ public final class Damage {
                 if (victimEffectManager.hasEffect(EffectType.Bully)) victimEffectManager.addEffect(EffectType.Bully, DataBase.getSkillData("Bully").ParameterValueInt(0)*20, null, 1);
             }
         }
-        if (victimLevel - attackerLevel > 30) {
-            damage /= 1+(victimLevel - attackerLevel)/10f;
+
+        if (victimEffectManager.hasEffect(EffectType.Reflection)) {
+            double ReflectionDamage = -damage/10;
+            if (attacker instanceof Player player) {
+                playerData(player).changeHealth(ReflectionDamage);
+            }
+        }
+
+        if (attackerEffectManager.hasEffect(EffectType.EnchantSlow)) {
+            EffectData effectData = attackerEffectManager.getData(EffectType.EnchantSlow);
+            double percent = effectData.getDouble(0);
+            int time = effectData.getInt(1);
+            if (random.nextDouble() < percent) victimEffectManager.addEffect(EffectType.Slow, time);
         }
 
         boolean victimDead = false;
@@ -316,6 +340,10 @@ public final class Damage {
                 for (EffectType effectType : new EffectType[]{EffectType.Revive, EffectType.LastChance}) {
                     if (playerData.EffectManager.hasEffect(effectType)) {
                         playerData.Status.Health = playerData.Status.MaxHealth / 2;
+                        if (effectType == EffectType.Revive) {
+                            int time = playerData.EffectManager.getData(EffectType.Revive).getInt(0);
+                            if (time > 0) playerData.EffectManager.addEffect(EffectType.Invincible, time);
+                        }
                         playerData.EffectManager.removeEffect(effectType);
                         player.sendMessage("§e[" + effectType.Display + "]§aが発動しました");
                         isRevive = true;
@@ -335,15 +363,6 @@ public final class Damage {
             victimMaxHealth = playerData.Status.MaxHealth;
             victimHealth = playerData.Status.Health;
         } else if (MobManager.isEnemy(victim)) {
-            if (victimEffectManager.hasEffect(EffectType.Glory)) damage *= 2;
-            if (victimEffectManager.hasEffect(EffectType.Seiko)) damage /= 2;
-            if (victimEffectManager.hasEffect(EffectType.Reflection)) {
-                double ReflectionDamage = -damage/10;
-                if (attacker instanceof Player player) {
-                    playerData(player).changeHealth(ReflectionDamage);
-                }
-            }
-
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
 
             boolean isStop = false;

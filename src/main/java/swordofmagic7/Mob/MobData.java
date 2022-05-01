@@ -38,4 +38,5 @@ public class MobData {
     public EnemyType enemyType = EnemyType.Normal;
     public int Size;
     public boolean isHide = false;
+    public boolean NonTame = false;
 }

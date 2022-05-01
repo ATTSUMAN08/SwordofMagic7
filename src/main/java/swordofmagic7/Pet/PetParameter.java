@@ -160,6 +160,7 @@ public class PetParameter implements Cloneable {
     }
 
     public void updateStatus() {
+        if (petData.BossPet) MaxLevel = PlayerData.MaxLevel;
         HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
         HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
         boolean isNotDummy = !petData.Id.equals("訓練用ダミー");

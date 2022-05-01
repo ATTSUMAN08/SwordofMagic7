@@ -11,6 +11,7 @@ import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.InstantBuff.InstantBuffData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Status.Status;
@@ -168,6 +169,7 @@ public class ViewBar {
         team.setCanSeeFriendlyInvisibles(true);
         int period = 5;
         double regen = 200d/period;
+        player.setMaximumNoDamageTicks(5);
         MultiThread.TaskRun(() -> {
             if (status.Health < 0) status.Health = status.MaxHealth;
             if (status.Mana < 0) status.Mana = status.MaxMana;
@@ -270,6 +272,9 @@ public class ViewBar {
                 String color = effect.getKey().Buff ? "§e§l" : "§c§l";
                 EffectList.add(decoLore(color + effect.getKey().Display + amount) + String.format("%.1f", effect.getValue().time / 20f) + "秒");
             }
+        }
+        for (Map.Entry<String, InstantBuffData> data : playerData.instantBuff.InstantBuffs.entrySet()) {
+            EffectList.add(decoLore("§e§l" + data.getKey() + data.getValue().time + "秒"));
         }
         if (EffectList.size() > 0) {
             List<String> data = new ArrayList<>();

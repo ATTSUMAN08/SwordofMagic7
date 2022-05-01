@@ -184,14 +184,13 @@ public class EffectManager {
             return false;
         }
         if (!effectType.Buff && effectType.effectRank.isNormal()) {
-            if (hasEffect(EffectType.Indulgence)) {
-                Effect.get(EffectType.Indulgence).stack--;
-                if (Effect.get(EffectType.Indulgence).stack < 1) Effect.remove(EffectType.Indulgence);
-                if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.Indulgence.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
-                return false;
-            }
-            if (hasEffect(EffectType.Profesy)) {
-                if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.Profesy.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            for (EffectType effectType2 : new EffectType[]{EffectType.Indulgence,EffectType.Profesy}) {
+                if (hasEffect(effectType2)) {
+                    Effect.get(effectType2).stack--;
+                    if (Effect.get(effectType2).stack < 1) Effect.remove(effectType2);
+                    if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                    return false;
+                }
             }
             if (hasEffect(EffectType.BeakMask) && effectType != EffectType.Stun && effectType != EffectType.Slow) {
                 if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.BeakMask.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);

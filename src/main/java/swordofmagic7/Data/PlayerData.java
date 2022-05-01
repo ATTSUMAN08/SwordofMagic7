@@ -177,7 +177,7 @@ public class PlayerData {
     public boolean interactTick = false;
     public boolean EffectLog = true;
     public boolean isPlayDungeonQuest = false;
-    public Collection<String> BlockList = new HashSet<>();
+    public Set<String> BlockList = new HashSet<>();
 
     public boolean isAFK() {
         return AFKTime > SomCore.AFKTime;
@@ -354,7 +354,7 @@ public class PlayerData {
         return PlayerData.playerData(player).BlockList.contains(this.player.getUniqueId().toString());
     }
 
-    public Collection<String> BlockListFromOther = new HashSet<>();
+    public Set<String> BlockListFromOther = new HashSet<>();
     private boolean nextUpdateBlockPlayer = false;
     public synchronized void updateBlockPlayer() {
         if (nextUpdateBlockPlayer) return;
@@ -613,10 +613,12 @@ public class PlayerData {
     private boolean isNonSave = false;
     public void save() {
         if (isNonSave) return;
+        /*
         if (Tutorial.TutorialProcess.containsKey(player) && Level == 1) {
             player.sendMessage(Tutorial.TutorialNonSave);
             return;
         }
+        */
         File playerFile = new File(DataBasePath, "PlayerData/" + player.getUniqueId() + ".yml");
         if (!playerFile.exists()) {
             try {
@@ -662,7 +664,7 @@ public class PlayerData {
         if (isPlayDungeonQuest) {
             lastLocation = player.getWorld().getSpawnLocation();
         } else lastLocation = Objects.requireNonNullElseGet(logoutLocation, () -> player.getLocation().clone());
-        lastLocation.add(0, 0.5, 0);
+        lastLocation.add(0, 1, 0);
         data.set("Location.x", lastLocation.getX());
         data.set("Location.y", lastLocation.getY());
         data.set("Location.z", lastLocation.getZ());
@@ -702,7 +704,7 @@ public class PlayerData {
         data.set("Setting.Inventory.ItemInventorySortReverse", ItemInventory.SortReverse);
         data.set("Setting.Inventory.RuneInventorySortReverse", RuneInventory.SortReverse);
         data.set("Setting.Inventory.PetInventorySortReverse", PetInventory.SortReverse);
-        data.set("BlockList", BlockList);
+        data.set("BlockList", new ArrayList<>(BlockList));
 
         data.set("Title.List", new ArrayList<>(titleManager.TitleList));
         data.set("Title.Select", titleManager.Title.Id);
@@ -838,7 +840,7 @@ public class PlayerData {
             ItemInventory.SortReverse = data.getBoolean("Setting.Inventory.ItemInventorySortReverse",false);
             RuneInventory.SortReverse = data.getBoolean("Setting.Inventory.RuneInventorySortReverse",false);
             PetInventory.SortReverse = data.getBoolean("Setting.Inventory.PetInventorySortReverse",false);
-            BlockList = data.getStringList("BlockList");
+            BlockList = new HashSet<>(data.getStringList("BlockList"));
 
             titleManager.TitleList = new HashSet<>(data.getStringList("Title.List"));
             titleManager.TitleList.removeIf(title -> !TitleDataList.containsKey(title));

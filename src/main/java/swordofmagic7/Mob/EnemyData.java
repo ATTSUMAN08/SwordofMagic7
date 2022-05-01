@@ -256,7 +256,6 @@ public class EnemyData {
                         MultiThread.TaskRunSynchronized(() -> {
                             if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
                                 mob.lookAt(NextLocation);
-                                if (target != null) mob.setTarget(target);
                                 pathfinder.moveTo(NextLocation, mobData.Mov*MovementMultiply);
                                 LastLocation = entity.getLocation();
                             }
@@ -330,9 +329,12 @@ public class EnemyData {
                         }
                     }
                     if (!isDefenseBattle && !mobData.enemyType.isBoss() && !mobData.NoAI && !mobData.Invisible) {
-                        if (PlayerList.getNear(entity.getLocation(), 64).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                        if (SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                             delete();
                         }
+                    }
+                    if (PlayerList.getNearNonDead(entity.getLocation(), 64+mobData.Search).size() == 0) {
+                        delete();
                     }
                 }
             }.runTaskTimerAsynchronously(plugin, 0, 20);
@@ -510,7 +512,7 @@ public class EnemyData {
                                     }
                                 }
                             }
-                            if (playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
+                            if (!mobData.NonTame && playerData.Skill.hasSkill("Pleasure") && getPetList().containsKey(mobData.Id)) {
                                 PetData petData = getPetData(mobData.Id);
                                 if (petData.BossPet) {
                                     if (random.nextDouble() <= 0.0005 * percentMultiply) {

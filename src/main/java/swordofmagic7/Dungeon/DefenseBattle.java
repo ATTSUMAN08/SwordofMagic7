@@ -7,6 +7,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Client;
 import swordofmagic7.Data.DataBase;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
@@ -21,7 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.MapList;
+import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Dungeon.Dungeon.Message;
 import static swordofmagic7.Dungeon.Dungeon.world;
@@ -102,7 +104,9 @@ public class DefenseBattle {
             Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DungeonTrigger);
             Set<Player> Players = new HashSet<>();
             MultiThread.TaskRunSynchronized(() -> {
-                EnemyList.add(MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, bossLocation));
+                EnemyData enemyData = MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, spawnLocation[random.nextInt(spawnLocation.length - 1)]);
+                enemyData.nonTargetLocation = targetLocation;
+                EnemyList.add(enemyData);
             });
             while (plugin.isEnabled() && Health > 0 && time > 0) {
                 Players = PlayerList.getNear(targetLocation, Radius);
@@ -169,7 +173,8 @@ public class DefenseBattle {
             EnemyList.clear();
             if (Health > 0 && time > 0) {
                 for (Player player : Players) {
-                    playerData(player).ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/1.5));
+                    PlayerData playerData = playerData(player);
+                    if (!playerData.isAFK()) playerData.ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/1.5));
                 }
                 Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LevelUp);
                 MultiThread.sleepTick(200);

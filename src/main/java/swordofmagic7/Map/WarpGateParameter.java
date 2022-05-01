@@ -6,6 +6,8 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.Ashark.AsharkB1;
+import swordofmagic7.Dungeon.Ashark.AsharkB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB1;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB3;
@@ -28,15 +30,18 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class WarpGateParameter {
     public String Id;
+    public String Display;
+    public String Lore;
     private Location Location;
     public String Target;
     public Location TargetLocation;
     public MapData NextMap;
     public boolean isActive = true;
     public String Trigger;
+    public boolean isTrigger = false;
 
     public void usePlayer(Player player) {
-        if (NextMap.ReqCombatPower > PlayerData.playerData(player).Status.getCombatPower()) {
+        if (!isTrigger && NextMap.ReqCombatPower > PlayerData.playerData(player).Status.getCombatPower()) {
             Function.sendMessage(player, "§e[戦闘力]§aが足りません §c[必要戦闘力:" + NextMap.ReqCombatPower + "]", SoundList.Nope);
             return;
         }
@@ -53,7 +58,13 @@ public class WarpGateParameter {
                 Novaha3.Start();
                 return;
             }
-        } else if (!isActive) return;
+            for (int i = 0; i < 4; i++) {
+                if (Trigger.equals("AsharkB1_Trigger" + i)) AsharkB1.Start(i);
+            }
+            if (Trigger.equals("AsharkB1_Check") && !AsharkB1.Check(player)) return;
+            if (Trigger.equals("AsharkB2") && AsharkB2.Start()) return;
+        }
+        if (!isActive || isTrigger) return;
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).getLocation();
         player.teleportAsync(TargetLocation);
@@ -96,9 +107,9 @@ public class WarpGateParameter {
         if (isStarted) return;
         isStarted = true;
         Hologram hologram = createHologram(getLocation().add(0, 4, 0));
-        hologram.appendTextLine(NextMap.Color + "§l《" + NextMap.Display + "》");
+        hologram.appendTextLine(Display);
         hologram.appendTextLine("");
-        hologram.appendTextLine(NextMap.Color + "§c必要戦闘力 " + String.format("%.0f", NextMap.ReqCombatPower));
+        hologram.appendTextLine(Lore);
         world = getLocation().getWorld();
         MultiThread.TaskRun(() -> {
             int i = 0;

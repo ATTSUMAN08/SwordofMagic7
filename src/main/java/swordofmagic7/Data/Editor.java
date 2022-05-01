@@ -1,6 +1,7 @@
 package swordofmagic7.Data;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -245,6 +246,48 @@ public class Editor {
                 }
             } else {
                 player.sendMessage("/mobSpawnerDataCreate <mobName> <level> <index> <radius> <radiusY> <maxMob> <perSpawn>");
+            }
+        }
+    }
+
+    public static void mobDropItemCreateCommand(Player player, String[] args) {
+        if (player.hasPermission("som7.developer")) {
+            if (args.length >= 3) {
+                String name = args[0];
+                if (DataBase.ItemList.containsKey(name)) {
+                    player.sendMessage("すでに存在しているItemIDです");
+                    return;
+                }
+                Material material = player.getInventory().getItemInMainHand().getType();
+                String folder = args[1];
+                int sell = Integer.parseInt(args[2]);
+                File dir = DataBase.searchFile(new File(DataBasePath, "ItemData/Material/エネミードロップ/"), folder);
+                if (dir == null) {
+                    player.sendMessage("Folderが見つかりません");
+                    return;
+                }
+                File file = new File(dir, name + ".yml");
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                        List<String> lore = new ArrayList<>();
+                        lore.add("準備中...");
+                        data.set("Display", name);
+                        data.set("Material", material.toString());
+                        data.set("Lore", lore);
+                        data.set("Category", "Material");
+                        data.set("Sell", sell);
+                        data.save(file);
+                        player.sendMessage(file.getName() + "を作成しました");
+                    } catch (Exception e) {
+                        player.sendMessage("File作成中にエラーが発生しました");
+                    }
+                } else {
+                    player.sendMessage("すでに存在しているFileです");
+                }
+            } else {
+                player.sendMessage("/mobDropItemCreate <name> <folder> <sell>");
             }
         }
     }

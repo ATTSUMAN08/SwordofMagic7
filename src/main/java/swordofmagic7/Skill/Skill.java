@@ -215,6 +215,7 @@ public class Skill {
                                                 if (rune != null) {
                                                     double value = rune.AdditionParameterValue(0)/100;
                                                     skillData.Parameter.get(0).Value *= value;
+                                                    skillData.Mana = Math.toIntExact(Math.round(skillData.CastTime * value));
                                                     skillData.CastTime = Math.toIntExact(Math.round(skillData.CastTime * value));
                                                     skillData.RigidTime = Math.toIntExact(Math.round(skillData.RigidTime * value));
                                                     skillData.CoolTime  = Math.toIntExact(Math.round(skillData.CoolTime * value));

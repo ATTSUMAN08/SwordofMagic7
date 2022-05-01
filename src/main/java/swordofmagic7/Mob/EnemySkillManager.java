@@ -28,25 +28,29 @@ public class EnemySkillManager {
 
     final BasicEnemySkills basicSkills = new BasicEnemySkills(this);
     public Symmore symmore;
-    public Griffia griffia;
+    public Griphia griphia;
     public LeeLai leeLai;
     public Synosas synosas;
     public KingSlime kingSlime;
     public Exta exta;
     public Vanoset vanoset;
     public LibraryGovernor libraryGovernor;
+    public Nias nias;
+    public Hind hind;
 
     public EnemySkillManager(EnemyData enemyData) {
         this.enemyData = enemyData;
         switch (enemyData.mobData.Id) {
             case "サイモア" -> symmore = new Symmore(this);
-            case "グリフィア" -> griffia = new Griffia(this);
+            case "グリフィア" -> griphia = new Griphia(this);
             case "リーライ" -> leeLai = new LeeLai(this);
             case "シノサス" -> synosas = new Synosas(this);
             case "キングスライム" -> kingSlime = new KingSlime(this);
             case "エクスタ" -> exta = new Exta(this);
             case "ヴァノセト" -> vanoset = new Vanoset(this);
             case "リブラリーガバナー" -> libraryGovernor = new LibraryGovernor(this);
+            case "ナイアス" -> nias = new Nias(this);
+            case "ハインド" -> hind = new Hind(this);
         }
     }
 
@@ -68,6 +72,12 @@ public class EnemySkillManager {
         }, "tickSkillTrigger");
     }
 
+    public void forceSkillTrigger(String skillId) {
+        MobSkillData mobSkillData = new MobSkillData();
+        mobSkillData.Skill = skillId;
+        mobSkillCast(mobSkillData);
+    }
+
     public void mobSkillCast(MobSkillData mobSkillData) {
         if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
         switch (mobSkillData.Skill) {
@@ -80,13 +90,13 @@ public class EnemySkillManager {
             case "Howl" -> symmore.Howl(80);
             case "MagicExplosion" -> symmore.MagicExplosion(300);
             //グリフィア
-            case "SingleFlameCircle" -> griffia.SingleFlameCircle(20);
-            case "AreaFlameCircle" -> griffia.AreaFlameCircle(20);
-            case "FlamePile" -> griffia.FlamePile(100);
-            case "Call" -> griffia.Call(100);
-            case "Loyalty" -> griffia.Loyalty(100);
-            case "Fluctuation" -> griffia.Fluctuation(250);
-            case "FixedStar" -> griffia.FixedStar(150);
+            case "SingleFlameCircle" -> griphia.SingleFlameCircle(20);
+            case "AreaFlameCircle" -> griphia.AreaFlameCircle(20);
+            case "FlamePile" -> griphia.FlamePile(100);
+            case "Call" -> griphia.Call(100);
+            case "Loyalty" -> griphia.Loyalty(100);
+            case "Fluctuation" -> griphia.Fluctuation(250);
+            case "FixedStar" -> griphia.FixedStar(150);
             //リーライ
             case "Glitter" -> leeLai.Glitter(60);
             case "Flash" -> leeLai.Flash(60);
@@ -136,7 +146,18 @@ public class EnemySkillManager {
             case "NecessarySacrifice" -> libraryGovernor.NecessarySacrifice();
             case "LetsShutUp" -> libraryGovernor.LetsShutUp();
             case "IndividualityConcrete" -> libraryGovernor.IndividualityConcrete();
-
+            //ナイアス
+            case "Displeased" -> nias.Displeased();
+            case "Regret" -> nias.Regret();
+            case "SmallHope" -> nias.SmallHope();
+            case "Execution" -> nias.Execution();
+            //ハインド
+            case "CouldNotHelp" -> hind.CouldNotHelp();
+            case "HeWasKindness" -> hind.HeWasKindness();
+            case "JustLooking" -> hind.JustLooking();
+            case "JustHopeButNot" -> hind.JustHopeButNot();
+            case "Understanding" -> hind.Understanding();
+            case "TheStartOfHope" -> hind.TheStartOfHope();
         }
         MultiThread.TaskRun(() -> {
             if (!CoolTime.containsKey(mobSkillData.Skill)) {
