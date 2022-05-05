@@ -34,8 +34,8 @@ public class MobSpawnerData {
             MultiThread.TaskRunTimer(() -> {
                 if (DeathTrigger != null) for (EnemyData enemyData : SpawnedList) {
                     if (enemyData.isDead()) {
-                        switch (DeathTrigger) {
-                            case "Novaha3" -> Novaha3.Count--;
+                        if ("Novaha3".equals(DeathTrigger)) {
+                            Novaha3.Count--;
                         }
                     }
                 }

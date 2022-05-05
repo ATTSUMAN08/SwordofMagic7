@@ -90,7 +90,7 @@
         </repository>
 
         <repository>
-            <id>jitpack</id>
+            <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
@@ -139,5 +139,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.NuVotifier</groupId>
+            <artifactId>NuVotifier</artifactId>
+            <version>2.7.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

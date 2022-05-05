@@ -1,7 +1,7 @@
 package swordofmagic7.Renderer;
 
 public class CustomMapData {
-    public CustomMapType type = CustomMapType.Image;
+    public CustomMapType type;
     public String path;
     public int OffsetX = 0;
     public int OffsetY = 0;

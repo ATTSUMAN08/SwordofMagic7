@@ -27,15 +27,13 @@ import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Particle.ParticleManager.angle;
 import static swordofmagic7.SomCore.random;
-import static swordofmagic7.Sound.CustomSound.playSound;
 
-public class Nias {
+public class Nias extends EnemySkillBase {
     private static final double radius = 96;
 
-    private final EnemySkillManager Manager;
     private final Location[] locations = new Location[12];
     public Nias(EnemySkillManager manager) {
-        this.Manager = manager;
+        super(manager);
         locations[0] = new Location(world, 5977.5, 72, 1781.5);
         locations[1] = new Location(world, 5976.5, 72, 1773.5);
         locations[2] = new Location(world, 5975.5, 72, 1765.5);
@@ -57,13 +55,6 @@ public class Nias {
                 MultiThread.sleepTick(20);
             }
         }, "Nias");
-    }
-
-    private void radiusMessage(String message, SoundList soundList) {
-        for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), radius)) {
-            sendMessage(player, message);
-            playSound(player, soundList);
-        }
     }
 
     private final Set<EnemyData> enemyList = new HashSet<>();
@@ -158,7 +149,10 @@ public class Nias {
             Vector vector = new Vector(0, -1, 0.7);
             for (int i = 0; i < time; i++) {
                 for (Player player : players) {
-                    if (player.getGameMode() == GameMode.SURVIVAL) player.setVelocity(vector);
+                    if (player.getGameMode() == GameMode.SURVIVAL) {
+                        player.setVelocity(vector);
+                        if (player.isSneaking()) Damage.makeDamage(entity(), player, DamageCause.ATK, "Execution2", 1, 1, 1, true, true);
+                    }
                 }
                 MultiThread.sleepTick(1);
             }

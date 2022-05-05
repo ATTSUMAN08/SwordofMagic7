@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MobData {
@@ -15,6 +16,7 @@ public class MobData {
     public Disguise disguise;
     public Material Icon;
     public double ColliderSize;
+    public double ColliderSizeY;
     public boolean Glowing;
     public boolean Invisible = false;
     public boolean NoAI = false;
@@ -34,9 +36,11 @@ public class MobData {
     public List<MobSkillData> SkillList = new ArrayList<>();
     public List<DropItemData> DropItemTable = new ArrayList<>();
     public List<DropRuneData> DropRuneTable = new ArrayList<>();
-    public List<Double> HPStop = new ArrayList<>();
+    public HashMap<Double, List<String>> HPStop = new HashMap<>();
+    public List<Double> HPStopPercent = new ArrayList<>();
     public EnemyType enemyType = EnemyType.Normal;
     public int Size;
     public boolean isHide = false;
     public boolean NonTame = false;
+    public boolean NonDespawn = false;
 }

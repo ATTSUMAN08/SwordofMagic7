@@ -11,6 +11,8 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemExtend.*;
+import swordofmagic7.Item.ItemUseList.RewardBox;
+import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
 
@@ -131,6 +133,14 @@ public class ItemParameter implements Cloneable {
                     Lore.add("§7・§lルーン未装着");
                 }
             }
+        }
+        if (RewardBoxList.containsKey(Id)) {
+            Lore.add(decoText("§3§l内容物"));
+            RewardBox rewardBox = RewardBoxList.get(Id);
+            for (RewardBoxData rewardBoxData : rewardBox.List) {
+                Lore.add("§7・§e§l" + rewardBoxData.id + "§ax" + rewardBoxData.amount + " §b§l-> §a§l" + String.format(format, rewardBoxData.percent*100) + "%");
+            }
+            Lore.add(rewardBox.isPartition ? "§b§lテーブル" : "§b§l抽選");
         }
         meta.setUnbreakable(true);
         meta.setLore(Lore);

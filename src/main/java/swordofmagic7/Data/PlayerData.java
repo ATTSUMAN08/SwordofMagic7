@@ -177,6 +177,7 @@ public class PlayerData {
     public boolean interactTick = false;
     public boolean EffectLog = true;
     public boolean isPlayDungeonQuest = false;
+    public boolean PetTame = true;
     public Set<String> BlockList = new HashSet<>();
 
     public boolean isAFK() {
@@ -462,6 +463,16 @@ public class PlayerData {
         sendMessage(player, msg, SoundList.Click);
     }
 
+    public void PetTame() {
+        PetTame(!PetTame);
+    }
+
+    void PetTame(boolean bool) {
+        PetTame = bool;
+        String msg = "§e[懐柔モード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
+    }
+
     public void EffectLog() {
         EffectLog(!EffectLog);
     }
@@ -697,6 +708,7 @@ public class PlayerData {
         data.set("Setting.NaturalMessage", NaturalMessage);
         data.set("Setting.RuneFilter.Quality", RuneQualityFilter);
         data.set("Setting.RuneFilter.Id", new ArrayList<>(RuneIdFilter));
+        data.set("Setting.PetTame", PetTame);
         data.set("Setting.Inventory.ViewInventory", ViewInventory.toString());
         data.set("Setting.Inventory.ItemInventorySort", ItemInventory.Sort.toString());
         data.set("Setting.Inventory.RuneInventorySort", RuneInventory.Sort.toString());
@@ -833,6 +845,7 @@ public class PlayerData {
             RuneQualityFilter = data.getDouble("Setting.RuneFilter.Quality",0d);
             RuneIdFilter = new HashSet<>(data.getStringList("Setting.RuneFilter.Id"));
             RuneIdFilter.removeIf(runeId -> !RuneList.containsKey(runeId));
+            PetTame = data.getBoolean("Setting.PetTame",true);
             ViewInventory = ViewInventoryType.valueOf(data.getString("Setting.Inventory.ViewInventory","ItemInventory"));
             ItemInventory.Sort = ItemSortType.valueOf(data.getString("Setting.Inventory.ItemInventorySort","Name"));
             RuneInventory.Sort = RuneSortType.valueOf(data.getString("Setting.Inventory.RuneInventorySort","Name"));

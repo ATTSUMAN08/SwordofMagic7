@@ -171,29 +171,37 @@ public class EffectManager {
     }
 
     public boolean addEffect(EffectType effectType, int time, Object[] objectData, int stack) {
-        if (hasEffect(EffectType.Stop)) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.Stop.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+        EffectType effectType2 = EffectType.Stop;
+        if (hasEffect(effectType2)) {
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
             return false;
         }
-        if (hasEffect(EffectType.PainBarrier) && effectType == EffectType.Stun) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.PainBarrier.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+        effectType2 = EffectType.PainBarrier;
+        if (hasEffect(effectType2) && effectType == EffectType.Stun) {
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
             return false;
         }
-        if (hasEffect(EffectType.SubzeroShield) && effectType == EffectType.Freeze) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.SubzeroShield.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+        effectType2 = EffectType.SubzeroShield;
+        if (hasEffect(effectType2) && effectType == EffectType.Freeze) {
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
             return false;
         }
         if (!effectType.Buff && effectType.effectRank.isNormal()) {
-            for (EffectType effectType2 : new EffectType[]{EffectType.Indulgence,EffectType.Profesy}) {
-                if (hasEffect(effectType2)) {
-                    Effect.get(effectType2).stack--;
-                    if (Effect.get(effectType2).stack < 1) Effect.remove(effectType2);
-                    if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
-                    return false;
-                }
+            effectType2 = EffectType.Indulgence;
+            if (hasEffect(effectType2)) {
+                Effect.get(effectType2).stack--;
+                if (Effect.get(effectType2).stack < 1) Effect.remove(effectType2);
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                return false;
             }
-            if (hasEffect(EffectType.BeakMask) && effectType != EffectType.Stun && effectType != EffectType.Slow) {
-                if (entity instanceof Player player) sendMessage(player, "§e[" + EffectType.BeakMask.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            effectType2 = EffectType.Profesy;
+            if (hasEffect(effectType2)) {
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                return false;
+            }
+            effectType2 = EffectType.BeakMask;
+            if (hasEffect(effectType2) && effectType != EffectType.Stun && effectType != EffectType.Slow) {
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
                 return false;
             }
         }
@@ -270,6 +278,10 @@ public class EffectManager {
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, double doubleData) {
         addEffect(entity, effectType, time, 1, player, new Object[]{doubleData});
+    }
+
+    public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, int intData) {
+        addEffect(entity, effectType, time, 1, player, new Object[]{intData});
     }
 
     public static void addEffect(LivingEntity entity, EffectType effectType, int time, Player player, Location locationData) {

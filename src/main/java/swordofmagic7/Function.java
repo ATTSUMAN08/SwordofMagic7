@@ -17,8 +17,10 @@ import org.bukkit.util.Vector;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
+import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -123,6 +125,7 @@ public final class Function {
     }
 
     public static String decoText(String str) {
+        if (str == null) return "null";
         int flame = 6 - Math.round(str.length() / 2f);
         StringBuilder deco = new StringBuilder("===");
         deco.append("=".repeat(Math.max(0, flame)));
@@ -289,6 +292,14 @@ public final class Function {
         return location;
     }
 
+    public static Location floorLocation(Location loc, double distance) {
+        Location origin = loc.clone();
+        origin.setPitch(90);
+        Location _return = RayTrace.rayLocationBlock(origin, distance, true).HitPosition;
+        _return.setDirection(origin.getDirection());
+        return _return;
+    }
+
     public static Location playerEyeLocation(Player player, double length) {
         return RayTrace.rayLocationBlock(player.getEyeLocation(), length, true).HitPosition;
     }
@@ -369,7 +380,7 @@ public final class Function {
     }
 
     public static boolean isHoldFishingRod(Player player) {
-        return player.getInventory().getItemInMainHand().getType() == Material.FISHING_ROD;
+        return playerData(player).Equipment.getEquip(EquipmentSlot.MainHand).Icon == Material.FISHING_ROD;
     }
 
     public static String decoDoubleToString(double i, String format) {
@@ -429,6 +440,10 @@ public final class Function {
 
     public static void ItemGetLog(Player player, ItemParameter itemParameter, int amount) {
         player.sendMessage("§b[+]§e" + itemParameter.Display + "§ax" + amount);
+    }
+
+    public static void RuneGetLog(Player player, RuneParameter rune) {
+        player.sendMessage("§b[+]§e" + rune.Display + " §e[レベル:" + rune.Level + "] [品質:" + String.format(playerData(player).ViewFormat(), rune.Quality * 100) + "%]");
     }
 
     public static Predicate<LivingEntity> otherPredicate(Player player) {

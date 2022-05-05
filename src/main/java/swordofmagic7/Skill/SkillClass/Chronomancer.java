@@ -10,6 +10,7 @@ import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Map.MapData;
+import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.EnemySkillManager;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
@@ -163,16 +164,19 @@ public class Chronomancer extends BaseSkillClass {
                         }
                     }
                 } else if (MobManager.isEnemy(target)) {
-                    EnemySkillManager manager = MobManager.EnemyTable(target.getUniqueId()).skillManager;
-                    if (manager != null) {
-                        for (Map.Entry<String, Integer> data : manager.CoolTime.entrySet()) {
-                            int cooltime = manager.getCoolTime(data.getKey());
-                            if (cooltime > 0) {
-                                manager.CoolTime.put(data.getKey(), cooltime+time);
-                                forwards.add(target);
-                                sendMessage(player, "§c" + manager.enemyData.mobData.Display + "§aの§b" + data.getKey() + "§aを§c延長§aしました");
-                                count++;
-                                if (rune == null || count >= 3) break;
+                    EnemyData enemyData = MobManager.EnemyTable(target.getUniqueId());
+                    if (enemyData != null && !enemyData.mobData.enemyType.isRaidBoss()) {
+                        EnemySkillManager manager = enemyData.skillManager;
+                        if (manager != null) {
+                            for (Map.Entry<String, Integer> data : manager.CoolTime.entrySet()) {
+                                int cooltime = manager.getCoolTime(data.getKey());
+                                if (cooltime > 0) {
+                                    manager.CoolTime.put(data.getKey(), cooltime + time);
+                                    forwards.add(target);
+                                    sendMessage(player, "§c" + manager.enemyData.mobData.Display + "§aの§b" + data.getKey() + "§aを§c延長§aしました");
+                                    count++;
+                                    if (rune == null || count >= 3) break;
+                                }
                             }
                         }
                     }

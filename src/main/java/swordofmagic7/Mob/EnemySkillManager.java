@@ -37,6 +37,7 @@ public class EnemySkillManager {
     public LibraryGovernor libraryGovernor;
     public Nias nias;
     public Hind hind;
+    public Nias2 nias2;
 
     public EnemySkillManager(EnemyData enemyData) {
         this.enemyData = enemyData;
@@ -51,6 +52,7 @@ public class EnemySkillManager {
             case "リブラリーガバナー" -> libraryGovernor = new LibraryGovernor(this);
             case "ナイアス" -> nias = new Nias(this);
             case "ハインド" -> hind = new Hind(this);
+            case "ナイアス2" -> nias2 = new Nias2(this);
         }
     }
 
@@ -152,12 +154,19 @@ public class EnemySkillManager {
             case "SmallHope" -> nias.SmallHope();
             case "Execution" -> nias.Execution();
             //ハインド
+            case "RangeBurning" -> hind.RangeBurning();
             case "CouldNotHelp" -> hind.CouldNotHelp();
+            case "LeaveBehind" -> hind.LeaveBehind();
             case "HeWasKindness" -> hind.HeWasKindness();
             case "JustLooking" -> hind.JustLooking();
             case "JustHopeButNot" -> hind.JustHopeButNot();
             case "Understanding" -> hind.Understanding();
             case "TheStartOfHope" -> hind.TheStartOfHope();
+            case "SummonNias" -> hind.SummonNias();
+            case "SummonNiasCheck" -> hind.SummonNiasCheck();
+            //ナイアス2
+            case "Regret2" -> nias2.Regret2();
+            case "Execution2" -> nias2.Execution2();
         }
         MultiThread.TaskRun(() -> {
             if (!CoolTime.containsKey(mobSkillData.Skill)) {

@@ -30,7 +30,7 @@ public class AlchemyData {
     public ItemStack view(String format) {
         ItemStack item = itemParameter.viewItem(Amount, format);
         ItemMeta meta = item.getItemMeta();
-        List<String> Lore = new ArrayList<>(meta.getLore());
+        List<String> Lore = new ArrayList<String>(meta.getLore());
         Lore.add(Function.decoText("§3§lアルケミー情報"));
         Lore.add(Function.decoLore("必要レベル") + ReqLevel);
         Lore.add(Function.decoLore("経験値") + Exp);

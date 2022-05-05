@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import swordofmagic7.Function;
+import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 
 import java.util.ArrayList;
@@ -41,11 +42,12 @@ public final class RayTrace {
         double distanceCheck = distance;
         for (LivingEntity entity : Function.NearLivingEntity(loc, distance, predicate)) {
             if (entity.getLocation().distance(loc) < distance) {
-                double colliderSize = 0;
+                BoundingBox box = entity.getBoundingBox().expand(size);
                 if (MobManager.isEnemy(entity)) {
-                    colliderSize = MobManager.EnemyTable(entity.getUniqueId()).mobData.ColliderSize;
+                    EnemyData enemyData = MobManager.EnemyTable(entity.getUniqueId());
+                    box.expand(enemyData.mobData.ColliderSize);
+                    box.expand(0, enemyData.mobData.ColliderSizeY, 0);
                 }
-                BoundingBox box = entity.getBoundingBox().expand(size+colliderSize);
                 RayTraceResult rayData = box.rayTrace(loc.toVector(), loc.getDirection(), distance);
                 if (rayData != null) {
                     Ray ray = new Ray();

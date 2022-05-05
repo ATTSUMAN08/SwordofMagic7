@@ -508,12 +508,12 @@ public class Skill {
     public boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList) {
         if (categoryList.size() == 0) return true;
         boolean check = false;
-        String Display = "";
+        StringBuilder Display = new StringBuilder();
         for (EquipmentCategory category : categoryList) {
-            if (Display.equals("")) {
-                Display = category.Display;
+            if (Display.toString().equals("")) {
+                Display = new StringBuilder(category.Display);
             } else {
-                Display += ", " + category.Display;
+                Display.append(", ").append(category.Display);
             }
             if (playerData.Equipment.getEquip(slot).itemEquipmentData.EquipmentCategory == category) {
                 check = true;

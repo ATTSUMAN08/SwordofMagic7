@@ -41,8 +41,9 @@ public class KingSlime {
             if (Enemy == null || !Enemy.isAlive()) {
                 Time = StartTime;
                 playerData.ItemInventory.removeItemParameter(item, 1);
-                TextView textView = new TextView("§b[" + ServerId + "] " + playerData.getNick() + "§aさんが");
+                TextView textView = new TextView(playerData.getNick() + "§aさんが");
                 textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aを使用しました");
+                textView.setFrom(ServerId);
                 Client.sendDisplay(playerData.player, textView);
                 Enemy = MobManager.mobSpawn(DataBase.getMobData("キングスライム"), 50, EventLocation);
                 MultiThread.TaskRun(() -> {
@@ -60,7 +61,7 @@ public class KingSlime {
                     }
                     ViewBar.resetSideBar(Players, "KingSlime");
                     if (Enemy.isDead()) {
-                        Client.sendBroadCast(new TextView("§b[" + ServerId + "] §cキングスライム§aが§c討伐§aされました"));
+                        Client.sendBroadCast(new TextView("§cキングスライム§aが§c討伐§aされました").setFrom(ServerId));
                         ItemParameterStack[] rewards = new ItemParameterStack[3];
                         rewards[0] = new ItemParameterStack(getItemParameter("キングスライムの核"));
                         rewards[0].Amount = 1;

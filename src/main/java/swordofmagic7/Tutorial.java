@@ -25,7 +25,7 @@ public class Tutorial {
     private static final Location[] TutorialLocation = new Location[64];
 
     public static void onLoad() {
-        Location clear = new Location(world, 1069.5, 65, -259.5);;
+        Location clear = new Location(world, 1069.5, 65, -259.5);
         TutorialLocation[0] = new Location(world, 1181.5, 65, -259.5);
         TutorialLocation[1] = new Location(world, 1153.5, 65, -259.5);
         TutorialLocation[2] = clear;

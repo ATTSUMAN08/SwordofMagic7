@@ -199,10 +199,10 @@ public class ViewBar {
                         else HealthPercentColor = "§a§l";
                         player.setLevel(Level);
                         player.setExp(ExpPercent);
-                        String shield = status.Shield > 0 ? "§e+" + (int) Math.round(status.Shield) + "§c" : "";
+                        String shield = status.Shield > 0 ? "§e+" + Math.round(status.Shield) + "§c" : "";
                         player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
-                                "§c§l《§cHealth: " + (int) Math.round(status.Health) + shield + "/" + (int) Math.round(status.MaxHealth) + "§c§l》" +
-                                "§b§l《§bMana: " + (int) Math.round(status.Mana) + "/" + (int) Math.round(status.MaxMana) + "§b§l》" +
+                                "§c§l《§cHealth: " + Math.round(status.Health) + shield + "/" + Math.round(status.MaxHealth) + "§c§l》" +
+                                "§b§l《§bMana: " + Math.round(status.Mana) + "/" + Math.round(status.MaxMana) + "§b§l》" +
                                 "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );

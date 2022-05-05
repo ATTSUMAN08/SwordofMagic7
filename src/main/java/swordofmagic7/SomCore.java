@@ -93,9 +93,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         plugin = this;
         javaPlugin = this;
         ServerId = getConfig().getString("ServerId");
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
-        //getServer().getPluginManager().registerEvents(new Som7Vote(), this);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+        getServer().getPluginManager().registerEvents(new Som7Vote(), this);
 
         Client.Host = getConfig().getString("Host", "localhost");
         Client.connect();
@@ -378,6 +378,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             } else if (cmd.getName().equalsIgnoreCase("castMode")) {
                 playerData.CastMode();
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("petTame")) {
+                playerData.PetTame();
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("viewFormat")) {
                 playerData.changeViewFormat();
                 return true;
@@ -600,11 +603,11 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             } else if (cmd.getName().equalsIgnoreCase("damageSimulator")) {
                 if (args.length >= 2) {
                     String format = "%.1f";
-                    double multiply = args.length == 3 ? Double.parseDouble(args[2]) : 1;
+                    double multiply = args.length >= 3 ? Double.parseDouble(args[2]) : 1;
                     double perforate = args.length == 4 ? Double.parseDouble(args[3]) : 0;
                     double atk = Double.parseDouble(args[0]);
                     double def = Double.parseDouble(args[1]);
-                    double damage = Math.pow(atk, 2) / (atk + def * 2) * (1-perforate);
+                    double damage = (Math.pow(atk, 2) / (atk + def * 4)) * (1-perforate);
                     damage += atk*perforate;
                     String log = "§cDamageSimulator§7: §a" + String.format(format, damage * multiply) + " §8(" + String.format(format, damage) + ") §f[" + multiply*100 + "]";
                     sendMessage(player, log);

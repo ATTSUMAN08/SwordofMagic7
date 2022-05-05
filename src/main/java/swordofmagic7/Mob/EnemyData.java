@@ -80,12 +80,16 @@ public class EnemyData {
     public boolean isDefenseBattle = false;
     private boolean isDead = false;
 
+    public boolean isDeleted() {
+        return isDead || entity == null || !entity.isValid();
+    }
+
     public boolean isDead() {
         return isDead || entity == null;
     }
 
     public boolean isAlive() {
-        return !isDead();
+        return !isDead() && entity.isValid();
     }
 
     public EnemyData(LivingEntity entity, MobData baseData, int level) {
@@ -126,7 +130,10 @@ public class EnemyData {
         return level >= 30 ? Math.pow(StatusMultiply(level), 1.1) : StatusMultiply(level);
     }
     public static double StatusMultiply3(int level) {
-        return level >= 30 ? Math.pow(StatusMultiply(level), 1.04) : StatusMultiply(level);
+        return StatusMultiply(level)/1.5;
+    }
+    public static double StatusMultiply4(int level) {
+        return level >= 30 ? Math.pow(StatusMultiply(level), 1.18): StatusMultiply(level);
     }
 
     public String viewHealthString() {
@@ -137,6 +144,7 @@ public class EnemyData {
         double multiply = StatusMultiply(Level);
         double multiply2 = StatusMultiply2(Level);
         double multiply3 = StatusMultiply3(Level);
+        double multiply4 = StatusMultiply4(Level);
 
         HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
         HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
@@ -178,12 +186,12 @@ public class EnemyData {
         }
 
         MaxHealth = mobData.Health * multiply2 * statusMultiply(StatusParameter.MaxHealth);
-        ATK = mobData.ATK * Math.pow(multiply, 1.11) * statusMultiply(StatusParameter.ATK);
+        ATK = mobData.ATK * multiply4 * statusMultiply(StatusParameter.ATK);
         DEF = mobData.DEF * multiply3 * statusMultiply(StatusParameter.DEF);
         ACC = mobData.ACC * multiply * statusMultiply(StatusParameter.ACC);
         EVA = mobData.EVA * multiply * statusMultiply(StatusParameter.EVA);
-        CriticalRate = mobData.CriticalRate * multiply * statusMultiply(StatusParameter.CriticalRate);
-        CriticalResist = mobData.CriticalResist * multiply3 * statusMultiply(StatusParameter.CriticalResist);
+        CriticalRate = mobData.CriticalRate * multiply4 * statusMultiply(StatusParameter.CriticalRate);
+        CriticalResist = mobData.CriticalResist * multiply * statusMultiply(StatusParameter.CriticalResist);
         Exp = mobData.Exp * multiply;
         ClassExp = mobData.Exp;
     }
@@ -192,16 +200,17 @@ public class EnemyData {
         double multiply = StatusMultiply(Level);
         double multiply2 = StatusMultiply2(Level);
         double multiply3 = StatusMultiply3(Level);
+        double multiply4 = StatusMultiply4(Level);
         String format = "%.0f";
         List<String> lore = new ArrayList<>();
         lore.add(decoText("§3§lステータス"));
         lore.add(decoLore("体力") + String.format(format, mobData.Health*multiply2));
-        lore.add(decoLore("攻撃力") + String.format(format, mobData.ATK * multiply));
+        lore.add(decoLore("攻撃力") + String.format(format, mobData.ATK * multiply4));
         lore.add(decoLore("防御力") + String.format(format, mobData.DEF * multiply3));
         lore.add(decoLore("命中") + String.format(format, mobData.ACC * multiply));
         lore.add(decoLore("回避") + String.format(format, mobData.EVA * multiply));
-        lore.add(decoLore("クリティカル発生") + String.format(format, mobData.CriticalRate * multiply));
-        lore.add(decoLore("クリティカル耐性") + String.format(format, mobData.CriticalResist * multiply3));
+        lore.add(decoLore("クリティカル発生") + String.format(format, mobData.CriticalRate * multiply4));
+        lore.add(decoLore("クリティカル耐性") + String.format(format, mobData.CriticalResist * multiply));
         lore.add(decoLore("キャラ経験値") + String.format(format, mobData.Exp * multiply));
         lore.add(decoLore("クラス経験値") + String.format(format, mobData.Exp));
         return lore;
@@ -225,7 +234,7 @@ public class EnemyData {
     }
 
     public boolean isRunnableAI() {
-        return runAITask && isAlive() && plugin.isEnabled();
+        return runAITask && isAlive() && plugin.isEnabled() && entity.isValid();
     }
 
     public Location LastLocation;
@@ -254,7 +263,9 @@ public class EnemyData {
                     if (targetLocation != null) {
                         NextLocation = targetLocation;
                         MultiThread.TaskRunSynchronized(() -> {
-                            if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
+                            if (entity.isInLava()) {
+                                entity.teleportAsync(SpawnLocation);
+                            } else if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
                                 mob.lookAt(NextLocation);
                                 pathfinder.moveTo(NextLocation, mobData.Mov*MovementMultiply);
                                 LastLocation = entity.getLocation();
@@ -328,13 +339,10 @@ public class EnemyData {
                             }
                         }
                     }
-                    if (!isDefenseBattle && !mobData.enemyType.isBoss() && !mobData.NoAI && !mobData.Invisible) {
-                        if (SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                    if (!mobData.NonDespawn && !isDefenseBattle && mobData.enemyType.isNormal() && !mobData.NoAI && !mobData.Invisible) {
+                        if (PlayerList.getNearNonDead(entity.getLocation(), 64+mobData.Search).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                             delete();
                         }
-                    }
-                    if (PlayerList.getNearNonDead(entity.getLocation(), 64+mobData.Search).size() == 0) {
-                        delete();
                     }
                 }
             }.runTaskTimerAsynchronously(plugin, 0, 20);
@@ -420,10 +428,19 @@ public class EnemyData {
                     }
                 }
             }
+            Player singlePlayer = null;
+            if (TotalDamageTable.size() == 1) {
+                for (LivingEntity entity : TotalDamageTable.keySet()) {
+                    if (entity instanceof Player player2) {
+                        singlePlayer = player2;
+                    }
+                }
+            }
             for (Player player : Involved) {
                 if (player.isOnline()) {
                     PlayerData playerData = playerData(player);
-                    if (!isEventServer() || !playerData.isAFK()) {
+                    boolean bool = singlePlayer == null || !playerData.isBlockFromPlayer(singlePlayer);
+                    if (!isEventServer() || !playerData.isAFK() && bool) {
                         double percentMultiply = 1; //playerData.isAFK() ? 0.3 : 1;
                         playerData.statistics.enemyKill(mobData);
                         Classes classes = playerData.Classes;
@@ -488,7 +505,7 @@ public class EnemyData {
                                             playerData.RuneInventory.addRuneParameter(runeParameter);
                                             Holo.add("§b§l[+]§e§l" + runeParameter.Display);
                                             if (playerData.DropLog.isRune() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare())) {
-                                                player.sendMessage("§b[+]§e" + runeParameter.Display + " §e[レベル:" + Level + "] [品質:" + String.format(playerData.ViewFormat(), runeParameter.Quality * 100) + "%]");
+                                                RuneGetLog(player, runeParameter);
                                             }
                                             if (runeParameter.isSpecial) {
                                                 TextView text = new TextView(playerData.getNick() + "§aさんが");
@@ -523,7 +540,7 @@ public class EnemyData {
                                         Client.sendDisplay(player, text);
                                     }
                                 } else {
-                                    if (random.nextDouble() <= 0.01 * percentMultiply) {
+                                    if (playerData.PetTame && random.nextDouble() <= 0.01 * percentMultiply) {
                                         PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
                                         playerData.PetInventory.addPetParameter(pet);
                                         Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);

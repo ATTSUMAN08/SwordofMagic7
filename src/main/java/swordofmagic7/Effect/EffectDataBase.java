@@ -68,7 +68,7 @@ public class EffectDataBase {
             }
             case HitAndGuard -> MultiplyStatusAdd(StatusParameter.DEF, DataBase.getRuneParameter("ヒットアンドガードのルーン").AdditionParameterValue(1)/100);
             case MagicBarrier -> DamageCauseResistanceAdd(DamageCause.MAT, DataBase.getRuneParameter("魔法障壁のルーン").AdditionParameterValue(1)/100);
-            case IceThorns -> DamageCauseMultiplyAdd(DamageCause.MAT, DataBase.getRuneParameter("氷の棘").AdditionParameterValue(0)/100);
+            case IceThorns -> DamageCauseMultiplyAdd(DamageCause.MAT, DataBase.getRuneParameter("氷の棘のルーン").AdditionParameterValue(0)/100);
         }
     }
 }

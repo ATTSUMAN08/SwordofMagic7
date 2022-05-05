@@ -351,3 +351,6 @@ commands:
     aliases: ds
     description: description
     usage: /<command>
+  petTame:
+    description: description
+    usage: /<command>

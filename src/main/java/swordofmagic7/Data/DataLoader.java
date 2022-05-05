@@ -20,6 +20,7 @@ import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
+import swordofmagic7.Item.ItemUseList.RewardBox;
 import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Life.Angler.AnglerData;
@@ -50,9 +51,7 @@ import swordofmagic7.Skill.SkillType;
 import swordofmagic7.Status.StatusParameter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.Log;
@@ -180,6 +179,7 @@ public class DataLoader {
                 runeData.Display = data.getString("Display");
                 runeData.Lore = data.getStringList("Lore");
                 runeData.isSpecial = data.getBoolean("isSpecial", false);
+                runeData.isHide = data.getBoolean("isHide", false);
                 runeData.isLoreHide = data.getBoolean("isLoreHide", false);
                 runeData.isNonTrade = data.getBoolean("isNonTrade", false);
                 for (StatusParameter param : StatusParameter.values()) {
@@ -660,6 +660,7 @@ public class DataLoader {
                 mobData.Invisible = data.getBoolean("Invisible", false);
                 mobData.NoAI = data.getBoolean("NoAI", false);
                 mobData.ColliderSize = data.getDouble("ColliderSize", 0);
+                mobData.ColliderSizeY = data.getDouble("ColliderSizeY", 0);
                 mobData.Glowing = data.getBoolean("Glowing", false);
                 mobData.isHide = data.getBoolean("isHide", false);
                 String entityType = data.getString("Type").toUpperCase();
@@ -694,6 +695,7 @@ public class DataLoader {
                 mobData.Hostile = data.getBoolean("Hostile", false);
                 mobData.Size = data.getInt("Size", 0);
                 mobData.NonTame = data.getBoolean("NonTame", false);
+                mobData.NonDespawn = data.getBoolean("NonDespawn", false);
                 if (data.isSet("EnemyType")) mobData.enemyType = EnemyType.valueOf(data.getString("EnemyType"));
                 mobData.DamageRanking = data.getBoolean("DamageRanking", mobData.enemyType.isBoss());
                 if (data.isSet("Skill")) {
@@ -726,7 +728,16 @@ public class DataLoader {
                     mobData.SkillList = SkillList;
                 }
                 if (data.isSet("HPStop")) {
-                    mobData.HPStop = data.getDoubleList("HPStop");
+                    for (String str : data.getStringList("HPStop")) {
+                        String[] split = str.split(",");
+                        double hpStop = Double.parseDouble(split[0]);
+                        mobData.HPStopPercent.add(hpStop);
+                        mobData.HPStop.put(hpStop, new ArrayList<>());
+                        for (int i = 1; i < split.length; i++) {
+                            mobData.HPStop.get(hpStop).add(split[i]);
+                        }
+
+                    }
                 }
 
                 List<DropItemData> DropItemTable = new ArrayList<>();
@@ -966,8 +977,13 @@ public class DataLoader {
 
     public static void RuneInfoDataLoad() {
         for (RuneParameter runeData : RuneList.values()) {
-            RuneInfoData.put(runeData.Id, new ArrayList<>(runeData.viewRune("%.0f", runeData.isLoreHide).getLore()));
-            RuneInfoData.get(runeData.Id).add(decoText("§3§l入手方法"));
+            try {
+                RuneInfoData.put(runeData.Id, new ArrayList<>(runeData.viewRune("%.0f", runeData.isLoreHide).getLore()));
+                RuneInfoData.get(runeData.Id).add(decoText("§3§l入手方法"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log("§cRuneInfoDataLoadError -> " + runeData.Id);
+            }
         }
         for (MobData mobData : MobList.values()) {
             for (DropRuneData dropData : mobData.DropRuneTable) {
@@ -992,21 +1008,45 @@ public class DataLoader {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                List<RewardBoxData> list = new ArrayList<>();
+                RewardBox rewardBox = new RewardBox();
+                rewardBox.isPartition = data.getBoolean("isPartition", false);
+                HashMap<String, Set<RewardBoxData>> group = new HashMap<>();
                 for (String str : data.getStringList("RewardBox")) {
                     String[] split = str.split(",");
                     RewardBoxData rewardBoxData = new RewardBoxData();
                     rewardBoxData.id = split[0];
+                    String groupId = null;
                     for (String meta : split) {
                         if (meta.contains("Amount:")) rewardBoxData.amount = Integer.parseInt(meta.replace("Amount:", ""));
                         if (meta.contains("Percent:")) rewardBoxData.percent = Double.parseDouble(meta.replace("Percent:", ""));
                         if (meta.contains("Level:")) rewardBoxData.Level = Integer.parseInt(meta.replace("Level:", ""));
                         if (meta.contains("MaxLevel:")) rewardBoxData.MaxLevel = Integer.parseInt(meta.replace("MaxLevel:", ""));
                         if (meta.contains("GrowthRate:")) rewardBoxData.GrowthRate = Double.parseDouble(meta.replace("GrowthRate:", ""));
+                        if (meta.contains("Group:")) groupId = meta.replace("Group:", "");
                     }
-                    list.add(rewardBoxData);
+                    if (groupId != null) {
+                        if (!group.containsKey(groupId)) group.put(groupId, new HashSet<>());
+                        group.get(groupId).add(rewardBoxData);
+                    } else {
+                        rewardBox.List.add(rewardBoxData);
+                    }
                 }
-                RewardBoxList.put(fileName, list);
+                for (Map.Entry<String, Set<RewardBoxData>> entry : group.entrySet()) {
+                    String groupPath = "Group." + entry.getKey();
+                    double percent;
+                    if (data.isSet(groupPath)) {
+                        percent = data.getDouble(groupPath);
+                    } else {
+                        Log("§c[" + file.getName() + "]のGroup[" + entry.getKey() + "]は設定されていません");
+                        percent = 0;
+                    }
+                    int spiltIndex = entry.getValue().size();
+                    for (RewardBoxData rewardBoxData : entry.getValue()) {
+                        rewardBoxData.percent = percent/spiltIndex;
+                        rewardBox.List.add(rewardBoxData);
+                    }
+                }
+                RewardBoxList.put(fileName, rewardBox);
             } catch (Exception e) {
                 e.printStackTrace();
                 loadError(file);

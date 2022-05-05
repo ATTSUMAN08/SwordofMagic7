@@ -98,7 +98,7 @@ public class Barbarian extends BaseSkillClass {
             for (LivingEntity victim : Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate())) {
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, EffectManager.hasEffect(victim, EffectType.Stun) ? value2 : value, 1);
                 ParticleManager.LineParticle(particleData, player.getEyeLocation(), victim.getEyeLocation(), 0.5, 1);
-                if (bool) Function.setVelocity(victim, player.getLocation().getDirection().clone().normalize().multiply(1.5).setY(1));
+                if (bool) Function.setVelocity(victim, player.getLocation().getDirection().clone().normalize().multiply(2.5).setY(1));
             }
 
             playSound(player, SoundList.AttackSweep);

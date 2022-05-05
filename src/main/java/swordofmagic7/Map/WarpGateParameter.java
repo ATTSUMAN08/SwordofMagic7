@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.Ashark.AsharkB1;
 import swordofmagic7.Dungeon.Ashark.AsharkB2;
+import swordofmagic7.Dungeon.Ashark.AsharkB4;
 import swordofmagic7.Dungeon.AusMine.AusMineB1;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB3;
@@ -63,6 +64,7 @@ public class WarpGateParameter {
             }
             if (Trigger.equals("AsharkB1_Check") && !AsharkB1.Check(player)) return;
             if (Trigger.equals("AsharkB2") && AsharkB2.Start()) return;
+            if (Trigger.equals("AsharkB4") && AsharkB4.Start()) return;
         }
         if (!isActive || isTrigger) return;
         NextMap.enter(player);

@@ -84,8 +84,6 @@ public class PetParameter implements Cloneable {
 
     PetParameter() {}
 
-    ;
-
     public PetParameter(Player player, PlayerData playerData, PetData petData, int Level, int MaxLevel, int Exp, double GrowthRate) {
         this.player = player;
         this.playerData = playerData;
@@ -116,9 +114,8 @@ public class PetParameter implements Cloneable {
     }
 
     int ReqExp() {
-        double reqExp = Classes.ReqExp(Level);
-        reqExp *= GrowthRate/2;
-        if (petData.BossPet) reqExp *= 5;
+        double reqExp = Classes.ReqExp(Level)/2f;
+        if (petData.BossPet) reqExp *= 2;
         return (int) Math.round(reqExp);
     }
 

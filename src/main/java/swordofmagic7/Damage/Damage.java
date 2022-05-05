@@ -17,7 +17,6 @@ import swordofmagic7.Function;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
-import swordofmagic7.Mob.MobSkillData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
@@ -121,8 +120,8 @@ public final class Damage {
         double Defence;
         double victimMaxHealth = 0;
         double victimHealth = 0;
-        double Multiply = 1;
-        double CriticalMultiply = 1.2;
+        double baseMultiply = 1;
+        double CriticalMultiply = 1.3;
         double Resistance = 1;
         EffectManager attackerEffectManager;
         EffectManager victimEffectManager;
@@ -138,7 +137,7 @@ public final class Damage {
             ACC = playerData.Status.ACC;
             CriticalRate = playerData.Status.CriticalRate;
             CriticalMultiply = playerData.Status.CriticalMultiply;
-            Multiply = playerData.Status.DamageCauseMultiply.getOrDefault(damageCause, Resistance);
+            baseMultiply = playerData.Status.DamageCauseMultiply.getOrDefault(damageCause, Resistance);
             attackerLevel = playerData.Level;
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
@@ -159,7 +158,7 @@ public final class Damage {
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
-            Multiply = enemyData.DamageCauseMultiply.getOrDefault(damageCause, Multiply);
+            baseMultiply = enemyData.DamageCauseMultiply.getOrDefault(damageCause, baseMultiply);
             attackerLevel = enemyData.Level;
             attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
@@ -167,7 +166,7 @@ public final class Damage {
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
-            Multiply = petParameter.DamageCauseMultiply.getOrDefault(damageCause, Multiply);
+            baseMultiply = petParameter.DamageCauseMultiply.getOrDefault(damageCause, baseMultiply);
             attackerLevel = petParameter.Level;
             petParameter.DecreaseStamina(1, 1);
             attackerEffectManager = petParameter.getEffectManager();
@@ -246,21 +245,16 @@ public final class Damage {
             return;
         }
 
-        baseDamage = (Math.pow(ATK, 2) / (ATK + DEF * 2)) * (1-perforate);
+        baseDamage = (Math.pow(ATK, 2) / (ATK + DEF * 4)) * (1-perforate);
         baseDamage += ATK*perforate;
         baseDamage *= damageMultiply;
-        baseDamage *= Multiply;
+        baseDamage *= baseMultiply;
         baseDamage /= Resistance;
         if (!invariably) {
             hitRate = Math.min(1, Math.pow(ACC, 1.6) / Math.pow(EVA, 1.6));
             if (victimEffectManager.hasEffect(EffectType.AbsolutelyEVA)) hitRate = 0;
         } else hitRate = 1;
-        if (CriticalRate > CriticalResist) {
-            criRate = (CriticalRate-CriticalResist/2)/((CriticalRate*2+CriticalResist)/3);
-        } else {
-            criRate = 1-(CriticalResist-CriticalRate/2)/((CriticalResist*2+CriticalRate)/3);
-        }
-        criRate = Math.min(Math.max(criRate, 0.01), 0.95);
+        criRate = Math.min(Math.max((CriticalRate-CriticalResist)/CriticalResist, 0), 0.95);
         Attack = ATK;
         Defence = DEF;
 
@@ -366,15 +360,16 @@ public final class Damage {
             EnemyData enemyData = MobManager.EnemyTable(victim.getUniqueId());
 
             boolean isStop = false;
-            for (double HPStop : enemyData.mobData.HPStop) {
+            for (double HPStop : enemyData.mobData.HPStopPercent) {
                 if (enemyData.Health / enemyData.MaxHealth > HPStop && HPStop >= (enemyData.Health-damage) / enemyData.MaxHealth) {
                     enemyData.Health = enemyData.MaxHealth * (HPStop-0.0001);
-                    for (MobSkillData skillData : enemyData.mobData.SkillList) {
-                        if (skillData.maxHealth == HPStop) {
-                            enemyData.skillManager.mobSkillCast(skillData);
-                        }
-                    }
                     isStop = true;
+                    MultiThread.TaskRun(() -> {
+                        for (String skill : enemyData.mobData.HPStop.get(HPStop)) {
+                            enemyData.skillManager.forceSkillTrigger(skill);
+                            MultiThread.sleepTick(20);
+                        }
+                    }, "HPStop");
                     break;
                 }
             }

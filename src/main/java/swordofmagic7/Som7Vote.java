@@ -1,13 +1,14 @@
 package swordofmagic7;
 
-/*
 import com.vexsoftware.votifier.model.Vote;
-import com.vexsoftware.votifier.support.forwarding.ForwardedVoteListener;
+import com.vexsoftware.votifier.model.VotifierEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
@@ -17,12 +18,13 @@ import java.io.IOException;
 
 import static swordofmagic7.SomCore.isDevEventServer;
 
-public class Som7Vote implements ForwardedVoteListener {
+public class Som7Vote implements Listener {
 
     private static final File file = new File(DataBase.DataBasePath, "OfflineVote.yml");
 
-    @Override
-    public void onForward(Vote vote) {
+    @EventHandler
+    public void onVotifierEvent(VotifierEvent event) {
+        Vote vote = event.getVote();
         MultiThread.TaskRun(() -> {
             OfflinePlayer player = Bukkit.getOfflinePlayer(vote.getUsername());
             if (player.isOnline()) {
@@ -54,4 +56,3 @@ public class Som7Vote implements ForwardedVoteListener {
         voteReward(player, data.getInt(uuid, 0));
     }
 }
-*/

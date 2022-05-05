@@ -99,19 +99,30 @@ public class Events implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
         }
-        int playerCount = Bukkit.getOnlinePlayers().size();
-        int normal = isEventServer() ? 80 : 40;
-        int vip = isEventServer() ? 85 : 45;
-        int premium = isEventServer() ? 90 : 50;
+        int playerCount = 0;
+        int vipCount = 0;
+        int premiumCount = 0;
+        for (Player player2 : Bukkit.getOnlinePlayers()) {
+            if (player2.hasPermission(Som7Premium)) {
+                premiumCount++;
+            } if (player2.hasPermission(Som7VIP)) {
+                vipCount++;
+            } else {
+                playerCount++;
+            }
+        }
+        if (player.hasPermission(OverLogin)) return;
+        int normal = isEventServer() ? 120 : 50;
+        boolean vip = vipCount >= 5;
+        boolean premium = premiumCount >= 10;
         if (playerCount >= normal) {
-            if (player.hasPermission(OverLogin)) return;
-            if (playerCount <= vip && player.hasPermission(Som7VIP)) return;
-            if (playerCount <= premium && player.hasPermission(Som7Premium)) return;
-            if (playerCount <= vip) {
+            if (!vip) {
+                if (player.hasPermission(Som7VIP)) return;
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§eVIP枠は開いています");
-            } else if (playerCount <= premium) {
+            } else if (!premium) {
+                if (player.hasPermission(Som7Premium)) return;
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§ePremium枠は開いています");
-            }  else {
+            } else {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e全ての枠が埋まっています");
             }
         }
@@ -226,6 +237,9 @@ public class Events implements Listener {
         if (block == null && item != null && Function.isHoldFishingRod(player) && action.isRightClick()) {
             playerData.Gathering.inputFishingCommand(FishingCommand.RightClick);
             event.setCancelled(false);
+        }
+        if (item != null) switch (item.getType()) {
+            case ARMOR_STAND, ENDER_PEARL, ENDER_EYE, MINECART, CHEST_MINECART, TNT_MINECART, FURNACE_MINECART, HOPPER_MINECART, COMMAND_BLOCK_MINECART -> event.setCancelled(true);
         }
         if (!playerData.interactTick) {
             playerData.interactTick = true;
@@ -415,9 +429,6 @@ public class Events implements Listener {
                 if (victim instanceof Player player) {
                     spawnPlayer(player);
                 }
-            }
-            case SUFFOCATION -> {
-                event.setCancelled(true);
             }
             default -> event.setCancelled(true);
         }
