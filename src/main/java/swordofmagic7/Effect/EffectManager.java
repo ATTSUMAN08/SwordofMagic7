@@ -2,26 +2,34 @@ package swordofmagic7.Effect;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Damage.Damage;
+import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Function;
 import swordofmagic7.Mob.EnemyData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Particle.ParticleData;
+import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
+import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
+import static swordofmagic7.Skill.SkillProcess.particleActivate;
 import static swordofmagic7.SomCore.plugin;
 
 public class EffectManager {
@@ -92,6 +100,15 @@ public class EffectManager {
                                     }
                                     case SubzeroShield -> {
                                         if (!playerData.Equipment.isOffHandEquip(EquipmentCategory.Shield)) removeEffect(effectType);
+                                    }
+                                    case PsychicPressure -> {
+                                        double value = effectData.getDouble(0);
+                                        double radius = 5;
+                                        double angle = 90;
+                                        ParticleManager.FanShapedParticle(particleActivate, player.getLocation(), radius, angle, 3);
+                                        Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, playerData.Skill.SkillProcess.Predicate(), false);
+                                        Damage.makeDamage(player, victims, DamageCause.MAT, "PsychicPressure", value, 1, 1);
+                                        ShapedParticle(new ParticleData(Particle.REVERSE_PORTAL), player.getLocation(), radius, angle, angle/2, 1, true);
                                     }
                                 }
                             }

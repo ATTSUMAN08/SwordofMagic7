@@ -103,7 +103,7 @@ public class Classes {
                 addLevel++;
             }
             addClassLevel(classData, addLevel);
-            BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました", false);
+            BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました", true);
             playSound(player, SoundList.LevelUp);
         }
         if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/Classes.ReqExp(getClassLevel(classData))*100) + "%)");

@@ -4,6 +4,7 @@ public enum EquipmentSlot {
     MainHand("メインハンド"),
     OffHand("オフハンド"),
     Armor("アーマー"),
+    Accessory("アクセサリ"),
     ;
 
     public String Display;

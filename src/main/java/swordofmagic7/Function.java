@@ -9,7 +9,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -220,7 +219,7 @@ public final class Function {
         for (Player player : PlayerList.get()) {
             if (player.isOnline()) {
                 PlayerData playerData = PlayerData.playerData(player);
-                if (playerData.NaturalMessage || isNatural) {
+                if (playerData.NaturalMessage || !isNatural) {
                     player.spigot().sendMessage(text);
                     if (sound != null) playSound(player, sound);
                 }
@@ -311,9 +310,7 @@ public final class Function {
     }
 
     public static void CloseInventory(Player player) {
-        if (player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING)  {
-            MultiThread.TaskRunSynchronized(player::closeInventory, "CloseInventory");
-        }
+        MultiThread.TaskRunSynchronized(player::closeInventory, "CloseInventory");
     }
 
     public static Object GetRandom(Set<?> list) {

@@ -233,11 +233,7 @@ public class Market {
             itemStacks[52] = ItemFlame(100);
             itemStacks[53] = page < Math.floor(marketList.size()/45f) ? NextPageItem : ShopFlame;
             itemStacks[49] = ItemFlameAmount(MarketPrefix, BuyAmount);
-            int i = 0;
-            for (ItemStack itemStack : itemStacks) {
-                player.getOpenInventory().getTopInventory().setItem(i, itemStack);
-                i++;
-            }
+            MultiThread.TaskRunSynchronized(() -> player.getOpenInventory().getTopInventory().setContents(itemStacks));
             playSound(player, SoundList.Tick);
         }
     }

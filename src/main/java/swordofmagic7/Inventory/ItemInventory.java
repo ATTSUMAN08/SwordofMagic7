@@ -8,10 +8,9 @@ import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.Status.StatusParameter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.*;
@@ -191,12 +190,22 @@ public class ItemInventory extends BasicInventory {
         }
     }
 
-    boolean ItemStackCheck(ItemParameter param1, ItemParameter param2) {
+    public static boolean ItemStackCheck(ItemParameter param1, ItemParameter param2) {
         if (param1.Id.equals(param2.Id)) {
             if (param1.Category.isEquipment()) {
-                if (param1.itemEquipmentData.Durable == param2.itemEquipmentData.Durable &&
-                        param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
-                        param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
+                if (param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
+                    param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()
+                ) {
+                    if (param1.itemEquipmentData.isAccessory()) {
+                        Set<StatusParameter> params = new HashSet<>();
+                        params.addAll(param1.itemEquipmentData.itemAccessory.Parameter.keySet());
+                        params.addAll(param2.itemEquipmentData.itemAccessory.Parameter.keySet());
+                        for (StatusParameter key : params) {
+                            if (!param1.itemEquipmentData.itemAccessory.Parameter.getOrDefault(key, -1d).equals(param2.itemEquipmentData.itemAccessory.Parameter.getOrDefault(key, -1d))) {
+                                return false;
+                            }
+                        }
+                    }
                     if (0 < param1.itemEquipmentData.getRuneSize()) {
                         for (int i = 0; i < param1.itemEquipmentData.getRuneSize(); i++) {
                             final RuneParameter rune1 = param1.itemEquipmentData.getRune(i);

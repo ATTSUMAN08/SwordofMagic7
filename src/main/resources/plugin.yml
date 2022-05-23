@@ -164,6 +164,9 @@ commands:
     aliases: [attr, a]
     description: description
     usage: /<command>
+  damageHolo:
+    description: description
+    usage: /<command>
   damageLog:
     description: description
     usage: /<command>
@@ -183,6 +186,9 @@ commands:
     description: description
     usage: /<command>
   effectLog:
+    description: description
+    usage: /<command>
+  particleDensity:
     description: description
     usage: /<command>
   viewFormat:

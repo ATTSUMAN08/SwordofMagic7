@@ -52,6 +52,7 @@ import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Quest.QuestManager;
+import swordofmagic7.Shop.AccessoryShop;
 import swordofmagic7.Shop.PetShop;
 import swordofmagic7.Shop.RuneShop;
 import swordofmagic7.Shop.Shop;
@@ -125,6 +126,7 @@ public class PlayerData {
     public PetManager PetManager;
     public PetShop PetShop;
     public PetEvolution PetEvolution;
+    public AccessoryShop accessoryShop;
     public MapManager MapManager;
     public Gathering Gathering;
     public QuestManager QuestManager;
@@ -179,6 +181,8 @@ public class PlayerData {
     public boolean isPlayDungeonQuest = false;
     public boolean PetTame = true;
     public Set<String> BlockList = new HashSet<>();
+    public int ParticleDensity = 100;
+    public boolean DamageHolo = true;
 
     public boolean isAFK() {
         return AFKTime > SomCore.AFKTime;
@@ -206,6 +210,7 @@ public class PlayerData {
         Upgrade = new Upgrade(player, this);
         Shop = new Shop(player, this);
         RuneShop = new RuneShop(player, this);
+        accessoryShop = new AccessoryShop(player, this);
         LifeStatus = new LifeStatus(player, this);
         PetManager = new PetManager(player, this);
         PetShop = new PetShop(player, this);
@@ -463,6 +468,16 @@ public class PlayerData {
         sendMessage(player, msg, SoundList.Click);
     }
 
+    public void DamageHolo() {
+        DamageHolo(!DamageHolo);
+    }
+
+    void DamageHolo(boolean bool) {
+        DamageHolo = bool;
+        String msg = "§e[ダメージホログラム]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
+        sendMessage(player, msg, SoundList.Click);
+    }
+
     public void PetTame() {
         PetTame(!PetTame);
     }
@@ -558,6 +573,19 @@ public class PlayerData {
             String msg = "§e[自視点ステータスバー]§aを" + (bool ? "§b[表示]" : "§c[非表示]") + "§aにしました";
             sendMessage(player, msg, SoundList.Click);
         }
+    }
+
+    public int ParticleDensityCache = 0;
+    public void ParticleDensity() {
+        if (ParticleDensity > 0) {
+            ParticleDensity(ParticleDensity-10);
+        } else ParticleDensity(100);
+    }
+
+    void ParticleDensity(int density) {
+        ParticleDensity = density;
+        String msg = "§c[パーティクル密度]§aを§b[" + ParticleDensity + "%]§aにしました";
+        sendMessage(player, msg, SoundList.Click);
     }
 
     public String ViewFormat() {
@@ -688,6 +716,7 @@ public class PlayerData {
         data.set("Map", Map.Id);
         data.set("Nick", Nick);
 
+        data.set("Setting.DamageHolo", DamageHolo);
         data.set("Setting.DamageLog", DamageLog.toString());
         data.set("Setting.ExpLog", ExpLog);
         data.set("Setting.DropLog", DropLog.toString());
@@ -705,6 +734,7 @@ public class PlayerData {
         data.set("Others.FishingSetCombo", Gathering.FishingSetCombo);
         data.set("Setting.PlayMode", PlayMode);
         data.set("Setting.ViewFormat", ViewFormat);
+        data.set("Setting.ParticleDensity", ParticleDensity);
         data.set("Setting.NaturalMessage", NaturalMessage);
         data.set("Setting.RuneFilter.Quality", RuneQualityFilter);
         data.set("Setting.RuneFilter.Id", new ArrayList<>(RuneIdFilter));
@@ -826,6 +856,7 @@ public class PlayerData {
             Map = getMapData(data.getString("Map", "Alden"));
             Nick = data.getString("Nick", player.getName());
 
+            DamageHolo = data.getBoolean("Setting.DamageHolo", true);
             DamageLog = DamageLogType.fromString(data.getString("Setting.DamageLog"));
             ExpLog = data.getBoolean("Setting.ExpLog", false);
             DropLog = DropLogType.fromString(data.getString("Setting.DropLog"));
@@ -841,6 +872,7 @@ public class PlayerData {
             Gathering.FishingUseCombo = data.getBoolean("Setting.FishingUseCombo", true);
             PlayMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
+            ParticleDensity = data.getInt("Setting.ParticleDensity",100);
             NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
             RuneQualityFilter = data.getDouble("Setting.RuneFilter.Quality",0d);
             RuneIdFilter = new HashSet<>(data.getStringList("Setting.RuneFilter.Id"));

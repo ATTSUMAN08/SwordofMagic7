@@ -58,8 +58,8 @@ public class Hind extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             double radius = 8;
             double angle = 100;
-            ParticleManager.FanShapedParticle(Manager.particleCasting, entity().getLocation(), radius, angle, 10);
-            Damage.makeDamage(entity(), ParticleManager.FanShapedCollider(entity().getLocation(), Function.NearEntityByEnemy(entity().getLocation(), radius), angle), DamageCause.ATK, "Burning", 1.4, 1, 1);
+            ParticleManager.FanShapedParticle(Manager.particleCasting, location(), radius, angle, 10);
+            Damage.makeDamage(entity(), ParticleManager.FanShapedCollider(location(), Function.NearEntityByEnemy(entity().getLocation(), radius), angle), DamageCause.ATK, "Burning", 1.4, 1, 1);
         }, "Burning");
     }
 
@@ -67,11 +67,11 @@ public class Hind extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             double radius = 10;
             double angle = 90;
-            Location right = entity().getLocation().clone();
-            Location left = entity().getLocation().clone();
+            Location right = location().clone();
+            Location left = location().clone();
             right.setYaw(right.getYaw()+90);
             left.setYaw(left.getYaw()-90);
-            Set<LivingEntity> targets = Function.NearEntityByEnemy(entity().getLocation(), radius);
+            Set<LivingEntity> targets = Function.NearEntityByEnemy(location(), radius);
             Set<LivingEntity> victims = new HashSet<>();
             victims.addAll(ParticleManager.FanShapedCollider(right, targets, angle));
             victims.addAll(ParticleManager.FanShapedCollider(left, targets, angle));
@@ -84,8 +84,8 @@ public class Hind extends EnemySkillBase {
     public void RangeBurning() {
         MultiThread.TaskRun(() -> {
             double radius = 15;
-            ParticleManager.CircleParticle(Manager.particleCasting, entity().getLocation(), radius, 24);
-            Damage.makeDamage(entity(), Function.NearEntityByEnemy(entity().getLocation(), radius), DamageCause.ATK, "RangeBurning", 1.4, 1, 1);
+            ParticleManager.CircleParticle(Manager.particleCasting, location(), radius, 24);
+            Damage.makeDamage(entity(), Function.NearEntityByEnemy(location(), radius), DamageCause.ATK, "RangeBurning", 1.4, 1, 1);
         }, "RangeBurning");
     }
 
@@ -95,7 +95,7 @@ public class Hind extends EnemySkillBase {
             Manager.CastSkillIgnoreAI(true);
             radiusMessage("§c「変な動きしないで」", SoundList.DungeonTrigger);
             ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.05f);
-            double max = 14;
+            double max = 18;
             double min = 7;
 
             for (int i = 0; i < 50; i += Manager.period) {
@@ -182,6 +182,7 @@ public class Hind extends EnemySkillBase {
                             PlayerData.playerData(victim).dead();
                         }
                     }
+                    enemyData.delete();
                 }, "CouldNotHelp");
             });
             MultiThread.sleepTick(10);
@@ -252,6 +253,7 @@ public class Hind extends EnemySkillBase {
                     for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
                         PlayerData.playerData(victim).dead();
                     }
+                    enemyData.delete();
                 }, "HeWasKindness");
             });
             MultiThread.sleepTick(10);
@@ -274,6 +276,7 @@ public class Hind extends EnemySkillBase {
             for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
                 PlayerData.playerData(victim).dead();
             }
+            nias.delete();
         }
     }
 }

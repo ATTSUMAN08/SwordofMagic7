@@ -8,13 +8,13 @@ import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.BasicInventory;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemParameter;
-import swordofmagic7.Item.RuneParameter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ShopFlame;
 import static swordofmagic7.Function.*;
+import static swordofmagic7.Inventory.ItemInventory.ItemStackCheck;
 import static swordofmagic7.Shop.Shop.*;
 
 public class SellInventory extends BasicInventory {
@@ -101,27 +101,5 @@ public class SellInventory extends BasicInventory {
                 List.remove(stack);
             }
         }
-    }
-
-    boolean ItemStackCheck(ItemParameter param1, ItemParameter param2) {
-        if (param1.Display.equals(param2.Display) &&
-                param1.itemEquipmentData.Durable == param2.itemEquipmentData.Durable &&
-                param1.itemEquipmentData.Plus == param2.itemEquipmentData.Plus &&
-                param1.itemEquipmentData.getRuneSize() == param2.itemEquipmentData.getRuneSize()) {
-            if (0 < param1.itemEquipmentData.getRuneSize()) {
-                for (int i = 0; i < param1.itemEquipmentData.getRuneSize(); i++) {
-                    final RuneParameter rune1 = param1.itemEquipmentData.getRune(i);
-                    final RuneParameter rune2 = param2.itemEquipmentData.getRune(i);
-                    if (rune1.Display.equals(rune2.Display) &&
-                            rune1.Level == rune2.Level &&
-                            rune1.Quality == rune2.Quality) {
-                        return true;
-                    }
-                }
-            } else {
-                return true;
-            }
-        }
-        return false;
     }
 }

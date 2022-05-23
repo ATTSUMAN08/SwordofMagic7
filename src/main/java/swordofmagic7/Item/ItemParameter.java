@@ -113,16 +113,19 @@ public class ItemParameter implements Cloneable {
         if (Category.isEquipment()) {
             Lore.add(itemParameter);
             Lore.add(decoLore("装備部位") + itemEquipmentData.EquipmentSlot.Display);
-            Lore.add(decoLore("装備種") + itemEquipmentData.EquipmentCategory.Display);
+            Lore.add(decoLore("装備種") + itemEquipmentData.equipmentCategory.Display);
             for (StatusParameter param : StatusParameter.values()) {
                 if (isZero(Parameter.get(param))) {
-                    Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param)) + " (" +String.format(format, this.itemEquipmentData.Parameter.get(param)) + ")");
+                    if (itemEquipmentData.isAccessory()) {
+                        Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param)) + " (" + String.format(format, itemEquipmentData.itemAccessory.Base.get(param)) + "±" + String.format("%.0f", itemEquipmentData.itemAccessory.Range.get(param)*100) + "%)");
+                    } else {
+                        Lore.add(param.DecoDisplay + String.format(format, Parameter.get(param)) + " (" +String.format(format, itemEquipmentData.Parameter.get(param)) + ")");
+                    }
                 }
             }
             //if (itemEquipmentData.RuneMultiply != 1)
             Lore.add(decoLore("ルーン性能") + String.format("%.0f", itemEquipmentData.RuneMultiply*100) + "%");
             Lore.add(decoLore("強化値") + itemEquipmentData.Plus);
-            Lore.add(decoLore("耐久値") + itemEquipmentData.Durable + "/" + itemEquipmentData.MaxDurable);
             Lore.add(decoLore("必要レベル") + itemEquipmentData.ReqLevel);
             Lore.add(itemRune);
             for (int i = 0; i < itemEquipmentData.RuneSlot; i++) {
@@ -140,7 +143,7 @@ public class ItemParameter implements Cloneable {
             for (RewardBoxData rewardBoxData : rewardBox.List) {
                 Lore.add("§7・§e§l" + rewardBoxData.id + "§ax" + rewardBoxData.amount + " §b§l-> §a§l" + String.format(format, rewardBoxData.percent*100) + "%");
             }
-            Lore.add(rewardBox.isPartition ? "§b§lテーブル" : "§b§l抽選");
+            Lore.add(rewardBox.isPartition ? "§b§l抽選" : "§b§lテーブル");
         }
         meta.setUnbreakable(true);
         meta.setLore(Lore);

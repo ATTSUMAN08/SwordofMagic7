@@ -22,9 +22,9 @@ import swordofmagic7.Market.Market;
 import swordofmagic7.Mob.MobInfo;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetParameter;
+import swordofmagic7.Shop.AccessoryShop;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TagGame;
-import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Tutorial;
 
 import java.util.List;
@@ -39,8 +39,8 @@ import static swordofmagic7.Menu.Data.*;
 import static swordofmagic7.Shop.PetShop.*;
 import static swordofmagic7.Shop.RuneShop.RuneEquipDisplay;
 import static swordofmagic7.Shop.Shop.ShopSellDisplay;
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.SomCore.spawnPlayer;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Menu {
 
@@ -123,6 +123,7 @@ public class Menu {
                 || equalInv(view, PetSellDisplay)
                 || equalInv(view, PetEvolutionDisplay)
                 || equalInv(view, SmeltEquipmentMaterializationDisplay)
+                || equalInv(view, AccessoryShop.ReLotteryDisplay)
                 );
     }
 
@@ -160,6 +161,7 @@ public class Menu {
                 case 8 -> playerData.Equipment.unEquip(EquipmentSlot.MainHand);
                 case 40 -> playerData.Equipment.unEquip(EquipmentSlot.OffHand);
                 case 36 -> playerData.Equipment.unEquip(EquipmentSlot.Armor);
+                case 37 -> playerData.Equipment.unEquip(EquipmentSlot.Accessory);
                 case 39 -> playerData.Menu.StatusInfo.StatusInfoView(player);
             }
 
@@ -258,6 +260,7 @@ public class Menu {
 
         if (currentItem != null) {
             playerData.RuneShop.RuneMenuClick(view, ClickInventory, clickType, currentItem, index, Slot);
+            playerData.accessoryShop.AccessoryMenuClick(view, ClickInventory, clickType, currentItem, index, Slot);
             playerData.PetShop.PetShopClick(view, ClickInventory, currentItem, index, Slot);
             playerData.PetEvolution.PetEvolutionClick(view, ClickInventory, index, Slot);
             playerData.Upgrade.UpgradeClick(view, ClickInventory, index, Slot);

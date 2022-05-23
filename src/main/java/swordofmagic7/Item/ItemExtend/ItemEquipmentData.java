@@ -11,10 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ItemEquipmentData implements Cloneable {
-    public EquipmentCategory EquipmentCategory;
+    public EquipmentCategory equipmentCategory;
     public EquipmentSlot EquipmentSlot;
-    public int Durable = 0;
-    public int MaxDurable = 0;
     public int ReqLevel = 0;
     public int Plus = 0;
     public int UpgradeCost = 999;
@@ -22,17 +20,26 @@ public class ItemEquipmentData implements Cloneable {
     public int RuneSlot = 0;
     public List<RuneParameter> Rune = new ArrayList<>();
     public double RuneMultiply = 1;
+    public ItemAccessory itemAccessory = new ItemAccessory();
 
     public HashMap<StatusParameter, Double> Parameter() {
         return Parameter(PlayerData.MaxLevel);
     }
 
+    public boolean isAccessory() {
+        return equipmentCategory == EquipmentCategory.Accessory;
+    }
+
     public HashMap<StatusParameter, Double> Parameter(int limit) {
         HashMap<StatusParameter, Double> Parameter = new HashMap<>();
+        double multiply = 1 + (isAccessory() ? Plus/100f : Plus*0.05+(Math.pow(Plus, 1.8)/100));
         for (StatusParameter statusParameter : StatusParameter.values()) {
-            double parameter = this.Parameter.get(statusParameter) * (1+Plus*0.05+(Math.pow(Plus, 1.8)/100));
+            double parameter = this.Parameter.get(statusParameter) * multiply;
             for (RuneParameter rune : Rune) {
                 parameter += rune.Parameter(statusParameter, limit)*RuneMultiply;
+            }
+            if (isAccessory()) {
+                parameter += itemAccessory.Parameter.getOrDefault(statusParameter, 0d) * multiply;
             }
             Parameter.put(statusParameter, parameter);
         }
@@ -60,6 +67,7 @@ public class ItemEquipmentData implements Cloneable {
         try {
             ItemEquipmentData clone = (ItemEquipmentData) super.clone();
             clone.Rune = new ArrayList<>(Rune);
+            clone.itemAccessory = itemAccessory.clone();
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
             return clone;
         } catch (CloneNotSupportedException e) {

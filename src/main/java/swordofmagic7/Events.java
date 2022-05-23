@@ -105,7 +105,7 @@ public class Events implements Listener {
         for (Player player2 : Bukkit.getOnlinePlayers()) {
             if (player2.hasPermission(Som7Premium)) {
                 premiumCount++;
-            } if (player2.hasPermission(Som7VIP)) {
+            } else if (player2.hasPermission(Som7VIP)) {
                 vipCount++;
             } else {
                 playerCount++;
@@ -113,14 +113,14 @@ public class Events implements Listener {
         }
         if (player.hasPermission(OverLogin)) return;
         int normal = isEventServer() ? 120 : 50;
-        boolean vip = vipCount >= 5;
-        boolean premium = premiumCount >= 10;
+        boolean vip = vipCount < 5;
+        boolean premium = premiumCount < 10;
         if (playerCount >= normal) {
-            if (!vip) {
-                if (player.hasPermission(Som7VIP)) return;
+            if (vip &&player.hasPermission(Som7VIP)) return;
+            if (premium && player.hasPermission(Som7Premium)) return;
+            if (vip) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§eVIP枠は開いています");
-            } else if (!premium) {
-                if (player.hasPermission(Som7Premium)) return;
+            } else if (premium) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§ePremium枠は開いています");
             } else {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e全ての枠が埋まっています");
@@ -318,6 +318,8 @@ public class Events implements Listener {
                     playerData.PetShop.PetShopOpen();
                 } else if (shop.equalsIgnoreCase("ルーン職人")) {
                     playerData.RuneShop.RuneMenuView();
+                } else if (shop.equalsIgnoreCase("アクセサリ職人")) {
+                    playerData.accessoryShop.AccessoryMenuView();
                 } else if (shop.equalsIgnoreCase("転職神官")) {
                     playerData.Classes.ClassSelectView(true);
                 } else if (shop.equalsIgnoreCase("買取屋")) {

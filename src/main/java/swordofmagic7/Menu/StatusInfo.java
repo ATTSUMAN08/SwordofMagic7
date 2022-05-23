@@ -8,7 +8,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
-import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -77,10 +76,10 @@ public class StatusInfo {
                 statusLore.add(StatusParameter.SkillRigidTime.DecoDisplay + String.format(format, status.SkillRigidTime*100) + " (" + String.format(format, 100/status.SkillRigidTime) + "%)");
                 statusLore.add(StatusParameter.SkillCooltime.DecoDisplay + String.format(format, status.SkillCooltime*100) + " (" + String.format(format, 100/status.SkillCooltime) + "%)");
                 statusLore.add(decoLore("クリティカルダメージ") + String.format(format, status.CriticalMultiply*100) + "%");
-                statusLore.add(decoLore("物理与ダメージ") + String.format(format, status.DamageCauseMultiply.get(DamageCause.ATK)*100) + " (" + String.format(format, status.DamageCauseMultiply.get(DamageCause.ATK)*100) + "%)");
-                statusLore.add(decoLore("魔法与ダメージ") + String.format(format, status.DamageCauseMultiply.get(DamageCause.MAT)*100) + " (" + String.format(format, status.DamageCauseMultiply.get(DamageCause.MAT)*100) + "%)");
-                statusLore.add(decoLore("物理被ダメージ耐性") + String.format(format, status.DamageCauseResistance.get(DamageCause.ATK)*100) + " (" + String.format(format, 100/status.DamageCauseResistance.get(DamageCause.ATK)) + "%)");
-                statusLore.add(decoLore("魔法被ダメージ耐性") + String.format(format, status.DamageCauseResistance.get(DamageCause.MAT)*100) + " (" + String.format(format, 100/status.DamageCauseResistance.get(DamageCause.MAT)) + "%)");
+                statusLore.add(decoLore("物理与ダメージ") + String.format(format, status.DamageMultiplyATK*100) + " (" + String.format(format, status.DamageMultiplyATK*100) + "%)");
+                statusLore.add(decoLore("魔法与ダメージ") + String.format(format, status.DamageMultiplyMAT*100) + " (" + String.format(format, status.DamageMultiplyMAT*100) + "%)");
+                statusLore.add(decoLore("物理被ダメージ耐性") + String.format(format, status.DamageResistanceATK*100) + " (" + String.format(format, 100/status.DamageResistanceATK) + "%)");
+                statusLore.add(decoLore("魔法被ダメージ耐性") + String.format(format, status.DamageResistanceMAT*100) + " (" + String.format(format, 100/status.DamageResistanceMAT) + "%)");
                 statusMeta.setLore(statusLore);
                 statusIcon.setItemMeta(statusMeta);
                 List<String> classLore = new ArrayList<>();
@@ -112,7 +111,7 @@ public class StatusInfo {
                 inv.setItem(3, new ItemStackData(Material.PAINTING, decoText("§3§l統計情報"), playerData.statistics.getStringList()).view());
                 inv.setItem(4, new ItemStackData(Material.RED_DYE, decoText("§3§lアトリビュート"), attrLore).view());
 
-                int slot = 6;
+                int slot = 5;
                 for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
                     if (playerData.Equipment.getEquip(equipmentSlot).isEmpty()) {
                         inv.setItem(slot, new ItemStackData(Material.BARRIER, "§c§l" + equipmentSlot.Display + "未装備").view());

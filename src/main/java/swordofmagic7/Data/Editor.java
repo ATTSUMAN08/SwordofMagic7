@@ -52,7 +52,7 @@ public class Editor {
                                 data.set("Materialization", args[7]);
                                 createMaterialization(args[7]);
                             }
-                            data.set("EquipmentCategory", itemData.itemEquipmentData.EquipmentCategory.toString());
+                            data.set("EquipmentCategory", itemData.itemEquipmentData.equipmentCategory.toString());
                             data.set("EquipmentSlot", itemData.itemEquipmentData.EquipmentSlot.toString());
                             data.set("Sell", itemData.Sell);
                             for (StatusParameter param : StatusParameter.values()) {
@@ -61,7 +61,6 @@ public class Editor {
                                 }
                             }
                             data.set("ReqLevel", itemData.itemEquipmentData.ReqLevel);
-                            data.set("Durable", itemData.itemEquipmentData.Durable);
                             data.set("RuneSlot", itemData.itemEquipmentData.RuneSlot);
                             data.set("UpgradeCost", itemData.itemEquipmentData.UpgradeCost);
                             data.set("StatusMultiply", Double.parseDouble(args[6]));
@@ -100,7 +99,7 @@ public class Editor {
                             File file = item.File;
                             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                             switch (dataPath) {
-                                case Durable, ReqLevel, RuneSlot, UpgradeCost, Sell -> {
+                                case ReqLevel, RuneSlot, UpgradeCost, Sell -> {
                                     int value = Integer.parseInt(args[2]);
                                     data.set(String.valueOf(dataPath), value);
                                 }
@@ -296,7 +295,6 @@ public class Editor {
 enum ItemDataPaths {
     Sell,
     ReqLevel,
-    Durable,
     RuneSlot,
     UpgradeCost,
     StatusMultiply,

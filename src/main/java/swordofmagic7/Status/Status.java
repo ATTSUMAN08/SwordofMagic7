@@ -6,13 +6,13 @@ import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Classes.Classes;
-import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectDataBase;
 import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
@@ -59,6 +59,11 @@ public class Status {
     public double SkillCooltime;
     public double Movement;
     public double Shield;
+    public double DamageMultiplyATK;
+    public double DamageMultiplyMAT;
+    public double DamageResistanceATK;
+    public double DamageResistanceMAT;
+    public double MagicCircleRange;
 
 
     public HashMap<StatusParameter, Double> BaseStatus = new HashMap<>();
@@ -67,8 +72,6 @@ public class Status {
     public HashMap<StatusParameter, Double> BaseMultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
     public double CriticalMultiply;
 
     public double BaseStatus(StatusParameter param) {
@@ -116,10 +119,11 @@ public class Status {
         combatPower += (BaseStatus(StatusParameter.SkillCooltime) + EquipStatus(StatusParameter.SkillCooltime));
         combatPower += (BaseStatus(StatusParameter.SkillCastTime) + EquipStatus(StatusParameter.SkillCastTime));
         combatPower += (BaseStatus(StatusParameter.SkillRigidTime) + EquipStatus(StatusParameter.SkillRigidTime));
-        for (DamageCause damageCause : DamageCause.values()) {
-            combatPower += DamageCauseMultiply.getOrDefault(damageCause,1d)*100;
-            combatPower += DamageCauseResistance.getOrDefault(damageCause,1d*100);
-        }
+        combatPower += (BaseStatus(StatusParameter.DamageMultiplyATK) + EquipStatus(StatusParameter.DamageMultiplyATK));
+        combatPower += (BaseStatus(StatusParameter.DamageMultiplyMAT) + EquipStatus(StatusParameter.DamageMultiplyATK));
+        combatPower += (BaseStatus(StatusParameter.DamageResistanceATK) + EquipStatus(StatusParameter.DamageResistanceATK));
+        combatPower += (BaseStatus(StatusParameter.DamageResistanceMAT) + EquipStatus(StatusParameter.DamageResistanceMAT));
+        combatPower += (BaseStatus(StatusParameter.MagicCircleRange) + EquipStatus(StatusParameter.MagicCircleRange));
         for (AttributeType attr : AttributeType.values()) {
             combatPower += playerData.Attribute.getAttribute(attr)*7.5;
         }
@@ -141,14 +145,6 @@ public class Status {
         return Math.pow(1.01, level) + level *0.05;
     }
 
-    void DamageCauseMultiplyAdd(DamageCause damageCause, double add) {
-        DamageCauseMultiply.put(damageCause, DamageCauseMultiply.get(damageCause)+add);
-    }
-
-    void DamageCauseResistanceAdd(DamageCause damageCause, double add) {
-        DamageCauseResistance.put(damageCause, DamageCauseResistance.get(damageCause)+add);
-    }
-
     void BaseMultiplyStatusAdd(StatusParameter statusParameter, double add) {
         BaseMultiplyStatus.put(statusParameter, BaseMultiplyStatus.get(statusParameter)+add);
     }
@@ -168,13 +164,10 @@ public class Status {
             multiplyStatusRev.put(param, 1d);
             baseMultiplyStatusRev.put(param, 1d);
         }
-        for (DamageCause cause : DamageCause.values()) {
-            DamageCauseMultiply.put(cause, 1d);
-            DamageCauseResistance.put(cause, 1d);
-        }
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            for (StatusParameter param : StatusParameter.values()) {
-                EquipStatus.put(param, EquipStatus(param) + playerData.Equipment.getEquip(slot).itemEquipmentData.Parameter(playerData.Level).get(param));
+            ItemEquipmentData itemEquipmentData = playerData.Equipment.getEquip(slot).itemEquipmentData;
+            if (itemEquipmentData.equipmentCategory != EquipmentCategory.Baton) for (StatusParameter param : StatusParameter.values()) {
+                EquipStatus.put(param, EquipStatus(param) + itemEquipmentData.Parameter(playerData.Level).get(param));
             }
         }
         for (AttributeType attr : AttributeType.values()) {
@@ -191,15 +184,6 @@ public class Status {
                         } else if (param.Display.equalsIgnoreCase(statusParam.Display)) {
                             MultiplyStatusAdd(statusParam, param.Value / 100 * multiply);
                         }
-                    }
-                    if (param.Display.equalsIgnoreCase("物理与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                        DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100 * multiply);
-                    } if (param.Display.equalsIgnoreCase("魔法与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                        DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100 * multiply);
-                    } if (param.Display.equalsIgnoreCase("物理被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                        DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100 * multiply);
-                    } if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                        DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100 * multiply);
                     }
                 }
             }
@@ -221,10 +205,6 @@ public class Status {
                         baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
                     }
                 }
-                for (DamageCause cause : DamageCause.values()) {
-                    DamageCauseMultiplyAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack);
-                    DamageCauseResistanceAdd(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack);
-                }
             }
             for (StatusParameter param : StatusParameter.values()) {
                 MultiplyStatus.put(param, MultiplyStatus(param) * multiplyStatusRev.get(param));
@@ -243,10 +223,6 @@ public class Status {
 
         CriticalMultiply = 1.3;
         CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
-        DamageCauseMultiplyAdd(DamageCause.ATK, Attribute(STR) * 0.005);
-        DamageCauseMultiplyAdd(DamageCause.MAT, Attribute(INT) * 0.004);
-        DamageCauseResistanceAdd(DamageCause.ATK, Attribute(VIT) * 0.003);
-        DamageCauseResistanceAdd(DamageCause.MAT, (Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
 
         double M = LevelMultiply();
         BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * (1 + Attribute(VIT) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxHealth));
@@ -263,6 +239,14 @@ public class Status {
         BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
         BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
         BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
+        BaseStatus.put(StatusParameter.DamageMultiplyATK, 1d);
+        BaseStatus.put(StatusParameter.DamageMultiplyMAT, 1d);
+        BaseStatus.put(StatusParameter.DamageResistanceATK, 1d);
+        BaseStatus.put(StatusParameter.DamageResistanceMAT, 1d);
+        MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, Attribute(STR) * 0.005);
+        MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, Attribute(INT) * 0.004);
+        MultiplyStatusAdd(StatusParameter.DamageResistanceATK, Attribute(VIT) * 0.003);
+        MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, (Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
 
         MaxHealth = finalStatus(StatusParameter.MaxHealth);
         HealthRegen = finalStatus(StatusParameter.HealthRegen);
@@ -278,6 +262,11 @@ public class Status {
         SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
+        DamageMultiplyATK = finalStatus(StatusParameter.DamageMultiplyATK);
+        DamageMultiplyMAT = finalStatus(StatusParameter.DamageMultiplyMAT);
+        DamageResistanceATK = finalStatus(StatusParameter.DamageResistanceATK);
+        DamageResistanceMAT = finalStatus(StatusParameter.DamageResistanceMAT);
+        MagicCircleRange = finalStatus(StatusParameter.MagicCircleRange);
         Movement = 0.24f;
         for (Map.Entry<EffectType, Double> entry : movementEffect.entrySet()) {
             if (playerData.EffectManager.hasEffect(entry.getKey())) {

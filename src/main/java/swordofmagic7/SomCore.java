@@ -354,6 +354,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 playerData.Attribute.AttributeMenuView();
                 playSound(player, SoundList.MenuOpen);
                 return true;
+            } else if (cmd.getName().equalsIgnoreCase("damageHolo")) {
+                playerData.DamageHolo();
+                return true;
             } else if (cmd.getName().equalsIgnoreCase("damageLog")) {
                 playerData.DamageLog();
                 return true;
@@ -368,6 +371,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("effectLog")) {
                 playerData.EffectLog();
+                return true;
+            } else if (cmd.getName().equalsIgnoreCase("particleDensity")) {
+                playerData.ParticleDensity();
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("strafeMode")) {
                 playerData.StrafeMode();
@@ -624,6 +630,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public static void spawnPlayer(Player player) {
         if (!nextSpawnPlayer.contains(player)) {
             nextSpawnPlayer.add(player);
+            PlayerData playerData = playerData(player);
+            playerData.Skill.setCastReady(true);
+            playerData.Skill.SkillProcess.normalAttackCoolTime = 0;
             MultiThread.TaskRunSynchronizedLater(() -> {
                 MapList.get("Alden").enter(player);
                 player.setFlying(false);

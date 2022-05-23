@@ -17,6 +17,11 @@ public enum StatusParameter {
     SkillCooltime("スキル再使用短縮"),
     SkillCastTime("スキル詠唱短縮"),
     SkillRigidTime("スキル硬直短縮"),
+    DamageMultiplyATK("物理与ダメージ"),
+    DamageMultiplyMAT("魔法与ダメージ"),
+    DamageResistanceATK("物理被ダメージ耐性"),
+    DamageResistanceMAT("魔法被ダメージ耐性"),
+    MagicCircleRange("魔法陣範囲"),
     ;
 
     public String Display;

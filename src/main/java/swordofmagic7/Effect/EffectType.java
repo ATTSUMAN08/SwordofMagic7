@@ -33,6 +33,7 @@ public enum EffectType {
     ShadowFatter("シャドウファッター", EffectRank.High, false, "[固定]を同じ状態になります", false),
     ImmuneDepression("免疫低下", false, "[被ダメージ耐性]が減少します", true),
     AttackProhibited("攻撃禁止", EffectRank.High, false, "攻撃できなくなります", false),
+    HeavyGravity("ヘビーグラビティ", EffectRank.High, false, "[スタン]と同じ効果です", false),
 
     Unconscious("無自覚", EffectRank.Impossible, false, "「自分では、自分が狂っていることはわからないものです」", false),
     Decay("崩壊", EffectRank.Impossible, false, "「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", false),
@@ -111,6 +112,7 @@ public enum EffectType {
     MagicBarrier("魔法障壁", true, "魔法被ダメージ耐性が上昇します", true),
     IceThorns("氷の棘", true, "魔法与ダメージが上昇します", true),
     EnchantSlow("エンチャントスロー", true, "この状態で敵を攻撃すると確率でスローが入るようになります", false),
+    PsychicPressure("サイキックプレッシャー", true, true, "前方にダメージ判定が発生します", false),
     ;
 
     public String Display;
@@ -217,7 +219,7 @@ public enum EffectType {
     }
 
     public boolean isCrowdControl() {
-        return this == Stun || isFreeze();
+        return this == Stun || this == HeavyGravity || isFreeze();
     }
 
     public boolean isSkillsNotAvailable() {

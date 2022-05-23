@@ -3,13 +3,17 @@ package swordofmagic7.Inventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.DataBase;
+import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.RuneParameter;
+import swordofmagic7.Status.StatusParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static swordofmagic7.Data.DataBase.format;
 import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Function.Log;
 
@@ -35,7 +39,12 @@ public class ItemParameterStack implements Cloneable {
                         ItemCategory category = itemParameter.Category;
                         data = new StringBuilder(itemParameter.Id + ",Amount:" + Amount);
                         if (category == ItemCategory.Equipment) {
-                                data.append(",Plus:").append(itemParameter.itemEquipmentData.Plus).append(",Durable:").append(itemParameter.itemEquipmentData.Durable);
+                                data.append(",Plus:").append(itemParameter.itemEquipmentData.Plus);
+                                if (itemParameter.itemEquipmentData.equipmentCategory == EquipmentCategory.Accessory) {
+                                        for (Map.Entry<StatusParameter, Double> entry : itemParameter.itemEquipmentData.itemAccessory.Parameter.entrySet()) {
+                                                data.append(",").append(entry.getKey()).append(":").append(String.format(format, entry.getValue()));
+                                        }
+                                }
                                 for (RuneParameter runeParameter : itemParameter.itemEquipmentData.Rune) {
                                         if (!runeParameter.toString().equals("None"))
                                                 data.append(",Rune:").append(runeParameter);
@@ -55,11 +64,15 @@ public class ItemParameterStack implements Cloneable {
                                 ItemParameter itemParameter = getItemParameter(split[0]);
                                 List<RuneParameter> Rune = new ArrayList<>();
                                 for (String str : split) {
+                                        if (itemParameter.itemEquipmentData.equipmentCategory == EquipmentCategory.Accessory) {
+                                                for (StatusParameter param : StatusParameter.values()) {
+                                                        if (str.contains(param + ":")) {
+                                                                itemParameter.itemEquipmentData.itemAccessory.Parameter.put(param, Double.parseDouble(str.replace(param + ":", "")));
+                                                        }
+                                                }
+                                        }
                                         if (str.contains("Amount:")) {
                                                 parameterStack.Amount = Integer.parseInt(str.replace("Amount:", ""));
-                                        }
-                                        if (str.contains("Durable:")) {
-                                                itemParameter.itemEquipmentData.Durable = Integer.parseInt(str.replace("Durable:", ""));
                                         }
                                         if (str.contains("Plus:")) {
                                                 itemParameter.itemEquipmentData.Plus = Integer.parseInt(str.replace("Plus:", ""));

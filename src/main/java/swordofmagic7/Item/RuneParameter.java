@@ -20,7 +20,7 @@ public class RuneParameter implements Cloneable {
     public String Display = "ルーン";
     public List<String> Lore = new ArrayList<>();
     public double Quality = 0.5;
-    public int Level = 0;
+    public int Level = 1;
     public boolean isSpecial = false;
     public boolean isHide = false;
     public boolean isLoreHide = false;

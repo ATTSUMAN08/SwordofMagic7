@@ -8,6 +8,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
+import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Item.RuneParameter;
@@ -222,17 +223,20 @@ public class RuneShop {
                             if (isSetSpecial) {
                                 sendMessage(player, "§e特殊ルーン§aは§c重複§aしません", SoundList.Nope);
                             } else {
-                                if (RuneCache.itemEquipmentData.getRuneSize() < RuneCache.itemEquipmentData.RuneSlot) {
-                                    playerData.RuneInventory.removeRuneParameter(index);
-                                    RuneCache.itemEquipmentData.addRune(rune);
-                                    playSound(player, SoundList.Click);
+                                if (RuneCache.itemEquipmentData.equipmentCategory == EquipmentCategory.Accessory && !rune.isSpecial) {
+                                    sendMessage(player, "§eアクセサリ§aは§e特殊ルーン§aのみ装着出来ます", SoundList.Nope);
                                 } else {
-                                    sendMessage(player, "§eルーンスロット§aに空きがありません", SoundList.Nope);
+                                    if (RuneCache.itemEquipmentData.getRuneSize() < RuneCache.itemEquipmentData.RuneSlot) {
+                                        playerData.RuneInventory.removeRuneParameter(index);
+                                        RuneCache.itemEquipmentData.addRune(rune);
+                                        playSound(player, SoundList.Click);
+                                    } else {
+                                        sendMessage(player, "§eルーンスロット§aに空きがありません", SoundList.Nope);
+                                    }
                                 }
                             }
                         } else {
-                            player.sendMessage("§e装備§aを§eセット§aしてください");
-                            playSound(player, SoundList.Nope);
+                            sendMessage(player, "§e装備§aを§eセット§aしてください", SoundList.Nope);
                         }
                     }
                 }

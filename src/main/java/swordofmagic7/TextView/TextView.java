@@ -12,6 +12,7 @@ public class TextView {
     String data = "Reset";
     SoundList sound = null;
     boolean isNatural = false;
+    boolean isMute = false;
 
     public TextView() {}
     public TextView(String str) {
@@ -25,6 +26,7 @@ public class TextView {
     @Override
     public String toString() {
         if (isNatural) data += ",isNatural";
+        if (isMute) data += ",isMute";
         if (sound != null) data += ",Sound:" + sound;
         return data;
     }
@@ -76,6 +78,11 @@ public class TextView {
 
     public TextView setFrom(String from) {
         data += ",From:" + from;
+        return this;
+    }
+
+    public TextView setMute(boolean mute) {
+        isMute = mute;
         return this;
     }
 

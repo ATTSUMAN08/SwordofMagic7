@@ -246,7 +246,7 @@ public class Gathering {
                     time++;
                     MultiThread.sleepTick(1);
                 }
-                if (!plugin.isEnabled()) {
+                if (!plugin.isEnabled() || !player.isOnline()) {
                     return;
                 }
                 FishingInProgress = false;

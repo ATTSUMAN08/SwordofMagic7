@@ -1,6 +1,5 @@
 package swordofmagic7.Effect;
 
-import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Status.StatusParameter;
@@ -18,16 +17,6 @@ public class EffectDataBase {
 
     public HashMap<StatusParameter, Double> BaseMultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
-
-    void DamageCauseMultiplyAdd(DamageCause damageCause, double add) {
-        DamageCauseMultiply.put(damageCause, DamageCauseMultiply.getOrDefault(damageCause, 0d)+add);
-    }
-
-    void DamageCauseResistanceAdd(DamageCause damageCause, double add) {
-        DamageCauseResistance.put(damageCause, DamageCauseResistance.getOrDefault(damageCause, 0d)+add);
-    }
 
     void BaseMultiplyStatusAdd(StatusParameter statusParameter, double add) {
         BaseMultiplyStatus.put(statusParameter, BaseMultiplyStatus.getOrDefault(statusParameter, 0d)+add);
@@ -48,27 +37,28 @@ public class EffectDataBase {
                         MultiplyStatusAdd(statusParam, param.Value / 100);
                     }
                 }
-                if (param.Display.equalsIgnoreCase("物理与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                    DamageCauseMultiplyAdd(DamageCause.ATK, param.Value / 100);
-                } if (param.Display.equalsIgnoreCase("魔法与ダメージ") || param.Display.equalsIgnoreCase("与ダメージ")) {
-                    DamageCauseMultiplyAdd(DamageCause.MAT, param.Value / 100);
-                } if (param.Display.equalsIgnoreCase("物理被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                    DamageCauseResistanceAdd(DamageCause.ATK, param.Value / 100);
-                } if (param.Display.equalsIgnoreCase("魔法被ダメージ耐性") || param.Display.equalsIgnoreCase("被ダメージ耐性")) {
-                    DamageCauseResistanceAdd(DamageCause.MAT, param.Value / 100);
+                if (param.Display.equals("与ダメージ")) {
+                    MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, param.Value / 100);
+                    MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, param.Value / 100);
+                } else if (param.Display.equals("被ダメージ耐性")) {
+                    MultiplyStatusAdd(StatusParameter.DamageResistanceATK, param.Value / 100);
+                    MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, param.Value / 100);
                 }
             }
         }
         switch (effectType) {
-            case CrossGuardCounter -> DamageCauseMultiplyAdd(DamageCause.ATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
+            case CrossGuardCounter -> MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
             case InsufficientFilling -> MultiplyStatusAdd(StatusParameter.ATK, -0.9);
             case Adhesive -> MultiplyStatusAdd(StatusParameter.ATK, -0.5);
             case ImmuneDepression -> {
-                for (DamageCause cause : DamageCause.values()) DamageCauseResistanceAdd(cause, DataBase.getRuneParameter("免疫低下のルーン").AdditionParameterValue(1)/100);
+                double value = DataBase.getRuneParameter("免疫低下のルーン").AdditionParameterValue(1)/100;
+                MultiplyStatusAdd(StatusParameter.DamageResistanceATK, value);
+                MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, value);
             }
             case HitAndGuard -> MultiplyStatusAdd(StatusParameter.DEF, DataBase.getRuneParameter("ヒットアンドガードのルーン").AdditionParameterValue(1)/100);
-            case MagicBarrier -> DamageCauseResistanceAdd(DamageCause.MAT, DataBase.getRuneParameter("魔法障壁のルーン").AdditionParameterValue(1)/100);
-            case IceThorns -> DamageCauseMultiplyAdd(DamageCause.MAT, DataBase.getRuneParameter("氷の棘のルーン").AdditionParameterValue(0)/100);
+            case MagicBarrier -> MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, DataBase.getRuneParameter("魔法障壁のルーン").AdditionParameterValue(1)/100);
+            case IceThorns -> MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, DataBase.getRuneParameter("氷の棘のルーン").AdditionParameterValue(0)/100);
+            case LuxuryLiquor -> MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, DataBase.getSkillData("ブルタリティ").ParameterValue(0)/100);
         }
     }
 }

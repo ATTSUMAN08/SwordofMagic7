@@ -43,7 +43,7 @@ public class Priest extends BaseSkillClass {
                 }
             }
             skillProcess.SkillRigid(skillData);
-        }, "MassHeal");
+        }, skillData.Id);
     }
 
     public void HolyBuff(SkillData skillData, ParticleData particleData, EffectType effectType) {

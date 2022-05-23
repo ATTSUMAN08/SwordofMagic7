@@ -69,13 +69,15 @@ public class PetParameter implements Cloneable {
     public double EVA;
     public double CriticalRate;
     public double CriticalResist;
+    public double DamageMultiplyATK;
+    public double DamageMultiplyMAT;
+    public double DamageResistanceATK;
+    public double DamageResistanceMAT;
     public PetAIState AIState = PetAIState.Follow;
     public ItemParameter[] Equipment = new ItemParameter[3];
     public HashMap<StatusParameter, Double> EquipmentStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
     private EffectManager effectManager;
 
     public boolean Summoned = false;
@@ -132,7 +134,7 @@ public class PetParameter implements Cloneable {
 
     double MultiplyStatus(StatusParameter param) {
         if (!MultiplyStatus.containsKey(param)) {
-            MultiplyStatus.put(param, 0d);
+            MultiplyStatus.put(param, 1d);
         }
         return MultiplyStatus.get(param);
     }
@@ -174,10 +176,6 @@ public class PetParameter implements Cloneable {
                 EquipmentStatus.put(param, item.itemEquipmentData.Parameter(playerData.Level).get(param));
             }
         }
-        for (DamageCause cause : DamageCause.values()) {
-            DamageCauseMultiply.put(cause, 1d);
-            DamageCauseResistance.put(cause, 1d);
-        }
         if (effectManager != null && effectManager.Effect.size() > 0) {
             for (Map.Entry<EffectType, EffectData> data : effectManager.Effect.entrySet()) {
                 EffectType effectType = data.getKey();
@@ -193,10 +191,6 @@ public class PetParameter implements Cloneable {
                     else {
                         baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
                     }
-                }
-                for (DamageCause cause : DamageCause.values()) {
-                    DamageCauseMultiply.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
-                    DamageCauseResistance.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
                 }
             }
             for (StatusParameter param : StatusParameter.values()) {
@@ -231,6 +225,10 @@ public class PetParameter implements Cloneable {
         EVA = (petData.EVA * Multiply + EquipmentStatus(StatusParameter.EVA)) * MultiplyStatus(StatusParameter.EVA);
         CriticalRate = (petData.CriticalRate * Multiply + EquipmentStatus(StatusParameter.CriticalRate)) * MultiplyStatus(StatusParameter.CriticalRate);
         CriticalResist = (petData.CriticalResist * Multiply + EquipmentStatus(StatusParameter.CriticalResist)) * MultiplyStatus(StatusParameter.CriticalResist);
+        DamageMultiplyATK = MultiplyStatus(StatusParameter.DamageMultiplyATK);
+        DamageMultiplyMAT = MultiplyStatus(StatusParameter.DamageMultiplyMAT);
+        DamageResistanceATK = MultiplyStatus(StatusParameter.DamageResistanceATK);
+        DamageResistanceMAT = MultiplyStatus(StatusParameter.DamageResistanceMAT);
 
         if (entity != null) {
             entity.setCustomName(getDisplayName());

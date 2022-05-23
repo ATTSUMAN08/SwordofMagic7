@@ -22,7 +22,6 @@ import swordofmagic7.Skill.SkillClass.*;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,8 +178,8 @@ public class Skill {
                                     skillData.CoolTime = (int) Math.floor(skillData.CoolTime * (1 / playerData.Status.SkillCooltime));
                                     if (playerData.Map.isRaid) {
                                         switch (skillData.Id) {
-                                            case "Resurrection" -> skillData.CoolTime = 20 * 60 * 5;
-                                            case "BackMasking" -> {
+                                            case "Revive" -> skillData.CoolTime = 20 * 60 * 5;
+                                            case "BackMasking", "Stop" -> {
                                                 sendMessage(player, "§a現在の§eマップ§aでは使用できません", SoundList.Nope);
                                                 return;
                                             }
@@ -460,12 +459,6 @@ public class Skill {
         return SkillCoolTime.getOrDefault(skillData.Id, 0);
     }
 
-    private boolean CategoryCheck(EquipmentSlot slot, EquipmentCategory category) {
-        List<EquipmentCategory> list = new ArrayList<>();
-        list.add(category);
-        return CategoryCheck(slot, list);
-    }
-
     public boolean hasSkill(String skill) {
         SkillData skillData = DataBase.getSkillData(skill);
         for (ClassData classData : playerData.Classes.classSlot) {
@@ -497,15 +490,15 @@ public class Skill {
         boolean ReqMainHand = true;
         boolean ReqOffHand = true;
         if (skillData.ReqMainHand.size() > 0) {
-            ReqMainHand = CategoryCheck(EquipmentSlot.MainHand, skillData.ReqMainHand);
+            ReqMainHand = CategoryCheck(EquipmentSlot.MainHand, skillData.ReqMainHand, skillData.SkillType.isPassive());
         }
         if (skillData.ReqOffHand.size() > 0) {
-            ReqOffHand = CategoryCheck(EquipmentSlot.OffHand, skillData.ReqOffHand);
+            ReqOffHand = CategoryCheck(EquipmentSlot.OffHand, skillData.ReqOffHand, skillData.SkillType.isPassive());
         }
         return ReqMainHand && ReqOffHand;
     }
 
-    public boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList) {
+    public boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList, boolean isPassive) {
         if (categoryList.size() == 0) return true;
         boolean check = false;
         StringBuilder Display = new StringBuilder();
@@ -515,7 +508,7 @@ public class Skill {
             } else {
                 Display.append(", ").append(category.Display);
             }
-            if (playerData.Equipment.getEquip(slot).itemEquipmentData.EquipmentCategory == category) {
+            if (playerData.Equipment.getEquip(slot).itemEquipmentData.equipmentCategory == category) {
                 check = true;
                 break;
             }
@@ -523,7 +516,7 @@ public class Skill {
         if (check) {
             return true;
         } else {
-            sendMessage(player, "§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります", SoundList.Nope);
+            if (!isPassive) sendMessage(player, "§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります", SoundList.Nope);
             return false;
         }
     }

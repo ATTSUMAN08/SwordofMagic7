@@ -26,8 +26,8 @@ public class AddTitle implements SomCommand, SomTabComplete {
     public boolean Command(CommandSender sender, String[] args) {
         Player target = null;
         if (sender instanceof Player player) target = player;
-        if (args.length == 1) {
-            target = Bukkit.getPlayer(args[0]);
+        if (args.length == 2) {
+            target = Bukkit.getPlayer(args[1]);
         }
         if (target != null && target.isOnline()) {
             PlayerData targetData = playerData(target);

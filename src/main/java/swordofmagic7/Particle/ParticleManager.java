@@ -5,7 +5,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.Data.PlayerData;
 import swordofmagic7.PlayerList;
 import swordofmagic7.RayTrace.RayTrace;
 
@@ -19,11 +19,13 @@ public final class ParticleManager {
     private static final int maxParticle = 30000;
     private static final int decParticle = Math.round(maxParticle/20f);
     public static void onLoad() {
+        /*
         MultiThread.TaskRunTimer(() -> {
             if (particleCount > 0) {
                 particleCount -= decParticle;
             }
         }, 1);
+        */
     }
 
     public static int angle(Vector vector) {
@@ -117,12 +119,24 @@ public final class ParticleManager {
         }
         Set<Player> Players = PlayerList.getNearNonAFK(location, 32);
         for (Player player : Players) {
+            PlayerData playerData = PlayerData.playerData(player);
+            if (playerData.ParticleDensity == 0) return;
+            else if (playerData.ParticleDensity < 100) {
+                playerData.ParticleDensityCache += playerData.ParticleDensity;
+                if (playerData.ParticleDensityCache < 100) {
+                    return;
+                } else {
+                    playerData.ParticleDensityCache -= 100;
+                }
+            }
+            /*
             if (particleCount > maxParticle) {
                 if (particleCountTick < (double) particleCount/maxParticle) {
                     particleCountTick++;
                     return;
                 } else particleCountTick = 0;
             }
+             */
             particleCount++;
             if (particleData.particle != Particle.REDSTONE) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);

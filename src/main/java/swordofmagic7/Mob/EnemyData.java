@@ -58,14 +58,16 @@ public class EnemyData {
     public double EVA;
     public double CriticalRate;
     public double CriticalResist;
+    public double DamageMultiplyATK;
+    public double DamageMultiplyMAT;
+    public double DamageResistanceATK;
+    public double DamageResistanceMAT;
     public double Exp;
     public double ClassExp;
     public double MovementMultiply = 1;
 
     public HashMap<StatusParameter, Double> MultiplyStatus = new HashMap<>();
     public HashMap<StatusParameter, Double> FixedStatus = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseMultiply = new HashMap<>();
-    public HashMap<DamageCause, Double> DamageCauseResistance = new HashMap<>();
 
     public final EnemySkillManager skillManager;
     public final EffectManager effectManager;
@@ -154,10 +156,6 @@ public class EnemyData {
             multiplyStatusRev.put(param, 1d);
             baseMultiplyStatusRev.put(param, 1d);
         }
-        for (DamageCause cause : DamageCause.values()) {
-            DamageCauseMultiply.put(cause, 1d);
-            DamageCauseResistance.put(cause, 1d);
-        }
         if (effectManager.Effect.size() > 0) {
             for (Map.Entry<EffectType, EffectData> data : effectManager.Effect.entrySet()) {
                 EffectType effectType = data.getKey();
@@ -174,10 +172,6 @@ public class EnemyData {
                         baseMultiplyStatusRev.put(param, baseMultiplyStatusRev.get(param) * Math.pow(1 + baseMultiplyStatusAdd, effectData.stack));
                     }
                 }
-                for (DamageCause cause : DamageCause.values()) {
-                    DamageCauseMultiply.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseMultiply.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
-                    DamageCauseResistance.merge(cause, EffectDataBase.EffectStatus(effectType).DamageCauseResistance.getOrDefault(cause, 0d) * effectData.stack, Double::sum);
-                }
             }
             for (StatusParameter param : StatusParameter.values()) {
                 MultiplyStatus.put(param, MultiplyStatus.get(param) * multiplyStatusRev.get(param));
@@ -192,6 +186,10 @@ public class EnemyData {
         EVA = mobData.EVA * multiply * statusMultiply(StatusParameter.EVA);
         CriticalRate = mobData.CriticalRate * multiply4 * statusMultiply(StatusParameter.CriticalRate);
         CriticalResist = mobData.CriticalResist * multiply * statusMultiply(StatusParameter.CriticalResist);
+        DamageMultiplyATK = statusMultiply(StatusParameter.DamageMultiplyATK);
+        DamageMultiplyMAT = statusMultiply(StatusParameter.DamageMultiplyMAT);
+        DamageResistanceATK = statusMultiply(StatusParameter.DamageResistanceATK);
+        DamageResistanceMAT = statusMultiply(StatusParameter.DamageResistanceMAT);
         Exp = mobData.Exp * multiply;
         ClassExp = mobData.Exp;
     }
@@ -216,7 +214,7 @@ public class EnemyData {
         return lore;
     }
 
-    private double statusMultiply(StatusParameter status) {
+    public double statusMultiply(StatusParameter status) {
         return MultiplyStatus.getOrDefault(status, 1d);
     }
 
@@ -473,7 +471,7 @@ public class EnemyData {
                                         Holo.add("§b§l[+]§e§l" + dropData.itemParameter.Display + "§a§lx" + amount);
                                         if (playerData.DropLog.isItem() || (dropData.Percent <= 0.05 && playerData.DropLog.isRare()))
                                             ItemGetLog(player, dropData.itemParameter, amount);
-                                        if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent <= 0.001 && mobData.enemyType.isNormal())) {
+                                        if ((dropData.Percent <= 0.01 && mobData.enemyType.isBoss()) || (dropData.Percent < 0.001 && mobData.enemyType.isNormal())) {
                                             TextView text = new TextView(playerData.getNick() + "§aさんが");
                                             text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
                                             text.addText("§aを§e獲得§aしました");

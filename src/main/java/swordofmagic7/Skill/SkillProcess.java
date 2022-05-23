@@ -147,7 +147,7 @@ public class SkillProcess {
     public void normalAttackTargetSelect() {
         if (playerData.Equipment.isMainHandEquip()) {
             if (0 >= normalAttackCoolTime) {
-                EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
+                EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.equipmentCategory;
                 Set<LivingEntity> victims = new HashSet<>();
                 switch (category) {
                     case Blade -> victims = RectangleCollider(player.getLocation(), SkillProcess.BladeLength, 1.5, Predicate(), true);
@@ -181,7 +181,7 @@ public class SkillProcess {
                 for (LivingEntity entity : victims) {
                     victim = entity;
                 }
-                EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory;
+                EquipmentCategory category = playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.equipmentCategory;
                 switch (category) {
                     case Blade -> {
                         normalAttackParticle(victim, Particle.SWEEP_ATTACK, 0, SkillProcess.BladeLength);

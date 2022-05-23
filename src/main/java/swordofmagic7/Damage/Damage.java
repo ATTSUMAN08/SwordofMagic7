@@ -22,7 +22,8 @@ import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -34,7 +35,7 @@ public final class Damage {
 
     public static int OutrageResetTime;
     public static int FrenzyResetTime;
-    public static double PvPDecay = 500;
+    public static double PvPDecay = 250;
     public static double PvPHealDecay = 10;
 
     public static void makeHeal(Player healer, Player victim, String source, double healMultiply) {
@@ -128,7 +129,7 @@ public final class Damage {
         int attackerLevel;
         int victimLevel;
 
-        Set<Player> HoloView = new HashSet<>();
+        List<Player> HoloView = new ArrayList<>();
         if (attacker instanceof Player player) {
             HoloView.add(player);
             if (!Function.isAlive(player)) return;
@@ -137,7 +138,10 @@ public final class Damage {
             ACC = playerData.Status.ACC;
             CriticalRate = playerData.Status.CriticalRate;
             CriticalMultiply = playerData.Status.CriticalMultiply;
-            baseMultiply = playerData.Status.DamageCauseMultiply.getOrDefault(damageCause, Resistance);
+            switch (damageCause) {
+                case ATK -> baseMultiply = playerData.Status.DamageMultiplyATK;
+                case MAT -> baseMultiply = playerData.Status.DamageMultiplyMAT;
+            }
             attackerLevel = playerData.Level;
             attackerEffectManager = playerData.EffectManager;
             attackerEffectManager.removeEffect(EffectType.Covert);
@@ -158,7 +162,10 @@ public final class Damage {
             ATK = enemyData.ATK;
             ACC = enemyData.ACC;
             CriticalRate = enemyData.CriticalRate;
-            baseMultiply = enemyData.DamageCauseMultiply.getOrDefault(damageCause, baseMultiply);
+            switch (damageCause) {
+                case ATK -> baseMultiply = enemyData.DamageMultiplyATK;
+                case MAT -> baseMultiply = enemyData.DamageMultiplyMAT;
+            }
             attackerLevel = enemyData.Level;
             attackerEffectManager = enemyData.effectManager;
         } else if (PetManager.isPet(attacker)) {
@@ -166,7 +173,10 @@ public final class Damage {
             ATK = petParameter.ATK;
             ACC = petParameter.ACC;
             CriticalRate = petParameter.CriticalRate;
-            baseMultiply = petParameter.DamageCauseMultiply.getOrDefault(damageCause, baseMultiply);
+            switch (damageCause) {
+                case ATK -> baseMultiply = petParameter.DamageMultiplyATK;
+                case MAT -> baseMultiply = petParameter.DamageMultiplyMAT;
+            }
             attackerLevel = petParameter.Level;
             petParameter.DecreaseStamina(1, 1);
             attackerEffectManager = petParameter.getEffectManager();
@@ -185,7 +195,10 @@ public final class Damage {
             EVA = playerData.Status.EVA;
             CriticalResist = playerData.Status.CriticalResist;
             victimLevel = playerData.Level;
-            Resistance = playerData.Status.DamageCauseResistance.getOrDefault(damageCause, Resistance);
+            switch (damageCause) {
+                case ATK -> Resistance = playerData.Status.DamageResistanceATK;
+                case MAT -> Resistance = playerData.Status.DamageResistanceMAT;
+            }
             if (player.isInsideVehicle()) {
                 DEF = 0;
                 EVA = 0;
@@ -211,7 +224,10 @@ public final class Damage {
             DEF = enemyData.DEF;
             EVA = enemyData.EVA;
             CriticalResist = enemyData.CriticalResist;
-            Resistance = enemyData.DamageCauseResistance.getOrDefault(damageCause, Resistance);
+            switch (damageCause) {
+                case ATK -> Resistance = enemyData.DamageResistanceATK;
+                case MAT -> Resistance = enemyData.DamageResistanceMAT;
+            }
             victimLevel = enemyData.Level;
             victimEffectManager = enemyData.effectManager;
             enemyData.HitCount++;
@@ -220,7 +236,10 @@ public final class Damage {
             DEF = petParameter.DEF;
             EVA = petParameter.EVA;
             CriticalResist = petParameter.CriticalResist;
-            Resistance = petParameter.DamageCauseResistance.getOrDefault(damageCause, Resistance);
+            switch (damageCause) {
+                case ATK -> Resistance = petParameter.DamageResistanceATK;
+                case MAT -> Resistance = petParameter.DamageResistanceMAT;
+            }
             victimLevel = petParameter.Level;
             petParameter.DecreaseStamina(3, 1);
             victimEffectManager = petParameter.getEffectManager();
@@ -229,7 +248,7 @@ public final class Damage {
         victim.playEffect(EntityEffect.HURT);
         if (victimEffectManager.isInvincible() && !ignoreInvincible) {
             String log = "§b§l" + EffectType.Invincible.Display;
-            randomHologram(log, victim.getEyeLocation());
+            randomHologram(log, victim.getEyeLocation(), HoloView);
             if (attacker instanceof Player player) {
                 DamageLogType DamageLog = playerData(player).DamageLog;
                 if (DamageLog.isDamageOnly()) {
@@ -301,7 +320,7 @@ public final class Damage {
             EffectData effectData = attackerEffectManager.getData(EffectType.EnchantSlow);
             double percent = effectData.getDouble(0);
             int time = effectData.getInt(1);
-            if (random.nextDouble() < percent) victimEffectManager.addEffect(EffectType.Slow, time);
+            if (random.nextDouble() < percent) EffectManager.addEffect(victim, EffectType.Slow, time, (Player) attacker);
         }
 
         boolean victimDead = false;
@@ -463,11 +482,8 @@ public final class Damage {
         }
     }
 
-    static void randomHologram(String string, Location loc) {
-        randomHologram(string, loc, new HashSet<>());
-    }
-
-    static void randomHologram(String string, Location loc, Set<Player> players) {
+    static void randomHologram(String string, Location loc, List<Player> players) {
+        if (players.size() == 1 && !playerData(players.get(0)).DamageHolo) return;
         double x = random.nextDouble() * 2 - 1;
         double y = random.nextDouble() + 1;
         double z = random.nextDouble() * 2 - 1;

@@ -11,6 +11,7 @@ public enum EquipmentCategory {
     Baton("指揮杖", "バトン", Material.BLAZE_ROD, EquipmentSlot.MainHand),
     Armor("鎧", "アーマー", Material.IRON_CHESTPLATE, EquipmentSlot.Armor),
     Trinket("武器装飾", "トリンケット", Material.MUSIC_DISC_13, EquipmentSlot.OffHand),
+    Accessory("アクセサリ", "アクセサリ", Material.CLOCK, EquipmentSlot.Accessory),
     ;
     public String Display;
     public String Display2;

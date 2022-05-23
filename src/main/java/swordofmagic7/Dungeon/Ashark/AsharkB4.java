@@ -23,7 +23,7 @@ public class AsharkB4 {
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
-    public static int StartTime = 1200;
+    public static int StartTime = 3600;
     private static final double Radius = 196;
     private static final String mobName = "ハインド";
     private static EnemyData Enemy;

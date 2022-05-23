@@ -36,21 +36,21 @@ public class Equipment {
     }
 
     public boolean isEquip(EquipmentSlot slot, EquipmentCategory category) {
-        return isEquip(slot) && playerData.Equipment.getEquip(slot).itemEquipmentData.EquipmentCategory == category;
+        return isEquip(slot) && playerData.Equipment.getEquip(slot).itemEquipmentData.equipmentCategory == category;
     }
     public boolean isMainHandEquip() {
         return isEquip(EquipmentSlot.MainHand) && playerData.Equipment.getEquip(EquipmentSlot.MainHand).Category.isEquipment();
     }
 
     public boolean isMainHandEquip(EquipmentCategory category) {
-        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.EquipmentCategory == category;
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.MainHand).itemEquipmentData.equipmentCategory == category;
     }
     public boolean isOffHandEquip() {
         return isEquip(EquipmentSlot.OffHand) && playerData.Equipment.getEquip(EquipmentSlot.OffHand).Category.isEquipment();
     }
 
     public boolean isOffHandEquip(EquipmentCategory category) {
-        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.OffHand).itemEquipmentData.EquipmentCategory == category;
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.OffHand).itemEquipmentData.equipmentCategory == category;
     }
 
     public boolean isArmorEquip() {
@@ -58,7 +58,7 @@ public class Equipment {
     }
 
     public boolean isArmorEquip(EquipmentCategory category) {
-        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.Armor).itemEquipmentData.EquipmentCategory == category;
+        return isMainHandEquip() && playerData.Equipment.getEquip(EquipmentSlot.Armor).itemEquipmentData.equipmentCategory == category;
     }
 
 
@@ -93,7 +93,9 @@ public class Equipment {
         if (isEquip(EquipmentSlot.Armor)) {
             player.getInventory().setItem(36, EquipSlot.get(EquipmentSlot.Armor).viewItem(1, playerData.ViewFormat()));
         } else player.getInventory().setItem(36, ItemFlame);
-        player.getInventory().setItem(37, ItemFlame);
+        if (isEquip(EquipmentSlot.Accessory)) {
+            player.getInventory().setItem(37, EquipSlot.get(EquipmentSlot.Accessory).viewItem(1, playerData.ViewFormat()));
+        } else player.getInventory().setItem(37, ItemFlame);
         player.getInventory().setItem(38, ItemFlame);
         playerData.Status.StatusUpdate();
         for (PetParameter pet : playerData.PetSummon) {

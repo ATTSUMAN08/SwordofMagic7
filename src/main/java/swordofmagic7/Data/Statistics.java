@@ -3,6 +3,8 @@ package swordofmagic7.Data;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import swordofmagic7.Classes.ClassData;
+import swordofmagic7.Dungeon.Ashark.AsharkB2;
+import swordofmagic7.Dungeon.Ashark.AsharkB4;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
 import swordofmagic7.Dungeon.AusMine.AusMineB4;
 import swordofmagic7.Dungeon.Novaha.Novaha2;
@@ -144,28 +146,37 @@ public class Statistics {
         switch (mobData.Id) {
             case "サイモア" -> {
                 titleManager.addTitle("サイモア討伐");
-                if ((AusMineB2.StartTime-AusMineB2.Time) < 60) titleManager.addTitle("サイモア討伐2");
+                if ((AusMineB2.StartTime - AusMineB2.Time) < 60) titleManager.addTitle("サイモア討伐2");
             }
             case "グリフィア" -> {
                 titleManager.addTitle("グリフィア討伐");
-                if ((AusMineB4.StartTime-AusMineB4.Time) < 100) titleManager.addTitle("グリフィア討伐2");
+                if ((AusMineB4.StartTime - AusMineB4.Time) < 100) titleManager.addTitle("グリフィア討伐2");
             }
             case "リーライ" -> {
                 titleManager.addTitle("リーライ討伐");
-                if ((TarnetB1.StartTime- TarnetB1.Time) < 60) titleManager.addTitle("リーライ討伐2");
+                if ((TarnetB1.StartTime - TarnetB1.Time) < 60) titleManager.addTitle("リーライ討伐2");
             }
             case "シノサス" -> {
                 titleManager.addTitle("シノサス討伐");
-                if ((TarnetB3.StartTime- TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
+                if ((TarnetB3.StartTime - TarnetB3.Time) < 100) titleManager.addTitle("シノサス討伐2");
             }
             case "エクスタ" -> {
                 titleManager.addTitle("エクスタ討伐");
-                if ((Novaha2.StartTime- Novaha2.Time) < 100) titleManager.addTitle("エクスタ討伐2");
+                if ((Novaha2.StartTime - Novaha2.Time) < 100) titleManager.addTitle("エクスタ討伐2");
             }
             case "ヴァノセト" -> {
                 titleManager.addTitle("ヴァノセト討伐");
-                if ((Novaha4.StartTime- Novaha4.Time) < 300) titleManager.addTitle("ヴァノセト討伐2");
-                if ((Novaha4.StartTime- Novaha4.Time) < 125) titleManager.addTitle("ヴァノセト討伐ThePeriod");
+                if ((Novaha4.StartTime - Novaha4.Time) < 300) titleManager.addTitle("ヴァノセト討伐2");
+                if ((Novaha4.StartTime - Novaha4.Time) < 125) titleManager.addTitle("ヴァノセト討伐ThePeriod");
+            }
+            case "ナイアス討伐" -> {
+                titleManager.addTitle("ナイアス討伐");
+                if ((AsharkB2.StartTime - AsharkB2.Time) < 150) titleManager.addTitle("ナイアス討伐2");
+            }
+            case "ハインド" -> {
+                titleManager.addTitle("ハインド討伐");
+                if ((AsharkB4.StartTime - AsharkB4.Time) < 1200) titleManager.addTitle("ハインド討伐2");
+                if ((AsharkB4.StartTime - AsharkB4.Time) < 600) titleManager.addTitle("ハインド討伐PickYouUp");
             }
             case "訓練用ダミー" -> titleManager.addTitle("訓練用ダミー討伐");
         }

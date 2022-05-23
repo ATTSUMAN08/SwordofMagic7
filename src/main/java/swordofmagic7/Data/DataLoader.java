@@ -141,19 +141,21 @@ public class DataLoader {
                         itemParameter.IconData = data.getString("PlayerHead");
                     }
                 } else if (itemParameter.Category == ItemCategory.Equipment) {
-                    itemParameter.itemEquipmentData.EquipmentCategory = EquipmentCategory.getEquipmentCategory(data.getString("EquipmentCategory"));
-                    itemParameter.Icon = itemParameter.itemEquipmentData.EquipmentCategory.material;
+                    itemParameter.itemEquipmentData.equipmentCategory = EquipmentCategory.getEquipmentCategory(data.getString("EquipmentCategory"));
+                    itemParameter.Icon = itemParameter.itemEquipmentData.equipmentCategory.material;
                     itemParameter.itemEquipmentData.ReqLevel = data.getInt("ReqLevel");
                     itemParameter.itemEquipmentData.RuneSlot = data.getInt("RuneSlot");
                     itemParameter.itemEquipmentData.UpgradeCost = data.getInt("UpgradeCost");
-                    itemParameter.itemEquipmentData.Durable = data.getInt("Durable");
-                    itemParameter.itemEquipmentData.MaxDurable = itemParameter.itemEquipmentData.Durable;
                     itemParameter.itemEquipmentData.EquipmentSlot = EquipmentSlot.MainHand.getEquipmentSlot(data.getString("EquipmentSlot"));
                     itemParameter.itemEquipmentData.RuneMultiply = data.getDouble("RuneMultiply", 1);
                     double statusMultiply = data.getDouble("StatusMultiply", 1);
+                    if (itemParameter.itemEquipmentData.isAccessory()) itemParameter.itemEquipmentData.itemAccessory.maxSlot = data.getInt("MaxSlot", 1);
                     for (StatusParameter param : StatusParameter.values()) {
                         if (data.isSet(param.toString())) {
-                            itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()) * statusMultiply);
+                            if (itemParameter.itemEquipmentData.isAccessory()) {
+                                itemParameter.itemEquipmentData.itemAccessory.Base.put(param, data.getDouble(param.toString()) * statusMultiply);
+                                itemParameter.itemEquipmentData.itemAccessory.Range.put(param, data.getDouble(param + "-Range", 1) * statusMultiply);
+                            } else itemParameter.itemEquipmentData.Parameter.put(param, data.getDouble(param.toString()) * statusMultiply);
                         }
                     }
                 }
@@ -568,13 +570,13 @@ public class DataLoader {
                     skillData.Parameter.add(param);
                     i++;
                 }
+                for (String str : data.getStringList("ReqMainHand")) {
+                    skillData.ReqMainHand.add(EquipmentCategory.getEquipmentCategory(str));
+                }
+                for (String str : data.getStringList("ReqOffHand")) {
+                    skillData.ReqOffHand.add(EquipmentCategory.getEquipmentCategory(str));
+                }
                 if (skillData.SkillType.isActive()) {
-                    for (String str : data.getStringList("ReqMainHand")) {
-                        skillData.ReqMainHand.add(EquipmentCategory.getEquipmentCategory(str));
-                    }
-                    for (String str : data.getStringList("ReqOffHand")) {
-                        skillData.ReqOffHand.add(EquipmentCategory.getEquipmentCategory(str));
-                    }
                     skillData.Stack = data.getInt("Stack", 1);
                     skillData.Mana = data.getInt("Mana");
                     skillData.CastTime = data.getInt("CastTime");

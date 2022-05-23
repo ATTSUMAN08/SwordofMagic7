@@ -28,7 +28,7 @@ public class RewardBox {
             double p = 0;
             double percent = random.nextDouble();
             for (RewardBoxData rewardBoxData : rewardBox.List) {
-                if (percent <= p && p+rewardBoxData.percent < percent) {
+                if (p <= percent && percent < p+rewardBoxData.percent) {
                     giveReward(playerData, item, rewardBoxData);
                     break;
                 }
@@ -49,12 +49,14 @@ public class RewardBox {
         if (rewardBoxData.id.equals("メル")) {
             playerData.Mel += rewardBoxData.amount;
             message.add("§7・§e" + rewardBoxData.amount + "メル");
+            /*
             if (rewardBoxData.percent <= 0.001) {
                 TextView textView = new TextView(playerData.getNick() + "§aさんが");
                 textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aから").addText("§e[" + rewardBoxData.amount + "メル]").addText("§aを§b獲得§aしました");
                 textView.setSound(SoundList.Tick);
                 Client.sendDisplay(playerData.player, textView);
             }
+             */
         } else if (DataBase.ItemList.containsKey(rewardBoxData.id)) {
             ItemParameter getItem = getItemParameter(rewardBoxData.id);
             playerData.ItemInventory.addItemParameter(getItem, rewardBoxData.amount);
@@ -70,6 +72,7 @@ public class RewardBox {
             RuneParameter rune = getRuneParameter(rewardBoxData.id);
             playerData.RuneInventory.addRuneParameter(rune);
             RuneGetLog(playerData.player, rune);
+            /*
             if (rewardBoxData.percent <= 0.001) {
                 TextView textView = new TextView(playerData.getNick() + "§aさんが");
                 textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aから");
@@ -77,16 +80,19 @@ public class RewardBox {
                 textView.setSound(SoundList.Tick);
                 Client.sendDisplay(playerData.player, textView);
             }
+             */
         } else if (DataBase.PetList.containsKey(rewardBoxData.id)) {
             PetParameter pet = new PetParameter(playerData.player, playerData, getPetData(rewardBoxData.id), rewardBoxData.Level, PlayerData.MaxLevel, 0, rewardBoxData.GrowthRate);
             playerData.PetInventory.addPetParameter(pet);
             message.add("§7・§e" + rewardBoxData.id);
+            /*
             if (rewardBoxData.percent <= 0.001) {
                 TextView textView = new TextView(playerData.getNick() + "§aさんが");
                 textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aから").addView(pet.getTextView(playerData.ViewFormat())).addText("§aを§b獲得§aしました");
                 textView.setSound(SoundList.Tick);
                 Client.sendDisplay(playerData.player, textView);
             }
+             */
         } else {
             message.add("§c設定ミスのアイテムがあります。運営に報告してください -> " + rewardBoxData.id);
         }

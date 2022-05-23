@@ -1,5 +1,6 @@
 package swordofmagic7.Mob.Skill;
 
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import swordofmagic7.Effect.EffectManager;
@@ -35,6 +36,19 @@ public class EnemySkillBase {
 
     public LivingEntity entity() {
         return enemyData().entity;
+    }
+
+    public Location location() {
+        Location location = entity().getLocation().clone();
+        if (target() != null) {
+            double x = location.getX();
+            double z = location.getZ();
+            double x2 = target().getLocation().getX();
+            double z2 = target().getLocation().getZ();
+            float yaw = (float) (Math.atan2(z2-z, x2-x)*180/Math.PI)-90;
+            location.setYaw(yaw);
+        }
+        return location;
     }
 
     public LivingEntity target() {

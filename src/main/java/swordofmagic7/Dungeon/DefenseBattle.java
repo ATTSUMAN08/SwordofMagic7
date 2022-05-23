@@ -104,7 +104,7 @@ public class DefenseBattle {
             Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DungeonTrigger);
             Set<Player> Players = new HashSet<>();
             MultiThread.TaskRunSynchronized(() -> {
-                EnemyData enemyData = MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, spawnLocation[random.nextInt(spawnLocation.length - 1)]);
+                EnemyData enemyData = MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, spawnLocation[random.nextInt(spawnLocation.length)]);
                 enemyData.nonTargetLocation = targetLocation;
                 EnemyList.add(enemyData);
             });
@@ -114,7 +114,7 @@ public class DefenseBattle {
                     for (int i2 = 0; i2 < 5; i2++) {
                         if (EnemyCount > 0 && EnemyList.size() < 50) {
                             MobData mobData = MobList.get(random.nextInt(MobList.size() - 1));
-                            Location location = spawnLocation[random.nextInt(spawnLocation.length - 1)];
+                            Location location = spawnLocation[random.nextInt(spawnLocation.length)];
                             EnemyData enemyData = MobManager.mobSpawn(mobData, wave * 5, location);
                             if (random.nextDouble() < 0.5) {
                                 enemyData.overrideTargetLocation = targetLocation;
