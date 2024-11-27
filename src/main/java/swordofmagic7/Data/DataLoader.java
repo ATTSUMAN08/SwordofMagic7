@@ -2,10 +2,7 @@ package swordofmagic7.Data;
 
 import me.libraryaddict.disguise.disguisetypes.*;
 import me.libraryaddict.disguise.disguisetypes.watchers.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Cat;
@@ -1086,7 +1083,7 @@ public class DataLoader {
             }
             case CAT -> {
                 CatWatcher watcher = new CatWatcher(disguise);
-                watcher.setType(data.isSet("Disguise.CatType") ? Cat.Type.valueOf(data.getString("Disguise.CatType")) : Cat.Type.RED);
+                watcher.setType(data.isSet("Disguise.CatType") ? Registry.CAT_VARIANT.getOrThrow(NamespacedKey.fromString(data.getString("Disguise.CatType").toLowerCase(Locale.ROOT))) : Cat.Type.RED);
                 disguise.setWatcher(watcher);
             }
             case PLAYER -> {

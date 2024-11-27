@@ -27,7 +27,7 @@ public class Ranger extends BaseSkillClass {
     public void ChainAttack(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
+            ParticleData particleData = new ParticleData(Particle.CRIT);
 
             MultiThread.sleepMillis(skillData.CastTime);
 

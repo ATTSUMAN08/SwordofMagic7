@@ -111,7 +111,7 @@ public class Barbarian extends BaseSkillClass {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
             double radius = skillData.ParameterValue(3);
-            ParticleData particleData = new ParticleData(Particle.VILLAGER_ANGRY);
+            ParticleData particleData = new ParticleData(Particle.ANGRY_VILLAGER);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, player.getLocation(), radius, 10);

@@ -40,7 +40,7 @@ public class Oracle extends BaseSkillClass {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
+            ParticleData particleData = new ParticleData(Particle.CRIT);
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -82,7 +82,7 @@ public class Oracle extends BaseSkillClass {
             skill.setCastReady(false);
             double radius = skillData.ParameterValue(1);
             int time = skillData.ParameterValueInt(0);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.YELLOW, 1));
+            ParticleData particleData = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1));
             Location origin = player.getLocation();
 
             for (int i = 0; i < skillData.CastTime; i++) {
@@ -125,7 +125,7 @@ public class Oracle extends BaseSkillClass {
             double radius = skillData.ParameterValue(2);
             int time = skillData.ParameterValueInt(0);
             Location origin = RayTrace.rayLocationBlock(player.getEyeLocation(), 10, true).HitPosition;
-            ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.AQUA, 1));
+            ParticleData particleData = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.AQUA, 1));
             particleData.setVector(Function.VectorDown);
 
             if (playerData.Equipment.isEquipRune("追尾魔法陣のルーン")) {

@@ -231,8 +231,8 @@ public class Skill {
                                             //プリースト
                                             case "MassHeal" -> priest.MassHeal(skillData);
                                             case "Monstrance" -> priest.Monstrance(skillData);
-                                            case "HolyDefense" -> priest.HolyBuff(skillData, new ParticleData(Particle.FIREWORKS_SPARK), EffectType.HolyDefense);
-                                            case "HolyAttack" -> priest.HolyBuff(skillData, new ParticleData(Particle.REDSTONE), EffectType.HolyAttack);
+                                            case "HolyDefense" -> priest.HolyBuff(skillData, new ParticleData(Particle.FIREWORK), EffectType.HolyDefense);
+                                            case "HolyAttack" -> priest.HolyBuff(skillData, new ParticleData(Particle.DUST), EffectType.HolyAttack);
                                             case "Revive" -> priest.Revive(skillData);
                                             //ペルタスト
                                             case "RimBlow" -> novice.Slash(skillData, 4, 160);
@@ -246,8 +246,8 @@ public class Skill {
                                             case "Electrocute" -> elementalist.Electrocute(skillData);
                                             case "StormDust" -> elementalist.StormDust(skillData);
                                             //バレットマーカー
-                                            case "TracerBullet" -> SkillProcess.BuffApply(skillData, EffectType.TracerBullet, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
-                                            case "DoubleGunStance" -> SkillProcess.BuffApply(skillData, EffectType.DoubleGunStance, new ParticleData(Particle.REDSTONE), skillData.ParameterValueInt(0) * 20);
+                                            case "TracerBullet" -> SkillProcess.BuffApply(skillData, EffectType.TracerBullet, new ParticleData(Particle.DUST), skillData.ParameterValueInt(0) * 20);
+                                            case "DoubleGunStance" -> SkillProcess.BuffApply(skillData, EffectType.DoubleGunStance, new ParticleData(Particle.DUST), skillData.ParameterValueInt(0) * 20);
                                             case "FreezeBullet" -> bulletMarker.FreezeBullet(skillData, SkillProcess);
                                             case "RestInPeace" -> bulletMarker.RestInPeace(skillData, SkillProcess);
                                             //ドッペルゾルドナー
@@ -261,7 +261,7 @@ public class Skill {
                                             case "Indulgendia" -> pardoner.Indulgendia(skillData);
                                             case "Forgiveness" -> pardoner.Forgiveness(skillData, 20);
                                             case "DiscernEvil" -> pardoner.DiscernEvil(skillData);
-                                            case "IncreaseMagicDef" -> priest.HolyBuff(skillData, new ParticleData(Particle.SPELL_WITCH), EffectType.IncreaseMagicDef);
+                                            case "IncreaseMagicDef" -> priest.HolyBuff(skillData, new ParticleData(Particle.WITCH), EffectType.IncreaseMagicDef);
                                             //クロノマンサー
                                             case "Slow" -> chronomancer.Slow(skillData);
                                             case "Stop" -> chronomancer.Stop(skillData);
@@ -333,7 +333,7 @@ public class Skill {
                                             case "Rampage" -> outLaw.Rampage(skillData);
                                             //カバリスト
                                             case "Ayinsof" -> {
-                                                ParticleData particleData = new ParticleData(Particle.SPELL_WITCH);
+                                                ParticleData particleData = new ParticleData(Particle.WITCH);
                                                 int time = skillData.ParameterValueInt(0) * 20;
                                                 if (playerData.Equipment.isEquipRune("単体魔法陣のルーン")) {
                                                     SkillProcess.PartyBuffApply(skillData, EffectType.Ayinsof, particleData, time);
@@ -343,7 +343,7 @@ public class Skill {
                                             }
                                             case "Sevenfold" -> {
                                                 EffectType effectType = playerData.Equipment.isEquipRune("ラストチャンスのルーン") ? EffectType.LastChance : EffectType.Sevenfold;
-                                                SkillProcess.PartyBuffApply(skillData, effectType, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                                SkillProcess.PartyBuffApply(skillData, effectType, new ParticleData(Particle.WITCH), skillData.ParameterValueInt(0)*20);
                                                 skillData.CoolTime = 120*20;
                                             }
                                             case "Gevura" -> kabbalist.Gevura(skillData);
@@ -356,7 +356,7 @@ public class Skill {
                                             case "SubzeroShield" -> cryomancer.SubzeroShield(skillData);
                                             case "SnowRolling" -> cryomancer.SnowRolling(skillData);
                                             //プレイグドクター
-                                            case "BeakMask" -> SkillProcess.BuffApply(skillData, EffectType.BeakMask, new ParticleData(Particle.SPELL_WITCH), skillData.ParameterValueInt(0)*20);
+                                            case "BeakMask" -> SkillProcess.BuffApply(skillData, EffectType.BeakMask, new ParticleData(Particle.WITCH), skillData.ParameterValueInt(0)*20);
                                             case "Modafinil" -> plagueDoctor.Modafinil(skillData);
                                             case "HealingFactor" -> plagueDoctor.HealingFactor(skillData);
                                             case "FumiGate" -> plagueDoctor.FumiGate(skillData);

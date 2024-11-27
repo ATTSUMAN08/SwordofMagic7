@@ -1,14 +1,14 @@
 package swordofmagic7.Item;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.NbtApiException;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemExtend.*;
 import swordofmagic7.Item.ItemUseList.RewardBox;
@@ -16,7 +16,6 @@ import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,24 +150,23 @@ public class ItemParameter implements Cloneable {
             meta.addItemFlags(flag);
         }
         if (Icon == Material.PLAYER_HEAD) {
-            SkullMeta skullMeta = (SkullMeta) meta;
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-            profile.getProperties().put("textures", new Property("textures", IconData));
             try {
-                Field field = skullMeta.getClass().getDeclaredField("profile");
-                field.setAccessible(true);
-                field.set(skullMeta, profile);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                Log("プレイヤへッドのロード時にエラーが発生しました -> " + Display);
+                NBT.modifyComponents(item, nbt -> {
+                    ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
+                    profileNbt.setUUID("id", UUID.randomUUID());
+                    ReadWriteNBT propertiesNbt = profileNbt.getCompoundList("properties").addCompound();
+                    propertiesNbt.setString("name", "textures");
+                    propertiesNbt.setString("value", IconData);
+                });
+            } catch (NbtApiException e) {
+                Log("プレイヤへッドのロード時にエラーが発生しました -> " + Display + " | " + e.getMessage());
             }
-
-            item.setItemMeta(skullMeta);
         } else {
             item.setItemMeta(meta);
         }
-        if (Category.isTool()) {
-            //NBTItem nbtItem = new NBTItem(item);
-        }
+        /*if (Category.isTool()) {
+            NBTItem nbtItem = new NBTItem(item);
+        }*/
 
         if (amount > MaxStackAmount) {
             amount = MaxStackAmount;

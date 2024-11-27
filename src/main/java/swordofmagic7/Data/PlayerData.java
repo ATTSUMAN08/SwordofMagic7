@@ -1,8 +1,7 @@
 package swordofmagic7.Data;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
+import eu.decentsoftware.holograms.api.holograms.HologramLine;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -244,8 +243,7 @@ public class PlayerData {
     }
 
     public Hologram hologram;
-    public VisibilityManager visibilityManager;
-    public TextLine[] hologramLine = new TextLine[3];
+    public HologramLine[] hologramLine = new HologramLine[3];
     public String holoTitle;
     public int HoloWait = 0;
     public int HoloAnim = 0;

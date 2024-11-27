@@ -94,7 +94,7 @@ public class Hind extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
             radiusMessage("§c「変な動きしないで」", SoundList.DungeonTrigger);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.05f);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.05f);
             double max = 18;
             double min = 7;
 

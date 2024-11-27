@@ -37,7 +37,7 @@ public class Doppelsoeldner extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.DeedsOfValor, (int) skillData.Parameter.get(0).Value * 20);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Howl);
             skillProcess.SkillRigid(skillData);
         }, "DeedsOfValor");

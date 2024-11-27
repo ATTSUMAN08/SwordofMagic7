@@ -85,7 +85,7 @@ public class LeeLai {
             try {
                 Location location = Manager.enemyData.entity.getLocation();
                 location.add(location.getDirection().clone().setY(0).normalize().multiply(5));
-                ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0);
+                ParticleData particleData = new ParticleData(Particle.FIREWORK, 0);
                 int i = 0;
                 Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
                 while (Manager.enemyData.isAlive() && !Manager.setCancel) {
@@ -115,7 +115,7 @@ public class LeeLai {
             try {
                 radiusMessage(Glory);
                 Location location = Manager.enemyData.entity.getLocation();
-                ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.3f, Function.VectorUp);
+                ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.3f, Function.VectorUp);
                 int i = 0;
                 Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
                 while (Manager.enemyData.isAlive() && !Manager.setCancel) {

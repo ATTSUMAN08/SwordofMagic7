@@ -81,7 +81,7 @@ public class Equipment {
                 } else if (item.getType() == Material.IRON_AXE) {
                     digSpeed = (int) Math.floor((playerData.LifeStatus.getLevel(LifeType.Lumber)-reqLevel)/5f);
                 }
-                if (digSpeed > 0) item.addUnsafeEnchantment(Enchantment.DIG_SPEED, digSpeed);
+                if (digSpeed > 0) item.addUnsafeEnchantment(Enchantment.EFFICIENCY, digSpeed);
             }
             player.getInventory().setItem(8, item);
         } else player.getInventory().setItem(8, new ItemStack(Material.AIR));

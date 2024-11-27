@@ -86,7 +86,7 @@ public class WarpGateParameter {
 
     public void Active() {
         isActive = true;
-        particleData = new ParticleData(Particle.SPELL_WITCH);
+        particleData = new ParticleData(Particle.WITCH);
     }
 
     public void ActiveAtTime(int time) {
@@ -99,11 +99,11 @@ public class WarpGateParameter {
 
     public void Disable() {
         isActive = false;
-        particleData = new ParticleData(Particle.REDSTONE);
+        particleData = new ParticleData(Particle.DUST);
     }
 
     private World world;
-    private ParticleData particleData = new ParticleData(Particle.SPELL_WITCH);
+    private ParticleData particleData = new ParticleData(Particle.WITCH);
     private boolean isStarted = false;
     public void start() {
         if (isStarted) return;

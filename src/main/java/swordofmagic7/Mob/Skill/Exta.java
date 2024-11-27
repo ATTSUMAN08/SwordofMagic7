@@ -42,8 +42,8 @@ public class Exta extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             if (target() != null) {
                 Manager.CastSkillIgnoreAI(true);
-                ParticleData particleData = new ParticleData(Particle.REDSTONE, 0.05f);
-                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+                ParticleData particleData = new ParticleData(Particle.DUST, 0.05f);
+                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
 
                 for (int i = 0; i < CastTime; i += Manager.period) {
                     ParticleManager.CircleParticle(particleData, target().getLocation(), 1, 24);
@@ -68,7 +68,7 @@ public class Exta extends EnemySkillBase {
                 Manager.CastSkill(true);
                 effectManager().addEffect(EffectType.Invincible, CastTime+60);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f, Function.VectorUp);
-                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
                 for (int i = 0; i < CastTime; i += Manager.period) {
                     ParticleManager.CircleParticle(particleData, entity().getLocation(), 1, 24);
                     MultiThread.sleepTick(Manager.period);
@@ -103,8 +103,8 @@ public class Exta extends EnemySkillBase {
             Manager.CastSkill(true);
             radiusMessage("§c祭壇が起動しようとしています！阻止してください！", SoundList.DungeonTrigger);
             effectManager().addEffect(EffectType.Invincible, 300);
-            ParticleData particleData = new ParticleData(Particle.EXPLOSION_LARGE);
-            ParticleData particleData2 = new ParticleData(Particle.SPELL_WITCH).setRandomOffset().setRandomOffset(2);
+            ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
+            ParticleData particleData2 = new ParticleData(Particle.WITCH).setRandomOffset().setRandomOffset(2);
             Set<EnemyData> enemyList = new HashSet<>();
             MobData mobData = DataBase.getMobData("起動結晶");
             MultiThread.TaskRunSynchronized(() -> {
@@ -140,8 +140,8 @@ public class Exta extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             radiusMessage("§c遠くにいる人を見つめています！", SoundList.DungeonTrigger);
-            ParticleData particleData = new ParticleData(Particle.SMOKE_NORMAL, 0.05f);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.SMOKE, 0.05f);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             Location origin = entity().getLocation();
             LivingEntity target = Function.FarthestLivingEntity(origin, Function.NearEntityByEnemy(origin, 64));
             if (target != null) {

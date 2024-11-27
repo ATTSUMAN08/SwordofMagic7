@@ -3,9 +3,9 @@ package swordofmagic7;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.handler.TouchHandler;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.DecentHologramsAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -57,20 +58,19 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public static Plugin plugin;
     public static JavaPlugin javaPlugin;
     public static final Random random = new Random();
-    public static final Set<Hologram> HologramSet = new HashSet<>();
+    public static final HashMap<String, Consumer<Player>> hologramTouchActions = new HashMap<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
     public static final int AFKTimePeriod = 1;
     public static final int AFKTime = 600;//1800;
 
     public static Hologram createHologram(Location location) {
-        Hologram hologram = HologramsAPI.createHologram(plugin, location);
-        HologramSet.add(hologram);
-        return hologram;
+        return DHAPI.createHologram("SOM7_" + UUID.randomUUID(), location);
     }
 
-    public static Hologram createTouchHologram(String Display, Location location, TouchHandler touchHandler) {
+    public static Hologram createTouchHologram(String Display, Location location, Consumer<Player> action) {
         Hologram hologram = createHologram(location);
-        hologram.appendTextLine(Display).setTouchHandler(touchHandler);
+        DHAPI.addHologramLine(hologram, Display);
+        hologramTouchActions.put(hologram.getId(), action);
         return hologram;
     }
 
@@ -151,7 +151,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
-            HologramSet.removeIf(Hologram::isDeleted);
         }, 200, 6000), "AutoSave");
 
         MultiThread.TaskRunTimer(() -> {
@@ -199,12 +198,17 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
     @Override
     public void onDisable() {
-
         MultiThread.closeMultiThreads();
 
-        for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
-            if (!hologram.isDeleted()) hologram.delete();
-        }
+        DecentHologramsAPI.get().getHologramManager().getHologramNames().forEach(hologramId -> {
+            if (hologramId.startsWith("SOM7_")) {
+                Hologram hologram = DHAPI.getHologram(hologramId);
+                if (hologram == null) return;
+                if (!hologram.isDisabled()) {
+                    hologram.destroy();
+                }
+            }
+        });
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();

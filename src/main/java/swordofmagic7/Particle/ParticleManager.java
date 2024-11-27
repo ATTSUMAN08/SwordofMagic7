@@ -138,7 +138,7 @@ public final class ParticleManager {
             }
              */
             particleCount++;
-            if (particleData.particle != Particle.REDSTONE) {
+            if (particleData.particle != Particle.DUST) {
                 player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed);
             } else player.spawnParticle(particleData.particle, location.clone().add(offset), 0, vector.getX(), vector.getY(), vector.getZ(), speed, particleData.dustOptions);
         }

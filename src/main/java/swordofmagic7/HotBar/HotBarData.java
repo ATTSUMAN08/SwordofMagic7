@@ -118,7 +118,7 @@ public class HotBarData implements Cloneable {
             }
         }
         if (glow) {
-            item.addUnsafeEnchantment(Enchantment.DURABILITY, 0);
+            item.addUnsafeEnchantment(Enchantment.UNBREAKING, 0);
             item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         item.setAmount(Math.max(Math.min(99, amount), 1));

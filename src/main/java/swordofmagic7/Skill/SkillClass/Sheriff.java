@@ -41,7 +41,7 @@ public class Sheriff extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.HeadShot, skillData.ParameterValueInt(1) * 20);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, "HeadShot");
@@ -56,7 +56,7 @@ public class Sheriff extends BaseSkillClass {
                 MultiThread.sleepTick(skillData.CastTime);
 
                 playerData.EffectManager.addEffect(EffectType.Redemption, time);
-                ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
+                ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
                 playSound(player, SoundList.Heal);
             } else {
                 player.sendMessage("§e[" + EffectType.RedemptionAble.Display + "]§aが必要です");
@@ -113,8 +113,8 @@ public class Sheriff extends BaseSkillClass {
 
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), ray.HitPosition, 0, 10);
-            ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), playerHandLocation(player), ray.HitPosition, 0, 10);
-            ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), playerHandLocation(player), ray.HitPosition, 0, 10);
+            ParticleManager.LineParticle(new ParticleData(Particle.FIREWORK), playerHandLocation(player), ray.HitPosition, 0, 10);
+            ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), ray.HitPosition, 0, 10);
             if (ray.isHitEntity()) {
                 Set<LivingEntity> targets = Function.NearLivingEntity(ray.HitPosition, 1.2, skillProcess.Predicate());
                 targets.add(ray.HitEntity);

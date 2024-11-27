@@ -48,7 +48,7 @@ public class KingSlime {
             List<LivingEntity> targets = new ArrayList<>(Function.NearEntityByEnemy(entity.getLocation(), 48));
             if (targets.size() > 0) {
                 LivingEntity target = targets.get(random.nextInt(targets.size()));
-                ParticleData particleData = new ParticleData(Particle.SLIME);
+                ParticleData particleData = new ParticleData(Particle.ITEM_SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, target, DamageCause.ATK, "SlimeLaser", 1.5, 1);
                 if (target instanceof Player player) playSound(player, SoundList.Slime);
@@ -74,7 +74,7 @@ public class KingSlime {
             }
 
             if (target != null && target.getLocation().distance(entity.getLocation()) < radius) {
-                ParticleData particleData = new ParticleData(Particle.SLIME);
+                ParticleData particleData = new ParticleData(Particle.ITEM_SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, target, DamageCause.ATK, "Crush", 4, 1);
                 Function.setVelocity(target, entity.getLocation().getDirection().setY(1));
@@ -142,7 +142,7 @@ public class KingSlime {
             LivingEntity entity = Manager.enemyData.entity;
             double length = 20;
             double angle = 130;
-            ParticleData particleData = new ParticleData(Particle.SLIME, 0.05f);
+            ParticleData particleData = new ParticleData(Particle.ITEM_SLIME, 0.05f);
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
 
             radiusMessage("§cキングスライムが強力な攻撃を使用としてます！避けてください！");

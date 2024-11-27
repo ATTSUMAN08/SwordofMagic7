@@ -131,7 +131,7 @@ public class Corsair extends BaseSkillClass {
 
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
-                ParticleManager.LineParticle(new ParticleData(Particle.SMOKE_NORMAL), playerHandLocation(player), 20, 0, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.SMOKE), playerHandLocation(player), 20, 0, 10);
                 EffectManager.addEffect(ray.HitEntity, EffectType.IronHook, time, player);
                 IronHookEntity = ray.HitEntity;
                 playSound(player, SoundList.DeBuff);

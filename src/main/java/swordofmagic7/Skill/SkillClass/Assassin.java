@@ -42,7 +42,7 @@ public class Assassin extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            ParticleData particleData = new ParticleData(Particle.SPELL_WITCH, 0.2f, player.getLocation().getDirection());
+            ParticleData particleData = new ParticleData(Particle.WITCH, 0.2f, player.getLocation().getDirection());
             Location start = player.getEyeLocation().clone();
             start.setPitch(0);
             Ray ray = RayTrace.rayLocationBlock(start, length, false);
@@ -109,8 +109,8 @@ public class Assassin extends BaseSkillClass {
 
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), ray.HitPosition, 0, 10);
-            ParticleManager.LineParticle(new ParticleData(Particle.SPELL), playerHandLocation(player), ray.HitPosition, 0, 10);
-            ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), playerHandLocation(player), ray.HitPosition, 0, 10);
+            ParticleManager.LineParticle(new ParticleData(Particle.WITCH), playerHandLocation(player), ray.HitPosition, 0, 10);
+            ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), ray.HitPosition, 0, 10);
             if (ray.isHitEntity()) {
                 LivingEntity victim = ray.HitEntity;
                 int count = 1;

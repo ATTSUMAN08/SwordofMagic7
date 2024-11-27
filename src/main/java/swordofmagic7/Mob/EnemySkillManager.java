@@ -19,8 +19,8 @@ import static swordofmagic7.SomCore.random;
 
 public class EnemySkillManager {
     public final EnemyData enemyData;
-    public final ParticleData particleCasting = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.RED, 1));
-    public final ParticleData particleActivate = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.PURPLE, 1));
+    public final ParticleData particleCasting = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.RED, 1));
+    public final ParticleData particleActivate = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.PURPLE, 1));
     public final HashMap<String, Integer> CoolTime = new HashMap<>();
     public final HashMap<String, Integer> Available = new HashMap<>();
     public boolean SkillReady = true;

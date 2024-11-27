@@ -3,6 +3,8 @@ package swordofmagic7;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
+import eu.decentsoftware.holograms.api.actions.ClickType;
+import eu.decentsoftware.holograms.event.HologramClickEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -331,7 +334,7 @@ public class Events implements Listener {
                 } else if (shop.equalsIgnoreCase("回復神官")) {
                     playerData.Status.Health = playerData.Status.MaxHealth;
                     playerData.Status.Mana = playerData.Status.MaxMana;
-                    ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getLocation(), 1, 2, 3, 3);
+                    ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), player.getLocation(), 1, 2, 3, 3);
                     playSound(player, SoundList.Heal);
                 } else if (shop.equalsIgnoreCase("マーケット")) {
                     playerData.Menu.Market.MarketMenuView();
@@ -663,5 +666,16 @@ public class Events implements Listener {
     @EventHandler
     void onSpectate(PlayerStartSpectatingEntityEvent event) {
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    void onHologramClick(HologramClickEvent event) {
+        if (event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) {
+            Player player = event.getPlayer();
+            Consumer<Player> action = hologramTouchActions.get(event.getHologram().getName());
+            if (action != null) {
+                action.accept(player);
+            }
+        }
     }
 }

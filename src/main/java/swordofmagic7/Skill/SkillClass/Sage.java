@@ -40,7 +40,7 @@ public class Sage extends BaseSkillClass {
             skill.setCastReady(false);
             double length = skillData.ParameterValue(0);
             double radius = skillData.ParameterValue(1);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, Function.VectorUp);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, Function.VectorUp);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 10);
@@ -73,7 +73,7 @@ public class Sage extends BaseSkillClass {
             int time = skillData.ParameterValueInt(0)*20;
             double radius = skillData.ParameterValue(1);
             ParticleData particleData = new ParticleData(Particle.PORTAL, 0.5f, Function.VectorUp).setRandomOffset(1.5f);
-            ParticleData particleData2 = new ParticleData(Particle.ENCHANTMENT_TABLE);
+            ParticleData particleData2 = new ParticleData(Particle.ENCHANT);
             Location loc = RayTrace.rayLocationBlock(player.getEyeLocation(), radius, false).HitPosition;
             loc.setPitch(90);
             Location origin = RayTrace.rayLocationBlock(loc, radius, false).HitPosition;

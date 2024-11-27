@@ -26,7 +26,7 @@ public class Gunner extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.Aiming, (int) skillData.Parameter.get(0).Value * 20);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.SPELL_WITCH), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
@@ -42,7 +42,7 @@ public class Gunner extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.Invincible, time);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT_MAGIC), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             player.setVelocity(player.getLocation().getDirection().clone().setY(0.5).normalize().multiply(-1));
             skillProcess.SkillRigid(skillData);

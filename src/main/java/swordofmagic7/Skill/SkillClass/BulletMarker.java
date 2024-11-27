@@ -65,7 +65,7 @@ public class BulletMarker extends BaseSkillClass {
             double value = skillData.ParameterValue(0)/100* multiply();
             int time = skillData.ParameterValueInt(1)*20;
             MultiThread.sleepTick(skillData.CastTime);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, true, 0.1f);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, true, 0.1f);
             ParticleData particleData1 = new ParticleData(Particle.CRIT);
 
             ParticleManager.LineParticle(particleData1, playerHandLocation(player), 20, 0, 10);

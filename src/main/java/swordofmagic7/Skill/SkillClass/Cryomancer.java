@@ -40,11 +40,11 @@ public class Cryomancer extends BaseSkillClass {
             final Location loc = RayTrace.rayLocationBlock(player.getEyeLocation(), distance, false).HitPosition;
             loc.setPitch(90);
             final Location origin = RayTrace.rayLocationBlock(loc, distance, false).HitPosition;
-            final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.4f, Function.VectorUp);
+            final ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.4f, Function.VectorUp);
             particleData.randomOffset = true;
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.8f;
-            final ParticleData particleData2 = new ParticleData(Particle.FIREWORKS_SPARK).setRandomOffset(1);
+            final ParticleData particleData2 = new ParticleData(Particle.FIREWORK).setRandomOffset(1);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 10);
@@ -84,7 +84,7 @@ public class Cryomancer extends BaseSkillClass {
             int count = 1 + skillData.ParameterValueInt(2);
             double radius = skillData.ParameterValue(1);
             Location origin = player.getLocation().clone().add(player.getLocation().getDirection().multiply(radius));
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.2f, Function.VectorUp);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.2f, Function.VectorUp);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);
@@ -109,7 +109,7 @@ public class Cryomancer extends BaseSkillClass {
             int time = skillData.ParameterValueInt(2)*20;
             double length = 10;
             double width = 3;
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.RectangleParticle(particleCasting, player.getLocation(), length, width, 3);
@@ -132,7 +132,7 @@ public class Cryomancer extends BaseSkillClass {
             int time = skillData.ParameterValueInt(0)*20;
             double freezePercent  = skillData.ParameterValue(1)/100;
             int time2 = skillData.ParameterValueInt(2)*20;
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK);
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -152,7 +152,7 @@ public class Cryomancer extends BaseSkillClass {
             int time = skillData.ParameterValueInt(1)*20;
             int hitRate = skillData.ParameterValueInt(2)*20;
             double radius  = skillData.ParameterValue(3);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK);
 
             MultiThread.sleepTick(skillData.CastTime);
 

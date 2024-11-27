@@ -84,7 +84,7 @@ public class Novice extends BaseSkillClass {
             final Location top = origin.clone().add(0, 8, 0);
             skillProcess.SkillRigid(skillData);
             for (LivingEntity victim : victims) {
-                ParticleManager.LineParticle(new ParticleData(Particle.CRIT_MAGIC), victim.getLocation(), top, 0.1, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.CRIT), victim.getLocation(), top, 0.1, 10);
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1);
                 MultiThread.sleepTick(2);
             }

@@ -60,7 +60,7 @@ public class Vanoset {
                     MultiThread.sleepTick(5);
                 }
                 if (Altar.isAlive()) {
-                    ParticleData particleData = new ParticleData(Particle.EXPLOSION_HUGE);
+                    ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
                     for (Player player : PlayerList.getNearNonDead(location, 96)) {
                         particleData.spawn(player.getEyeLocation());
                         PlayerData.playerData(player).dead();
@@ -104,7 +104,7 @@ public class Vanoset {
                 Manager.CastSkill(true);
                 Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime+60);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f, Function.VectorUp);
-                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+                ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
                 int i = 0;
                 while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
                     ParticleManager.CircleParticle(particleData, entity.getLocation(), 1, 24);
@@ -138,8 +138,8 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             double radius = 15;
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
@@ -169,7 +169,7 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「盲信的な信仰は正しいものなのでしょうか？」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
 
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
@@ -195,8 +195,8 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「周囲に対抗魔法陣が生成されます」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.01f, Function.VectorUp);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.01f, Function.VectorUp);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime+40);
             double radius = 3;
 
@@ -256,7 +256,7 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「祭壇が生贄を吸収しようとしています」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
 
             Set<EnemyData> enemyList = new HashSet<>();
             MultiThread.TaskRunSynchronized(() -> {
@@ -304,7 +304,7 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「ときに人は、何かに引き込まれてしまうものです」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
+            ParticleData particleData = new ParticleData(Particle.CRIT);
 
             MultiThread.sleepTick(10);
             Manager.CastSkill(false);
@@ -394,7 +394,7 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「本当にこれが、ただの歴史だと言えるのでしょうか？」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK);
             double radius = 15;
 
             int i = 0;
@@ -425,7 +425,7 @@ public class Vanoset {
             radiusMessage("§c「引き込まれてしまうものほど、危険なものなことが多いです」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.LAVA);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             double radius = 8;
 
             for (int i = 0; i < 15; i++) {
@@ -449,8 +449,8 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             radiusMessage("§c「結局のところ、全てはただの歴史です」", SoundList.DungeonTrigger);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             double radius = 15;
 
             int i = 0;

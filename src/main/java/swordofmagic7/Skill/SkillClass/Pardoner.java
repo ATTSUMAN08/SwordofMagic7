@@ -41,7 +41,7 @@ public class Pardoner extends BaseSkillClass {
             int time = skillData.ParameterValueInt(1) * 20;
             double heal = playerData.Status.HLP * skillData.ParameterValue(0) / 100;
             double radius = skillData.ParameterValue(1);
-            ParticleManager.CircleParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getLocation(), radius, 30);
+            ParticleManager.CircleParticle(new ParticleData(Particle.HAPPY_VILLAGER), player.getLocation(), radius, 30);
             for (Player target : PlayerList.getNearNonDead(player.getLocation(), radius)) {
                 if (skillProcess.isAllies(target) || target == player) {
                     playerData(target).EffectManager.addEffect(EffectType.Indulgendia, time, heal);
@@ -66,7 +66,7 @@ public class Pardoner extends BaseSkillClass {
             double multiply = skillData.ParameterValue(1);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) {
-                ParticleManager.LineParticle(new ParticleData(Particle.SPELL_WITCH), playerHandLocation(player), 20, 0, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.WITCH), playerHandLocation(player), 20, 0, 10);
                 LivingEntity target = ray.HitEntity;
                 for (Map.Entry<EffectType, EffectData> data : EffectManager.getEffectManager(target).Effect.entrySet()) {
                     if (!data.getKey().Buff && !data.getKey().isStatic && !data.getValue().flags) {
@@ -101,11 +101,11 @@ public class Pardoner extends BaseSkillClass {
             Player target;
             if (ray.isHitEntity()) {
                 target = (Player) ray.HitEntity;
-                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORK), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
             } else {
                 target = player;
             }
-            ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), target.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORK), target.getLocation(), 1, 2, 3, 3);
             PlayerData targetData = playerData(target);
             boolean cured = false;
             for (Map.Entry<EffectType, EffectData> effect : targetData.EffectManager.Effect.entrySet()) {
@@ -145,7 +145,7 @@ public class Pardoner extends BaseSkillClass {
 
             MultiThread.sleepTick(skillData.CastTime);
 
-            ParticleManager.LineParticle(new ParticleData(Particle.SPELL_WITCH), playerHandLocation(player), 20, 0, 10);
+            ParticleManager.LineParticle(new ParticleData(Particle.WITCH), playerHandLocation(player), 20, 0, 10);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.PredicateA());
             Player target;
             if (ray.isHitEntity()) {

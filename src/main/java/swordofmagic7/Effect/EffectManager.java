@@ -122,13 +122,13 @@ public class EffectManager {
                             if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
                                 if (isFixed != null) entity.teleportAsync(isFixed);
                                 if (isCrowdControl) {
-                                    entity.removePotionEffect(PotionEffectType.SLOW);
-                                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 255, false, false, false));
+                                    entity.removePotionEffect(PotionEffectType.SLOWNESS);
+                                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 255, false, false, false));
                                 }
                             }
                             if (isSlow) {
-                                entity.removePotionEffect(PotionEffectType.SLOW);
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 2, false, false));
+                                entity.removePotionEffect(PotionEffectType.SLOWNESS);
+                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 2, false, false));
                             }
                             if (isBlind) {
                                 entity.removePotionEffect(PotionEffectType.BLINDNESS);

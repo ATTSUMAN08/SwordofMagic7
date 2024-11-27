@@ -45,7 +45,7 @@ public class Elementalist extends BaseSkillClass {
             MultiThread.sleepTick(skillData.CastTime);
 
             playerData.EffectManager.addEffect(EffectType.ElementalBurst, (int) skillData.Parameter.get(0).Value*20);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT_MAGIC), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, "ElementalBurst");
@@ -59,7 +59,7 @@ public class Elementalist extends BaseSkillClass {
             final Location loc = RayTrace.rayLocationBlock(player.getEyeLocation(), distance, false).HitPosition;
             loc.setPitch(90);
             final Location origin = RayTrace.rayLocationBlock(loc, distance, false).HitPosition;
-            final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.4f, Function.VectorDown);
+            final ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.4f, Function.VectorDown);
             particleData.randomOffset = true;
             particleData.randomOffsetMultiply = (float) (radius/2);
             particleData.speedRandom = 0.8f;
@@ -146,14 +146,14 @@ public class Elementalist extends BaseSkillClass {
                 LivingEntity lastTarget = target;
                 Set<LivingEntity> Hit = new HashSet<>();
                 Damage.makeDamage(player, target, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value/100, 1);
-                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), player.getEyeLocation(), target.getEyeLocation(), 0.5, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORK), player.getEyeLocation(), target.getEyeLocation(), 0.5, 10);
                 for (int i = 0; i < count; i++) {
                     Set<LivingEntity> nextTargets = new HashSet<>(Function.NearLivingEntity(target.getLocation(), radius, skillProcess.Predicate()));
                     nextTargets.removeAll(Hit);
                     if (nextTargets.size() > 0) {
                         target = SkillProcess.Nearest(target.getLocation(), nextTargets).get(0);
                         Damage.makeDamage(player, target, DamageCause.MAT, skillData.Id, value, 1);
-                        ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), lastTarget.getEyeLocation(), target.getEyeLocation(), 0.5, 10);
+                        ParticleManager.LineParticle(new ParticleData(Particle.FIREWORK), lastTarget.getEyeLocation(), target.getEyeLocation(), 0.5, 10);
                         Hit.add(target);
                         lastTarget = target;
                         MultiThread.sleepTick(2);

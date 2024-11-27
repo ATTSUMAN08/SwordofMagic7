@@ -78,7 +78,7 @@ public class PlagueDoctor extends BaseSkillClass {
             int hitRate = Math.toIntExact(Math.round(skillData.ParameterValue(1)*20));
             int count = skillData.ParameterValueInt(2);
             double radius = skillData.ParameterValue(3);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.RED, 1));
+            ParticleData particleData = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.RED, 1));
             Location origin = player.getLocation();
 
             for (int i = 0; i < skillData.CastTime; i++) {

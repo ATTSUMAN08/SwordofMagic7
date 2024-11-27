@@ -40,13 +40,13 @@ public class Cleric extends BaseSkillClass {
             Player target;
             if (ray.isHitEntity()) {
                 target = (Player) ray.HitEntity;
-                ParticleManager.LineParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.HAPPY_VILLAGER), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
             } else {
                 target = player;
             }
             PlayerData targetData = playerData(target);
             if (targetData.Status.Health < targetData.Status.MaxHealth) {
-                ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), target.getLocation(), 1, 2, 3, 3);
+                ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), target.getLocation(), 1, 2, 3, 3);
                 makeHeal(player, target, skillData.Id, value);
                 playSound(player, SoundList.Heal);
                 playSound(target, SoundList.Heal);
@@ -69,11 +69,11 @@ public class Cleric extends BaseSkillClass {
             Player target;
             if (ray.isHitEntity()) {
                 target = (Player) ray.HitEntity;
-                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORKS_SPARK), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
+                ParticleManager.LineParticle(new ParticleData(Particle.FIREWORK), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
             } else {
                 target = player;
             }
-            ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), target.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORK), target.getLocation(), 1, 2, 3, 3);
             PlayerData targetData = playerData(target);
             boolean cured = false;
             for (Map.Entry<EffectType, EffectData> effect : targetData.EffectManager.Effect.entrySet()) {

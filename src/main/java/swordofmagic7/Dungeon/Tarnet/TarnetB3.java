@@ -41,7 +41,7 @@ public class TarnetB3 {
     private static final double Radius = Dungeon.Radius*2;
     private static final String sidebarId = "TarnetB3";
     public static float SkillTime = -1;
-    public static final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, VectorUp);
+    public static final ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, VectorUp);
     public static final ParticleData particleData2 = new ParticleData(Particle.LAVA, 0.1f, VectorUp);
     public static ParticleData useParticle = particleData;
     public static double useRadius = 15;

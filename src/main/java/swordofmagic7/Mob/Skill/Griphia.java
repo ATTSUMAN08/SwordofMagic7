@@ -85,7 +85,7 @@ public class Griphia extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.FLAME, 0.1f);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(entity().getLocation(), 32);
             int i = 0;
             while (isRunnableAI()) {
@@ -116,8 +116,8 @@ public class Griphia extends EnemySkillBase {
     public void Call(int CastTime) {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            ParticleData particleData = new ParticleData(Particle.SMOKE_NORMAL, 0.1f);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.SMOKE, 0.1f);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             Set<Player> victims = PlayerList.getNearNonDead(entity().getLocation(), 64);
             LivingEntity target = null;
             double distance = 0;
@@ -151,8 +151,8 @@ public class Griphia extends EnemySkillBase {
     public void Loyalty(int CastTime) {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             int i = 0;
             while (isRunnableAI()) {
                 if (i < CastTime) {
@@ -184,7 +184,7 @@ public class Griphia extends EnemySkillBase {
             effectManager().addEffect(EffectType.Invincible, CastTime);
             final Location TargetCandle = Candle[random.nextInt(Candle.length)];
             ParticleData particleData = new ParticleData(Particle.END_ROD);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                 player.sendMessage("§c強力な攻撃§aの準備をしています！");
                 player.sendMessage("§c有効なロウソク§aの所へ§c避難§aしてください！");
@@ -222,8 +222,8 @@ public class Griphia extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime);
             Manager.CastSkill(true);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, Function.VectorUp);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, Function.VectorUp);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 64);
             final Location SafeLocation = Manager.enemyData.entity.getLocation();
             double randomInx = random.nextDouble()*Math.PI*2;

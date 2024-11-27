@@ -277,7 +277,7 @@ public class Status {
         setCombatPower();
         MultiThread.TaskRunSynchronized(() -> {
             player.setWalkSpeed((float) Math.min(Movement, 1));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 0, false, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 0, false, false, false));
         });
 
         String color = "§f";

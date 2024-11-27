@@ -42,7 +42,7 @@ public class Synosas {
             Manager.CastSkill(true);
             double radius = 10;
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
+            ParticleData particleData = new ParticleData(Particle.CRIT);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i < CastTime) {
                     ParticleManager.CircleParticle(Manager.particleCasting, Manager.enemyData.entity.getLocation(), radius, 72);
@@ -88,7 +88,7 @@ public class Synosas {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.DRIP_WATER);
+            ParticleData particleData = new ParticleData(Particle.DRIPPING_WATER);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
@@ -109,8 +109,8 @@ public class Synosas {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.EXPLOSION_NORMAL);
-            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.EXPLOSION);
+            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
@@ -134,8 +134,8 @@ public class Synosas {
             Manager.CastSkill(true);
             int radius = 15;
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.SPELL_WITCH);
-            ParticleData particleData2 = new ParticleData(Particle.REDSTONE);
+            ParticleData particleData = new ParticleData(Particle.WITCH);
+            ParticleData particleData2 = new ParticleData(Particle.DUST);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i < CastTime) {
                     ParticleManager.CircleParticle(particleData, Manager.enemyData.entity.getLocation(), radius, 72);
@@ -163,7 +163,7 @@ public class Synosas {
             Manager.CastSkill(true);
             TarnetB3.radiusMessage("§a危険です！§e[過充填区域]§aから離れてください！");
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.EXPLOSION_HUGE);
+            ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
             TarnetB3.useParticle = TarnetB3.particleData2;
             TarnetB3.useRadius = 20;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
@@ -191,7 +191,7 @@ public class Synosas {
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 120);
             Manager.CastSkill(true);
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.DRIP_LAVA);
+            ParticleData particleData = new ParticleData(Particle.DRIPPING_LAVA);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
@@ -213,7 +213,7 @@ public class Synosas {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
             int i = 0;
-            ParticleData particleData = new ParticleData(Particle.DRIP_LAVA);
+            ParticleData particleData = new ParticleData(Particle.DRIPPING_LAVA);
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i > CastTime) {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {

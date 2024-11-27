@@ -10,7 +10,7 @@ public class ParticleData implements Cloneable {
     public static float IgnoreValue = -999;
     public static Vector RandomVector = new Vector(-999, -999, -999);
 
-    public Particle particle = Particle.REDSTONE;
+    public Particle particle = Particle.DUST;
     public Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
     public ParticleType particleType = ParticleType.General;
     public float speed = 0;

@@ -36,7 +36,7 @@ public class Kabbalist extends BaseSkillClass {
             double value = playerData.Status.HLP*skillData.ParameterValue(0)/100;
             int time = skillData.ParameterValueInt(1)*20;
             double radius = skillData.ParameterValue(2);
-            ParticleData particleData = new ParticleData(Particle.VILLAGER_HAPPY);
+            ParticleData particleData = new ParticleData(Particle.HAPPY_VILLAGER);
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -61,7 +61,7 @@ public class Kabbalist extends BaseSkillClass {
             int time = skillData.ParameterValueInt(1)*20;
             double hitRate = skillData.ParameterValue(2)*20;
             double radius = skillData.ParameterValue(3);
-            ParticleData particleData = new ParticleData(Particle.VILLAGER_HAPPY);
+            ParticleData particleData = new ParticleData(Particle.HAPPY_VILLAGER);
             Location origin = player.getLocation();
 
             for (int i = 0; i < skillData.CastTime; i++) {

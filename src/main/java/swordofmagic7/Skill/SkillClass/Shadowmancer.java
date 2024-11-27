@@ -30,7 +30,7 @@ public class Shadowmancer extends BaseSkillClass {
         super(skillProcess);
     }
 
-    public static ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.BLACK, 1));
+    public static ParticleData particleData = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.BLACK, 1));
 
     public void ShadowPool(SkillData skillData) {
         MultiThread.TaskRun(() -> {
@@ -58,7 +58,7 @@ public class Shadowmancer extends BaseSkillClass {
             skill.setCastReady(false);
             int time = skillData.ParameterValueInt(0)*20;
             double value = skillData.ParameterValue(1)/100;
-            ParticleData particleData = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.YELLOW, 1));
+            ParticleData particleData = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1));
 
             MultiThread.sleepTick(skillData.CastTime);
 

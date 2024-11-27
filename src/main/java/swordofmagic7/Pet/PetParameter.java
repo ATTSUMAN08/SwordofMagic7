@@ -330,7 +330,7 @@ public class PetParameter implements Cloneable {
         Lore.add(decoText("ペット情報"));
         if (Summoned) {
             Lore.add(decoLore("状態") + AIState.Display);
-            meta.addEnchant(Enchantment.DURABILITY, 0, true);
+            meta.addEnchant(Enchantment.UNBREAKING, 0, true);
         } else {
             Lore.add(decoLore("状態") + "ケージ内 [" + AIState.Display + "]");
         }

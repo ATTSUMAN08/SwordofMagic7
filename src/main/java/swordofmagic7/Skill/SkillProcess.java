@@ -130,8 +130,8 @@ public class SkillProcess {
         return Targets;
     }
 
-    public static final ParticleData particleCasting = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.YELLOW, 1));
-    public static final ParticleData particleActivate = new ParticleData(Particle.REDSTONE, new Particle.DustOptions(Color.ORANGE, 1));
+    public static final ParticleData particleCasting = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1));
+    public static final ParticleData particleActivate = new ParticleData(Particle.DUST, new Particle.DustOptions(Color.ORANGE, 1));
     public int normalAttackCoolTime = 0;
     public int SkillCastTime = 0;
 
@@ -192,7 +192,7 @@ public class SkillProcess {
                         normalAttackCoolTime = 15;
                     }
                     case Rod -> {
-                        normalAttackParticle(victim, Particle.CRIT_MAGIC, 0, 25);
+                        normalAttackParticle(victim, Particle.CRIT, 0, 25);
                         playSound(player, SoundList.RodAttack);
                         normalAttackCoolTime = 12;
                     }

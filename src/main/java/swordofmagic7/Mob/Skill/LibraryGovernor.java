@@ -227,7 +227,7 @@ public class LibraryGovernor {
             double z = random.nextDouble()*5;
             LivingEntity entity = Manager.enemyData.entity;
             Location origin = entity.getLocation().clone().add(x, 0, z);
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
             for (int i = 0; i < 20; i++) {
                 ParticleManager.CircleParticle(particleData, origin, radius, 12);
                 MultiThread.sleepTick(5);
@@ -271,8 +271,8 @@ public class LibraryGovernor {
                     int time = 0;
                     switch (Function.StringToHashInt(player.getName(), 3)) {
                         case 0 -> {
-                            ParticleData particleData = new ParticleData(Particle.REDSTONE);
-                            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_LARGE);
+                            ParticleData particleData = new ParticleData(Particle.DUST);
+                            ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
                             double radius = 8;
                             int x = 25;
                             time = x*20;

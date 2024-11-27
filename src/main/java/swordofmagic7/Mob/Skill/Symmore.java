@@ -91,8 +91,8 @@ public class Symmore {
                 playSound(player, SoundList.DungeonTrigger);
             }
             final Set<LivingEntity> list = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 32);
-            ParticleData particleData = new ParticleData(Particle.SPELL_WITCH, 0.5f);
-            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_LARGE);
+            ParticleData particleData = new ParticleData(Particle.WITCH, 0.5f);
+            ParticleData particleData1 = new ParticleData(Particle.EXPLOSION_EMITTER);
             final int ReqCount = list.size()*7;
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {

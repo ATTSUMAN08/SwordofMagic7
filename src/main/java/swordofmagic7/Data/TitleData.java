@@ -54,7 +54,7 @@ public class TitleData {
             lore.add(Function.decoText("プレビュー"));
             lore.addAll(List.of(Display));
             ItemStack item = new ItemStackData(Icon, Function.decoText(Id), lore).view();
-            if (has) item.addUnsafeEnchantment(Enchantment.DURABILITY, 0);
+            if (has) item.addUnsafeEnchantment(Enchantment.UNBREAKING, 0);
             item.setAmount(Amount);
             return item;
         } catch (Exception e) {

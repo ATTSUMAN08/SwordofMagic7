@@ -1,8 +1,8 @@
 package swordofmagic7.Mob;
 
 import com.destroystokyo.paper.entity.Pathfinder;
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -386,7 +386,7 @@ public class EnemyData {
         isDead = true;
         MultiThread.TaskRun(() -> {
             if (entity != null) {
-                ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORKS_SPARK, 0.22f), entity.getLocation(), 50);
+                ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORK, 0.22f), entity.getLocation(), 50);
                 playSound(entity.getLocation(), SoundList.Death);
                 Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
             }
@@ -550,11 +550,10 @@ public class EnemyData {
                                 Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
                                 MultiThread.TaskRunSynchronized(() -> {
                                     Hologram hologram = createHologram(loc);
-                                    VisibilityManager visibilityManager = hologram.getVisibilityManager();
-                                    visibilityManager.setVisibleByDefault(false);
-                                    visibilityManager.showTo(player);
+                                    hologram.setDefaultVisibleState(false);
+                                    hologram.setShowPlayer(player);
                                     for (String holo : Holo) {
-                                        hologram.appendTextLine(holo);
+                                        DHAPI.addHologramLine(hologram, holo);
                                     }
                                     MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
                                 }, "EnemyKillRewardHolo");

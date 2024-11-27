@@ -71,7 +71,7 @@ public class Peltast extends BaseSkillClass {
                 playerData.EffectManager.addEffect(EffectType.HighGuard, time);
             }
             playerData.EffectManager.addEffect(EffectType.Stun, time);
-            ParticleManager.CylinderParticle(new ParticleData(Particle.SMOKE_NORMAL), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.SMOKE), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
@@ -92,7 +92,7 @@ public class Peltast extends BaseSkillClass {
                 double radius = rune.AdditionParameterValue(1);
                 Damage.makeDamage(player, Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()), DamageCause.ATK, skillData.Id, value2, 1, 1);
             }
-            ParticleManager.CylinderParticle(new ParticleData(Particle.REDSTONE), player.getLocation(), 1, 2, 3, 3);
+            ParticleManager.CylinderParticle(new ParticleData(Particle.DUST), player.getLocation(), 1, 2, 3, 3);
             playSound(player, SoundList.Heal);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

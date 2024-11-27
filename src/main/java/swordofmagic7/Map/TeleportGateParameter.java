@@ -36,7 +36,7 @@ public class TeleportGateParameter {
     }
 
     private World world;
-    private final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, VectorUp);
+    private final ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, VectorUp);
     public void start() {
         world = Location.getWorld();
         MultiThread.TaskRun(() -> {

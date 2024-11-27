@@ -35,7 +35,7 @@ public class Priest extends BaseSkillClass {
             MultiThread.sleepMillis(skillData.CastTime);
 
             double radius = skillData.ParameterValue(1);
-            ParticleManager.CircleParticle(new ParticleData(Particle.VILLAGER_HAPPY), player.getLocation(), radius, 30);
+            ParticleManager.CircleParticle(new ParticleData(Particle.HAPPY_VILLAGER), player.getLocation(), radius, 30);
             for (Player target : PlayerList.getNearNonDead(player.getLocation(), radius)) {
                 if (skillProcess.isAllies(target) || target == player) {
                     makeHeal(player, target, skillData.Id, skillData.ParameterValue(0) / 100);
@@ -88,7 +88,7 @@ public class Priest extends BaseSkillClass {
     public void Revive(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            ParticleData particleData = new ParticleData(Particle.VILLAGER_HAPPY);
+            ParticleData particleData = new ParticleData(Particle.HAPPY_VILLAGER);
             int time = skillData.ParameterValueInt(0)*20;
             int time2 = 0;
             RuneParameter rune = playerData.Equipment.equippedRune("祝福のルーン");

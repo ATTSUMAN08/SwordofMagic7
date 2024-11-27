@@ -51,7 +51,7 @@ public class Tamer extends BaseSkillClass {
             PetParameter pet = playerData.getPetSelect();
             if (pet != null) {
                 pet.changeHealth((int) Math.round(playerData.Status.HLP * skillData.Parameter.get(0).Value / 100));
-                ParticleManager.CylinderParticle(new ParticleData(Particle.VILLAGER_HAPPY), pet.entity.getLocation(), 1.5, 1, 3, 3);
+                ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
             }
             skillProcess.SkillRigid(skillData);
@@ -68,7 +68,7 @@ public class Tamer extends BaseSkillClass {
             PetParameter pet = playerData.getPetSelect();
             if (pet != null) {
                 pet.getEffectManager().addEffect(EffectType.PetBoost, time);
-                ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORKS_SPARK), pet.entity.getLocation(), 1.5, 1, 3, 3);
+                ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORK), pet.entity.getLocation(), 1.5, 1, 3, 3);
                 playSound(player, Heal);
             }
             skillProcess.SkillRigid(skillData);

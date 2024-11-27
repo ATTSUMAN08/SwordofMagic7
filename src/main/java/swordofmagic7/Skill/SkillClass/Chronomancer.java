@@ -61,7 +61,7 @@ public class Chronomancer extends BaseSkillClass {
                 playerData.EffectManager.addEffect(EffectType.EnchantSlow, time2, new Object[]{percent,time});
                 playSound(player, SoundList.Heal);
             } else {
-                ParticleManager.CircleParticle(new ParticleData(Particle.SMOKE_LARGE, 0.2f, Function.VectorUp), origin, radius, 20);
+                ParticleManager.CircleParticle(new ParticleData(Particle.LARGE_SMOKE, 0.2f, Function.VectorUp), origin, radius, 20);
                 Set<LivingEntity> Targets = Function.NearLivingEntity(origin, radius, skillProcess.Predicate());
                 for (LivingEntity target : Targets) {
                     EffectManager.addEffect(target, EffectType.Slow, time, player);
@@ -104,7 +104,7 @@ public class Chronomancer extends BaseSkillClass {
         MultiThread.TaskRun(() -> {
             double multiply = 1-(skillData.ParameterValue(0)/100);
             int time = skillData.ParameterValueInt(1) * 20;
-            ParticleData particleData = new ParticleData(Particle.ENCHANTMENT_TABLE);
+            ParticleData particleData = new ParticleData(Particle.ENCHANT);
             Set<Player> Targets = new HashSet<>();
             skill.setCastReady(false);
 
@@ -145,7 +145,7 @@ public class Chronomancer extends BaseSkillClass {
                 MultiThread.sleepMillis(millis);
             }
 
-            ParticleManager.CircleParticle(new ParticleData(Particle.SMOKE_LARGE, 0.2f, Function.VectorUp), origin, radius, 20);
+            ParticleManager.CircleParticle(new ParticleData(Particle.LARGE_SMOKE, 0.2f, Function.VectorUp), origin, radius, 20);
             Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
             Set<LivingEntity> forwards = new HashSet<>();
             RuneParameter rune = playerData.Equipment.equippedRune("タイムアウトのルーン");
@@ -207,7 +207,7 @@ public class Chronomancer extends BaseSkillClass {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
             if (BackMaskingHealth > 0) {
-                ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.1f, Function.VectorUp);
+                ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, Function.VectorUp);
                 for (int i = 0; i < skillData.CastTime; i++) {
                     ParticleManager.CircleParticle(particleData, player.getLocation().clone().add(0, skill.SkillCastProgress*2, 0), 1, 10);
                     MultiThread.sleepMillis(millis);

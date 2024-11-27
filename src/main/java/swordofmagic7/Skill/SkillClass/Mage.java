@@ -51,7 +51,7 @@ public class Mage extends BaseSkillClass {
                 origin = ray.HitPosition;
                 origin.add(player.getEyeLocation().getDirection().multiply(-1));
                 origin.add(0, 0.2, 0);
-                final ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK);
+                final ParticleData particleData = new ParticleData(Particle.FIREWORK);
 
 
                 for (int i = 0; i < skillData.CastTime; i++) {
@@ -73,7 +73,7 @@ public class Mage extends BaseSkillClass {
     public void MagicMissile(SkillData skillData) {
         MultiThread.TaskRun(() -> {
             skill.setCastReady(false);
-            ParticleData particleData = new ParticleData(Particle.FIREWORKS_SPARK, 0.05f);
+            ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.05f);
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -98,8 +98,8 @@ public class Mage extends BaseSkillClass {
             double radius = skillData.ParameterValue(1);
             skill.setCastReady(false);
             final Location origin = player.getLocation().clone();
-            ParticleData particleData = new ParticleData(Particle.CRIT_MAGIC);
-            ParticleData particleData1 = new ParticleData(Particle.FIREWORKS_SPARK, 0.5f, VectorDown);
+            ParticleData particleData = new ParticleData(Particle.CRIT);
+            ParticleData particleData1 = new ParticleData(Particle.FIREWORK, 0.5f, VectorDown);
 
             for (int i = 0; i < skillData.CastTime; i++) {
                 ParticleManager.CircleParticle(particleCasting, origin, radius, 30);

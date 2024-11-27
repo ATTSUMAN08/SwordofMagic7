@@ -37,7 +37,7 @@ public class Matador extends BaseSkillClass {
             skill.setCastReady(false);
             double length = 20;
             int time = skillData.ParameterValueInt(0)*20;
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
 
             MultiThread.sleepTick(skillData.CastTime);
 
@@ -59,7 +59,7 @@ public class Matador extends BaseSkillClass {
             skill.setCastReady(false);
             double length = 20;
             int time = skillData.ParameterValueInt(0)*20;
-            ParticleData particleData = new ParticleData(Particle.REDSTONE);
+            ParticleData particleData = new ParticleData(Particle.DUST);
 
             MultiThread.sleepTick(skillData.CastTime);
 
