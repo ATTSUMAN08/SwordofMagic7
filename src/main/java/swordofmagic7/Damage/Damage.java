@@ -1,7 +1,7 @@
 package swordofmagic7.Damage;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.VisibilityManager;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -483,19 +483,18 @@ public final class Damage {
     }
 
     static void randomHologram(String string, Location loc, List<Player> players) {
-        if (players.size() == 1 && !playerData(players.get(0)).DamageHolo) return;
+        if (players.size() == 1 && !playerData(players.getFirst()).DamageHolo) return;
         double x = random.nextDouble() * 2 - 1;
         double y = random.nextDouble() + 1;
         double z = random.nextDouble() * 2 - 1;
         MultiThread.TaskRunSynchronized(() -> {
             loc.add(x, y, z);
             Hologram hologram = createHologram(loc);
-            VisibilityManager manager = hologram.getVisibilityManager();
-            manager.setVisibleByDefault(false);
+            hologram.setDefaultVisibleState(false);
             for (Player player : players) {
-                manager.showTo(player);
+                hologram.setShowPlayer(player);
             }
-            hologram.appendTextLine(string);
+            DHAPI.addHologramLine(hologram, string);
             MultiThread.TaskRunSynchronizedLater(hologram::delete, 20);
         });
     }

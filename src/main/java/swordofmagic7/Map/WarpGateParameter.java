@@ -1,6 +1,7 @@
 package swordofmagic7.Map;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -109,9 +110,9 @@ public class WarpGateParameter {
         if (isStarted) return;
         isStarted = true;
         Hologram hologram = createHologram(getLocation().add(0, 4, 0));
-        hologram.appendTextLine(Display);
-        hologram.appendTextLine("");
-        hologram.appendTextLine(Lore);
+        DHAPI.addHologramLine(hologram, Display);
+        DHAPI.addHologramLine(hologram, "");
+        DHAPI.addHologramLine(hologram, Lore);
         world = getLocation().getWorld();
         MultiThread.TaskRun(() -> {
             int i = 0;

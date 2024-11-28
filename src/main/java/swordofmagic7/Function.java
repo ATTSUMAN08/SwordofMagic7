@@ -3,7 +3,8 @@ package swordofmagic7;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -48,7 +49,7 @@ public final class Function {
         Log(str, false);
     }
     public static void Log(String str, boolean stackTrace) {
-        Bukkit.getLogger().info(str);
+        plugin.getLogger().info(str);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("som7.log")) player.sendMessage(str);
         }
@@ -207,20 +208,20 @@ public final class Function {
         }
     }
 
-    public static void BroadCast(TextComponent text) {
+    public static void BroadCast(Component text) {
         BroadCast(text, null, true);
     }
 
-    public static void BroadCast(TextComponent text, SoundList sound) {
+    public static void BroadCast(Component text, SoundList sound) {
         BroadCast(text, sound, true);
     }
 
-    public static void BroadCast(TextComponent text, SoundList sound, boolean isNatural) {
+    public static void BroadCast(Component text, SoundList sound, boolean isNatural) {
         for (Player player : PlayerList.get()) {
             if (player.isOnline()) {
                 PlayerData playerData = PlayerData.playerData(player);
                 if (playerData.NaturalMessage || !isNatural) {
-                    player.spigot().sendMessage(text);
+                    player.sendMessage(text);
                     if (sound != null) playSound(player, sound);
                 }
             }
@@ -407,7 +408,7 @@ public final class Function {
     }
 
     public static void sendMessage(Player player, TextComponent message) {
-        player.spigot().sendMessage(message);
+        player.sendMessage(message);
     }
 
     public static void sendMessage(Player player, List<String> message) {

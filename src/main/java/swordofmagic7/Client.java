@@ -1,9 +1,8 @@
 package swordofmagic7;
 
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
@@ -100,11 +99,10 @@ public class Client {
             out.flush();
         } catch (Exception e) {
             e.printStackTrace();
-            Log("通信サーバーの接続されていません");
+            Log("通信サーバーに接続されていません");
         }
     }
 
-    private static final TextComponent newLine = new TextComponent(ComponentSerializer.parse("{text: \"\n\"}"));
     public static void Trigger(String packet) {
         String[] data = packet.split(",");
         switch (data[0]) {
@@ -122,7 +120,7 @@ public class Client {
                 Function.BroadCast(textComponentFromPacket(data), sound, isNatural);
             }
             case "Chat", "Display" -> {
-                TextComponent text = new TextComponent();
+                TextComponent text = Component.empty();
                 String from = "";
                 String display = "";
                 String uuid = "";
@@ -139,16 +137,16 @@ public class Client {
                         isMute = true;
                     }
                 }
-                if (data[0].equals("Chat")) text.addExtra("§b[" + from + "] §r" + display + "§a: §r");
-                if (data[0].equals("Display")) text.addExtra("§b[" + from + "] §r");
-                text.addExtra(textComponentFromPacket(data));
+                if (data[0].equals("Chat")) text = text.append(Component.text("§b[" + from + "] §r" + display + "§a: §r"));
+                if (data[0].equals("Display")) text = text.append(Component.text("§b[" + from + "] §r"));
+                text = text.append(textComponentFromPacket(data));
                 for (Player player : PlayerList.get()) {
                     if (player.isOnline()) {
                         if (isMute) {
                             if (player.isOp()) {
-                                TextComponent textMuted = new TextComponent();
-                                textMuted.addExtra("§4[M]");
-                                textMuted.addExtra(text);
+                                TextComponent textMuted = Component.empty();
+                                textMuted = textMuted.append(Component.text("§4[M]"));
+                                textMuted = textMuted.append(text);
                                 sendMessage(player, textMuted);
                             } else if (player.getUniqueId().toString().equals(uuid)) {
                                 sendMessage(player, text);
@@ -165,29 +163,29 @@ public class Client {
         }
     }
 
-    public static TextComponent textComponentFromPacket(String[] data) {
-        TextComponent finalText = new TextComponent();
-        TextComponent text = new TextComponent();
-        TextComponent hover = new TextComponent();
+    public static Component textComponentFromPacket(String[] data) {
+        Component finalText = Component.empty();
+        Component text = Component.empty();
+        Component hover = Component.empty();
         for (int i = 1; i < data.length; i++) {
             String[] split = data[i].split(":", 2);
             if (split[0].equalsIgnoreCase("Reset")) {
-                finalText.addExtra(text);
-                text = new TextComponent();
+                finalText = finalText.append(text);
+                text = Component.empty();
             } else if (split[0].equalsIgnoreCase("Text")) {
-                text.addExtra(split[1]);
+                text = text.append(Component.text(split[1]));
             } else if (split[0].equalsIgnoreCase("Hover")) {
                 boolean first = true;
                 for (String str : split[1].split("\n")) {
-                    if (!first) hover.addExtra(newLine);
-                    hover.addExtra(str);
+                    if (!first) hover = hover.appendNewline();
+                    hover = hover.append(Component.text(str));
                     first = false;
                 }
-                text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create()));
-                hover = new TextComponent();
+                text = text.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                hover = Component.empty();
             }
         }
-        finalText.addExtra(text);
+        finalText = finalText.append(text);
         return finalText;
     }
 }

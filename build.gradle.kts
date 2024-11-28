@@ -39,7 +39,7 @@ bukkit {
     name = project.name
     version = "${project.version}"
     description = "Sword of Magic 7のプラグインのFork"
-    authors = listOf("MomiNeko", "SOM", "ATTSUMAN08")
+    authors = listOf("MomiNeko", "SomNetworkMembers", "ATTSUMAN08")
     apiVersion = "1.21"
 
     main = "swordofmagic7.SomCore"

@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Data.DataBase.DownScrollItem;
 import static swordofmagic7.Data.DataLoader.MaxTitleSlot;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;

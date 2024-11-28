@@ -1,5 +1,6 @@
 package swordofmagic7.Data;
 
+import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import eu.decentsoftware.holograms.api.holograms.HologramLine;
 import net.kyori.adventure.bossbar.BossBar;
@@ -247,21 +248,23 @@ public class PlayerData {
     public String holoTitle;
     public int HoloWait = 0;
     public int HoloAnim = 0;
+
     public void InitializeHologram() {
         MultiThread.TaskRunSynchronized(() -> {
-            if (hologram != null && !hologram.isDeleted()) hologram.delete();
+            if (hologram != null && !hologram.isDisabled()) hologram.delete();
             hologram = createHologram(playerHoloLocation());
-            visibilityManager = hologram.getVisibilityManager();
-            if (!HoloSelfView) visibilityManager.hideTo(player);
-            hologramLine[2] = hologram.appendTextLine(DefaultTitle.Display[0]);
-            hologramLine[0] = hologram.appendTextLine("NameTag");
-            hologramLine[1] = hologram.appendTextLine("HealthBar");
+            if (!HoloSelfView) hologram.setHidePlayer(player);
+            hologramLine[2] = DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
+            hologramLine[0] = DHAPI.addHologramLine(hologram, "NameTag");
+            hologramLine[1] = DHAPI.addHologramLine(hologram, "HealthBar");
             MultiThread.TaskRun(() -> {
                 while (playerWhileCheck(this)) {
-                    if (visibilityManager.isVisibleByDefault()) {
-                        visibilityManager.resetVisibilityAll();
-                        if (HoloSelfView && !isAFK()) visibilityManager.showTo(player);
-                        else visibilityManager.hideTo(player);
+                    if (hologram.isDefaultVisibleState()) {
+                        hologram.getShowPlayers().clear();
+                        hologram.getHidePlayers().clear();
+
+                        if (HoloSelfView && !isAFK()) hologram.setShowPlayer(player);
+                        else hologram.setHidePlayer(player);
                         Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
                         nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
                         nonViewer.addAll(BlockListAtPlayer());
@@ -269,7 +272,7 @@ public class PlayerData {
                             if (!playerData(player).isAFK()) nonViewer.remove(player);
                         }
                         for (Player player : nonViewer) {
-                            visibilityManager.hideTo(player);
+                            hologram.setHidePlayer(player);
                         }
                     }
                     MultiThread.sleepTick(30);
@@ -301,11 +304,11 @@ public class PlayerData {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (player.isOnline() && !hologram.isDeleted()) {
+                    if (player.isOnline() && !hologram.isDisabled()) {
                         hologramLine[2].setText(holoTitle);
-                        hologram.teleport(playerHoloLocation());
+                        DHAPI.moveHologram(hologram, playerHoloLocation());
                     } else {
-                        if (!hologram.isDeleted()) hologram.delete();
+                        if (!hologram.isDisabled()) hologram.delete();
                         this.cancel();
                     }
                 }
@@ -565,8 +568,8 @@ public class PlayerData {
 
     void HoloSelfView(boolean bool, boolean message) {
         HoloSelfView = bool;
-        if (bool) visibilityManager.showTo(player);
-        else visibilityManager.hideTo(player);
+        if (bool) hologram.setShowPlayer(player);
+        else hologram.setHidePlayer(player);
         if (message) {
             String msg = "§e[自視点ステータスバー]§aを" + (bool ? "§b[表示]" : "§c[非表示]") + "§aにしました";
             sendMessage(player, msg, SoundList.Click);
@@ -1224,10 +1227,10 @@ public class PlayerData {
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
                 deadTime = 1200;
                 Hologram hologram = createHologram(player.getEyeLocation());
-                hologram.appendTextLine(hologramLine[0].getText());
+                DHAPI.addHologramLine(hologram, hologramLine[0].getText());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
-                hologram.appendItemLine(head);
+                DHAPI.addHologramLine(hologram, head);
                 new BukkitRunnable() {
                     final ParticleData particleData = new ParticleData(Particle.END_ROD, 0.1f);
                     @Override

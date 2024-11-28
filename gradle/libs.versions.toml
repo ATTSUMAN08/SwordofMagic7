@@ -3,7 +3,7 @@ kotlin = "2.1.0-RC2"
 shadow = "8.3.5"
 pluginYml = "0.6.0"
 
-paperApi = "1.21.1-R0.1-SNAPSHOT"
+paperApi = "1.21.3-R0.1-SNAPSHOT"
 protocolLib = "5.1.0"
 libsDisguises = "10.0.44"
 nuVotifier = "2.7.2"

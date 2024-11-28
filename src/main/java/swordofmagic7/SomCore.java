@@ -14,7 +14,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitTask;
@@ -55,8 +54,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
-    public static Plugin plugin;
-    public static JavaPlugin javaPlugin;
+    public static SomCore plugin;
     public static final Random random = new Random();
     public static final HashMap<String, Consumer<Player>> hologramTouchActions = new HashMap<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
@@ -91,7 +89,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         saveDefaultConfig();
         reloadConfig();
         plugin = this;
-        javaPlugin = this;
         ServerId = getConfig().getString("ServerId");
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
@@ -200,15 +197,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
     public void onDisable() {
         MultiThread.closeMultiThreads();
 
-        DecentHologramsAPI.get().getHologramManager().getHologramNames().forEach(hologramId -> {
-            if (hologramId.startsWith("SOM7_")) {
-                Hologram hologram = DHAPI.getHologram(hologramId);
-                if (hologram == null) return;
-                if (!hologram.isDisabled()) {
-                    hologram.destroy();
-                }
-            }
-        });
+        deleteHolograms();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
@@ -227,6 +216,16 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             }
         }
         Log("CleanEnemy: " + count);
+    }
+
+    public static List<Hologram> getHolograms() {
+        return DecentHologramsAPI.get().getHologramManager().getHolograms().stream().filter(hologram -> hologram.getId().startsWith("SOM7_")).toList();
+    }
+
+    public static void deleteHolograms() {
+        for (Hologram hologram : getHolograms()) {
+            if (!hologram.isDisabled()) hologram.destroy();
+        }
     }
 
     public void commandRegister() {

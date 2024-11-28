@@ -45,7 +45,7 @@ public class GetItem implements SomCommand, SomTabComplete {
                 targetData.ItemInventory.viewInventory();
                 TextView textView = stack.itemParameter.getTextView(stack.Amount, targetData.ViewFormat());
                 textView.addText("§aを§e獲得§aしました");
-                sendMessage(targetData.player, textView.toComponent());
+                targetData.player.sendMessage(textView.toComponent());
                 return true;
             }
         } else {

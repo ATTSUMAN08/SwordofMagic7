@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.Socket;
 
 import static swordofmagic7.Function.Log;
-import static swordofmagic7.SomCore.javaPlugin;
 
 public class FileClient {
     static Socket socket;
@@ -26,7 +25,7 @@ public class FileClient {
                 in = socket.getInputStream();
                 out = socket.getOutputStream();
 
-                fos = new FileOutputStream(new File(javaPlugin.getDataFolder(), "client_receive.yml"));
+                fos = new FileOutputStream(new File(SomCore.plugin.getDataFolder(), "client_receive.yml"));
 
                 while (socket.isConnected()) {
                     int ch;
@@ -59,7 +58,7 @@ public class FileClient {
         MultiThread.TaskRun(() -> {
             int ch;
             try {
-                FileInputStream fis = new FileInputStream(new File(javaPlugin.getDataFolder(), "client_send.yml"));
+                FileInputStream fis = new FileInputStream(new File(SomCore.plugin.getDataFolder(), "client_send.yml"));
                 while ((ch = fis.read()) != -1) {
                     out.write(ch);
                 }

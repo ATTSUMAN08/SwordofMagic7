@@ -97,7 +97,7 @@ public class TextView {
             String[] split = data[i].split(":", 2);
             if (split[0].equalsIgnoreCase("Reset")) {
                 finalText.addExtra(text);
-                text = new net.md_5.bungee.api.chat.TextComponent();
+                text = new TextComponent();
             } else if (split[0].equalsIgnoreCase("Text")) {
                 text.addExtra(split[1]);
             } else if (split[0].equalsIgnoreCase("Hover")) {

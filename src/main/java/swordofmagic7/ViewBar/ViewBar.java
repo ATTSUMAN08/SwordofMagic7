@@ -207,7 +207,7 @@ public class ViewBar {
                                 "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                         );
 
-                        if (playerData.visibilityManager != null && !playerData.hologram.isDeleted()) {
+                        if (playerData.hologram != null && !playerData.hologram.isDisabled()) {
                             int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
                             int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
                             int x2 = 20 - x;
@@ -215,11 +215,11 @@ public class ViewBar {
                             playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
 
                             if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
-                                if (playerData.visibilityManager.isVisibleByDefault()) {
-                                    playerData.visibilityManager.setVisibleByDefault(false);
+                                if (playerData.hologram.isDefaultVisibleState()) {
+                                    playerData.hologram.setDefaultVisibleState(false);
                                 }
-                            } else if (!playerData.visibilityManager.isVisibleByDefault()) {
-                                playerData.visibilityManager.setVisibleByDefault(true);
+                            } else if (!playerData.hologram.isDefaultVisibleState()) {
+                                playerData.hologram.setDefaultVisibleState(true);
                             }
                         }
 
