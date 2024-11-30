@@ -33,6 +33,8 @@ dependencies {
 
     implementation(libs.kotlinSerializationJson)
     implementation(libs.itemNbtApi)
+
+    bukkitLibrary(libs.jedis)
 }
 
 bukkit {

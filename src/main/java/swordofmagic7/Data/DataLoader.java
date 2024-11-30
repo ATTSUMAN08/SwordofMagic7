@@ -13,6 +13,7 @@ import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
+import swordofmagic7.Function;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Item.ItemCategory;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
@@ -45,6 +46,7 @@ import swordofmagic7.Skill.SkillClass.Alchemist.AlchemyData;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Skill.SkillType;
+import swordofmagic7.SomCore;
 import swordofmagic7.Status.StatusParameter;
 
 import java.io.File;
@@ -74,13 +76,13 @@ public class DataLoader {
         RuneInfoDataLoad();
         DefenseBattleMobListLoad();
         RewardBoxListLoad();
-        Log("§aDataLoader -> AllLoad");
+        SomCore.plugin.getLogger().info("[DataLoader] 全データ読み込み");
     }
 
     public static void ItemDataLoad() {
         File itemDirectories = new File(DataBasePath, "ItemData");
-        List<File> itemFiles = dumpFile(itemDirectories);
-        for (File file : itemFiles) {
+        Function.createFolder(itemDirectories);
+        for (File file : dumpFile(itemDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -162,13 +164,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> ItemData");
+        SomCore.plugin.getLogger().info("[DataLoader] ItemData");
     }
 
     public static void RuneDataLoad() {
         File runeDirectories = new File(DataBasePath, "RuneData/");
-        List<File> runeFile = dumpFile(runeDirectories);
-        for (File file : runeFile) {
+        Function.createFolder(runeDirectories);
+        for (File file : dumpFile(runeDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -206,13 +208,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> RuneData");
+        SomCore.plugin.getLogger().info("[DataLoader] RuneData");
     }
 
     public static void PetDataLoad() {
         File petDirectories = new File(DataBasePath, "PetData/");
-        List<File> petFile = dumpFile(petDirectories);
-        for (File file : petFile) {
+        Function.createFolder(petDirectories);
+        for (File file : dumpFile(petDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -251,11 +253,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> PetData");
+        SomCore.plugin.getLogger().info("[DataLoader] PetData");
     }
 
     public static void RecipeDataLoad() {
-        for (File file : dumpFile(new File(DataBasePath, "Recipe/"))) {
+        File recipeDirectories = new File(DataBasePath, "Recipe/");
+        Function.createFolder(recipeDirectories);
+        for (File file : dumpFile(recipeDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -277,13 +281,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> RecipeData");
+        SomCore.plugin.getLogger().info("[DataLoader] RecipeData");
     }
 
     public static void MapDataLoad() {
         File mapDirectories = new File(DataBasePath, "MapData/");
-        List<File> mapFile = dumpFile(mapDirectories);
-        for (File file : mapFile) {
+        Function.createFolder(mapDirectories);
+        for (File file : dumpFile(mapDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -326,13 +330,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> MapData");
+        SomCore.plugin.getLogger().info("[DataLoader] MapData");
     }
 
     public static void LifeDataLoad() {
         File lifeMineDirectories = new File(DataBasePath, "Life/Mine");
-        List<File> lifeMineFile = dumpFile(lifeMineDirectories);
-        for (File file : lifeMineFile) {
+        Function.createFolder(lifeMineDirectories);
+        for (File file : dumpFile(lifeMineDirectories)) {
             try {
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                 String fileName = file.getName().replace(".yml", "");
@@ -533,14 +537,14 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> LifeData");
+        SomCore.plugin.getLogger().info("[DataLoader] LifeData");
     }
     public static int MaxMakeSlot = 0;
 
     public static void SkillDataLoad() {
         File skillDirectories = new File(DataBasePath, "SkillData/");
-        List<File> skillFile = dumpFile(skillDirectories);
-        for (File file : skillFile) {
+        Function.createFolder(skillDirectories);
+        for (File file : dumpFile(skillDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -587,13 +591,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> SkillData");
+        SomCore.plugin.getLogger().info("[DataLoader] SkillData");
     }
 
     public static void ClassDataLoad() {
         File classDirectories = new File(DataBasePath, "ClassData/");
-        List<File> classFile = dumpFile(classDirectories);
-        for (File file : classFile) {
+        Function.createFolder(classDirectories);
+        for (File file : dumpFile(classDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -626,8 +630,8 @@ public class DataLoader {
                 e.printStackTrace();
                 loadError(file);
             }
-        }
-        for (File file : classFile) {
+
+            // ReqClass
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -642,13 +646,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> ClassData");
+        SomCore.plugin.getLogger().info("[DataLoader] ClassData");
     }
 
     public static void MobDataLoad() {
         File mobDirectories = new File(DataBasePath, "EnemyData/");
-        List<File> mobFile = dumpFile(mobDirectories);
-        for (File file : mobFile) {
+        Function.createFolder(mobDirectories);
+        for (File file : dumpFile(mobDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -802,13 +806,13 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> EnemyData");
+        SomCore.plugin.getLogger().info("[DataLoader] EnemyData");
     }
 
     public static void ShopDataLoad() {
         File shopDirectories = new File(DataBasePath, "ShopData/");
-        List<File> shopFile = dumpFile(shopDirectories);
-        for (File file : shopFile) {
+        Function.createFolder(shopDirectories);
+        for (File file : dumpFile(shopDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -852,13 +856,17 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> ShopData");
+        SomCore.plugin.getLogger().info("[DataLoader] ShopData");
     }
 
     public static int MaxTitleSlot = 0;
+
     public static void TitleDataLoad() {
         TitleGUIMap.clear();
-        for (File file : dumpFile(new File(DataBasePath, "TitleData/"))) {
+
+        File titleDirectories = new File(DataBasePath, "TitleData/");
+        Function.createFolder(titleDirectories);
+        for (File file : dumpFile(titleDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -888,24 +896,26 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> TitleData");
+        SomCore.plugin.getLogger().info("[DataLoader] TitleData");
     }
 
     public static void NpcDataLoad() {
         File npcDirectories = new File(DataBasePath, "Npc");
-        List<File> npcFiles = dumpFile(npcDirectories);
-        for (File file : npcFiles) {
+        Function.createFolder(npcDirectories);
+        for (File file : dumpFile(npcDirectories)) {
             String fileName = file.getName().replace(".yml", "");
             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
             NpcData npcData = new NpcData();
             npcData.Message = data.getStringList("Message");
             NpcList.put(Integer.valueOf(fileName), npcData);
         }
-        Log("§aDataLoader -> NpcData");
+        SomCore.plugin.getLogger().info("[DataLoader] NpcData");
     }
 
     public static void MobSpawnerDataLoad() {
-        for (File file : dumpFile(new File(DataBasePath, "Spawner/"))) {
+        File spawnerDirectories = new File(DataBasePath, "Spawner");
+        Function.createFolder(spawnerDirectories);
+        for (File file : dumpFile(spawnerDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -929,7 +939,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> MobSpawnerData");
+        SomCore.plugin.getLogger().info("[DataLoader] MobSpawnerData");
     }
 
     public static void ItemInfoDataLoad() {
@@ -971,7 +981,7 @@ public class DataLoader {
                 ItemInfoData.get(stack.itemParameter.Id).add("§7・§e§l" + recipe.getKey());
             }
         }
-        Log("§aDataLoader -> ItemInfoData");
+        SomCore.plugin.getLogger().info("[DataLoader] ItemInfoData");
     }
 
     public static void RuneInfoDataLoad() {
@@ -989,7 +999,7 @@ public class DataLoader {
                 RuneInfoData.get(dropData.runeParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
             }
         }
-        Log("§aDataLoader -> RuneInfoData");
+        SomCore.plugin.getLogger().info("[DataLoader] RuneInfoData");
     }
 
     public static void DefenseBattleMobListLoad() {
@@ -999,11 +1009,13 @@ public class DataLoader {
         for (String name : data.getStringList("MobList")) {
             DefenseBattle.MobList.add(DataBase.getMobData(name));
         }
-        Log("§aDataLoader -> DefenseBattleMobList");
+        SomCore.plugin.getLogger().info("[DataLoader] DefenseBattleMobList");
     }
 
     public static void RewardBoxListLoad() {
-        for (File file : dumpFile(new File(DataBasePath, "RewardBox/"))) {
+        File rewardBoxDirectories = new File(DataBasePath, "RewardBox/");
+        Function.createFolder(rewardBoxDirectories);
+        for (File file : dumpFile(rewardBoxDirectories)) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -1051,7 +1063,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        Log("§aDataLoader -> RewardBoxList");
+        SomCore.plugin.getLogger().info("[DataLoader] RewardBoxList");
     }
 
     public static void disguiseLoader(Disguise disguise, FileConfiguration data) {

@@ -4,6 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
@@ -11,6 +14,7 @@ import swordofmagic7.TextView.TextView;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Objects;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
@@ -18,16 +22,14 @@ import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.SomCore.plugin;
 
 public class Client {
-
     private static final int BufferSize = 1048576;
 
-    public static String Host;
     public static Socket socket;
     public static DataInputStream in;
     public static DataOutputStream out;
     public static boolean isConnection = false;
 
-    public static void connect() {
+    /*public static void connect() {
         MultiThread.TaskRun(() -> {
             try {
                 socket = new Socket(Host, 24456);
@@ -63,7 +65,7 @@ public class Client {
                 connect();
             }
         }, "Client");
-    }
+    }*/
 
     public static void sendBroadCast(TextView textView) {
         send("BroadCast," + textView.toString());

@@ -15,7 +15,7 @@ public class MySQL {
                     ""
             );
         } catch (SQLException e) {
-            e.printStackTrace();
+            SomCore.plugin.getLogger().warning("Could not connect to MySQL database! " + e);
         }
 
     }

@@ -29,6 +29,7 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -461,5 +462,16 @@ public final class Function {
 
     public static int StringToHashInt(String str, int mod) {
         return Math.abs(str.hashCode() % mod);
+    }
+
+    public static void createFolder(File file) {
+        if (!file.exists()) {
+            final boolean fileCreated = file.mkdirs();
+            if (fileCreated) {
+                Log("フォルダが存在しないため作成しました: " + file.getPath());
+            } else {
+                Log("フォルダの作成に失敗しました: " + file.getPath());
+            }
+        }
     }
 }

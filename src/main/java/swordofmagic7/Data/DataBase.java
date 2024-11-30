@@ -31,6 +31,7 @@ import swordofmagic7.Shop.ItemRecipe;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Skill.SkillClass.Alchemist.AlchemyData;
 import swordofmagic7.Skill.SkillData;
+import swordofmagic7.SomCore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import static swordofmagic7.Function.decoText;
 
 public final class DataBase {
     public static List<String> IgnoreIPList = new ArrayList<>();
-    public static final String DataBasePath = "M:\\Minecraft\\Server\\SwordofMagic7\\DataBase\\";
+    public static final String DataBasePath = SomCore.plugin.getDataFolder().getPath();
     public static final String format = "%.3f";
     public static final int MaxStackAmount = 100;
     public static final String Som7VIP = "som7.VIP";
@@ -150,6 +151,10 @@ public final class DataBase {
 
     public static List<File> dumpFile(File file) {
         List<File> list = new ArrayList<>();
+        if (!file.exists()) {
+            SomCore.plugin.getLogger().warning("存在しないファイルが参照されました: " + file.getPath());
+            return list;
+        }
         File[] files = file.listFiles();
         for (File tmpFile : files) {
             if (!tmpFile.getName().equals(".sync")) {
@@ -341,25 +346,23 @@ public final class DataBase {
         }
     }
 
-    public static ClassData getClassData(String str) {
-        if (ClassList.containsKey(str)) {
-            return ClassList.get(str);
-        } else if (ClassListDisplay.containsKey(str)) {
-            return ClassListDisplay.get(str);
+    public static ClassData getClassData(String className) {
+        if (ClassList.containsKey(className)) {
+            return ClassList.get(className);
+        } else if (ClassListDisplay.containsKey(className)) {
+            return ClassListDisplay.get(className);
         } else {
-            Log("§cNon-ClassData: " + str, true);
-            return null;
+            throw new NullPointerException("クラスのデータが存在しません: " + className);
         }
     }
 
-    public static SkillData getSkillData(String skill) {
-        if (SkillDataList.containsKey(skill)) {
-            return SkillDataList.get(skill);
-        } else if (SkillDataDisplayList.containsKey(skill)) {
-            return SkillDataDisplayList.get(skill);
+    public static SkillData getSkillData(String skillName) {
+        if (SkillDataList.containsKey(skillName)) {
+            return SkillDataList.get(skillName);
+        } else if (SkillDataDisplayList.containsKey(skillName)) {
+            return SkillDataDisplayList.get(skillName);
         } else {
-            Log("§cNon-SkillData: " + skill, true);
-            return new SkillData();
+            throw new NullPointerException("スキルのデータが存在しません: " + skillName);
         }
     }
 

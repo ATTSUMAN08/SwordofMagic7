@@ -37,6 +37,7 @@ import swordofmagic7.Particle.ParticleManager;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
+import swordofmagic7.redis.RedisManager;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -89,13 +90,18 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         saveDefaultConfig();
         reloadConfig();
         plugin = this;
-        ServerId = getConfig().getString("ServerId");
+        ServerId = getConfig().getString("serverId");
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
         getServer().getPluginManager().registerEvents(new Som7Vote(), this);
 
-        Client.Host = getConfig().getString("Host", "localhost");
-        Client.connect();
+        RedisManager.connect(
+                getConfig().getString("redis.host", "localhost"),
+                getConfig().getInt("redis.port", 6379),
+                getConfig().getString("redis.username", "null"),
+                getConfig().getString("redis.password", "null"),
+                getConfig().getBoolean("redis.ssl", false)
+        );
         //FileClient.connect();
 
         Tutorial.onLoad();

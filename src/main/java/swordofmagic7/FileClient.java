@@ -18,7 +18,7 @@ public class FileClient {
         MultiThread.TaskRun(() -> {
             FileOutputStream fos;
             try {
-                socket = new Socket(Client.Host, 24457);
+                socket = new Socket("127.0.0.1", 24457);
                 isConnection = true;
                 Log("ファイルサーバーセッション開始");
 

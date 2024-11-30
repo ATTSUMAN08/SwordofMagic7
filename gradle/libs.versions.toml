@@ -11,6 +11,7 @@ kotlinSerializationJson = "1.7.3"
 decentHolograms = "2.8.12"
 citizens = "2.0.35-SNAPSHOT"
 itemNbtApi = "2.14.0"
+jedis = "5.2.0"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -27,3 +28,4 @@ kotlinSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-ser
 decentHolograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentHolograms" }
 citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
 itemNbtApi = { group = "de.tr7zw", name = "item-nbt-api", version.ref = "itemNbtApi" }
+jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
