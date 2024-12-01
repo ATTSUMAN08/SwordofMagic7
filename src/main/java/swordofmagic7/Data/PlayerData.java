@@ -2,7 +2,6 @@ package swordofmagic7.Data;
 
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
-import eu.decentsoftware.holograms.api.holograms.HologramLine;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -244,7 +243,6 @@ public class PlayerData {
     }
 
     public Hologram hologram;
-    public HologramLine[] hologramLine = new HologramLine[3];
     public String holoTitle;
     public int HoloWait = 0;
     public int HoloAnim = 0;
@@ -254,9 +252,10 @@ public class PlayerData {
             if (hologram != null && !hologram.isDisabled()) hologram.delete();
             hologram = createHologram(playerHoloLocation());
             if (!HoloSelfView) hologram.setHidePlayer(player);
-            hologramLine[2] = DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
-            hologramLine[0] = DHAPI.addHologramLine(hologram, "NameTag");
-            hologramLine[1] = DHAPI.addHologramLine(hologram, "HealthBar");
+            //System.out.println("Hologram Initialized");
+            DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
+            DHAPI.addHologramLine(hologram, "NameTag");
+            DHAPI.addHologramLine(hologram, "HealthBar");
             MultiThread.TaskRun(() -> {
                 while (playerWhileCheck(this)) {
                     if (hologram.isDefaultVisibleState()) {
@@ -305,7 +304,9 @@ public class PlayerData {
                 @Override
                 public void run() {
                     if (player.isOnline() && !hologram.isDisabled()) {
-                        hologramLine[2].setText(holoTitle);
+                        if (holoTitle != null) {
+                            DHAPI.setHologramLine(hologram, 0, holoTitle);
+                        }
                         DHAPI.moveHologram(hologram, playerHoloLocation());
                     } else {
                         if (!hologram.isDisabled()) hologram.delete();
@@ -1023,7 +1024,7 @@ public class PlayerData {
             Lore.add(decoLore("§e§lペットケージ容量") + PetInventory.getList().size() + "/" + PetInventory.MaxSlot);
             Lore.add(decoLore("§e§lソート方法/順") + PetInventory.Sort.Display + "/" + booleanToTextOrder(PetInventory.SortReverse));
         }
-        Lore.add("§c§l※BE勢は選択した後インベントリを閉じるとメニューが開きます");
+        Lore.add("§c§l※統合版は選択した後インベントリを閉じるとメニューが開きます");
         return new ItemStackData(Material.BOOK, decoText("§e§lユーザーメニュー"), Lore).view();
     }
 
@@ -1227,7 +1228,7 @@ public class PlayerData {
                 player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
                 deadTime = 1200;
                 Hologram hologram = createHologram(player.getEyeLocation());
-                DHAPI.addHologramLine(hologram, hologramLine[0].getText());
+                DHAPI.addHologramLine(hologram, hologram.getPage(0).getLine(1).getText());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
                 DHAPI.addHologramLine(hologram, head);

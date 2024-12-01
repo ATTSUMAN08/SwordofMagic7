@@ -1,5 +1,6 @@
 package swordofmagic7.ViewBar;
 
+import eu.decentsoftware.holograms.api.DHAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -150,6 +151,7 @@ public class ViewBar {
     private final List<String> ScoreKey = new ArrayList<>();
     private Scoreboard board;
     private Objective sidebarObject;
+
     public void tickUpdate() {
         if (tickUpdate) return;
         tickUpdate = true;
@@ -212,7 +214,7 @@ public class ViewBar {
                             int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
                             int x2 = 20 - x;
                             if (s > 0) x2 = 0;
-                            playerData.hologramLine[1].setText(HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
+                            DHAPI.setHologramLine(playerData.hologram, 2, HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
 
                             if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
                                 if (playerData.hologram.isDefaultVisibleState()) {

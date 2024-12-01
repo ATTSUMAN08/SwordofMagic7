@@ -1,5 +1,6 @@
 package swordofmagic7.Status;
 
+import eu.decentsoftware.holograms.api.DHAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -292,7 +293,7 @@ public class Status {
         }
         player.setPlayerListName(classText + "§e| " + prefix + color + playerData.Nick);
         player.setDisplayName(prefix + "§f" + playerData.Nick);
-        if (playerData.hologram != null && !playerData.hologram.isDisabled() && playerData.hologramLine[0] != null) playerData.hologramLine[0].setText("§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
+        if (playerData.hologram != null && !playerData.hologram.isDisabled()) DHAPI.setHologramLine(playerData.hologram, 1, "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
         playerData.updateBlockPlayer();
     }
 

@@ -10,8 +10,6 @@ import static swordofmagic7.Function.Log;
 import static swordofmagic7.SomCore.plugin;
 
 public class MultiThread extends Thread {
-
-    public static List<Thread> MultiThreads = new ArrayList<>();
     /*
     private static final List<MultiThreadRunnable> SynchronizedTaskList = new ArrayList<>();
     public static void SynchronizedLoopCaster() {
@@ -33,13 +31,6 @@ public class MultiThread extends Thread {
         }, 0 , 1);
     }
      */
-
-    public static void closeMultiThreads() {
-        for (Thread thread : MultiThreads) {
-            thread.interrupt();
-        }
-        MultiThreads.clear();
-    }
 
     private static final boolean log = false;
 

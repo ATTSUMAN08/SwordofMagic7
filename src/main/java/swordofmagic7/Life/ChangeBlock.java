@@ -1,22 +1,23 @@
 package swordofmagic7.Life;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
 import java.util.HashMap;
 
 public class ChangeBlock {
-    public HashMap<Location, BlockData> changeBlock = new HashMap<>();
+    public HashMap<Location, Material> changeBlock = new HashMap<>();
 
     public boolean checkLocation(Location location) {
         return changeBlock.containsKey(location);
     }
 
-    public void put(Location location, BlockData blockData) {
-        changeBlock.put(location, blockData);
+    public void put(Location location, Material material) {
+        changeBlock.put(location, material);
     }
 
-    public BlockData get(Location location) {
+    public Material get(Location location) {
         return changeBlock.get(location);
     }
 

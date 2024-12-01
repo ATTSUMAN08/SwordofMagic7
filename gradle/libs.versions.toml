@@ -2,10 +2,11 @@
 kotlin = "2.1.0-RC2"
 shadow = "8.3.5"
 pluginYml = "0.6.0"
+hidetakeSSH = "2.11.2"
 
 paperApi = "1.21.3-R0.1-SNAPSHOT"
-protocolLib = "5.1.0"
-libsDisguises = "10.0.44"
+packetEvents = "2.6.0"
+libsDisguises = "10.0.44-SNAPSHOT"
 nuVotifier = "2.7.2"
 kotlinSerializationJson = "1.7.3"
 decentHolograms = "2.8.12"
@@ -18,10 +19,11 @@ kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 pluginYml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginYml" }
+hidetakeSSH = { id = "org.hidetake.ssh", version.ref = "hidetakeSSH" }
 
 [libraries]
 paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }
-protocolLib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocolLib" }
+packetEvents = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetEvents" }
 libsDisguises = { group = "LibsDisguises", name = "LibsDisguises", version.ref = "libsDisguises" }
 nuVotifier = { group = "com.github.NuVotifier", name = "NuVotifier", version.ref = "nuVotifier" }
 kotlinSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }

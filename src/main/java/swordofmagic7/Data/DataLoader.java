@@ -5,10 +5,7 @@ import me.libraryaddict.disguise.disguisetypes.watchers.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Cat;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fox;
-import org.bukkit.entity.Horse;
+import org.bukkit.entity.*;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
@@ -59,6 +56,7 @@ import static swordofmagic7.Function.decoText;
 public class DataLoader {
 
     public static void AllLoad() {
+        long start = System.currentTimeMillis();
         ItemDataLoad();
         RuneDataLoad();
         PetDataLoad();
@@ -76,10 +74,11 @@ public class DataLoader {
         RuneInfoDataLoad();
         DefenseBattleMobListLoad();
         RewardBoxListLoad();
-        SomCore.plugin.getLogger().info("[DataLoader] 全データ読み込み");
+        SomCore.plugin.getLogger().info("[DataLoader] 全データ読み込みが完了しました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ItemDataLoad() {
+        long start = System.currentTimeMillis();
         File itemDirectories = new File(DataBasePath, "ItemData");
         Function.createFolder(itemDirectories);
         for (File file : dumpFile(itemDirectories)) {
@@ -164,10 +163,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ItemData");
+        SomCore.plugin.getLogger().info("[DataLoader] ItemDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RuneDataLoad() {
+        long start = System.currentTimeMillis();
         File runeDirectories = new File(DataBasePath, "RuneData/");
         Function.createFolder(runeDirectories);
         for (File file : dumpFile(runeDirectories)) {
@@ -208,10 +208,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RuneData");
+        SomCore.plugin.getLogger().info("[DataLoader] RuneDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void PetDataLoad() {
+        long start = System.currentTimeMillis();
         File petDirectories = new File(DataBasePath, "PetData/");
         Function.createFolder(petDirectories);
         for (File file : dumpFile(petDirectories)) {
@@ -253,10 +254,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] PetData");
+        SomCore.plugin.getLogger().info("[DataLoader] PetDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RecipeDataLoad() {
+        long start = System.currentTimeMillis();
         File recipeDirectories = new File(DataBasePath, "Recipe/");
         Function.createFolder(recipeDirectories);
         for (File file : dumpFile(recipeDirectories)) {
@@ -281,10 +283,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RecipeData");
+        SomCore.plugin.getLogger().info("[DataLoader] RecipeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MapDataLoad() {
+        long start = System.currentTimeMillis();
         File mapDirectories = new File(DataBasePath, "MapData/");
         Function.createFolder(mapDirectories);
         for (File file : dumpFile(mapDirectories)) {
@@ -330,10 +333,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] MapData");
+        SomCore.plugin.getLogger().info("[DataLoader] MapDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void LifeDataLoad() {
+        long start = System.currentTimeMillis();
         File lifeMineDirectories = new File(DataBasePath, "Life/Mine");
         Function.createFolder(lifeMineDirectories);
         for (File file : dumpFile(lifeMineDirectories)) {
@@ -537,11 +541,12 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] LifeData");
+        SomCore.plugin.getLogger().info("[DataLoader] LifeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
     public static int MaxMakeSlot = 0;
 
     public static void SkillDataLoad() {
+        long start = System.currentTimeMillis();
         File skillDirectories = new File(DataBasePath, "SkillData/");
         Function.createFolder(skillDirectories);
         for (File file : dumpFile(skillDirectories)) {
@@ -551,14 +556,14 @@ public class DataLoader {
                 SkillData skillData = new SkillData();
                 skillData.Id = fileName;
                 skillData.Icon = Material.getMaterial(data.getString("Icon", "END_CRYSTAL"));
-                skillData.Display = data.getString("Display");
+                skillData.Display = data.getString("Display", "名前が未設定のスキル");
                 List<String> Lore = new ArrayList<>();
                 for (String str : data.getStringList("Lore")) {
                     Lore.add("§a§l" + str);
                 }
                 skillData.Lore = Lore;
-                skillData.SkillType = SkillType.valueOf(data.getString("SkillType"));
-                skillData.ReqLevel = data.getInt("ReqLevel");
+                skillData.SkillType = SkillType.valueOf(data.getString("SkillType", "ACTIVE").toUpperCase(Locale.ROOT));
+                skillData.ReqLevel = data.getInt("ReqLevel", 1);
                 int i = 0;
                 while (data.isSet("Parameter-" + i + ".Display")) {
                     SkillParameter param = new SkillParameter();
@@ -591,10 +596,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] SkillData");
+        SomCore.plugin.getLogger().info("[DataLoader] SkillDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ClassDataLoad() {
+        long start = System.currentTimeMillis();
         File classDirectories = new File(DataBasePath, "ClassData/");
         Function.createFolder(classDirectories);
         for (File file : dumpFile(classDirectories)) {
@@ -646,10 +652,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ClassData");
+        SomCore.plugin.getLogger().info("[DataLoader] ClassDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MobDataLoad() {
+        long start = System.currentTimeMillis();
         File mobDirectories = new File(DataBasePath, "EnemyData/");
         Function.createFolder(mobDirectories);
         for (File file : dumpFile(mobDirectories)) {
@@ -806,10 +813,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] EnemyData");
+        SomCore.plugin.getLogger().info("[DataLoader] EnemyDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ShopDataLoad() {
+        long start = System.currentTimeMillis();
         File shopDirectories = new File(DataBasePath, "ShopData/");
         Function.createFolder(shopDirectories);
         for (File file : dumpFile(shopDirectories)) {
@@ -856,14 +864,15 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ShopData");
+        SomCore.plugin.getLogger().info("[DataLoader] ShopDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static int MaxTitleSlot = 0;
 
     public static void TitleDataLoad() {
-        TitleGUIMap.clear();
+        long start = System.currentTimeMillis();
 
+        TitleGUIMap.clear();
         File titleDirectories = new File(DataBasePath, "TitleData/");
         Function.createFolder(titleDirectories);
         for (File file : dumpFile(titleDirectories)) {
@@ -893,13 +902,14 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] TitleData");
+        SomCore.plugin.getLogger().info("[DataLoader] TitleDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void NpcDataLoad() {
+        long start = System.currentTimeMillis();
         File npcDirectories = new File(DataBasePath, "Npc");
         Function.createFolder(npcDirectories);
         for (File file : dumpFile(npcDirectories)) {
@@ -909,10 +919,11 @@ public class DataLoader {
             npcData.Message = data.getStringList("Message");
             NpcList.put(Integer.valueOf(fileName), npcData);
         }
-        SomCore.plugin.getLogger().info("[DataLoader] NpcData");
+        SomCore.plugin.getLogger().info("[DataLoader] NpcDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MobSpawnerDataLoad() {
+        long start = System.currentTimeMillis();
         File spawnerDirectories = new File(DataBasePath, "Spawner");
         Function.createFolder(spawnerDirectories);
         for (File file : dumpFile(spawnerDirectories)) {
@@ -939,10 +950,11 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] MobSpawnerData");
+        SomCore.plugin.getLogger().info("[DataLoader] MobSpawnerDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ItemInfoDataLoad() {
+        long start = System.currentTimeMillis();
         for (ItemParameter itemData : ItemList.values()) {
             ItemInfoData.put(itemData.Id, new ArrayList<>());
             if (itemData.isLoreHide) ItemInfoData.get(itemData.Id).add("§c§lこの情報へのアクセス権限がありません");
@@ -981,10 +993,11 @@ public class DataLoader {
                 ItemInfoData.get(stack.itemParameter.Id).add("§7・§e§l" + recipe.getKey());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ItemInfoData");
+        SomCore.plugin.getLogger().info("[DataLoader] ItemInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RuneInfoDataLoad() {
+        long start = System.currentTimeMillis();
         for (RuneParameter runeData : RuneList.values()) {
             try {
                 RuneInfoData.put(runeData.Id, new ArrayList<>(runeData.viewRune("%.0f", runeData.isLoreHide).getLore()));
@@ -999,20 +1012,22 @@ public class DataLoader {
                 RuneInfoData.get(dropData.runeParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RuneInfoData");
+        SomCore.plugin.getLogger().info("[DataLoader] RuneInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void DefenseBattleMobListLoad() {
+        long start = System.currentTimeMillis();
         File file = new File(DataBasePath, "DefenseBattle.yml");
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         DefenseBattle.MobList.clear();
         for (String name : data.getStringList("MobList")) {
             DefenseBattle.MobList.add(DataBase.getMobData(name));
         }
-        SomCore.plugin.getLogger().info("[DataLoader] DefenseBattleMobList");
+        SomCore.plugin.getLogger().info("[DataLoader] DefenseBattleMobListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RewardBoxListLoad() {
+        long start = System.currentTimeMillis();
         File rewardBoxDirectories = new File(DataBasePath, "RewardBox/");
         Function.createFolder(rewardBoxDirectories);
         for (File file : dumpFile(rewardBoxDirectories)) {
@@ -1063,7 +1078,7 @@ public class DataLoader {
                 loadError(file);
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RewardBoxList");
+        SomCore.plugin.getLogger().info("[DataLoader] RewardBoxListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void disguiseLoader(Disguise disguise, FileConfiguration data) {
@@ -1085,7 +1100,7 @@ public class DataLoader {
             }
             case RABBIT -> {
                 RabbitWatcher watcher = new RabbitWatcher(disguise);
-                watcher.setType(data.isSet("Disguise.RabbitType") ? RabbitType.valueOf(data.getString("Disguise.RabbitType")) : RabbitType.BROWN);
+                watcher.setType(data.isSet("Disguise.RabbitType") ? Rabbit.Type.valueOf(data.getString("Disguise.RabbitType")) : Rabbit.Type.BROWN);
                 disguise.setWatcher(watcher);
             }
             case FOX -> {

@@ -1,32 +1,32 @@
 package swordofmagic7.Skill;
 
 public enum SkillType {
-    Active("アクティブ"),
-    PetAttack("ペット攻撃"),
-    PetSupport("ペット補助"),
-    Passive("パッシブ"),
+    ACTIVE("アクティブ"),
+    PASSIVE("パッシブ"),
+    PET_ATTACK("ペット攻撃"),
+    PET_SUPPORT("ペット補助"),
     ;
 
-    public String Display;
+    public final String Display;
 
     SkillType(String Display) {
         this.Display = Display;
     }
 
     public boolean isActive() {
-        return this == Active || this.isPetSkill();
+        return this == ACTIVE || this.isPetSkill();
     }
 
     public boolean isPassive() {
-        return this == Passive;
+        return this == PASSIVE;
     }
 
     public boolean isPetAttack() {
-        return this == PetAttack;
+        return this == PET_ATTACK;
     }
 
     public boolean isPetSupport() {
-        return this == PetSupport;
+        return this == PET_SUPPORT;
     }
 
     public boolean isPetSkill() {

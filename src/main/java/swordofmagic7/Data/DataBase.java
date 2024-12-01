@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import swordofmagic7.Classes.ClassData;
 import swordofmagic7.Damage.Damage;
+import swordofmagic7.Function;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Item.ItemUseList.RewardBox;
@@ -24,7 +25,6 @@ import swordofmagic7.Map.TeleportGateParameter;
 import swordofmagic7.Map.WarpGateParameter;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobSpawnerData;
-import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Npc.NpcData;
 import swordofmagic7.Pet.PetData;
 import swordofmagic7.Shop.ItemRecipe;
@@ -153,6 +153,7 @@ public final class DataBase {
         List<File> list = new ArrayList<>();
         if (!file.exists()) {
             SomCore.plugin.getLogger().warning("存在しないファイルが参照されました: " + file.getPath());
+            Function.createFolder(file);
             return list;
         }
         File[] files = file.listFiles();
@@ -184,24 +185,76 @@ public final class DataBase {
     }
 
     static void loadError(File file) {
-        Log("§c[" + file.getName() + "]のロード中にエラーが発生しました");
+        Log(file.getPath() + " のロード中にエラーが発生しました");
+    }
+
+    static void loadError(File file, String str) {
+        Log(file.getPath() + " のロード中にエラーが発生しました, " + str);
     }
 
     public static void DataLoad() {
-        MultiThread.TaskRunSynchronized(() -> {
-            LifeType.Initialize();
-            AnvilUISlot[0] = 1;
-            AnvilUISlot[1] = 4;
-            AnvilUISlot[2] = 7;
+        LifeType.Initialize();
+        AnvilUISlot[0] = 1;
+        AnvilUISlot[1] = 4;
+        AnvilUISlot[2] = 7;
 
-            DataLoader.AllLoad();
+        DataLoader.AllLoad();
 
-            File warpDirectories = new File(DataBasePath, "WarpGateData/");
-            List<File> warpFile = dumpFile(warpDirectories);
-            for (File file : warpFile) {
-                try {
-                    FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                    String fileName = file.getName().replace(".yml", "");
+        File warpDirectories = new File(DataBasePath, "WarpGateData/");
+        List<File> warpFile = dumpFile(warpDirectories);
+        for (File file : warpFile) {
+            try {
+                FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                String fileName = file.getName().replace(".yml", "");
+                World world = Bukkit.getWorld(data.getString("Location.w", "world"));
+                double x = data.getDouble("Location.x");
+                double y = data.getDouble("Location.y");
+                double z = data.getDouble("Location.z");
+                float yaw = (float) data.getDouble("Location.yaw");
+                float pitch = (float) data.getDouble("Location.pitch");
+                Location loc = new Location(world, x, y, z, yaw, pitch);
+                WarpGateParameter warp = new WarpGateParameter();
+                warp.Id = fileName;
+                warp.setLocation(loc.clone());
+                if (data.isSet("Target")) {
+                    warp.Target = data.getString("Target");
+                } else if (data.isSet("TargetLocation")) {
+                    double xT = data.getDouble("TargetLocation.x");
+                    double yT = data.getDouble("TargetLocation.y");
+                    double zT = data.getDouble("TargetLocation.z");
+                    float yawT = (float) data.getDouble("TargetLocation.yaw");
+                    float pitchT = (float) data.getDouble("TargetLocation.pitch");
+                    warp.TargetLocation = new Location(world, xT, yT, zT, yawT, pitchT);
+                }
+                warp.Trigger = data.getString("Trigger");
+                warp.isTrigger = data.getBoolean("isTrigger", false);
+                if (warp.isTrigger) {
+                    warp.Display = data.getString("Display");
+                    warp.Lore = data.getString("Lore");
+                } else {
+                    warp.NextMap = MapList.get(data.getString("NextMap"));
+                    warp.Display = warp.NextMap.Color + "§l《" + warp.NextMap.Display + "》";
+                    warp.Lore = warp.NextMap.Color + "§c必要戦闘力 " + String.format("%.0f", warp.NextMap.ReqCombatPower);
+                }
+                warp.start();
+                if (data.getBoolean("Default", true)) {
+                    warp.Active();
+                } else {
+                    warp.Disable();
+                }
+                WarpGateList.put(fileName, warp);
+            } catch (Exception e) {
+                loadError(file);
+            }
+        }
+
+        File teleportDirectories = new File(DataBasePath, "TeleportGateData/");
+        List<File> teleportFile = dumpFile(teleportDirectories);
+        for (File file : teleportFile) {
+            try {
+                FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+                String fileName = file.getName().replace(".yml", "");
+                if (!fileName.equalsIgnoreCase("GUI")) {
                     World world = Bukkit.getWorld(data.getString("Location.w", "world"));
                     double x = data.getDouble("Location.x");
                     double y = data.getDouble("Location.y");
@@ -209,86 +262,36 @@ public final class DataBase {
                     float yaw = (float) data.getDouble("Location.yaw");
                     float pitch = (float) data.getDouble("Location.pitch");
                     Location loc = new Location(world, x, y, z, yaw, pitch);
-                    WarpGateParameter warp = new WarpGateParameter();
-                    warp.Id = fileName;
-                    warp.setLocation(loc.clone());
-                    if (data.isSet("Target")) {
-                        warp.Target = data.getString("Target");
-                    } else if (data.isSet("TargetLocation")) {
-                        double xT = data.getDouble("TargetLocation.x");
-                        double yT = data.getDouble("TargetLocation.y");
-                        double zT = data.getDouble("TargetLocation.z");
-                        float yawT = (float) data.getDouble("TargetLocation.yaw");
-                        float pitchT = (float) data.getDouble("TargetLocation.pitch");
-                        warp.TargetLocation = new Location(world, xT, yT, zT, yawT, pitchT);
-                    }
-                    warp.Trigger = data.getString("Trigger");
-                    warp.isTrigger = data.getBoolean("isTrigger", false);
-                    if (warp.isTrigger) {
-                        warp.Display = data.getString("Display");
-                        warp.Lore = data.getString("Lore");
-                    } else {
-                        warp.NextMap = MapList.get(data.getString("NextMap"));
-                        warp.Display = warp.NextMap.Color + "§l《" + warp.NextMap.Display + "》";
-                        warp.Lore = warp.NextMap.Color + "§c必要戦闘力 " + String.format("%.0f", warp.NextMap.ReqCombatPower);
-                    }
-                    warp.start();
-                    if (data.getBoolean("Default", true)) {
-                        warp.Active();
-                    } else {
-                        warp.Disable();
-                    }
-                    WarpGateList.put(fileName, warp);
-                } catch (Exception e) {
-                    loadError(file);
-                }
-            }
-
-            File teleportDirectories = new File(DataBasePath, "TeleportGateData/");
-            List<File> teleportFile = dumpFile(teleportDirectories);
-            for (File file : teleportFile) {
-                try {
-                    FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-                    String fileName = file.getName().replace(".yml", "");
-                    if (!fileName.equalsIgnoreCase("GUI")) {
-                        World world = Bukkit.getWorld(data.getString("Location.w", "world"));
-                        double x = data.getDouble("Location.x");
-                        double y = data.getDouble("Location.y");
-                        double z = data.getDouble("Location.z");
-                        float yaw = (float) data.getDouble("Location.yaw");
-                        float pitch = (float) data.getDouble("Location.pitch");
-                        Location loc = new Location(world, x, y, z, yaw, pitch);
-                        TeleportGateParameter teleport = new TeleportGateParameter();
-                        teleport.Id = fileName;
-                        teleport.Display = data.getString("Display");
-                        teleport.Icon = Material.getMaterial(data.getString("Icon"));
-                        teleport.Title = data.getString("Title");
-                        teleport.Subtitle = data.getString("Subtitle");
-                        teleport.Location = loc;
-                        teleport.DefaultActive = data.getBoolean("DefaultActive");
-                        teleport.Map = getMapData(data.getString("Map"));
-                        teleport.Mel = data.getInt("Mel", 0);
-                        TeleportGateList.put(fileName, teleport);
-                        teleport.start();
-                    } else {
-                        for (int i = 0; i < 54; i++) {
-                            if (data.isSet("TeleportGateMenu." + i)) {
-                                TeleportGateMenu.put(i, data.getString("TeleportGateMenu." + i));
-                            }
+                    TeleportGateParameter teleport = new TeleportGateParameter();
+                    teleport.Id = fileName;
+                    teleport.Display = data.getString("Display");
+                    teleport.Icon = Material.getMaterial(data.getString("Icon"));
+                    teleport.Title = data.getString("Title");
+                    teleport.Subtitle = data.getString("Subtitle");
+                    teleport.Location = loc;
+                    teleport.DefaultActive = data.getBoolean("DefaultActive");
+                    teleport.Map = getMapData(data.getString("Map"));
+                    teleport.Mel = data.getInt("Mel", 0);
+                    TeleportGateList.put(fileName, teleport);
+                    teleport.start();
+                } else {
+                    for (int i = 0; i < 54; i++) {
+                        if (data.isSet("TeleportGateMenu." + i)) {
+                            TeleportGateMenu.put(i, data.getString("TeleportGateMenu." + i));
                         }
                     }
-                } catch (Exception e) {
-                    loadError(file);
                 }
+            } catch (Exception e) {
+                loadError(file);
             }
+        }
 
-            for (MobSpawnerData spawnerData : MobSpawnerList.values()) {
-                spawnerData.start();
-            }
+        for (MobSpawnerData spawnerData : MobSpawnerList.values()) {
+            spawnerData.start();
+        }
 
-            Damage.OutrageResetTime = DataBase.getSkillData("Outrage").ParameterValueInt(0)*20;
-            Damage.FrenzyResetTime = DataBase.getSkillData("Frenzy").ParameterValueInt(0)*20;
-        });
+        Damage.OutrageResetTime = DataBase.getSkillData("Outrage").ParameterValueInt(0)*20;
+        Damage.FrenzyResetTime = DataBase.getSkillData("Frenzy").ParameterValueInt(0)*20;
     }
 
     public static HashMap<String, ItemParameter> getItemList() {

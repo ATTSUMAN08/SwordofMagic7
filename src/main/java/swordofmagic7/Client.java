@@ -3,106 +3,52 @@ package swordofmagic7;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.Protocol;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
+import swordofmagic7.redis.RedisManager;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.Objects;
+import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.plugin;
 
 public class Client {
-    private static final int BufferSize = 1048576;
-
-    public static Socket socket;
-    public static DataInputStream in;
-    public static DataOutputStream out;
-    public static boolean isConnection = false;
-
-    /*public static void connect() {
-        MultiThread.TaskRun(() -> {
-            try {
-                socket = new Socket(Host, 24456);
-                in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                Log("通信サーバーへ接続しました -> " + socket.getLocalAddress());
-                isConnection = true;
-                String packet;
-                while (true) {
-                    packet = in.readUTF();
-                    if (socket.isClosed() || !plugin.isEnabled()) {
-                        Log("セッションを切断します");
-                        break;
-                    }
-                    if (packet.equalsIgnoreCase("close")) {
-                        Log("セッションクローズが呼ばれました");
-                        break;
-                    }
-                    Trigger(packet);
-                    MultiThread.sleepMillis(10);
-                }
-                in.close();
-                out.close();
-                socket.close();
-                Log("セッションを終了しました");
-            } catch (IOException e) {
-                Log("通信エラーが発生しました[0]");
-                if (isConnection) {
-                    Log("通信サーバーから切断されました");
-                    isConnection = false;
-                }
-                MultiThread.sleepTick(100);
-                connect();
-            }
-        }, "Client");
-    }*/
-
     public static void sendBroadCast(TextView textView) {
         send("BroadCast," + textView.toString());
     }
 
     public static void sendPlayerChat(Player player, TextView textView) {
+        String displayName = PlainTextComponentSerializer.plainText().serialize(player.displayName());
         send("Chat," + new TextView()
                 .addView(textView)
-                .setSender(Function.unColored(player.getDisplayName()))
+                .setSender(Function.unColored(displayName))
                 .setUUID(player.getUniqueId())
                 .setSender(player.getName())
-                .setDisplay(player.getDisplayName())
+                .setDisplay(displayName)
                 .setMute(!player.hasPermission("snc.chat"))
                 .setFrom(ServerId)
                 .toString());
     }
 
     public static void sendDisplay(Player player, TextView textView) {
+        String displayName = PlainTextComponentSerializer.plainText().serialize(player.displayName());
         send("Display," + new TextView()
                 .addView(textView)
-                .setSender(Function.unColored(player.getDisplayName()))
+                .setSender(Function.unColored(displayName))
                 .setUUID(player.getUniqueId())
                 .setSender(player.getName())
-                .setDisplay(player.getDisplayName())
+                .setDisplay(displayName)
                 .setMute(!player.hasPermission("snc.chat"))
                 .setFrom(ServerId)
                 .toString());
     }
 
     public static void send(String str) {
-        try {
-            out.writeUTF(str);
-            out.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log("通信サーバーに接続されていません");
-        }
+        RedisManager.publishObject("SNC", List.of(str));
     }
 
     public static void Trigger(String packet) {

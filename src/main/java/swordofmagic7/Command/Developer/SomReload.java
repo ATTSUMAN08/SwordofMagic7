@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
-import swordofmagic7.SomCore;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 
@@ -22,7 +21,6 @@ public class SomReload implements SomCommand {
         for (Player player : Bukkit.getOnlinePlayers()) {
             playerData(player).saveCloseInventory();
         }
-        SomCore.deleteHolograms();
         MultiThread.TaskRunSynchronizedLater(() -> Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7"), 5);
         return true;
     }

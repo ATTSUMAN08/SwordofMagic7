@@ -53,7 +53,7 @@ public class Gathering {
 
     public static void ChangeBlock(Player player, Block block, Material material, int time) {
         MultiThread.TaskRun(() -> {
-            ChangeBlock(player).put(block.getLocation(), material.createBlockData());
+            ChangeBlock(player).put(block.getLocation(), material);
             MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), material.createBlockData());
             int i = 0;

@@ -1,11 +1,12 @@
 package swordofmagic7;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.google.gson.Gson;
 import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.DecentHologramsAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import swordofmagic7.Command.Builder.FlySpeed;
 import swordofmagic7.Command.Builder.GameModeChange;
 import swordofmagic7.Command.Builder.PlayMode;
@@ -39,12 +41,11 @@ import swordofmagic7.TextView.TextViewManager;
 import swordofmagic7.Trade.TradeManager;
 import swordofmagic7.redis.RedisManager;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -54,23 +55,26 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class SomCore extends JavaPlugin implements PluginMessageListener {
-
+    public static World world;
     public static SomCore plugin;
     public static final Random random = new Random();
+    public static final HashMap<String, Hologram> hologramMap = new HashMap<>();
     public static final HashMap<String, Consumer<Player>> hologramTouchActions = new HashMap<>();
     public static final HashMap<Player, Location> PlayerLastLocation = new HashMap<>();
     public static final int AFKTimePeriod = 1;
     public static final int AFKTime = 600;//1800;
+    public static final Gson gson = new Gson();
 
     public static Hologram createHologram(Location location) {
-        return DHAPI.createHologram("SOM7_" + UUID.randomUUID(), location);
+        Hologram hologram = DHAPI.createHologram("SOM7_" + UUID.randomUUID(), location);
+        hologramMap.put(hologram.getId(), hologram);
+        return hologram;
     }
 
-    public static Hologram createTouchHologram(String Display, Location location, Consumer<Player> action) {
+    public static void createTouchHologram(String Display, Location location, Consumer<Player> action) {
         Hologram hologram = createHologram(location);
         DHAPI.addHologramLine(hologram, Display);
         hologramTouchActions.put(hologram.getId(), action);
-        return hologram;
     }
 
     public static boolean isEventServer() {
@@ -90,10 +94,17 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         saveDefaultConfig();
         reloadConfig();
         plugin = this;
+        world = Bukkit.getWorld("world");
         ServerId = getConfig().getString("serverId");
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
         getServer().getPluginManager().registerEvents(new Som7Vote(), this);
+
+        if (!getDataFolder().exists()) getDataFolder().mkdirs();
+        File marketFolder = new File(getDataFolder(), "Market");
+        if (!marketFolder.exists()) marketFolder.mkdirs();
+
+        DataLoad();
 
         RedisManager.connect(
                 getConfig().getString("redis.host", "localhost"),
@@ -102,31 +113,21 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 getConfig().getString("redis.password", "null"),
                 getConfig().getBoolean("redis.ssl", false)
         );
-        //FileClient.connect();
 
         Tutorial.onLoad();
 
         new Events(this);
-        DataLoad();
         Dungeon.Initialize();
 
         PlayerList.load();
 
-        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        if (protocolManager != null) {
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.BLOCK_CHANGE));
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.WORLD_PARTICLES));
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.STOP_SOUND));
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.CUSTOM_SOUND_EFFECT));
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.ENTITY_SOUND));
-            protocolManager.addPacketListener(new PacketListener(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT));
-        }
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketEventsListener(), PacketListenerPriority.NORMAL);
 
         for (WarpGateParameter warp : WarpGateList.values()) {
             warp.start();
         }
 
-        World world = Bukkit.getWorld("world");
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         world.setGameRule(GameRule.DO_FIRE_TICK, false);
@@ -139,7 +140,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         world.setTime(6000);
 
-        BTTSet(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             BroadCast("§e[オートセーブ]§aを§b開始§aします");
             PlayerList.ResetPlayer.clear();
             Collection<PlayerData> PlayerDataList = new HashSet<>(PlayerData.getPlayerData().values());
@@ -154,7 +155,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 }
             }
             BroadCast("§e[オートセーブ]§aが§b完了§aしました");
-        }, 200, 6000), "AutoSave");
+        }, 200, 6000);
 
         MultiThread.TaskRunTimer(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -169,7 +170,15 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                             playerData.AFKTime += AFKTimePeriod;
                             playerData.statistics.AFKTime += AFKTimePeriod;
                             if (playerData.isAFK()) {
-                                player.sendTitle("§eAFKTime: §a" + playerData.AFKTime + "秒", "", 0, AFKTimePeriod * 20 + 5, 0);
+                                player.showTitle(Title.title(
+                                        Component.text("§eAFKTime: §a" + playerData.AFKTime + "秒"),
+                                        Component.empty(),
+                                        Title.Times.times(
+                                                Duration.ZERO,
+                                                Duration.ofSeconds(AFKTimePeriod + 5),
+                                                Duration.ZERO
+                                        )
+                                ));
                                 if (DefenseBattle.isStarted) teleportServer(player, "Lobby");
                             }
                         } else {
@@ -201,7 +210,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
 
     @Override
     public void onDisable() {
-        MultiThread.closeMultiThreads();
+        //MultiThread.closeMultiThreads();
 
         deleteHolograms();
 
@@ -215,22 +224,26 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             if (enemyData.entity != null) enemyData.entity.remove();
             count++;
         }
-        for (Entity entity : Bukkit.getWorld("world").getEntities()) {
+        for (Entity entity : world.getEntities()) {
             if (!(entity instanceof Player) && !ignoreEntity(entity)) {
                 entity.remove();
                 count++;
             }
         }
         Log("CleanEnemy: " + count);
+        Bukkit.getScheduler().cancelTasks(this);
+        Log("Plugin Task Cancelled");
     }
 
-    public static List<Hologram> getHolograms() {
-        return DecentHologramsAPI.get().getHologramManager().getHolograms().stream().filter(hologram -> hologram.getId().startsWith("SOM7_")).toList();
+    public static Collection<Hologram> getHolograms() {
+        return hologramMap.values();
     }
 
     public static void deleteHolograms() {
         for (Hologram hologram : getHolograms()) {
-            if (!hologram.isDisabled()) hologram.destroy();
+            if (!hologram.isDisabled()) {
+                DHAPI.removeHologram(hologram.getId());
+            }
         }
     }
 
@@ -273,7 +286,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         SomCommand.register("runeFilter", new RuneFilter());
     }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (sender instanceof Player player) {
             PlayerData playerData = playerData(player);
             if (player.hasPermission("som7.developer")) {
@@ -445,10 +458,14 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("uuid")) {
                 Player target;
-                if (args.length == 1 && Bukkit.getPlayer(args[0]) != null) {
+                if (args.length == 1) {
                     target = Bukkit.getPlayer(args[0]);
                 } else {
                     target = player;
+                }
+                if (target == null) {
+                    player.sendMessage("§c" + args[0] + "は存在しないプレイヤーです");
+                    return true;
                 }
                 player.sendMessage(target.getName() + ": " + target.getUniqueId());
                 return true;
@@ -536,17 +553,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 MultiThread.TaskRun(() -> {
                     if (ServerId.equalsIgnoreCase("Dev")) {
                         try {
-                            URL url = new URL("http://192.168.0.18:81/PlayerData/" + player.getUniqueId() + ".yml");
-                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                            conn.setAllowUserInteraction(false);
-                            conn.setInstanceFollowRedirects(true);
-                            conn.setRequestMethod("GET");
-                            conn.connect();
-                            int httpStatusCode = conn.getResponseCode();
-                            if (httpStatusCode != HttpURLConnection.HTTP_OK) {
-                                throw new Exception("HTTP Status " + httpStatusCode);
-                            }
-                            DataInputStream dataInStream = new DataInputStream(conn.getInputStream());
+                            DataInputStream dataInStream = getDataInputStream(player);
                             DataOutputStream dataOutStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(DataBasePath + "PlayerData\\" + player.getUniqueId() + ".yml")));
                             byte[] b = new byte[4096];
                             int readByte;
@@ -557,8 +564,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                             dataOutStream.close();
                             MultiThread.TaskRunSynchronizedLater(playerData::load, 5);
                         } catch (Exception e) {
-                            e.printStackTrace();
-                            sendMessage(player, "§cデータのダウンロードに失敗しました");
+                            sendMessage(player, "§cデータのダウンロードに失敗しました。" + e.getMessage());
                         }
                     } else {
                         sendMessage(player, "§b開発鯖§a以外では利用できません");
@@ -617,14 +623,7 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 return true;
             } else if (cmd.getName().equalsIgnoreCase("damageSimulator")) {
                 if (args.length >= 2) {
-                    String format = "%.1f";
-                    double multiply = args.length >= 3 ? Double.parseDouble(args[2]) : 1;
-                    double perforate = args.length == 4 ? Double.parseDouble(args[3]) : 0;
-                    double atk = Double.parseDouble(args[0]);
-                    double def = Double.parseDouble(args[1]);
-                    double damage = (Math.pow(atk, 2) / (atk + def * 4)) * (1-perforate);
-                    damage += atk*perforate;
-                    String log = "§cDamageSimulator§7: §a" + String.format(format, damage * multiply) + " §8(" + String.format(format, damage) + ") §f[" + multiply*100 + "]";
+                    String log = getString(args);
                     sendMessage(player, log);
                 } else {
                     sendMessage(player, "§e/damageSimulator <atk> <def> [<multiply>] [<perforate>]");
@@ -633,6 +632,31 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
             }
         }
         return false;
+    }
+
+    private static @NotNull DataInputStream getDataInputStream(Player player) throws Exception {
+        URL url = new URI("http://192.168.0.18:81/PlayerData/" + player.getUniqueId() + ".yml").toURL();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setAllowUserInteraction(false);
+        conn.setInstanceFollowRedirects(true);
+        conn.setRequestMethod("GET");
+        conn.connect();
+        int httpStatusCode = conn.getResponseCode();
+        if (httpStatusCode != HttpURLConnection.HTTP_OK) {
+            throw new Exception("HTTP Status " + httpStatusCode);
+        }
+        return new DataInputStream(conn.getInputStream());
+    }
+
+    private static @NotNull String getString(String[] args) {
+        String format = "%.1f";
+        double multiply = args.length >= 3 ? Double.parseDouble(args[2]) : 1;
+        double perforate = args.length == 4 ? Double.parseDouble(args[3]) : 0;
+        double atk = Double.parseDouble(args[0]);
+        double def = Double.parseDouble(args[1]);
+        double damage = (Math.pow(atk, 2) / (atk + def * 4)) * (1-perforate);
+        damage += atk*perforate;
+        return "§cDamageSimulator§7: §a" + String.format(format, damage * multiply) + " §8(" + String.format(format, damage) + ") §f[" + multiply*100 + "]";
     }
 
     private static final Set<Player> nextSpawnPlayer = new HashSet<>();

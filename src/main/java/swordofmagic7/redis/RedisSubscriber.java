@@ -1,9 +1,12 @@
 package swordofmagic7.redis;
 
+import com.google.gson.Gson;
+import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import swordofmagic7.MultiThread.MultiThreadRunnable;
 import swordofmagic7.SomCore;
+import swordofmagic7.api.events.RedisMessageEvent;
 
 import java.util.Arrays;
 
@@ -19,7 +22,7 @@ public class RedisSubscriber extends JedisPubSub implements MultiThreadRunnable 
     public void run() {
         boolean firstTry = true;
 
-        while (!RedisManager.closing && !Thread.interrupted() && RedisManager.jedisPool != null && !RedisManager.jedisPool.isClosed()) {
+        while (SomCore.plugin.isEnabled() && !Thread.interrupted() && RedisManager.jedisPool != null && !RedisManager.jedisPool.isClosed()) {
             try (Jedis jedis = RedisManager.getJedis()) {
                 if (firstTry) {
                     SomCore.plugin.getLogger().info("Redis Pub/Sub接続が確立されました!");
@@ -29,13 +32,13 @@ public class RedisSubscriber extends JedisPubSub implements MultiThreadRunnable 
                 }
 
                 try {
+                    SomCore.plugin.getLogger().info("正常にRedisチャンネルに登録しました: " + Arrays.toString(channels));
                     jedis.subscribe(this, channels); // blocking call
-                    SomCore.plugin.getLogger().info("Successfully subscribed channels: " + Arrays.toString(channels) + "!");
                 } catch (Exception e) {
-                    SomCore.plugin.getLogger().warning("Could not subscribe!");
+                    SomCore.plugin.getLogger().warning("Redisチャンネルの登録中にエラーが発生しました: " + e.getMessage());
                 }
             } catch (Exception e) {
-                if (RedisManager.closing) {
+                if (!SomCore.plugin.isEnabled()) {
                     return;
                 }
 
@@ -55,7 +58,12 @@ public class RedisSubscriber extends JedisPubSub implements MultiThreadRunnable 
     }
 
     @Override
-    public void onMessage(String channel, String message) {
-        SomCore.plugin.getLogger().info("Received message from channel " + channel + ": " + message);
+    public void onMessage(String channel, String message) {;
+        RedisMessageObject obj = SomCore.gson.fromJson(message, RedisMessageObject.class);
+        if (obj == null) {
+            SomCore.plugin.getLogger().warning("無効なメッセージをRedisから受信しました: " + message);
+            return;
+        }
+        Bukkit.getServer().getPluginManager().callEvent(new RedisMessageEvent(channel, obj.identifier, obj.message));
     }
 }

@@ -1,10 +1,13 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import org.hidetake.groovy.ssh.core.RunHandler
+import org.hidetake.groovy.ssh.session.SessionHandler
 
 plugins {
     alias(libs.plugins.pluginYml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.hidetakeSSH)
 }
 
 group = "swordofmagic7"
@@ -14,16 +17,15 @@ repositories {
     mavenCentral()
     maven(url = "https://repo.papermc.io/repository/maven-public/")
     maven(url = "https://oss.sonatype.org/content/groups/public/")
-    maven(url = "https://repo.dmulloy2.net/repository/public/") // ProtocolLib
     maven(url = "https://repo.md-5.net/content/groups/public/") // LibsDisguises
     maven(url = "https://jitpack.io") // NuVotifier, DecentHolograms
     maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
-    maven(url = "https://repo.codemc.io/repository/maven-public/") // ItemNBTAPI
+    maven(url = "https://repo.codemc.io/repository/maven-public/") // ItemNBTAPI, PacketEvents
 }
 
 dependencies {
     compileOnly(libs.paperApi)
-    compileOnly(libs.protocolLib)
+    compileOnly(libs.packetEvents)
     compileOnly(libs.libsDisguises)
     compileOnly(libs.nuVotifier)
     compileOnly(libs.decentHolograms)
@@ -37,6 +39,31 @@ dependencies {
     bukkitLibrary(libs.jedis)
 }
 
+remotes {
+    withGroovyBuilder {
+        "create"("devServer") {
+            setProperty("host", properties["TEMP_SFTP_HOST"]!!)
+            setProperty("port", properties["TEMP_SFTP_PORT"]!!.toString().toInt())
+            setProperty("user", properties["TEMP_SFTP_USER"]!!)
+            setProperty("password", properties["TEMP_SFTP_PASSWORD"]!!)
+        }
+    }
+}
+
+tasks.register("deploy") {
+    dependsOn("build")
+    doLast {
+        ssh.run(delegateClosureOf<RunHandler> {
+            session(remotes["devServer"], delegateClosureOf<SessionHandler> {
+                put(hashMapOf(
+                    "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
+                    "into" to "plugins/${project.name}-${project.version}.jar"
+                ))
+            })
+        })
+    }
+}
+
 bukkit {
     name = project.name
     version = "${project.version}"
@@ -45,7 +72,7 @@ bukkit {
     apiVersion = "1.21"
 
     main = "swordofmagic7.SomCore"
-    softDepend = listOf("DecentHolograms", "Citizens", "LibsDisguises", "ProtocolLib", "NuVotifier")
+    softDepend = listOf("DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier")
 
     permissions {
         register("som7.developer") {

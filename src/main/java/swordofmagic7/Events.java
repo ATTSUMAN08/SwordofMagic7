@@ -46,12 +46,10 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
+import swordofmagic7.api.events.RedisMessageEvent;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static swordofmagic7.Data.DataBase.*;
@@ -676,6 +674,13 @@ public class Events implements Listener {
             if (action != null) {
                 action.accept(player);
             }
+        }
+    }
+
+    @EventHandler
+    void onRedisMessage(RedisMessageEvent e) {
+        if (Objects.equals(e.getChannel(), "SNC")) {
+            Client.Trigger(e.getMessage().getFirst());
         }
     }
 }

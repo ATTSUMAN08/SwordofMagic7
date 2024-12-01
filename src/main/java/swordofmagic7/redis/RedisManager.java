@@ -1,17 +1,20 @@
 package swordofmagic7.redis;
 
+import com.google.gson.Gson;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.MultiThread.MultiThread;
+import swordofmagic7.SomCore;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RedisManager {
     public static JedisPool jedisPool = null;
-    public static boolean closing = false;
-    public static RedisSubscriber redisSubscriber = new RedisSubscriber("test");
+    public static RedisSubscriber redisSubscriber = new RedisSubscriber("SNC");
 
     public static void connect(
             final String hostname,
@@ -29,6 +32,12 @@ public class RedisManager {
             jedisPool = new JedisPool(new JedisPoolConfig(), hostname, port, Protocol.DEFAULT_TIMEOUT, password, ssl);
         }
         MultiThread.TaskRun(redisSubscriber, "RedisSubscriber");
+    }
+
+    public static void publishObject(String channel, List<String> message) {
+        try (Jedis jedis = getJedis()) {
+            jedis.publish(channel, SomCore.gson.toJson(new RedisMessageObject(DataBase.ServerId, message)));
+        }
     }
 
     public static Jedis getJedis() {

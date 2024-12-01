@@ -115,3 +115,4 @@ run/
 .gradle/
 .kotlin/
 build/
+gradle.properties
