@@ -316,7 +316,7 @@ public final class Function {
     }
 
     public static Object GetRandom(Set<?> list) {
-        if (list.isEmpty()) {
+        if (!list.isEmpty()) {
             int a = random.nextInt(list.size());
             int i = 0;
             for (Object obj : list) {

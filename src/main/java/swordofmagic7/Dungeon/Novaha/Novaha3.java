@@ -37,7 +37,7 @@ public class Novaha3 {
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§cエネミ§aを§c" + Count + "体§a討伐せよ", new String[]{"§c祭壇を起動するために生贄を捧げてください"}, SoundList.DungeonTrigger);
-                while (Time > 0 && list.isEmpty() && plugin.isEnabled()) {
+                while (Time > 0 && !list.isEmpty() && plugin.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);

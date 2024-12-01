@@ -118,7 +118,7 @@ public class Exta extends EnemySkillBase {
                 MultiThread.sleepTick(5);
             }
             enemyList.removeIf(EnemyData::isDead);
-            if (enemyList.isEmpty()) {
+            if (!enemyList.isEmpty()) {
                 for (LivingEntity victim : Function.NearEntityByEnemy(location[0], 64)) {
                     Damage.makeDamage(entity(), victim, DamageCause.MAT, "Starting", 1000, 1);
                     particleData.spawn(victim.getEyeLocation());

@@ -105,7 +105,7 @@ public class SideBarToDo {
     }
 
     public void refresh() {
-        if (list.isEmpty()) {
+        if (!list.isEmpty()) {
             List<String> textData = new ArrayList<>();
             textData.add(decoText("SideBarToDo"));
             for (SideBarToDoData data : list) {

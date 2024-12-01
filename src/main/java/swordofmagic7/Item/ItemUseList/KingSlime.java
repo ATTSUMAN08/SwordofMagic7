@@ -48,7 +48,7 @@ public class KingSlime {
                 Enemy = MobManager.mobSpawn(DataBase.getMobData("キングスライム"), 50, EventLocation);
                 MultiThread.TaskRun(() -> {
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    while (Time > 0 && Enemy.isAlive() && list.isEmpty() && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && plugin.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
                         Time--;

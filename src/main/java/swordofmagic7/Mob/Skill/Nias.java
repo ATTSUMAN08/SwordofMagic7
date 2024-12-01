@@ -49,7 +49,7 @@ public class Nias extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             while (Manager.enemyData.isRunnableAI()) {
                 enemyList.removeIf(EnemyData::isDead);
-                if (enemyList.isEmpty()) {
+                if (!enemyList.isEmpty()) {
                     Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 25);
                 }
                 MultiThread.sleepTick(20);

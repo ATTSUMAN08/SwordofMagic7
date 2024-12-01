@@ -47,7 +47,7 @@ public class AusMineB3 {
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DungeonTrigger);
-                while (Time > 0 && Health > 0 && list.isEmpty() && plugin.isEnabled()) {
+                while (Time > 0 && Health > 0 && !list.isEmpty() && plugin.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);
@@ -82,7 +82,7 @@ public class AusMineB3 {
                 ViewBar.resetBossBarOther(Players);
                 Function.setPlayDungeonQuest(Players, false);
                 EnemyList.clear();
-                if (Health > 0 && list.isEmpty()) {
+                if (Health > 0 && !list.isEmpty()) {
                     Able = true;
                     getWarpGate("AusMineB3_to_AusMineB4").ActiveAtTime(ElevatorActiveTime);
                     Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
