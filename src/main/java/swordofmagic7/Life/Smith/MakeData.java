@@ -1,5 +1,6 @@
 package swordofmagic7.Life.Smith;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,7 +26,7 @@ public class MakeData {
         ItemStack item = new ItemStack(Icon, 1);
         ItemMeta meta = item.getItemMeta();
         List<String> Lore = new ArrayList<>();
-        meta.setDisplayName(decoText(Display));
+        meta.displayName(Component.text(decoText(Display)));
         Lore.add("§a§l素材を消費して武器を作成します");
         Lore.add("§a§l完成品は以下の中からランダムに選ばれます");
         Lore.add(decoText("§3§lアイテムリスト"));
@@ -38,7 +39,7 @@ public class MakeData {
         for (ItemParameterStack stack : itemRecipe.ReqStack) {
             Lore.add(decoLore(stack.itemParameter.Id) + stack.Amount + "個");
         }
-        meta.setLore(Lore);
+        meta.lore(Lore.stream().map(Component::text).toList());
         item.setItemMeta(meta);
         return item;
     }

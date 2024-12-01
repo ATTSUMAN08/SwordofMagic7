@@ -1,7 +1,8 @@
 package swordofmagic7.Trade;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -45,11 +46,11 @@ public class TradeData {
     }
 
     public void requestTrade() {
-        TextComponent inviteMessage = new TextComponent(playerData[0].getNick() + "§aさんから§e[トレード]§aを§b申請§aされました ");
-        TextComponent accept = new TextComponent("§b[/trade accept]");
-        accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/trade accept"));
-        inviteMessage.addExtra(accept);
-        player[1].spigot().sendMessage(inviteMessage);
+        TextComponent inviteMessage = Component.text(playerData[0].getNick() + "§aさんから§e[トレード]§aを§b申請§aされました ");
+        final TextComponent accept = Component.text("§b[/trade accept]")
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/trade accept"));
+        inviteMessage = inviteMessage.append(accept);
+        player[1].sendMessage(inviteMessage);
         player[0].sendMessage(playerData[1].getNick() + "§aさんに§e[トレード]§aを§b申請§aしました");
     }
 

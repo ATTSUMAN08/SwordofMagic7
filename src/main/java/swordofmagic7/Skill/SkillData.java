@@ -1,5 +1,6 @@
 package swordofmagic7.Skill;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class SkillData implements Cloneable {
         if (Icon == null) Icon = Material.END_CRYSTAL;
         ItemStack item = new ItemStack(Icon);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(decoText(Display));
+        meta.displayName(Component.text(decoText(Display)));
         List<String> Lore = new ArrayList<>(this.Lore);
         Lore.add(decoText("§3§lスキルステータス"));
         for (SkillParameter param : Parameter) {

@@ -135,9 +135,9 @@ public class PartyData {
         List<String> lore = view();
         ItemStack item = ItemStackPlayerHead(Leader);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(lore.getFirst());
+        meta.displayName(Component.text(lore.getFirst()));
         lore.removeFirst();
-        meta.setLore(lore);
+        meta.lore(lore.stream().map(Component::text).toList());
         item.setItemMeta(meta);
         return item;
     }

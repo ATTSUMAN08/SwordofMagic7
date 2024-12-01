@@ -1,5 +1,6 @@
 package swordofmagic7.Menu;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -47,7 +48,7 @@ public class StatusInfo {
             final ItemStack statusIcon = ItemStackPlayerHead(player);
             final ItemMeta statusMeta = statusIcon.getItemMeta();
             while (Viewer.getOpenInventory().getTopInventory().equals(inv)) {
-                statusMeta.setDisplayName(decoText(playerData.Nick));
+                statusMeta.displayName(Component.text(decoText(playerData.Nick)));
                 int APTitle = 0;
                 for (String title : playerData.titleManager.TitleList) {
                     APTitle += DataBase.TitleDataList.get(title).attributePoint;

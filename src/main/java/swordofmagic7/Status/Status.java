@@ -1,6 +1,7 @@
 package swordofmagic7.Status;
 
 import eu.decentsoftware.holograms.api.DHAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -190,7 +191,7 @@ public class Status {
             }
         }
 
-        if (playerData.EffectManager.Effect.size() > 0) {
+        if (!playerData.EffectManager.Effect.isEmpty()) {
             for (Map.Entry<EffectType, EffectData> data : playerData.EffectManager.Effect.entrySet()) {
                 EffectType effectType = data.getKey();
                 EffectData effectData = data.getValue();
@@ -213,7 +214,7 @@ public class Status {
             }
         }
 
-        if (playerData.instantBuff.InstantBuffs.size() > 0) {
+        if (!playerData.instantBuff.InstantBuffs.isEmpty()) {
             HashMap<StatusParameter, Double> multiply = playerData.instantBuff.getMultiply();
             HashMap<StatusParameter, Double> fixed = playerData.instantBuff.getFixed();
             for (StatusParameter param : StatusParameter.values()) {
@@ -291,8 +292,8 @@ public class Status {
         for (ClassData classData : playerData.Classes.classSlot) {
             classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
         }
-        player.setPlayerListName(classText + "§e| " + prefix + color + playerData.Nick);
-        player.setDisplayName(prefix + "§f" + playerData.Nick);
+        player.displayName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
+        player.displayName(Component.text(prefix + "§f" + playerData.Nick));
         if (playerData.hologram != null && !playerData.hologram.isDisabled()) DHAPI.setHologramLine(playerData.hologram, 1, "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
         playerData.updateBlockPlayer();
     }

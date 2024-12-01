@@ -2,6 +2,7 @@ package swordofmagic7.Pet;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
@@ -322,7 +323,7 @@ public class PetParameter implements Cloneable {
         if (petData.Icon == null) Log(petData.Id + " -> Icon Error");
         ItemStack item = new ItemStack(petData.Icon);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(decoText(petData.Display));
+        meta.displayName(Component.text(decoText(petData.Display)));
         List<String> Lore = new ArrayList<>();
         for (String str : petData.Lore) {
             Lore.add("§a§l" + str);

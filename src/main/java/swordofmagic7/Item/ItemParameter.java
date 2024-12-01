@@ -3,6 +3,7 @@ package swordofmagic7.Item;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NbtApiException;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -72,7 +73,7 @@ public class ItemParameter implements Cloneable {
             PotionMeta potion = (PotionMeta) meta;
             potion.setColor(color);
         }
-        meta.setDisplayName(decoText(Display));
+        meta.displayName(Component.text(decoText(Display)));
         meta.setCustomModelData(CustomModelData);
         List<String> Lore = new ArrayList<>();
         if (isLoreHide && this.isLoreHide) Lore.add("§c§lこの情報へのアクセス権限がありません");
