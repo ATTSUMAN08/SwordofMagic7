@@ -70,7 +70,7 @@ public class EffectManager {
                     isSlow = false;
                     isBlind = false;
                     isFixed = null;
-                    if (Effect.size() > 0) {
+                    if (!Effect.isEmpty()) {
                         for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
                             EffectType effectType = effect.getKey();
                             EffectData effectData = effect.getValue();

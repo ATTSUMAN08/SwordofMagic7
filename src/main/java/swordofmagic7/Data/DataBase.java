@@ -1,5 +1,6 @@
 package swordofmagic7.Data;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -115,36 +116,8 @@ public final class DataBase {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwningPlayer(player);
-        if (Display != null) meta.setDisplayName(Display);
-        if (Lore != null) meta.setLore(Lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    public static ItemStack ItemStackPlayerHeadFromData(OfflinePlayer player, String Display, List<String> Lore) {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwningPlayer(player);
-        if (Display != null) meta.setDisplayName(Display);
-        if (Lore != null) meta.setLore(Lore);
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    private static ItemStack UpScrollItem() {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwner("MHF_ArrowUp");
-        meta.setDisplayName("§e§l上にスクロール");
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    private static ItemStack DownScrollItem() {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwner("MHF_ArrowDown");
-        meta.setDisplayName("§e§l下にスクロール");
+        if (Display != null) meta.displayName(Component.text(Display));
+        if (Lore != null) meta.lore(Lore.stream().map(Component::text).toList());
         item.setItemMeta(meta);
         return item;
     }
@@ -157,29 +130,36 @@ public final class DataBase {
             return list;
         }
         File[] files = file.listFiles();
-        for (File tmpFile : files) {
-            if (!tmpFile.getName().equals(".sync")) {
-                if (tmpFile.isDirectory()) {
-                    list.addAll(dumpFile(tmpFile));
-                } else {
-                    list.add(tmpFile);
+        if (files != null) {
+            for (File tmpFile : files) {
+                if (!tmpFile.getName().equals(".sync")) {
+                    if (tmpFile.isDirectory()) {
+                        list.addAll(dumpFile(tmpFile));
+                    } else {
+                        list.add(tmpFile);
+                    }
                 }
             }
+        } else {
+            SomCore.plugin.getLogger().warning("ファイルが存在しません: " + file.getPath());
         }
         return list;
     }
 
     public static File searchFile(File dir, String search) {
-        List<File> list = new ArrayList<>();
         File[] files = dir.listFiles();
-        for (File tmpFile : files) {
-            if (tmpFile.getName().equals(search)) {
-                return tmpFile;
+        if (files != null) {
+            for (File tmpFile : files) {
+                if (tmpFile.getName().equals(search)) {
+                    return tmpFile;
+                }
+                if (tmpFile.isDirectory()) {
+                    File file = searchFile(tmpFile, search);
+                    if (file != null) return file;
+                }
             }
-            if (tmpFile.isDirectory()) {
-                File file = searchFile(tmpFile, search);
-                if (file != null) return file;
-            }
+        } else {
+            SomCore.plugin.getLogger().warning("ファイルが存在しません: " + dir.getPath());
         }
         return null;
     }
@@ -265,7 +245,7 @@ public final class DataBase {
                     TeleportGateParameter teleport = new TeleportGateParameter();
                     teleport.Id = fileName;
                     teleport.Display = data.getString("Display");
-                    teleport.Icon = Material.getMaterial(data.getString("Icon"));
+                    teleport.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
                     teleport.Title = data.getString("Title");
                     teleport.Subtitle = data.getString("Subtitle");
                     teleport.Location = loc;

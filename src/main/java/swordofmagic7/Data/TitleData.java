@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemStackData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
@@ -43,10 +42,7 @@ public class TitleData {
 
     public ItemStack view(boolean has) {
         try {
-            List<String> lore = new ArrayList<>();
-            for (String str : Lore) {
-                lore.add("§a§l" + str);
-            }
+            List<String> lore = Function.loreText(Lore);
             if (attributePoint > 0) {
                 lore.add(Function.decoText("獲得ボーナス"));
                 lore.add(decoLore("アトリビュートポイント") + attributePoint);

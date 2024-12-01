@@ -11,8 +11,8 @@ public enum LifeType {
     Smith("鍛冶"),
     ;
 
-    public String Display;
-    public static HashMap<String, LifeType> getData = new HashMap<>();
+    public final String Display;
+    public static final HashMap<String, LifeType> getData = new HashMap<>();
 
     LifeType(String Display) {
         this.Display = Display;

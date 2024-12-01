@@ -51,7 +51,7 @@ public class MarketContainer {
 
     public void save() {
         File marketFile = new File(DataBasePath, "Market/" + uuid + ".yml");
-        if (marketData.size() > 0 || Mel > 0) {
+        if (!marketData.isEmpty() || Mel > 0) {
             if (!marketFile.exists()) {
                 try {
                     marketFile.createNewFile();
@@ -90,7 +90,7 @@ public class MarketContainer {
                 marketData.add(new MarketData(str));
             }
             Mel = data.getInt("Mel", 0);
-            if (marketData.size() == 0 && Mel == 0) {
+            if (marketData.isEmpty() && Mel == 0) {
                 try {
                     Files.deleteIfExists(marketFile.toPath());
                 } catch (IOException e) {

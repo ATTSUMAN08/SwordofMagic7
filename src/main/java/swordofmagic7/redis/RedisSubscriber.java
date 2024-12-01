@@ -1,6 +1,5 @@
 package swordofmagic7.redis;
 
-import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -47,8 +46,8 @@ public class RedisSubscriber extends JedisPubSub implements MultiThreadRunnable 
                     unsubscribe();
                 } catch (Exception ignored) {}
 
-                // Sleep for 5 seconds to prevent massive spam in console
                 try {
+                    // noinspection BusyWait
                     Thread.sleep(5000);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
@@ -58,7 +57,7 @@ public class RedisSubscriber extends JedisPubSub implements MultiThreadRunnable 
     }
 
     @Override
-    public void onMessage(String channel, String message) {;
+    public void onMessage(String channel, String message) {
         RedisMessageObject obj = SomCore.gson.fromJson(message, RedisMessageObject.class);
         if (obj == null) {
             SomCore.plugin.getLogger().warning("無効なメッセージをRedisから受信しました: " + message);

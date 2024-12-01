@@ -30,7 +30,7 @@ public class PetInventory extends BasicInventory {
     public void start() {
         MultiThread.TaskRun(() -> {
             while (playerWhileCheck(playerData)) {
-                if (List.size() > 0) {
+                if (!List.isEmpty()) {
                     for (PetParameter pet : List) {
                         if (!pet.Summoned) {
                             pet.changeStamina(1);
@@ -120,7 +120,7 @@ public class PetInventory extends BasicInventory {
         int index = ScrollTick*8;
         int slot = 9;
         try {
-            if (List.size() > 0) switch (Sort) {
+            if (!List.isEmpty()) switch (Sort) {
                 case Name -> List.sort(new PetSortName());
                 case Level -> List.sort(new PetSortLevel());
                 case GrowthRate -> List.sort(new PetSortGrowthRate());

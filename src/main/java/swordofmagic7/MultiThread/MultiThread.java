@@ -3,9 +3,6 @@ package swordofmagic7.MultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static swordofmagic7.Function.Log;
 import static swordofmagic7.SomCore.plugin;
 
@@ -15,7 +12,7 @@ public class MultiThread extends Thread {
     public static void SynchronizedLoopCaster() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             synchronized (SynchronizedTaskList) {
-                if (SynchronizedTaskList.size() > 0) {
+                if (SynchronizedTasklist.isEmpty()) {
                     for (MultiThreadRunnable runnable : SynchronizedTaskList) {
                         try {
                             runnable.run();

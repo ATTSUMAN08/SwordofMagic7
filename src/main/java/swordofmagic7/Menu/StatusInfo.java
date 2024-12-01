@@ -35,6 +35,7 @@ public class StatusInfo {
         this.player = player;
         this.playerData = playerData;
     }
+
     public void StatusInfoView(Player player) {
         final Inventory inv = decoInv(StatusInfoDisplay, 1);
         final PlayerData playerData = playerData(player);

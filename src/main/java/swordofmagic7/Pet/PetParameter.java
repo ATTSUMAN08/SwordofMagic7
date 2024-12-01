@@ -278,7 +278,7 @@ public class PetParameter implements Cloneable {
             if (playerData.Level < Level - 10) {
                 cancel.add("§aレベルが足りないため召喚出来ません");
             }
-            if (cancel.size() > 0) {
+            if (!cancel.isEmpty()) {
                 for (String str : cancel) {
                     player.sendMessage(str);
                 }
@@ -405,7 +405,7 @@ public class PetParameter implements Cloneable {
                         if (target == null && AIState.isAttack()) {
                             double radius = 24;
                             List<LivingEntity> targets = SkillProcess.Nearest(entity.getLocation(), Function.NearLivingEntity(player.getLocation(), radius, playerData.Skill.SkillProcess.Predicate()));
-                            if (targets.size() > 0) target = targets.get(0);
+                            if (!targets.isEmpty()) target = targets.get(0);
                         }
                         if (target != null) {
                             if (target.getLocation().distance(entity.getLocation()) > 32 || target.isDead()) {

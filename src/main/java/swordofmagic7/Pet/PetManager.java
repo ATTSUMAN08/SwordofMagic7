@@ -53,8 +53,9 @@ public class PetManager {
 
     public void PetSelect() {
         Ray ray = RayTrace.rayLocationEntity(player.getEyeLocation(), 24, 1, PetManager::isPet);
-        if (ray.isHitEntity())
-        PetSelect(ray.HitEntity);
+        if (ray.isHitEntity()) {
+            PetSelect(ray.HitEntity);
+        }
     }
     public void PetSelect(LivingEntity entity) {
         PlayerData playerData = playerData(player);
@@ -89,9 +90,7 @@ public class PetManager {
         PetParameter pet = playerData.getPetSelect();
         if (pet != null && PetManager.isPet(pet.entity)) {
             switch (pet.AIState) {
-                case Follow -> {
-                    PetAISelect(pet, PetAIState.Attack);
-                }
+                case Follow -> PetAISelect(pet, PetAIState.Attack);
                 case Attack -> {
                     PetAISelect(pet, PetAIState.Support);
                     pet.target = null;

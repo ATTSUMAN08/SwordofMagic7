@@ -5,7 +5,7 @@ public enum QuestType {
     Enemy("エネミー討伐"),
     ;
 
-    public String Display;
+    public final String Display;
 
     QuestType(String Display) {
         this.Display = Display;

@@ -41,7 +41,7 @@ public class AusMineB4 {
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                     Message(Players, DungeonQuestTrigger, "§cグリフィア§aを討伐せよ", null, SoundList.DungeonTrigger);
-                    while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && list.isEmpty() && plugin.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
                         Function.setPlayDungeonQuest(Players, true);

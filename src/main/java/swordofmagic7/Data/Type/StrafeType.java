@@ -6,7 +6,7 @@ public enum StrafeType {
     All("すべての条件"),
     ;
 
-    public String Display;
+    public final String Display;
 
     StrafeType(String Display) {
         this.Display = Display;

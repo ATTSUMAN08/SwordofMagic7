@@ -261,10 +261,10 @@ public class Gathering {
                     if (dataList.size() > 1) {
                         data = dataList.get(random.nextInt(dataList.size() - 1));
                     } else if (dataList.size() == 1) {
-                        data = dataList.get(0);
+                        data = dataList.getFirst();
                     }
                     if (data != null) {
-                        AnglerItemData hitData = data.itemData.get(data.itemData.size() - 1);
+                        AnglerItemData hitData = data.itemData.getLast();
                         for (AnglerItemData itemData : data.itemData) {
                             if (random.nextDouble() < itemData.Percent * multiply) {
                                 hitData = itemData;

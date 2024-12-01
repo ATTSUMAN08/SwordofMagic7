@@ -13,9 +13,9 @@ public enum AttributeType {
     VIT("§6§l活力", Material.ORANGE_DYE, "§a§l体力と防御に関するステータスに影響します"),
     ;
 
-    public String Display;
-    Material Icon;
-    List<String> Lore;
+    public final String Display;
+    public final Material Icon;
+    public final List<String> Lore;
 
     AttributeType(String Display, Material Icon, String Lore) {
         this.Display = Display;

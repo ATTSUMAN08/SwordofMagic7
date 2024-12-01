@@ -39,7 +39,7 @@ public class Novaha4 {
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
                     Message(Players, DungeonQuestTrigger, "§cヴァノセト§aを討伐せよ", null, SoundList.DungeonTrigger);
-                    while (Time > 0 && Enemy.isAlive() && list.size() > 0 && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && list.isEmpty() && plugin.isEnabled()) {
                         list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
                         Function.setPlayDungeonQuest(Players, true);

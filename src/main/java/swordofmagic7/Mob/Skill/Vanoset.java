@@ -270,7 +270,7 @@ public class Vanoset {
                 MultiThread.TaskRun(() -> {
                     boolean isAlive = true;
                     SacrificeCount = 0;
-                    while (plugin.isEnabled() && enemyList.size() > 0) {
+                    while (plugin.isEnabled() && !enemyList.isEmpty()) {
                         Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 25);
                         enemyList.removeIf(EnemyData::isDead);
                         for (EnemyData enemyData : enemyList) {

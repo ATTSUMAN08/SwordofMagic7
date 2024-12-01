@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import swordofmagic7.Equipment.EquipmentCategory;
+import swordofmagic7.Function;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Mob.MobSpawnerData;
 import swordofmagic7.MultiThread.MultiThread;
@@ -31,7 +32,7 @@ public class Editor {
                             ItemParameter itemData = DataBase.getItemParameter("テンプレート" + suffix.Display2);
                             File dir = new File(DataBasePath, "ItemData/Equipment/" + series + "シリーズ");
                             File file = new File(DataBasePath, "ItemData/Equipment/" + series + "シリーズ/" + loopId + ".yml");
-                            dir.mkdirs();
+                            Function.createFolder(dir);
                             file.createNewFile();
                             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
 
@@ -94,7 +95,7 @@ public class Editor {
                     } else {
                         sender.sendMessage(itemId + "は存在しません");
                     }
-                    if (itemList.size() > 0) {
+                    if (!itemList.isEmpty()) {
                         for (ItemParameter item : itemList) {
                             File file = item.File;
                             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -218,7 +219,7 @@ public class Editor {
                 int maxMob = Integer.parseInt(args[5]);
                 int perSpawn = Integer.parseInt(args[6]);
                 File dir = new File(DataBasePath, "Spawner/" + name + "/");
-                if (!dir.exists()) dir.mkdirs();
+                if (!dir.exists()) Function.createFolder(dir);
                 File file = new File(DataBasePath, "Spawner/" + name + "/" + name + "Lv" + level + "_" + index + ".yml");
                 if (!file.exists()) {
                     try {

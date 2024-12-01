@@ -115,10 +115,10 @@ public enum EffectType {
     PsychicPressure("サイキックプレッシャー", true, true, "前方にダメージ判定が発生します", false),
     ;
 
-    public String Display;
+    public final String Display;
     public EffectRank effectRank = EffectRank.Normal;
-    public boolean Buff;
-    public List<String> Lore;
+    public final boolean Buff;
+    public final List<String> Lore;
     public int MaxStack = 1;
     public boolean view = true;
     public boolean isUpdateStatus = false;

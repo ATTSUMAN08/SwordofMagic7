@@ -316,7 +316,7 @@ public final class Function {
     }
 
     public static Object GetRandom(Set<?> list) {
-        if (list.size() > 0) {
+        if (list.isEmpty()) {
             int a = random.nextInt(list.size());
             int i = 0;
             for (Object obj : list) {
@@ -472,6 +472,8 @@ public final class Function {
             } else {
                 Log("フォルダの作成に失敗しました: " + file.getPath());
             }
+        } else {
+            Log("フォルダは既に存在します: " + file.getPath());
         }
     }
 }

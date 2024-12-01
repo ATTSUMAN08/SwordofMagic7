@@ -58,7 +58,7 @@ public class AsharkB1 {
                 Players = PlayerList.getNearNonDead(location, Radius);
                 Set<Player> list = PlayerList.getNearNonDead(location, Radius);
                 Message(Players, DungeonQuestTrigger, "§cエネミー§aを§c" + Count[i] + "体§a討伐せよ", null, SoundList.DungeonTrigger);
-                while (Time[i] > 0 && list.size() > 0 && plugin.isEnabled()) {
+                while (Time[i] > 0 && !list.isEmpty() && plugin.isEnabled()) {
                     list = PlayerList.getNearNonDead(location, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);

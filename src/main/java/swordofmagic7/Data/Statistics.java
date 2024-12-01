@@ -31,9 +31,7 @@ public class Statistics {
         this.player = player;
         this.playerData = playerData;
         titleManager = playerData.titleManager;
-        MultiThread.TaskRunTimer(() -> {
-            playTime++;
-        }, 20);
+        MultiThread.TaskRunTimer(() -> playTime++, 20);
     }
 
     public int playTime = 0;

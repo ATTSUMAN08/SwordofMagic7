@@ -8,7 +8,7 @@ public enum DropLogType {
     Rare("レアドロのみ"),
     ;
 
-    public String Display;
+    public final String Display;
 
     DropLogType(String Display) {
         this.Display = Display;

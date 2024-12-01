@@ -213,7 +213,7 @@ public class Skill {
                                                 RuneParameter rune = playerData.Equipment.equippedRune("気配り上手のルーン");
                                                 if (rune != null) {
                                                     double value = rune.AdditionParameterValue(0)/100;
-                                                    skillData.Parameter.get(0).Value *= value;
+                                                    skillData.Parameter.getFirst().Value *= value;
                                                     skillData.Mana = Math.toIntExact(Math.round(skillData.CastTime * value));
                                                     skillData.CastTime = Math.toIntExact(Math.round(skillData.CastTime * value));
                                                     skillData.RigidTime = Math.toIntExact(Math.round(skillData.RigidTime * value));
@@ -489,21 +489,21 @@ public class Skill {
     public boolean CategoryCheck(SkillData skillData) {
         boolean ReqMainHand = true;
         boolean ReqOffHand = true;
-        if (skillData.ReqMainHand.size() > 0) {
+        if (!skillData.ReqMainHand.isEmpty()) {
             ReqMainHand = CategoryCheck(EquipmentSlot.MainHand, skillData.ReqMainHand, skillData.SkillType.isPassive());
         }
-        if (skillData.ReqOffHand.size() > 0) {
+        if (!skillData.ReqOffHand.isEmpty()) {
             ReqOffHand = CategoryCheck(EquipmentSlot.OffHand, skillData.ReqOffHand, skillData.SkillType.isPassive());
         }
         return ReqMainHand && ReqOffHand;
     }
 
     public boolean CategoryCheck(EquipmentSlot slot, List<EquipmentCategory> categoryList, boolean isPassive) {
-        if (categoryList.size() == 0) return true;
+        if (categoryList.isEmpty()) return true;
         boolean check = false;
         StringBuilder Display = new StringBuilder();
         for (EquipmentCategory category : categoryList) {
-            if (Display.toString().equals("")) {
+            if (Display.toString().isEmpty()) {
                 Display = new StringBuilder(category.Display);
             } else {
                 Display.append(", ").append(category.Display);

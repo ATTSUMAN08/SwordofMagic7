@@ -1,5 +1,6 @@
 package swordofmagic7;
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -73,11 +74,11 @@ public class TagGame {
             message("§eTagGame Start !");
             task = MultiThread.TaskRunTimer(() -> {
                 if (Players.size() == 1) {
-                    message(Players.get(0).getDisplayName() + "§aさんが§b勝利§aしました");
+                    message(Players.getFirst().getDisplayName() + "§aさんが§b勝利§aしました");
                     MultiThread.TaskRunLater(TagGame::resetTagGame, 100, "resetTagGame");
                     task.cancel();
                 }
-                if (Tag.size() > 0) {
+                if (!Tag.isEmpty()) {
                     tagTime--;
                     List<Player> players = new ArrayList<>(Players);
                     players.removeAll(Tag);
@@ -91,7 +92,7 @@ public class TagGame {
                     }
                     if (tagTime <= 0) {
                         for (Player player : Tag) {
-                            message(player.getDisplayName() + "§aさんが§c脱落§aしました");
+                            message(PlainTextComponentSerializer.plainText().serialize(player.displayName()) + "§aさんが§c脱落§aしました");
                             player.getInventory().setHelmet(null);
                         }
                         tagTime = startTime;
@@ -115,7 +116,7 @@ public class TagGame {
         }
         if (!isPlayer(player)) {
             Players.add(player);
-            message(player.getDisplayName() + "§aさんが参加しました");
+            message(PlainTextComponentSerializer.plainText().serialize(player.displayName()) + "§aさんが参加しました");
             Joined.add(player);
             tagCheck();
         } else {
@@ -126,7 +127,7 @@ public class TagGame {
     public static void leave(Player player) {
         if (isPlayer(player)) {
             player.setGlowing(false);
-            message(player.getDisplayName() + "§aさんがやめました");
+            message(PlainTextComponentSerializer.plainText().serialize(player.displayName()) + "§aさんがやめました");
             Players.remove(player);
             tagCheck();
         } else {
@@ -137,7 +138,7 @@ public class TagGame {
     public static void kick(Player player) {
         if (isPlayer(player)) {
             player.setGlowing(false);
-            message(player.getDisplayName() + "§aさんが§c強制退場§aさせられました");
+            message(PlainTextComponentSerializer.plainText().serialize(player.displayName()) + "§aさんが§c強制退場§aさせられました");
             Players.remove(player);
             tagCheck();
         }

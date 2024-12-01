@@ -127,7 +127,7 @@ public class PetShop {
                 playerData.PetInventory.removePetParameter(index);
                 playerData.Mel += Mel;
                 if (PetSell.size() > 45) {
-                    PetSell.remove(0);
+                    PetSell.removeFirst();
                 }
                 player.sendMessage("§e[" + pet.petData.Display + "§e]§aを§c売却§aしました §e[+" + Mel + "メル]");
                 playSound(player, SoundList.LevelUp);

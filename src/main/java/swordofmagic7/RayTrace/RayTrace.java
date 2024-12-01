@@ -56,19 +56,19 @@ public final class RayTrace {
                     double distance2 = ray.HitPosition.distance(loc);
                     if (distanceCheck > distance2) {
                         distanceCheck = distance2;
-                        rayDataList.add(0, ray);
+                        rayDataList.addFirst(ray);
                     } else {
                         rayDataList.add(ray);
                     }
                 }
             }
         }
-        if (rayDataList.size() == 0) {
+        if (rayDataList.isEmpty()) {
             Ray ray = new Ray();
             ray.HitPosition = loc.add(loc.getDirection().multiply(distance));
             return ray;
         } else {
-            return rayDataList.get(0);
+            return rayDataList.getFirst();
         }
     }
 }

@@ -17,6 +17,7 @@ import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.sendMessage;
 
 public class Client {
+
     public static void sendBroadCast(TextView textView) {
         send("BroadCast," + textView.toString());
     }

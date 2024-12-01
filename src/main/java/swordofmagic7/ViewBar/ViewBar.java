@@ -278,7 +278,7 @@ public class ViewBar {
         for (Map.Entry<String, InstantBuffData> data : playerData.instantBuff.InstantBuffs.entrySet()) {
             EffectList.add(decoLore("§e§l" + data.getKey() + data.getValue().time + "秒"));
         }
-        if (EffectList.size() > 0) {
+        if (!EffectList.isEmpty()) {
             List<String> data = new ArrayList<>();
             data.add(decoText("バフ・デバフ"));
             data.addAll(EffectList);

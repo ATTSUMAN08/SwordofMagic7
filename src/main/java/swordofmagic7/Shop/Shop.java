@@ -204,7 +204,7 @@ public class Shop {
                         if (item.itemEquipmentData.Plus >= 10) {
                             sendMessage(player, "§e装備§aの§c強化値§aが§b+10§a以上です", SoundList.Nope);
                             return;
-                        } else if (item.itemEquipmentData.Rune.size() > 0) {
+                        } else if (!item.itemEquipmentData.Rune.isEmpty()) {
                             sendMessage(player, "§e装備§aに§eルーン§aが§e装着§aされています", SoundList.Nope);
                             return;
                         }

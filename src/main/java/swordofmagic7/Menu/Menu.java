@@ -143,7 +143,7 @@ public class Menu {
                 ItemMeta meta = currentItem.getItemMeta();
                 if (meta.hasLore()) {
                     List<String> Lore = meta.getLore();
-                    index = Integer.parseInt(Lore.get(Lore.size() - 1).replace("§8SlotID:", ""));
+                    index = Integer.parseInt(Lore.getLast().replace("§8SlotID:", ""));
                 }
             }
         } catch (Exception ignored) {}
@@ -225,18 +225,19 @@ public class Menu {
                     }
                 }
             } else if (playerData.ViewInventory.isHotBar()) {
-                if (8 < Slot && Slot < 36)
-                switch (Slot) {
-                    case 26 -> {}
-                    case 17 -> playerData.HotBar.ScrollUp();
-                    case 35 -> playerData.HotBar.ScrollDown();
-                    default -> {
-                        if (clickType.isRightClick()) {
-                            playerData.HotBar.use(slotToIndex(Slot));
-                        } else {
-                            playerData.HotBar.setSelectSlot(slotToIndex(Slot));
-                            Trigger.TriggerMenuView();
-                            playSound(player, SoundList.Click);
+                if (8 < Slot && Slot < 36) {
+                    switch (Slot) {
+                        case 26 -> {}
+                        case 17 -> playerData.HotBar.ScrollUp();
+                        case 35 -> playerData.HotBar.ScrollDown();
+                        default -> {
+                            if (clickType.isRightClick()) {
+                                playerData.HotBar.use(slotToIndex(Slot));
+                            } else {
+                                playerData.HotBar.setSelectSlot(slotToIndex(Slot));
+                                Trigger.TriggerMenuView();
+                                playSound(player, SoundList.Click);
+                            }
                         }
                     }
                 }
@@ -283,8 +284,6 @@ public class Menu {
                 mobInfo.MobInfoClick(view, currentItem, Slot);
                 runeInfo.RuneInfoClick(view, currentItem, Slot);
                 playerData.Skill.getAlchemist().AlchemyClick(view, currentItem, Slot);
-            } else if (ClickInventory == view.getBottomInventory()) {
-
             }
         }
 

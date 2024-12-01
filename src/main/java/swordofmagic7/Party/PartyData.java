@@ -1,7 +1,8 @@
 package swordofmagic7.Party;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -65,11 +66,11 @@ public class PartyData {
             Message(playerData.getNick() + "§aさんが§e[" + Display + "]§aから§c脱退§aしました");
             Members.remove(player);
             playerData.Party = null;
-            if (Members.size() == 0) {
+            if (Members.isEmpty()) {
                 PartyList.remove(Display);
                 Function.sendMessage(player, "§e[" + Display + "]§aを§c解散§aしました", SoundList.Tick);
             } else if (Leader == player) {
-                Promote(Members.get(0));
+                Promote(Members.getFirst());
             }
         }
     }
@@ -79,11 +80,11 @@ public class PartyData {
         if (!PartyInvites.containsKey(player)) {
             if (Members.size() < MaxPlayer) {
                 Message(playerData.getNick() + "§aさんを§e[" + Display + "]§aに§e招待§aしました");
-                TextComponent inviteMessage = new TextComponent(playerData(Leader).getNick() + "§aさんから§e[" + Display + "]§aに§e招待§aされました ");
-                TextComponent accept = new TextComponent("§b[/party accept]");
-                accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"));
-                inviteMessage.addExtra(accept);
-                player.spigot().sendMessage(inviteMessage);
+                TextComponent inviteMessage = Component.text(playerData(Leader).getNick() + "§aさんから§e[" + Display + "]§aに§e招待§aされました ");
+                final TextComponent accept = Component.text("§b[/party accept]")
+                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"));
+                inviteMessage = inviteMessage.append(accept);
+                player.sendMessage(inviteMessage);
                 playSound(player, SoundList.Tick);
                 PartyInvites.put(player, this);
                 MultiThread.TaskRunSynchronizedLater(() -> {
@@ -134,8 +135,8 @@ public class PartyData {
         List<String> lore = view();
         ItemStack item = ItemStackPlayerHead(Leader);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(lore.get(0));
-        lore.remove(0);
+        meta.setDisplayName(lore.getFirst());
+        lore.removeFirst();
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;

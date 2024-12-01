@@ -112,7 +112,7 @@ public class RuneShop {
     }
 
     public void addRuneCrashed(RuneParameter rune) {
-        RuneCrashed.add(0, rune);
+        RuneCrashed.addFirst(rune);
         if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
     }
 
@@ -189,7 +189,7 @@ public class RuneShop {
                     if (clickType.isRightClick() && rune.Quality >= maxQuality) {
                         sendMessage(player, "§e品質§aが§e" + (maxQuality*100) + "%§a以上です", SoundList.Nope);
                     } else {
-                        RuneCrashed.add(0, rune);
+                        RuneCrashed.addFirst(rune);
                         if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
                         playerData.RuneInventory.removeRuneParameter(index);
                         playerData.ItemInventory.addItemParameter(RunePowder, 1);

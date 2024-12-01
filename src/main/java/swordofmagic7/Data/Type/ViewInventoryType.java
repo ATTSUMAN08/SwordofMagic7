@@ -7,7 +7,7 @@ public enum ViewInventoryType {
     HotBar("スキルスロット"),
     ;
 
-    public String Display;
+    public final String Display;
 
     ViewInventoryType(String Display) {
         this.Display = Display;

@@ -6,7 +6,7 @@ public enum CastType {
     Hold("ホールド"),
     ;
 
-    public String Display;
+    public final String Display;
 
     CastType(String Display) {
         this.Display = Display;

@@ -2,6 +2,7 @@ package swordofmagic7.Classes;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import swordofmagic7.Function;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Skill.SkillData;
 
@@ -24,10 +25,7 @@ public class ClassData {
     public HashMap<ClassData, Integer> ReqClass= new HashMap<>();
 
     public ItemStack view() {
-        List<String> lore = new ArrayList<>();
-        for (String str : Lore) {
-            lore.add("§a§l" + str);
-        }
+        List<String> lore = Function.loreText(Lore);
         lore.add(decoText("§3§lスキル一覧"));
         for (SkillData skill : SkillList) {
             lore.add("§7・§e§l" + skill.Display);

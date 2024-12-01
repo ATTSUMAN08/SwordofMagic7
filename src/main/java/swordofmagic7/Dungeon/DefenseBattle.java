@@ -140,7 +140,7 @@ public class DefenseBattle {
                 }
                 if (isAttack) Message(Players, " ", "§e§l生命の樹§aが攻撃されています！", null, SoundList.Nope, true);
                 time--;
-                if (EnemyCount == 0 && EnemyList.size() == 0) break;
+                if (EnemyCount == 0 && EnemyList.isEmpty()) break;
                 List<String> textData = new ArrayList<>();
                 textData.add(decoText("防衛戦 [生命の樹]"));
                 textData.add(decoLore("現在Wave") + wave);

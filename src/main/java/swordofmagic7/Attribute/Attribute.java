@@ -1,5 +1,6 @@
 package swordofmagic7.Attribute;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -93,7 +94,7 @@ public class Attribute {
     public ItemStack attributeView(AttributeType type) {
         ItemStack item = new ItemStack(type.Icon);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(decoText(type.Display + " §e§l[" + Parameter.get(type) + "] "));
+        meta.displayName(Component.text(decoText(type.Display + " §e§l[" + Parameter.get(type) + "] ")));
         List<String> Lore = new ArrayList<>(type.Lore);
         Lore.add(decoText("§3§l追加ステータス"));
         final String format = "%.1f";
@@ -122,7 +123,7 @@ public class Attribute {
             Lore.add(decoLore("物理被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.3) + "%");
             Lore.add(decoLore("魔法被ダメージ軽減") + "+" + String.format(format, Parameter.get(type) * 0.1) + "%");
         }
-        meta.setLore(Lore);
+        meta.lore(Lore.stream().map(Component::text).toList());
         item.setItemMeta(meta);
         return item;
     }

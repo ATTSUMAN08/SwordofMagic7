@@ -169,7 +169,7 @@ public class Classes {
             playerData.EffectManager.clearEffect();
             int petSummoned = playerData.PetSummon.size();
             for (int i = 0; i < petSummoned; i++) {
-                playerData.PetSummon.get(0).cage();
+                playerData.PetSummon.getFirst().cage();
             }
             playSound(player, SoundList.LevelUp);
         } else {

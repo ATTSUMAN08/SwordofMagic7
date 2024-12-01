@@ -96,17 +96,17 @@ public class SkillProcess {
 
     public static Set<LivingEntity> FanShapedCollider(Location location, double radius, double angle, Predicate<LivingEntity> Predicate, boolean single) {
         Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(location, radius, Predicate));
-        if (Targets.size() == 0) return Targets;
+        if (Targets.isEmpty()) return Targets;
         Targets = ParticleManager.FanShapedCollider(location, Targets, angle);
-        if (single && Targets.size() > 0) Targets = Collections.singleton(Nearest(location, Targets).get(0));
+        if (single && !Targets.isEmpty()) Targets = Collections.singleton(Nearest(location, Targets).getFirst());
         return Targets;
     }
 
     public static Set<LivingEntity> RectangleCollider(Location location, double length, double width, Predicate<LivingEntity> Predicate, boolean single) {
         Set<LivingEntity> Targets = new HashSet<>(Function.NearLivingEntity(location, length, Predicate));
-        if (Targets.size() == 0) return Targets;
+        if (Targets.isEmpty()) return Targets;
         Targets = ParticleManager.RectangleCollider(location, Targets, length, width);
-        if (single && Targets.size() > 0) Targets = Collections.singleton(Nearest(location, Targets).get(0));
+        if (single && !Targets.isEmpty()) Targets = Collections.singleton(Nearest(location, Targets).getFirst());
         return Targets;
     }
 
@@ -115,7 +115,7 @@ public class SkillProcess {
     }
 
     public static List<LivingEntity> Nearest(Location location, Set<LivingEntity> Entities, double distance) {
-        if (Entities.size() == 0) return new ArrayList<>();
+        if (Entities.isEmpty()) return new ArrayList<>();
         LivingEntity target = null;
         for (LivingEntity entity : Entities) {
             if (location.distance(entity.getLocation()) < distance) {
@@ -202,7 +202,7 @@ public class SkillProcess {
                         normalAttackCoolTime = playerData.EffectManager.hasEffect(EffectType.DoubleGunStance) ? 7 : 10;
                     }
                     case Baton -> {
-                        if (playerData.PetSummon.size() == 0) {
+                        if (playerData.PetSummon.isEmpty()) {
                             sendMessage(player, "§e[ペット]§aが§e召喚§aされていません", SoundList.Nope);
                         }
                     }

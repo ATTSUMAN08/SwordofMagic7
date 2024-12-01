@@ -45,8 +45,8 @@ public class Tutorial {
             PlayerData playerData = playerData(player);
             boolean start = false;
             for (TutorialData data : TutorialList) {
-                if (data.start == i) {
-                    BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§b開始§aしました", true);
+                if (data.start() == i) {
+                    BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display() + "§aを§b開始§aしました", true);
                     //if (playerData.Level == 1) player.sendMessage(TutorialNonSave);
                     start = true;
                 }
@@ -56,9 +56,9 @@ public class Tutorial {
                 TutorialProcess.put(player, i);
                 MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LevelUp), 1);
                 for (TutorialData data : TutorialList) {
-                    if (data.end == i) {
+                    if (data.end() == i) {
                         TutorialProcess.remove(player);
-                        BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display + "§aを§eクリア§aしました", true);
+                        BroadCast(playerData.getNick() + "§aさんが§eチュートリアル" + data.Display() + "§aを§eクリア§aしました", true);
                     }
                 }
             }
@@ -71,13 +71,5 @@ public class Tutorial {
     }
 }
 
-class TutorialData {
-    final String Display;
-    final int start;
-    final int end;
-    TutorialData(String Display, int start, int end) {
-        this.Display = Display;
-        this.start = start;
-        this.end = end;
-    }
+record TutorialData(String Display, int start, int end) {
 }

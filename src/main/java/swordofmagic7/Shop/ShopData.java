@@ -57,9 +57,8 @@ public class ShopData implements Cloneable {
     @Override
     public ShopData clone() {
         try {
-            ShopData clone = (ShopData) super.clone();
             // TODO: このクローンが元の内部を変更できないようにミュータブルな状態をここにコピーします
-            return clone;
+            return (ShopData) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

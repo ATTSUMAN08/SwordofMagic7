@@ -6,7 +6,7 @@ public enum EffectRank {
     Impossible("§c§l解除不可"),
     ;
 
-    public String Display;
+    public final String Display;
 
     EffectRank(String Display) {
         this.Display = Display;

@@ -159,8 +159,7 @@ public class DataLoader {
                 }
                 ItemList.put(itemParameter.Id, itemParameter);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] ItemDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -176,7 +175,7 @@ public class DataLoader {
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                 RuneParameter runeData = new RuneParameter();
                 runeData.Id = fileName;
-                runeData.Icon = Material.getMaterial(data.getString("Icon"));
+                runeData.Icon = Material.getMaterial(data.getString("Icon", "BARRIER"));
                 runeData.Display = data.getString("Display");
                 runeData.Lore = data.getStringList("Lore");
                 runeData.isSpecial = data.getBoolean("isSpecial", false);
@@ -204,8 +203,7 @@ public class DataLoader {
                 }
                 RuneList.put(runeData.Id, runeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] RuneDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -224,11 +222,11 @@ public class DataLoader {
                 petData.Display = data.getString("Display");
                 petData.Lore = data.getStringList("Lore");
                 petData.isNonTrade = data.getBoolean("isNonTrade", false);
-                petData.entityType = EntityType.fromName(data.getString("Type").toUpperCase());
+                petData.entityType = EntityType.valueOf(data.getString("Type", "ZOMBIE").toUpperCase());
                 if (data.isSet("Disguise.Type")) {
-                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase());
+                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type", "SKELETON").toUpperCase());
                     if (disguiseType == DisguiseType.PLAYER) {
-                        petData.disguise = new PlayerDisguise(data.getString("Disguise.Player"));
+                        petData.disguise = new PlayerDisguise(data.getString("Disguise.Player", "MomiNeko"));
                     } else {
                         petData.disguise = new MobDisguise(disguiseType);
                     }
@@ -250,8 +248,7 @@ public class DataLoader {
                 petData.BossPet = data.getBoolean("BossPet", false);
                 PetList.put(fileName, petData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] PetDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -279,8 +276,7 @@ public class DataLoader {
                 }
                 ItemRecipeList.put(fileName, itemRecipe);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] RecipeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -329,8 +325,7 @@ public class DataLoader {
                 }
                 MapList.put(fileName, mapData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] MapDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -357,8 +352,7 @@ public class DataLoader {
                 }
                 MineDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -381,8 +375,7 @@ public class DataLoader {
                 }
                 LumberDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -405,8 +398,7 @@ public class DataLoader {
                 }
                 HarvestDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -428,8 +420,7 @@ public class DataLoader {
                 }
                 AnglerDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -451,8 +442,7 @@ public class DataLoader {
                 CookData lifeData = new CookData(cookItem, viewItem, viewAmount, ReqLevel, Exp, recipe);
                 CookDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -478,8 +468,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -495,8 +484,7 @@ public class DataLoader {
                 SmeltData lifeData = new SmeltData(item, Amount, ReqLevel, Exp, recipe);
                 SmeltDataList.put(fileName, lifeData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
 
@@ -537,8 +525,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] LifeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -592,8 +579,7 @@ public class DataLoader {
                 SkillDataList.put(skillData.Id, skillData);
                 SkillDataDisplayList.put(skillData.Display, skillData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] SkillDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -633,8 +619,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
 
             // ReqClass
@@ -648,8 +633,7 @@ public class DataLoader {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] ClassDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -673,19 +657,14 @@ public class DataLoader {
                 mobData.ColliderSizeY = data.getDouble("ColliderSizeY", 0);
                 mobData.Glowing = data.getBoolean("Glowing", false);
                 mobData.isHide = data.getBoolean("isHide", false);
-                String entityType = data.getString("Type").toUpperCase();
-                if (EntityType.fromName(entityType) != null) {
-                    mobData.entityType = EntityType.valueOf(entityType);
-                } else {
-                    mobData.entityType = EntityType.SKELETON;
-                    Log("§cError Non-EntityType: " + fileName);
-                }
+                String entityType = data.getString("Type", "ZOMBIE").toUpperCase();
+                mobData.entityType = EntityType.valueOf(entityType);
                 mobData.Icon = Material.getMaterial(data.getString("Icon", mobData.entityType + "_SPAWN_EGG"));
                 if (mobData.Icon == null) mobData.Icon = Material.PAPER;
                 if (data.isSet("Disguise.Type")) {
-                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type").toUpperCase());
+                    DisguiseType disguiseType = DisguiseType.valueOf(data.getString("Disguise.Type", "SKELETON").toUpperCase());
                     if (disguiseType == DisguiseType.PLAYER) {
-                        mobData.disguise = new PlayerDisguise(data.getString("Disguise.Player"));
+                        mobData.disguise = new PlayerDisguise(data.getString("Disguise.Player", "MomiNeko"));
                     } else {
                         mobData.disguise = new MobDisguise(disguiseType);
                     }
@@ -809,8 +788,7 @@ public class DataLoader {
 
                 MobList.put(fileName, mobData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] EnemyDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -860,8 +838,7 @@ public class DataLoader {
                 }
                 ShopList.put(fileName, shopData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] ShopDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -946,8 +923,7 @@ public class DataLoader {
                 mobSpawnerData.location = new Location(Bukkit.getWorld(data.getString("Location.w", "world")), x, y, z);
                 MobSpawnerList.put(fileName, mobSpawnerData);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] MobSpawnerDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -1074,8 +1050,7 @@ public class DataLoader {
                 }
                 RewardBoxList.put(fileName, rewardBox);
             } catch (Exception e) {
-                e.printStackTrace();
-                loadError(file);
+                loadError(file, e.getMessage());
             }
         }
         SomCore.plugin.getLogger().info("[DataLoader] RewardBoxListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
@@ -1110,7 +1085,7 @@ public class DataLoader {
             }
             case CAT -> {
                 CatWatcher watcher = new CatWatcher(disguise);
-                watcher.setType(data.isSet("Disguise.CatType") ? Registry.CAT_VARIANT.getOrThrow(NamespacedKey.fromString(data.getString("Disguise.CatType").toLowerCase(Locale.ROOT))) : Cat.Type.RED);
+                watcher.setType(data.isSet("Disguise.CatType") ? Registry.CAT_VARIANT.getOrThrow(NamespacedKey.fromString(data.getString("Disguise.CatType", "RED").toLowerCase(Locale.ROOT))) : Cat.Type.RED);
                 disguise.setWatcher(watcher);
             }
             case PLAYER -> {

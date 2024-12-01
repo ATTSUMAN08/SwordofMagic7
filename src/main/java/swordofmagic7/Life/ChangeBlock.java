@@ -2,7 +2,6 @@ package swordofmagic7.Life;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
 
 import java.util.HashMap;
 

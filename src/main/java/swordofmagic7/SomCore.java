@@ -17,7 +17,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.scheduler.BukkitTask;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import swordofmagic7.Command.Builder.FlySpeed;
@@ -100,9 +99,9 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
         getServer().getPluginManager().registerEvents(new Som7Vote(), this);
 
-        if (!getDataFolder().exists()) getDataFolder().mkdirs();
+        if (!getDataFolder().exists()) Function.createFolder(getDataFolder());
         File marketFolder = new File(getDataFolder(), "Market");
-        if (!marketFolder.exists()) marketFolder.mkdirs();
+        if (!marketFolder.exists()) Function.createFolder(marketFolder);
 
         DataLoad();
 
@@ -674,11 +673,6 @@ public final class SomCore extends JavaPlugin implements PluginMessageListener {
                 nextSpawnPlayer.remove(player);
             }, 1, "spawnPlayer");
         }
-    }
-
-    public static HashMap<BukkitTask, String> BukkitTaskTag = new HashMap<>();
-    public static void BTTSet(BukkitTask task, String tag) {
-        BukkitTaskTag.put(task, tag);
     }
 
     @Override

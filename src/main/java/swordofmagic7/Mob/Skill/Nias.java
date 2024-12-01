@@ -49,7 +49,7 @@ public class Nias extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             while (Manager.enemyData.isRunnableAI()) {
                 enemyList.removeIf(EnemyData::isDead);
-                if (enemyList.size() > 0) {
+                if (enemyList.isEmpty()) {
                     Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 25);
                 }
                 MultiThread.sleepTick(20);
@@ -60,7 +60,7 @@ public class Nias extends EnemySkillBase {
     private final Set<EnemyData> enemyList = new HashSet<>();
     public void Displeased() {
         MultiThread.TaskRun(() -> {
-            if (enemyList.size() > 0) {
+            if (!enemyList.isEmpty()) {
                 enemyList.removeIf(EnemyData::isDead);
                 for (EnemyData enemyData : enemyList) {
                     enemyData.delete();

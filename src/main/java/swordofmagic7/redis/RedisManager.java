@@ -1,6 +1,5 @@
 package swordofmagic7.redis;
 
-import com.google.gson.Gson;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;

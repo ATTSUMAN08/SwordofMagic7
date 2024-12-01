@@ -7,7 +7,7 @@ public enum DamageLogType {
     All("すべて表示"),
     ;
 
-    public String Display;
+    public final String Display;
 
     DamageLogType(String Display) {
         this.Display = Display;

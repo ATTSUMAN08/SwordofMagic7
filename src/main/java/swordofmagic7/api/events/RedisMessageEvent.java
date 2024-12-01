@@ -7,6 +7,7 @@ import swordofmagic7.Data.DataBase;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class RedisMessageEvent extends Event {
     private static final HandlerList HANDLER_LIST = new HandlerList();
     private final String channel;

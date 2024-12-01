@@ -8,6 +8,8 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.jetbrains.annotations.NotNull;
+import swordofmagic7.SomCore;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -34,7 +36,7 @@ public class MapRender extends MapRenderer{
     }
 
     @Override
-    public void render(MapView view, MapCanvas canvas, Player player) {
+    public void render(@NotNull MapView view, MapCanvas canvas, @NotNull Player player) {
         BufferedImage image = new BufferedImage(this.image.getWidth(), this.image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = image.createGraphics();
         graphics.drawImage(this.image, data.OffsetX, data.OffsetY, null);
@@ -44,7 +46,7 @@ public class MapRender extends MapRenderer{
     public ItemStack view(int id) {
         ItemStack myMap = new ItemStack(Material.FILLED_MAP);
         while (Bukkit.getMap(id) == null) {
-            Bukkit.getServer().createMap(Bukkit.getWorld("world"));
+            Bukkit.getServer().createMap(SomCore.world);
         }
         MapView mapView = Bukkit.getMap(id);
         mapView.getRenderers().clear();

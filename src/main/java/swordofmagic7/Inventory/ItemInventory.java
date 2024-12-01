@@ -19,7 +19,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
     public final int MaxSlot = 300;
-    private final List<ItemParameterStack> List = new ArrayList<>();
+    private final List<ItemParameterStack> list = new ArrayList<>();
     private final String itemStack = decoText("§3§lアイテムスタック");
     public ItemSortType Sort = ItemSortType.Category;
     public boolean SortReverse = false;
@@ -29,11 +29,11 @@ public class ItemInventory extends BasicInventory {
     }
 
     public List<ItemParameterStack> getList() {
-        return List;
+        return list;
     }
 
     public void clear() {
-        List.clear();
+        list.clear();
     }
 
     public void ItemInventorySort() {
@@ -62,22 +62,22 @@ public class ItemInventory extends BasicInventory {
         playerData.ViewInventory = ViewInventoryType.ItemInventory;
         int index = ScrollTick*8;
         int slot;
-        List.removeIf(stack -> stack.Amount <= 0);
+        list.removeIf(stack -> stack.Amount <= 0);
         try {
-            if (List.size() > 0) switch (Sort) {
-                case Name -> List.sort(new ItemSortName());
-                case Category -> List.sort(new ItemSortCategory());
-                case Amount -> List.sort(new ItemSortAmount());
+            if (!list.isEmpty()) switch (Sort) {
+                case Name -> list.sort(new ItemSortName());
+                case Category -> list.sort(new ItemSortCategory());
+                case Amount -> list.sort(new ItemSortAmount());
             }
-            if (SortReverse) Collections.reverse(List);
+            if (SortReverse) Collections.reverse(list);
         } catch (Exception e) {
             sendMessage(player, "§eソート処理中§aに§cエラー§aが発生したため§eソート処理§aを§e中断§aしました" + e.getMessage());
         }
         int i = index;
         for (slot = 9; slot < 36; slot++) {
-            if (i < List.size()) {
-                while (i < List.size()) {
-                    ItemParameterStack stack = List.get(i);
+            if (i < list.size()) {
+                while (i < list.size()) {
+                    ItemParameterStack stack = list.get(i);
                     if (wordSearch == null || stack.itemParameter.Id.contains(wordSearch)) {
                         ItemStack item = stack.itemParameter.viewItem(stack.Amount, playerData.ViewFormat(), false);
                         ItemMeta meta = item.getItemMeta();
@@ -102,7 +102,7 @@ public class ItemInventory extends BasicInventory {
     }
 
     public ItemParameterStack getItemParameterStack(ItemParameter param) {
-        for (ItemParameterStack stack : List) {
+        for (ItemParameterStack stack : list) {
             if (ItemStackCheck(stack.itemParameter, param)) {
                 return stack;
             }
@@ -111,20 +111,20 @@ public class ItemInventory extends BasicInventory {
     }
 
     public ItemParameterStack getItemParameterStack(int i) {
-        if (i < List.size()) {
-            return List.get(i);
+        if (i < list.size()) {
+            return list.get(i);
         }
         return null;
     }
 
     public ItemParameter getItemParameter(int i) {
-        if (i < List.size()) {
-            return List.get(i).itemParameter.clone();
+        if (i < list.size()) {
+            return list.get(i).itemParameter.clone();
         } else return null;
     }
 
     public ItemParameter getItemParameter(String name) {
-        for (ItemParameterStack stack : List) {
+        for (ItemParameterStack stack : list) {
             if (stack.itemParameter.Id.equals(name)) {
                 return stack.itemParameter;
             }
@@ -138,7 +138,7 @@ public class ItemInventory extends BasicInventory {
     }
 
     public boolean hasItemParameter(ItemParameter param, int amount) {
-        for (ItemParameterStack stack : List) {
+        for (ItemParameterStack stack : list) {
             if (ItemStackCheck(stack.itemParameter, param)) {
                 return stack.Amount >= amount;
             }
@@ -151,9 +151,9 @@ public class ItemInventory extends BasicInventory {
     }
 
     public synchronized void addItemParameter(ItemParameter param, int addAmount) {
-        if (List.size() < MaxSlot) {
-            if (List.size() >= MaxSlot-10) {
-                sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
+        if (list.size() < MaxSlot) {
+            if (list.size() >= MaxSlot-10) {
+                sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - list.size()) +"スロット§aです", SoundList.Tick);
             }
         } else {
             sendMessage(player, "§e[アイテムインベントリ]§aが§c満杯§aです", SoundList.Nope);
@@ -166,7 +166,7 @@ public class ItemInventory extends BasicInventory {
             ItemParameterStack newStack = new ItemParameterStack();
             newStack.itemParameter = param.clone();
             newStack.Amount = addAmount;
-            List.add(newStack);
+            list.add(newStack);
         }
     }
 
@@ -178,7 +178,7 @@ public class ItemInventory extends BasicInventory {
         ItemParameterStack stack = getItemParameterStack(param);
         stack.Amount -= removeAmount;
         if (stack.Amount <= 0) {
-            List.remove(stack);
+            list.remove(stack);
         }
     }
 
@@ -186,7 +186,7 @@ public class ItemInventory extends BasicInventory {
         ItemParameterStack stack = getItemParameterStack(index);
         stack.Amount -= removeAmount;
         if (stack.Amount <= 0) {
-            List.remove(stack);
+            list.remove(stack);
         }
     }
 

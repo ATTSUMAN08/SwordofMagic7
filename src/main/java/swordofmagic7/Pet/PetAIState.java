@@ -6,7 +6,7 @@ public enum PetAIState {
     Support("サポート"),
     ;
 
-    public String Display;
+    public final String Display;
 
     PetAIState(String Display) {
         this.Display = Display;

@@ -1,5 +1,6 @@
 package swordofmagic7.Market;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +12,7 @@ import swordofmagic7.Item.ItemParameter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.DataBasePath;
@@ -53,20 +55,20 @@ public class MarketData {
         ItemParameter itemPram = itemParameterStack.itemParameter;
         ItemStack item = itemPram.viewItem(itemParameterStack.Amount, format);
         ItemMeta meta = item.getItemMeta();
-        List<String> Lore = new ArrayList<>(meta.getLore());
+        List<Component> lore = meta.hasLore() ? new ArrayList<>(Objects.requireNonNull(meta.lore())) : new ArrayList<>();
         File file = new File(DataBasePath, "Market/" + Market.MarketPriceYml);
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-        Lore.add(Function.decoText("§3§l出品情報"));
+        lore.add(Component.text(Function.decoText("§3§l出品情報")));
         try {
-            Lore.add(Function.decoLore("参考相場") + (data.isSet(itemPram.Id) ? data.getInt(itemPram.Id) : "§7§l過去取引無し"));
+            lore.add(Component.text(Function.decoLore("参考相場") + (data.isSet(itemPram.Id) ? data.getInt(itemPram.Id) : "§7§l過去取引無し")));
         } catch (Exception e) {
-            Lore.add(Function.decoLore("参考相場") + "§c§l読み込みに失敗しました");
+            lore.add(Component.text(Function.decoLore("参考相場") + "§c§l読み込みに失敗しました"));
         }
-        Lore.add(Function.decoLore("出品者") + MarketContainer.getOwnerNick(Owner));
-        Lore.add(Function.decoLore("出品価格") + Mel + "メル/個");
-        Lore.add(Function.decoLore("出品数") + itemParameterStack.Amount + "個");
-        Lore.add(Function.decoLore("経過") + (int) Math.floor((System.currentTimeMillis() - timeStamp)/60000f) + "分");
-        meta.setLore(Lore);
+        lore.add(Component.text(Function.decoLore("出品者") + MarketContainer.getOwnerNick(Owner)));
+        lore.add(Component.text(Function.decoLore("出品価格") + Mel + "メル/個"));
+        lore.add(Component.text(Function.decoLore("出品数") + itemParameterStack.Amount + "個"));
+        lore.add(Component.text(Function.decoLore("経過") + (int) Math.floor((System.currentTimeMillis() - timeStamp)/60000f) + "分"));
+        meta.lore(lore);
         item.setItemMeta(meta);
         item.setAmount(Math.min(MaxStackAmount, itemParameterStack.Amount));
         return item;

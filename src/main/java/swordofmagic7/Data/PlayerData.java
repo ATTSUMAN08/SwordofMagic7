@@ -4,6 +4,7 @@ import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -66,6 +67,7 @@ import swordofmagic7.ViewBar.SideBarToDo.SideBarToDo;
 import swordofmagic7.ViewBar.ViewBar;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 
 import static swordofmagic7.Classes.Classes.MaxSlot;
@@ -1198,9 +1200,7 @@ public class PlayerData {
     public void setTargetEntity(LivingEntity entity) {
         targetEntity = entity;
         if (TargetEntityTask != null) TargetEntityTask.cancel();
-        TargetEntityTask = MultiThread.TaskRunLater(() -> {
-            targetEntity = null;
-        }, 100, "TargetEntityTask");
+        TargetEntityTask = MultiThread.TaskRunLater(() -> targetEntity = null, 100, "TargetEntityTask");
     }
 
     public void revival() {
@@ -1225,7 +1225,11 @@ public class PlayerData {
                 statistics.DownCount++;
                 logoutLocation = player.getWorld().getSpawnLocation();
                 player.setGameMode(GameMode.SPECTATOR);
-                player.sendTitle("§4§lYou Are Dead", "", 20, 200, 20);
+                player.showTitle(Title.title(
+                        Component.text("§4§lYou Are Dead"),
+                        Component.text(""),
+                        Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(10), Duration.ofSeconds(1))
+                ));
                 deadTime = 1200;
                 Hologram hologram = createHologram(player.getEyeLocation());
                 DHAPI.addHologramLine(hologram, hologram.getPage(0).getLine(1).getText());
@@ -1270,7 +1274,13 @@ public class PlayerData {
                                     MultiThread.sleepTick(1);
                                 }
                             }, "PlayerDeadTick");
-                            if (deadTime < 1100) player.sendTitle("§4§lYou Are Dead", "§e§lスニークでリスポーン", 0, 20, 0);
+                            if (deadTime < 1100) {
+                                player.showTitle(Title.title(
+                                        Component.text("§4§lYou Are Dead"),
+                                        Component.text("§e§lスニークでリスポーン"),
+                                        Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
+                                ));
+                            }
                         }
                     }
                 }.runTaskTimer(plugin, 0, 10);

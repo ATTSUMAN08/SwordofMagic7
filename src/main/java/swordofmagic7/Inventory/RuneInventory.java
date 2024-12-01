@@ -83,9 +83,9 @@ public class RuneInventory extends BasicInventory {
     public synchronized void viewRune() {
         playerData.ViewInventory = ViewInventoryType.RuneInventory;
         int index = ScrollTick*8;
-        int slot = 9;
+        int slot;
         try {
-            if (List.size() > 0) switch (Sort) {
+            if (!List.isEmpty()) switch (Sort) {
                 case Name -> List.sort(new RuneSortName());
                 case Level -> List.sort(new RuneSortLevel());
                 case Quality -> List.sort(new RuneSortQuality());
