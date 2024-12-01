@@ -19,6 +19,7 @@ public class PacketEventsListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         Player player = event.getPlayer();
+        if (!player.isOnline()) return;
         PlayerData playerData = PlayerData.playerData(player);
 
         if (event.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE) {
