@@ -17,7 +17,7 @@ import java.util.Set;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class AsharkB2 {
     private static final Location EventLocation = new Location(world,6009.5, 72, 1763.5);
@@ -44,7 +44,7 @@ public class AsharkB2 {
                     Players = PlayerList.getNearNonDead(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
                     Message(Players, DungeonQuestTrigger, "§c" + mobName + "§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
-                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
                         Function.setPlayDungeonQuest(Players, true);

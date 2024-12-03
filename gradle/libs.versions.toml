@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.0-RC2"
+kotlin = "2.1.0"
 shadow = "8.3.5"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
@@ -13,6 +13,8 @@ decentHolograms = "2.8.12"
 citizens = "2.0.35-SNAPSHOT"
 itemNbtApi = "2.14.0"
 jedis = "5.2.0"
+kotlinCoroutines = "1.9.0"
+mcCoroutine = "2.20.0"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -31,3 +33,6 @@ decentHolograms = { group = "com.github.decentsoftware-eu", name = "decenthologr
 citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
 itemNbtApi = { group = "de.tr7zw", name = "item-nbt-api", version.ref = "itemNbtApi" }
 jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
+kotlinCoroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+mcCoroutineApi = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-api", version.ref = "mcCoroutine" }
+mcCoroutineCore = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mcCoroutine" }

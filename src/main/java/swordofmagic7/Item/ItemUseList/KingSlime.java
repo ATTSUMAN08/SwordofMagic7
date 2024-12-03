@@ -24,7 +24,7 @@ import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class KingSlime {
 
@@ -48,7 +48,7 @@ public class KingSlime {
                 Enemy = MobManager.mobSpawn(DataBase.getMobData("キングスライム"), 50, EventLocation);
                 MultiThread.TaskRun(() -> {
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
                         Time--;

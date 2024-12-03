@@ -17,8 +17,8 @@ import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class AsharkB1 {
     private static final int x = 4;
@@ -58,7 +58,7 @@ public class AsharkB1 {
                 Players = PlayerList.getNearNonDead(location, Radius);
                 Set<Player> list = PlayerList.getNearNonDead(location, Radius);
                 Message(Players, DungeonQuestTrigger, "§cエネミー§aを§c" + Count[i] + "体§a討伐せよ", null, SoundList.DungeonTrigger);
-                while (Time[i] > 0 && !list.isEmpty() && plugin.isEnabled()) {
+                while (Time[i] > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNearNonDead(location, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);

@@ -2,6 +2,7 @@ package swordofmagic7;
 
 import com.vexsoftware.votifier.model.Vote;
 import com.vexsoftware.votifier.model.VotifierEvent;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,8 +17,6 @@ import swordofmagic7.MultiThread.MultiThread;
 import java.io.File;
 import java.io.IOException;
 
-import static swordofmagic7.SomCore.isDevEventServer;
-
 public class Som7Vote implements Listener {
 
     private static final File file = new File(DataBase.DataBasePath, "OfflineVote.yml");
@@ -30,7 +29,7 @@ public class Som7Vote implements Listener {
             if (player.isOnline()) {
                 voteReward((Player) player, 1);
                 Function.BroadCast("§e" + vote.getUsername() + "§aさんが§d投票§aしました §7(" + vote.getServiceName() + ")");
-            } else if (isDevEventServer()) {
+            } else if (SomCore.Companion.isDevEventServer()) {
                 try {
                     FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                     String uuid = player.getUniqueId().toString();

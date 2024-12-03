@@ -27,8 +27,8 @@ import java.util.Set;
 
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Vanoset {
@@ -47,7 +47,7 @@ public class Vanoset {
         MultiThread.TaskRunSynchronizedLater(() -> {
             Altar = MobManager.mobSpawn(DataBase.getMobData("ノヴァハ祭壇"), Manager.enemyData.Level, location);
             MultiThread.TaskRun(() -> {
-                while (plugin.isEnabled() && Manager.enemyData.isAlive() && Altar.isAlive() && !Altar.entity.isDead()) {
+                while (instance.isEnabled() && Manager.enemyData.isAlive() && Altar.isAlive() && !Altar.entity.isDead()) {
                     double percent = Manager.enemyData.Health/Manager.enemyData.MaxHealth;
                     double percent2 = Altar.Health/Altar.MaxHealth;
                     if (Math.abs(percent - percent2) >= 0.01) {
@@ -72,7 +72,7 @@ public class Vanoset {
             MultiThread.TaskRun(() -> {
                 boolean potential = true;
                 boolean pastFacts = true;
-                while (plugin.isEnabled() && Manager.enemyData.isAlive()) {
+                while (instance.isEnabled() && Manager.enemyData.isAlive()) {
                     double percent = Altar.Health / Altar.MaxHealth;
                     if (potential && percent <= 0.51) {
                         potential = false;
@@ -270,7 +270,7 @@ public class Vanoset {
                 MultiThread.TaskRun(() -> {
                     boolean isAlive = true;
                     SacrificeCount = 0;
-                    while (plugin.isEnabled() && !enemyList.isEmpty()) {
+                    while (instance.isEnabled() && !enemyList.isEmpty()) {
                         Manager.enemyData.effectManager.addEffect(EffectType.Invincible, 25);
                         enemyList.removeIf(EnemyData::isDead);
                         for (EnemyData enemyData : enemyList) {
@@ -398,7 +398,7 @@ public class Vanoset {
             double radius = 15;
 
             int i = 0;
-            while (plugin.isEnabled() && Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
+            while (instance.isEnabled() && Manager.enemyData.isAlive() && !Manager.setCancel && i < CastTime) {
                 ParticleManager.CircleParticle(particleData, location, radius, 48);
                 i += Manager.period;
                 MultiThread.sleepTick(Manager.period);
@@ -454,7 +454,7 @@ public class Vanoset {
             double radius = 15;
 
             int i = 0;
-            while (plugin.isEnabled() && Manager.enemyData.isAlive() && !Manager.setCancel && i < 30) {
+            while (instance.isEnabled() && Manager.enemyData.isAlive() && !Manager.setCancel && i < 30) {
                 ParticleManager.CircleParticle(particleData, location, radius, 48);
                 i += Manager.period;
                 MultiThread.sleepTick(Manager.period);

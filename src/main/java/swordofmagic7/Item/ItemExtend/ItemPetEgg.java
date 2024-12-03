@@ -8,7 +8,7 @@ import swordofmagic7.Pet.PetParameter;
 
 import static swordofmagic7.Data.DataBase.PetList;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class ItemPetEgg implements Cloneable  {
     public String PetId;

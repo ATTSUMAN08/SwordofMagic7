@@ -2,6 +2,7 @@ package swordofmagic7.Map;
 
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -26,8 +27,7 @@ import swordofmagic7.Sound.SoundList;
 
 import static swordofmagic7.Data.DataBase.WarpGateList;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static swordofmagic7.SomCore.createHologram;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class WarpGateParameter {
@@ -109,7 +109,7 @@ public class WarpGateParameter {
     public void start() {
         if (isStarted) return;
         isStarted = true;
-        Hologram hologram = createHologram(getLocation().add(0, 4, 0));
+        Hologram hologram = SomCore.instance.createHologram(getLocation().add(0, 4, 0));
         DHAPI.addHologramLine(hologram, Display);
         DHAPI.addHologramLine(hologram, "");
         DHAPI.addHologramLine(hologram, Lore);
@@ -118,7 +118,7 @@ public class WarpGateParameter {
             int i = 0;
             final double increment = (2 * Math.PI) / 90;
             final double radius = 2;
-            while (plugin.isEnabled()) {
+            while (instance.isEnabled()) {
                 double angle = i * increment;
                 double x = radius * Math.cos(angle);
                 double z = radius * Math.sin(angle);

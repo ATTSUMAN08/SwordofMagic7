@@ -13,7 +13,7 @@ import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
 import swordofmagic7.ViewBar.ViewBar;
@@ -29,8 +29,8 @@ import static swordofmagic7.Dungeon.Dungeon.Message;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class DefenseBattle {
     private static final Location location = new Location(world, 2234.5,139,2345.5);
@@ -62,7 +62,7 @@ public class DefenseBattle {
         spawnLocation[7] = new Location(world, 2300.5,64,2407.5);
         spawnLocation[8] = new Location(world, 2314.5,64,2370.5);
 
-        if (SomCore.isEventServer()) MultiThread.TaskRunTimer(() -> {
+        if (SomCore.Companion.isEventServer()) MultiThread.TaskRunTimer(() -> {
             LocalDateTime time = LocalDateTime.now();
             DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
             String display = format.format(time);
@@ -108,7 +108,7 @@ public class DefenseBattle {
                 enemyData.nonTargetLocation = targetLocation;
                 EnemyList.add(enemyData);
             });
-            while (plugin.isEnabled() && Health > 0 && time > 0) {
+            while (instance.isEnabled() && Health > 0 && time > 0) {
                 Players = PlayerList.getNear(targetLocation, Radius);
                 MultiThread.TaskRunSynchronized(() -> {
                     for (int i2 = 0; i2 < 5; i2++) {

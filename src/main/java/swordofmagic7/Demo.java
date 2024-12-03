@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class Demo {
     public void run(LivingEntity entity, int stopCMD, int moveCMD) {
@@ -26,6 +26,6 @@ public class Demo {
                     item.setItemMeta(meta);
                 }
             }
-        }.runTaskTimer(plugin, 0, 5);
+        }.runTaskTimer(instance, 0, 5);
     }
 }

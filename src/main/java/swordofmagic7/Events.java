@@ -5,9 +5,13 @@ import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import eu.decentsoftware.holograms.api.actions.ClickType;
 import eu.decentsoftware.holograms.event.HologramClickEvent;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
+import net.somrpg.swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.api.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -31,6 +35,7 @@ import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
@@ -46,17 +51,14 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
-import swordofmagic7.api.events.RedisMessageEvent;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Mob.MobManager.EnemyTable;
-import static swordofmagic7.SomCore.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
@@ -88,7 +90,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium) || player.hasPermission(Som7VIP);
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
-        if ((!bypass || isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
+        if ((!bypass || SomCore.Companion.isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
             for (Player player2 : Bukkit.getOnlinePlayers()) {
                 if (getIP(player2.getAddress()).equals(getIP(event.getAddress()))) {
                     event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
@@ -96,7 +98,7 @@ public class Events implements Listener {
                 }
             }
         }
-        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !isDevServer()) {
+        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
         }
@@ -113,7 +115,7 @@ public class Events implements Listener {
             }
         }
         if (player.hasPermission(OverLogin)) return;
-        int normal = isEventServer() ? 120 : 50;
+        int normal = SomCore.Companion.isEventServer() ? 120 : 50;
         boolean vip = vipCount < 5;
         boolean premium = premiumCount < 10;
         if (playerCount >= normal) {
@@ -344,9 +346,7 @@ public class Events implements Listener {
                     Dungeon.Trigger(shop);
                 }
                 if (NpcList.containsKey(npc.getId())) {
-                    MultiThread.TaskRun(() -> {
-                        NpcMessage.ShowMessage(player, npc);
-                    }, "ShowMessage");
+                    MultiThread.TaskRun(() -> NpcMessage.ShowMessage(player, npc), "ShowMessage");
                 }
             }
         }
@@ -430,7 +430,7 @@ public class Events implements Listener {
             case VOID -> {
                 event.setCancelled(true);
                 if (victim instanceof Player player) {
-                    spawnPlayer(player);
+                    SomCore.instance.spawnPlayer(player);
                 }
             }
             default -> event.setCancelled(true);
@@ -670,9 +670,9 @@ public class Events implements Listener {
     void onHologramClick(HologramClickEvent event) {
         if (event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) {
             Player player = event.getPlayer();
-            Consumer<Player> action = hologramTouchActions.get(event.getHologram().getName());
+            @NotNull Function1<@NotNull Player, @NotNull Unit> action = SomCore.instance.getHologramTouchActions().get(event.getHologram().getName());
             if (action != null) {
-                action.accept(player);
+                action.invoke(player);
             }
         }
     }

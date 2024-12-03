@@ -1,10 +1,14 @@
 package swordofmagic7.Data;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -42,6 +46,7 @@ import swordofmagic7.Life.LifeStatus;
 import swordofmagic7.Life.LifeType;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.Map.MapManager;
+import swordofmagic7.Menu.Data;
 import swordofmagic7.Menu.Menu;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
@@ -58,7 +63,6 @@ import swordofmagic7.Shop.RuneShop;
 import swordofmagic7.Shop.Shop;
 import swordofmagic7.Skill.CastType;
 import swordofmagic7.Skill.Skill;
-import swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Title.TitleManager;
@@ -74,8 +78,7 @@ import static swordofmagic7.Classes.Classes.MaxSlot;
 import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.createHologram;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
@@ -186,7 +189,7 @@ public class PlayerData {
     public boolean DamageHolo = true;
 
     public boolean isAFK() {
-        return AFKTime > SomCore.AFKTime;
+        return AFKTime > SomCore.AFK_TIME;
     }
 
     public ViewInventoryType ViewInventory = ViewInventoryType.ItemInventory;
@@ -203,7 +206,7 @@ public class PlayerData {
         PetInventory = new PetInventory(player, this);
         Equipment = new Equipment(player, this);
         Classes = new Classes(player, this);
-        Skill = new Skill(player, this, plugin);
+        Skill = new Skill(player, this, instance);
         Status = new Status(player, this, Classes, Skill);
         Menu = new Menu(player, this);
         Attribute = new Attribute(player, this);
@@ -232,6 +235,23 @@ public class PlayerData {
         InitializeHologram();
         InitializeBossBar();
 
+        ArrayList<WrapperPlayServerSetSlot> packets = new ArrayList<>();
+        packets.add(new WrapperPlayServerSetSlot(0, 0, 1,
+                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_ItemInventory)
+        ));
+        packets.add(new WrapperPlayServerSetSlot(0, 0, 2,
+                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_RuneInventory)
+        ));
+        packets.add(new WrapperPlayServerSetSlot(0, 0, 3,
+                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_PetInventory)
+        ));
+        packets.add(new WrapperPlayServerSetSlot(0, 0, 4,
+                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_SkillMenuIcon)
+        ));
+        for (WrapperPlayServerSetSlot packet : packets) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+        }
+
         MultiThread.TaskRun(() -> {
             while (playerWhileCheck(this)) {
                 if (useCookCoolTime > 0) useCookCoolTime--;
@@ -252,7 +272,7 @@ public class PlayerData {
     public void InitializeHologram() {
         MultiThread.TaskRunSynchronized(() -> {
             if (hologram != null && !hologram.isDisabled()) hologram.delete();
-            hologram = createHologram(playerHoloLocation());
+            hologram = SomCore.instance.createHologram(playerHoloLocation());
             if (!HoloSelfView) hologram.setHidePlayer(player);
             //System.out.println("Hologram Initialized");
             DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
@@ -315,7 +335,7 @@ public class PlayerData {
                         this.cancel();
                     }
                 }
-            }.runTaskTimer(plugin, 0, 1);
+            }.runTaskTimer(instance, 0, 1);
         }, "HologramInitialize");
     }
 
@@ -330,7 +350,7 @@ public class PlayerData {
                 LivingEntity entity = overrideTargetEntity != null ? overrideTargetEntity : targetEntity;
                 if (entity != null && !entity.isDead()) {
                     player.showBossBar(BossBarTargetInfo);
-                    float percent = (float) Math.min(Math.max(entity.getHealth()/entity.getMaxHealth(), 0), 1);
+                    float percent = (float) Math.min(Math.max(entity.getHealth()/Function.getMaxHealth(entity), 0), 1);
                     BossBarTargetInfo.name(Component.text("§c§l" + entity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
                     BossBarTargetInfo.progress(percent);
                 } else {
@@ -338,7 +358,7 @@ public class PlayerData {
                 }
                 if (otherTargetEntity != null && !otherTargetEntity.isDead()) {
                     player.showBossBar(BossBarOther);
-                    float percent = (float) Math.min(Math.max(otherTargetEntity.getHealth()/otherTargetEntity.getMaxHealth(), 0), 1);
+                    float percent = (float) Math.min(Math.max(otherTargetEntity.getHealth()/Function.getMaxHealth(otherTargetEntity), 0), 1);
                     BossBarOther.name(Component.text("§c§l" + otherTargetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
                     BossBarOther.progress(percent);
                 } else if (otherTargetEntity != null && otherTargetEntity.isDead()) {
@@ -374,12 +394,12 @@ public class PlayerData {
                 String uuid = player.getUniqueId().toString();
                 PlayerData targetData = PlayerData.playerData(player2);
                 if (isBlockPlayer(player2) && !Skill.SkillProcess.Predicate().test(player2)) {
-                    player.hidePlayer(plugin, player2);
-                    player2.hidePlayer(plugin, player);
+                    player.hidePlayer(instance, player2);
+                    player2.hidePlayer(instance, player);
                     targetData.BlockListFromOther.add(uuid);
                 } else if (!isBlockFromPlayer(player2) && !targetData.hideFlag) {
-                    player.showPlayer(plugin, player2);
-                    player2.showPlayer(plugin, player);
+                    player.showPlayer(instance, player2);
+                    player2.showPlayer(instance, player);
                     targetData.BlockListFromOther.remove(uuid);
                 }
             }
@@ -615,7 +635,7 @@ public class PlayerData {
     public void saveCloseInventory() {
         MultiThread.TaskRunSynchronized(() -> {
             CloseInventory(player);
-            Bukkit.getScheduler().runTaskLater(plugin, this::save, 2);
+            Bukkit.getScheduler().runTaskLater(instance, this::save, 2);
         });
     }
 
@@ -667,7 +687,7 @@ public class PlayerData {
             try {
                 playerFile.createNewFile();
             } catch (Exception e) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error creating " + playerFile.getName() + "!");
+                Bukkit.getConsoleSender().sendMessage("Error creating " + playerFile.getName() + "!");
             }
         }
         FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
@@ -1118,7 +1138,7 @@ public class PlayerData {
 
     void setRightClickHoldTask() {
         if (RightClickHoldTask != null) RightClickHoldTask.cancel();
-        RightClickHoldTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        RightClickHoldTask = Bukkit.getScheduler().runTaskLater(instance, () -> {
             if (player.isHandRaised() || player.isBlocking()) {
                 setRightClickHoldTask();
             } else {
@@ -1139,13 +1159,13 @@ public class PlayerData {
         MultiThread.TaskRunSynchronized(() -> {
             hideFlag = true;
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.hidePlayer(plugin, this.player);
+                player.hidePlayer(instance, this.player);
             }
         });
         showHideTask = MultiThread.TaskRunSynchronizedLater(() -> {
             hideFlag = false;
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.showPlayer(plugin, this.player);
+                player.showPlayer(instance, this.player);
             }
         }, time);
     }
@@ -1231,7 +1251,7 @@ public class PlayerData {
                         Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(10), Duration.ofSeconds(1))
                 ));
                 deadTime = 1200;
-                Hologram hologram = createHologram(player.getEyeLocation());
+                Hologram hologram = SomCore.instance.createHologram(player.getEyeLocation());
                 DHAPI.addHologramLine(hologram, hologram.getPage(0).getLine(1).getText());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
@@ -1283,8 +1303,9 @@ public class PlayerData {
                             }
                         }
                     }
-                }.runTaskTimer(plugin, 0, 10);
+                }.runTaskTimer(instance, 0, 10);
             }, "PlayerDead");
         }
     }
+
 }

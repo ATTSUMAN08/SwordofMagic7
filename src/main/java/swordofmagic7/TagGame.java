@@ -1,6 +1,7 @@
 package swordofmagic7;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +18,7 @@ import java.util.List;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.random;
-import static swordofmagic7.SomCore.spawnPlayer;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class TagGame {
     public static final String Prefix = "§c[鬼ごっこ]§r ";
@@ -64,7 +64,7 @@ public class TagGame {
         if (task != null) task.cancel();
         MultiThread.TaskRun(() -> {
             for (Player player : Players) {
-                spawnPlayer(player);
+                SomCore.instance.spawnPlayer(player);
             }
             MultiThread.sleepTick(10);
             message("§e5秒後§aに§eゲーム§aを§b開始§aします");

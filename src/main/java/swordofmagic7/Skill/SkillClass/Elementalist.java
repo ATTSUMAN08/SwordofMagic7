@@ -28,7 +28,7 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.RodAttack;
 

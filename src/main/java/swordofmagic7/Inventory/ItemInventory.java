@@ -1,5 +1,6 @@
 package swordofmagic7.Inventory;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,7 +15,6 @@ import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {
@@ -157,7 +157,7 @@ public class ItemInventory extends BasicInventory {
             }
         } else {
             sendMessage(player, "§e[アイテムインベントリ]§aが§c満杯§aです", SoundList.Nope);
-            spawnPlayer(player);
+            SomCore.instance.spawnPlayer(player);
         }
         ItemParameterStack stack = getItemParameterStack(param);
         if (stack.Amount > 0) {

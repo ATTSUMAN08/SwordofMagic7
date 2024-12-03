@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Auction {
@@ -60,7 +60,7 @@ public class Auction {
                                 Client.sendDisplay(Owner.player, text);
                                 time = 30;
                                 String error = null;
-                                while (0 < time && plugin.isEnabled()) {
+                                while (0 < time && instance.isEnabled()) {
                                     List<String> list = new ArrayList<>();
                                     list.add(Function.decoText("オークション"));
                                     list.add(Function.decoLore("§b§l出品者") + Owner.getNick());

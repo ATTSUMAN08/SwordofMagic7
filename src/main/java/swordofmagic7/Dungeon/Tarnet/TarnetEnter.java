@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class TarnetEnter {
 
@@ -30,7 +30,7 @@ public class TarnetEnter {
             inProgress = true;
             MultiThread.TaskRun(() -> {
                 int i = 3;
-                while (plugin.isEnabled() && i > 0 && inProgress) {
+                while (instance.isEnabled() && i > 0 && inProgress) {
                     set(i);
                     i--;
                     MultiThread.sleepTick(20);

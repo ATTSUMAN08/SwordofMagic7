@@ -21,7 +21,7 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Cook {
 

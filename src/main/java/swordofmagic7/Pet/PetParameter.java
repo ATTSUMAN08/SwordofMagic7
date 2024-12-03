@@ -36,8 +36,8 @@ import java.util.*;
 import static swordofmagic7.Data.DataBase.getPetData;
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetParameter implements Cloneable {
@@ -382,7 +382,7 @@ public class PetParameter implements Cloneable {
     }
 
     public boolean isRunnableAI() {
-        return runAITask && entity != null && plugin.isEnabled();
+        return runAITask && entity != null && instance.isEnabled();
     }
 
     public BukkitTask asyncAITask;
@@ -430,7 +430,7 @@ public class PetParameter implements Cloneable {
                         cage();
                     }
                 }
-            }.runTaskTimerAsynchronously(plugin, 0, 20);
+            }.runTaskTimerAsynchronously(instance, 0, 20);
         }
     }
 

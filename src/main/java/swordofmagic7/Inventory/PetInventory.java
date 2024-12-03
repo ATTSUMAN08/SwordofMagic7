@@ -1,5 +1,6 @@
 package swordofmagic7.Inventory;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,7 +15,6 @@ import java.util.*;
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.playerWhileCheck;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetInventory extends BasicInventory {
@@ -68,7 +68,7 @@ public class PetInventory extends BasicInventory {
             }
         } else {
             sendMessage(player, "§e[ペットケージ]§aが§c満杯§aです", SoundList.Nope);
-            spawnPlayer(player);
+            SomCore.instance.spawnPlayer(player);
         }
         HashMap.put(pet.petUUID, pet);
         List.add(pet);

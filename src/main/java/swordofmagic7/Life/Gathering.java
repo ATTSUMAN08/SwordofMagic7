@@ -18,7 +18,7 @@ import swordofmagic7.Life.Mine.MineData;
 import swordofmagic7.Life.Mine.MineItemData;
 import swordofmagic7.Map.MapData;
 import swordofmagic7.MultiThread.MultiThread;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.Statistics.FishingComboStatisticsList;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Gathering {
     private final Player player;
@@ -61,7 +61,7 @@ public class Gathering {
                 i++;
                 //player.sendBlockChange(block.getLocation(), mater
                 // ial.createBlockData());
-                if (!plugin.isEnabled() && !player.isOnline()) {
+                if (!instance.isEnabled() && !player.isOnline()) {
                     return;
                 }
                 MultiThread.sleepTick(20);
@@ -246,7 +246,7 @@ public class Gathering {
                     time++;
                     MultiThread.sleepTick(1);
                 }
-                if (!plugin.isEnabled() || !player.isOnline()) {
+                if (!instance.isEnabled() || !player.isOnline()) {
                     return;
                 }
                 FishingInProgress = false;
@@ -284,7 +284,7 @@ public class Gathering {
                         double timePerSecond = requestFishingCommand.length / (time * 0.05);
                         if (FishingUseCombo) FishingComboBoost++;
                         player.sendMessage("§e[" + hitData.itemParameter.Display + "§ax" + amount + "§e]§aを釣りあげました！ §b[" + combo + "Combo] §e[" + String.format("%.2f", time * 0.05) + "秒] §c[" + String.format("%.2f", timePerSecond) + "/秒] §7[" + FishingMissCount + "Miss] §b[+" + (int) ((multiply - 1) * 100) + "%]");
-                        SomCore.PlayerLastLocation.remove(player);
+                        SomCore.instance.getPlayerLastLocation().remove(player);
                         MultiThread.TaskRunLater(() -> {
                             if (!hook.isDead()) FishingHit(hook);
                         }, 60, "FishingHookHit");

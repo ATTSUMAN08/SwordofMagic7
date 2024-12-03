@@ -25,7 +25,7 @@ import java.util.Set;
 
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class LibraryGovernor {

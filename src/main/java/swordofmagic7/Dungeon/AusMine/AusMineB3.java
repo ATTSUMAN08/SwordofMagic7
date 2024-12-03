@@ -16,8 +16,8 @@ import java.util.Set;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class AusMineB3 {
     private static boolean Able = false;
@@ -47,7 +47,7 @@ public class AusMineB3 {
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DungeonTrigger);
-                while (Time > 0 && Health > 0 && !list.isEmpty() && plugin.isEnabled()) {
+                while (Time > 0 && Health > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);

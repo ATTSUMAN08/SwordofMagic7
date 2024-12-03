@@ -1,5 +1,6 @@
 package swordofmagic7.Inventory;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,7 +15,6 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.sendMessage;
-import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class RuneInventory extends BasicInventory {
@@ -43,7 +43,7 @@ public class RuneInventory extends BasicInventory {
             }
         } else {
             sendMessage(player, "§e[ルーンインベントリ]§aが§c満杯§aです", SoundList.Nope);
-            spawnPlayer(player);
+            SomCore.instance.spawnPlayer(player);
         }
         List.add(runeParameter.clone());
     }

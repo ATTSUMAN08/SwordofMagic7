@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static swordofmagic7.Function.Log;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public final class MobManager {
 
@@ -35,7 +35,7 @@ public final class MobManager {
 
     public static EnemyData mobSpawn(MobData baseData, int level, Location location) {
         LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, baseData.entityType, false);
-        entity.setMetadata("SomEntity", new FixedMetadataValue(plugin, true));
+        entity.setMetadata("SomEntity", new FixedMetadataValue(instance, true));
         if (entity instanceof Slime slime) {
             slime.setSize(baseData.Size);
         }

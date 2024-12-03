@@ -12,7 +12,7 @@ import swordofmagic7.RayTrace.RayTrace;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public final class ParticleManager {
 

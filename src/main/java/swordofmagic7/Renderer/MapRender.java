@@ -9,7 +9,7 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

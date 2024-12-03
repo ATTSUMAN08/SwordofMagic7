@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -42,7 +43,7 @@ import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.*;
+import static net.somrpg.swordofmagic7.SomCore.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class EnemyData {
@@ -232,7 +233,7 @@ public class EnemyData {
     }
 
     public boolean isRunnableAI() {
-        return runAITask && isAlive() && plugin.isEnabled() && entity.isValid();
+        return runAITask && isAlive() && instance.isEnabled() && entity.isValid();
     }
 
     public Location LastLocation;
@@ -343,7 +344,7 @@ public class EnemyData {
                         }
                     }
                 }
-            }.runTaskTimerAsynchronously(plugin, 0, 20);
+            }.runTaskTimerAsynchronously(instance, 0, 20);
         }
     }
 
@@ -438,7 +439,7 @@ public class EnemyData {
                 if (player.isOnline()) {
                     PlayerData playerData = playerData(player);
                     boolean bool = singlePlayer == null || !playerData.isBlockFromPlayer(singlePlayer);
-                    if (!isEventServer() || !playerData.isAFK() && bool) {
+                    if (!SomCore.Companion.isEventServer() || !playerData.isAFK() && bool) {
                         double percentMultiply = 1; //playerData.isAFK() ? 0.3 : 1;
                         playerData.statistics.enemyKill(mobData);
                         Classes classes = playerData.Classes;
@@ -549,7 +550,7 @@ public class EnemyData {
                                 playerData.viewUpdate();
                                 Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
                                 MultiThread.TaskRunSynchronized(() -> {
-                                    Hologram hologram = createHologram(loc);
+                                    Hologram hologram = instance.createHologram(loc);
                                     hologram.setDefaultVisibleState(false);
                                     hologram.setShowPlayer(player);
                                     for (String holo : Holo) {

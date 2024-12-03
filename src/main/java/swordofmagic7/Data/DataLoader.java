@@ -43,7 +43,7 @@ import swordofmagic7.Skill.SkillClass.Alchemist.AlchemyData;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
 import swordofmagic7.Skill.SkillType;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Status.StatusParameter;
 
 import java.io.File;
@@ -74,7 +74,7 @@ public class DataLoader {
         RuneInfoDataLoad();
         DefenseBattleMobListLoad();
         RewardBoxListLoad();
-        SomCore.plugin.getLogger().info("[DataLoader] 全データ読み込みが完了しました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] 全データ読み込みが完了しました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ItemDataLoad() {
@@ -162,7 +162,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ItemDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] ItemDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RuneDataLoad() {
@@ -206,7 +206,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RuneDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] RuneDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void PetDataLoad() {
@@ -251,7 +251,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] PetDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] PetDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RecipeDataLoad() {
@@ -279,7 +279,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RecipeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] RecipeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MapDataLoad() {
@@ -328,7 +328,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] MapDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] MapDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void LifeDataLoad() {
@@ -528,7 +528,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] LifeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] LifeDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
     public static int MaxMakeSlot = 0;
 
@@ -582,7 +582,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] SkillDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] SkillDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ClassDataLoad() {
@@ -636,7 +636,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ClassDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] ClassDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MobDataLoad() {
@@ -791,7 +791,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] EnemyDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] EnemyDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ShopDataLoad() {
@@ -841,7 +841,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ShopDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] ShopDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static int MaxTitleSlot = 0;
@@ -882,7 +882,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] TitleDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] TitleDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void NpcDataLoad() {
@@ -896,7 +896,7 @@ public class DataLoader {
             npcData.Message = data.getStringList("Message");
             NpcList.put(Integer.valueOf(fileName), npcData);
         }
-        SomCore.plugin.getLogger().info("[DataLoader] NpcDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] NpcDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void MobSpawnerDataLoad() {
@@ -926,7 +926,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] MobSpawnerDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] MobSpawnerDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void ItemInfoDataLoad() {
@@ -969,7 +969,7 @@ public class DataLoader {
                 ItemInfoData.get(stack.itemParameter.Id).add("§7・§e§l" + recipe.getKey());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] ItemInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] ItemInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RuneInfoDataLoad() {
@@ -988,7 +988,7 @@ public class DataLoader {
                 RuneInfoData.get(dropData.runeParameter.Id).add("§7・§e§l" + mobData.Display + " §b§l-> §e§l" + dropData.Percent*100 + "%");
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RuneInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] RuneInfoDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void DefenseBattleMobListLoad() {
@@ -999,7 +999,7 @@ public class DataLoader {
         for (String name : data.getStringList("MobList")) {
             DefenseBattle.MobList.add(DataBase.getMobData(name));
         }
-        SomCore.plugin.getLogger().info("[DataLoader] DefenseBattleMobListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] DefenseBattleMobListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void RewardBoxListLoad() {
@@ -1053,7 +1053,7 @@ public class DataLoader {
                 loadError(file, e.getMessage());
             }
         }
-        SomCore.plugin.getLogger().info("[DataLoader] RewardBoxListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
+        SomCore.instance.getLogger().info("[DataLoader] RewardBoxListを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     public static void disguiseLoader(Disguise disguise, FileConfiguration data) {

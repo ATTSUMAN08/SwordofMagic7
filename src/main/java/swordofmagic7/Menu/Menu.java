@@ -1,5 +1,6 @@
 package swordofmagic7.Menu;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
@@ -39,7 +40,6 @@ import static swordofmagic7.Menu.Data.*;
 import static swordofmagic7.Shop.PetShop.*;
 import static swordofmagic7.Shop.RuneShop.RuneEquipDisplay;
 import static swordofmagic7.Shop.Shop.ShopSellDisplay;
-import static swordofmagic7.SomCore.spawnPlayer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Menu {
@@ -318,7 +318,7 @@ public class Menu {
                         if (Tutorial.TutorialProcess.containsKey(player)) {
                             player.sendMessage("§eチュートリアル中§aは使用できません");
                             playSound(player, SoundList.Nope);
-                        } else spawnPlayer(player);
+                        } else SomCore.instance.spawnPlayer(player);
                     }
                     playSound(player, SoundList.Click);
                 }

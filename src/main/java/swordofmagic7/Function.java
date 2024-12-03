@@ -5,10 +5,12 @@ import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -40,8 +42,7 @@ import java.util.function.Predicate;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.SomCore.plugin;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class Function {
@@ -50,7 +51,7 @@ public final class Function {
         Log(str, false);
     }
     public static void Log(String str, boolean stackTrace) {
-        plugin.getLogger().info(str);
+        instance.getLogger().info(str);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("som7.log")) player.sendMessage(str);
         }
@@ -157,7 +158,7 @@ public final class Function {
     }
 
     public static boolean playerWhileCheck(PlayerData playerData) {
-        return  PlayerData.playerData.containsValue(playerData) && playerData.player.isOnline() && plugin.isEnabled();
+        return  PlayerData.playerData.containsValue(playerData) && playerData.player.isOnline() && instance.isEnabled();
     }
 
     public static String decoLore(String str) {
@@ -317,7 +318,7 @@ public final class Function {
 
     public static Object GetRandom(Set<?> list) {
         if (!list.isEmpty()) {
-            int a = random.nextInt(list.size());
+            int a = SomCore.random.nextInt(list.size());
             int i = 0;
             for (Object obj : list) {
                 if (i == a) return obj;
@@ -453,7 +454,7 @@ public final class Function {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(server);
-        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+        player.sendPluginMessage(instance, "BungeeCord", out.toByteArray());
     }
 
     public static int StringToHashInt(String str) {
@@ -472,8 +473,12 @@ public final class Function {
             } else {
                 Log("フォルダの作成に失敗しました: " + file.getPath());
             }
-        } else {
-            Log("フォルダは既に存在します: " + file.getPath());
         }
+    }
+
+    public static double getMaxHealth(LivingEntity entity) {
+        AttributeInstance maxHealthInstance = entity.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+        if (maxHealthInstance == null) throw new NullPointerException("Attribute.MAX_HEALTH is null");
+        return maxHealthInstance.getValue();
     }
 }

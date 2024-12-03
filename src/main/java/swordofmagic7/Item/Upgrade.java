@@ -1,5 +1,6 @@
 package swordofmagic7.Item;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,8 +20,7 @@ import java.util.List;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.UpgradeDisplay;
-import static swordofmagic7.SomCore.isDevServer;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Upgrade {
@@ -127,13 +127,11 @@ public class Upgrade {
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, cost);
 
-                                if (!isDevServer()) {
-                                    if (UpgradeCache[1].itemEquipmentData.Plus >= 20) {
-                                        TextView text = new TextView(playerData.getNick() + "§aさんが");
-                                        text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
-                                        text.addText(suffix);
-                                        Client.sendDisplay(player, text);
-                                    }
+                                if (!SomCore.Companion.isDevServer() && UpgradeCache[1].itemEquipmentData.Plus >= 20) {
+                                    TextView text = new TextView(playerData.getNick() + "§aさんが");
+                                    text.addView(UpgradeCache[1].getTextView(1, playerData.ViewFormat()));
+                                    text.addText(suffix);
+                                    Client.sendDisplay(player, text);
                                 }
                             } else {
                                 player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");

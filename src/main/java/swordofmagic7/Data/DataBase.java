@@ -32,7 +32,7 @@ import swordofmagic7.Shop.ItemRecipe;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Skill.SkillClass.Alchemist.AlchemyData;
 import swordofmagic7.Skill.SkillData;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ import static swordofmagic7.Function.decoText;
 
 public final class DataBase {
     public static List<String> IgnoreIPList = new ArrayList<>();
-    public static final String DataBasePath = SomCore.plugin.getDataFolder().getPath();
+    public static final String DataBasePath = SomCore.instance.getDataFolder().getPath();
     public static final String format = "%.3f";
     public static final int MaxStackAmount = 100;
     public static final String Som7VIP = "som7.VIP";
@@ -125,7 +125,7 @@ public final class DataBase {
     public static List<File> dumpFile(File file) {
         List<File> list = new ArrayList<>();
         if (!file.exists()) {
-            SomCore.plugin.getLogger().warning("存在しないファイルが参照されました: " + file.getPath());
+            SomCore.instance.getLogger().warning("存在しないファイルが参照されました: " + file.getPath());
             Function.createFolder(file);
             return list;
         }
@@ -141,7 +141,7 @@ public final class DataBase {
                 }
             }
         } else {
-            SomCore.plugin.getLogger().warning("ファイルが存在しません: " + file.getPath());
+            SomCore.instance.getLogger().warning("ファイルが存在しません: " + file.getPath());
         }
         return list;
     }
@@ -159,7 +159,7 @@ public final class DataBase {
                 }
             }
         } else {
-            SomCore.plugin.getLogger().warning("ファイルが存在しません: " + dir.getPath());
+            SomCore.instance.getLogger().warning("ファイルが存在しません: " + dir.getPath());
         }
         return null;
     }

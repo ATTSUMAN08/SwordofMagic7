@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class ItemAccessory implements Cloneable {
     public HashMap<StatusParameter, Double> Base = new HashMap<>();

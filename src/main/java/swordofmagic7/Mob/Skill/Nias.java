@@ -26,7 +26,7 @@ import java.util.Set;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Particle.ParticleManager.angle;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Nias extends EnemySkillBase {
     private static final double radius = 96;

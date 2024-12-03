@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import static swordofmagic7.PlayerList.getNearLivingEntity;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class EnemySkillManager {
     public final EnemyData enemyData;

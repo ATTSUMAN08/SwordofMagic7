@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class Novaha3 {
     private static boolean Able = false;
@@ -37,7 +37,7 @@ public class Novaha3 {
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                 Message(Players, DungeonQuestTrigger, "§cエネミ§aを§c" + Count + "体§a討伐せよ", new String[]{"§c祭壇を起動するために生贄を捧げてください"}, SoundList.DungeonTrigger);
-                while (Time > 0 && !list.isEmpty() && plugin.isEnabled()) {
+                while (Time > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
                     Function.setPlayDungeonQuest(Players, true);

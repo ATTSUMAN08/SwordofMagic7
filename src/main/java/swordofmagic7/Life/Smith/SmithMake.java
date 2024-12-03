@@ -20,7 +20,7 @@ import static swordofmagic7.Data.DataLoader.MaxMakeSlot;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class SmithMake {
     private final Player player;

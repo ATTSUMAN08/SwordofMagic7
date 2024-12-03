@@ -14,7 +14,7 @@ import java.util.List;
 
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class TeleportGateParameter {
     public String Id;
@@ -43,7 +43,7 @@ public class TeleportGateParameter {
             int i = 0;
             final double increment = (2 * Math.PI) / 90;
             final double radius = 1.5;
-            while (plugin.isEnabled()) {
+            while (instance.isEnabled()) {
                 i++;
                 double angle = i * increment;
                 double x = radius * Math.cos(angle);

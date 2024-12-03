@@ -1,5 +1,6 @@
 package swordofmagic7.Mob;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import swordofmagic7.Dungeon.Novaha.Novaha3;
 import swordofmagic7.MultiThread.MultiThread;
@@ -10,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Function.VectorDown;
-import static swordofmagic7.SomCore.isEventServer;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class MobSpawnerData {
     public String Id;
@@ -29,7 +29,7 @@ public class MobSpawnerData {
     private final List<EnemyData> SpawnedList = new ArrayList<>();
 
     public void start() {
-        if (!Started && (!isEventServer() || DeathTrigger != null)) {
+        if (!Started && (!SomCore.Companion.isEventServer() || DeathTrigger != null)) {
             Started = true;
             MultiThread.TaskRunTimer(() -> {
                 if (DeathTrigger != null) for (EnemyData enemyData : SpawnedList) {

@@ -14,7 +14,7 @@ import java.util.List;
 
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class RewardBox {
 

@@ -16,7 +16,7 @@ public final class PlayerList {
     public static final Set<Player> PlayerList = new HashSet<>();
     public static final Set<String> ResetPlayer = new HashSet<>();
 
-    static void load() {
+    public static void load() {
         PlayerList.clear();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.isOnline()) {

@@ -30,7 +30,7 @@ import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleActivate;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class EffectManager {
     public LivingEntity entity;
@@ -60,7 +60,7 @@ public class EffectManager {
             case Enemy -> enemyData = (EnemyData) ownerData;
         }
         MultiThread.TaskRun(() -> {
-            while (isRunnable && plugin.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
+            while (isRunnable && instance.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
                 || (ownerType.isEnemy() && enemyData.isAlive())
                 || (ownerType.isPet() && petParameter.player.isOnline()))) {
                 try {

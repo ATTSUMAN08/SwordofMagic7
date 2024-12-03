@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import static swordofmagic7.Function.Log;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class MultiThread extends Thread {
     /*
@@ -32,10 +32,10 @@ public class MultiThread extends Thread {
     private static final boolean log = false;
 
     public static Thread TaskRun(MultiThreadRunnable runnable, String ThreadTag) {
-        if (plugin.isEnabled()) {
+        if (instance.isEnabled()) {
             try {
                 if (log) Log("TaskRun -> " + ThreadTag);
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+                Bukkit.getScheduler().runTaskAsynchronously(instance, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
@@ -49,9 +49,9 @@ public class MultiThread extends Thread {
     }
 
     public static void TaskRunSynchronized(MultiThreadRunnable runnable, String ThreadTag) {
-        if (plugin.isEnabled()) {
+        if (instance.isEnabled()) {
             try {
-                Bukkit.getScheduler().runTask(plugin, runnable);
+                Bukkit.getScheduler().runTask(instance, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
@@ -60,10 +60,10 @@ public class MultiThread extends Thread {
     }
 
     public static BukkitTask TaskRunLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
-        if (plugin.isEnabled()) {
+        if (instance.isEnabled()) {
             try {
                 if (log) Log("TaskRunLater -> " + ThreadTag);
-                return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, tick);
+                return Bukkit.getScheduler().runTaskLaterAsynchronously(instance, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
@@ -77,18 +77,18 @@ public class MultiThread extends Thread {
     }
 
     public static BukkitTask TaskRunTimer(MultiThreadRunnable runnable, int tick) {
-        return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0, tick);
+        return Bukkit.getScheduler().runTaskTimerAsynchronously(instance, runnable, 0, tick);
     }
 
     public static BukkitTask TaskRunSynchronizedTimer(MultiThreadRunnable runnable, int tick, String ThreadTag) {
         if (log) Log("TaskRunSynchronizedTimer -> " + ThreadTag);
-        return Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0, tick);
+        return Bukkit.getScheduler().runTaskTimer(instance, runnable, 0, tick);
     }
 
     public static BukkitTask TaskRunSynchronizedLater(MultiThreadRunnable runnable, int tick, String ThreadTag) {
-        if (plugin.isEnabled()) {
+        if (instance.isEnabled()) {
             try {
-                return Bukkit.getScheduler().runTaskLater(plugin, runnable, tick);
+                return Bukkit.getScheduler().runTaskLater(instance, runnable, tick);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);

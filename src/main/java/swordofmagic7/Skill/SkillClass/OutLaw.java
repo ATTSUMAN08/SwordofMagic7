@@ -21,7 +21,7 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
-import static swordofmagic7.SomCore.random;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class OutLaw extends BaseSkillClass {

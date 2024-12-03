@@ -34,6 +34,9 @@ dependencies {
     }
 
     implementation(libs.kotlinSerializationJson)
+    implementation(libs.kotlinCoroutinesCore)
+    implementation(libs.mcCoroutineApi)
+    implementation(libs.mcCoroutineCore)
     implementation(libs.itemNbtApi)
 
     bukkitLibrary(libs.jedis)
@@ -51,6 +54,8 @@ remotes {
 }
 
 tasks.register("deploy") {
+    description = "Deploy the plugin to the dev server"
+    group = JavaBasePlugin.BUILD_TASK_NAME
     dependsOn("build")
     doLast {
         ssh.run(delegateClosureOf<RunHandler> {
@@ -71,7 +76,7 @@ bukkit {
     authors = listOf("MomiNeko", "SomNetworkMembers", "ATTSUMAN08")
     apiVersion = "1.21"
 
-    main = "swordofmagic7.SomCore"
+    main = "net.somrpg.swordofmagic7.SomCore"
     softDepend = listOf("DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier")
 
     permissions {

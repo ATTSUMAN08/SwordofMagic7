@@ -23,7 +23,7 @@ import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
 import static swordofmagic7.Dungeon.Dungeon.*;
 import static swordofmagic7.Function.VectorUp;
-import static swordofmagic7.SomCore.plugin;
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class TarnetB3 {
@@ -72,7 +72,7 @@ public class TarnetB3 {
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
                     Message(Players, DungeonQuestTrigger, "§cシノサス§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
-                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && plugin.isEnabled()) {
+                    while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
                         Function.setPlayDungeonQuest(Players, true);

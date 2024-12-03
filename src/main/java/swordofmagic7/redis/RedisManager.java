@@ -6,7 +6,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.MultiThread.MultiThread;
-import swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.SomCore;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +35,7 @@ public class RedisManager {
 
     public static void publishObject(String channel, List<String> message) {
         try (Jedis jedis = getJedis()) {
-            jedis.publish(channel, SomCore.gson.toJson(new RedisMessageObject(DataBase.ServerId, message)));
+            jedis.publish(channel, SomCore.Companion.getGson().toJson(new RedisMessageObject(DataBase.ServerId, message)));
         }
     }
 
