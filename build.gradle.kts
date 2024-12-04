@@ -8,10 +8,11 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.hidetakeSSH)
+    alias(libs.plugins.grgit)
 }
 
 group = "swordofmagic7"
-version = "0.1.0"
+version = "0.1.0+${versionMetadata()}"
 
 repositories {
     mavenCentral()
@@ -33,11 +34,10 @@ dependencies {
         exclude(group = "*", module = "*")
     }
 
-    implementation(libs.kotlinSerializationJson)
-    implementation(libs.kotlinCoroutinesCore)
-    implementation(libs.mcCoroutineApi)
-    implementation(libs.mcCoroutineCore)
     implementation(libs.itemNbtApi)
+    implementation(libs.kotlinSerializationJson)
+    implementation(libs.bundles.coroutines)
+    implementation(libs.bundles.cloud)
 
     bukkitLibrary(libs.jedis)
 }
@@ -62,11 +62,23 @@ tasks.register("deploy") {
             session(remotes["devServer"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
-                    "into" to "plugins/${project.name}-${project.version}.jar"
+                    "into" to "plugins/${project.name}.jar"
                 ))
             })
         })
     }
+}
+
+fun versionMetadata(): String {
+    if (!grgit.status().isClean) {
+        return "${grgit.head().abbreviatedId}-Dev"
+    }
+
+    val tag = grgit.tag.list().find { it.commit.id == grgit.head().id }
+    if (tag != null) {
+        return ""
+    }
+    return "${grgit.head().abbreviatedId}"
 }
 
 bukkit {
@@ -504,7 +516,7 @@ tasks.build {
 
 tasks.shadowJar {
     archiveClassifier.set("")
-    relocate("de.tr7zw.changeme.nbtapi", "net.somrpg.shade.nbtapi")
+    relocate("de.tr7zw.changeme.nbtapi", "net.somrpg.swordofmagic7.shade.nbtapi")
 }
 
 tasks.processResources {

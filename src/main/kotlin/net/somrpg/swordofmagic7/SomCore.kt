@@ -8,6 +8,7 @@ import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
+import net.somrpg.swordofmagic7.commands.CommandManager
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import org.bukkit.*
 import org.bukkit.command.Command
@@ -234,6 +235,7 @@ class SomCore : SuspendingJavaPlugin() {
         }, 20)
 
         commandRegister()
+        CommandManager().registerCommands()
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
     }
 
