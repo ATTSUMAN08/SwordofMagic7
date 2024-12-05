@@ -4,23 +4,24 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChangeBlock {
-    public HashMap<Location, Material> changeBlock = new HashMap<>();
+    public final Map<Location, Material> changedBlocks = new HashMap<>();
 
     public boolean checkLocation(Location location) {
-        return changeBlock.containsKey(location);
+        return changedBlocks.containsKey(location);
     }
 
     public void put(Location location, Material material) {
-        changeBlock.put(location, material);
+        changedBlocks.put(location, material);
     }
 
     public Material get(Location location) {
-        return changeBlock.get(location);
+        return changedBlocks.get(location);
     }
 
     public void remove(Location location) {
-        changeBlock.remove(location);
+        changedBlocks.remove(location);
     }
 }

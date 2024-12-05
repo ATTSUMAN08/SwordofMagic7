@@ -9,6 +9,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.somrpg.swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.TaskUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -232,9 +233,29 @@ public class PlayerData {
 
         PetInventory.start();
 
-        InitializeHologram();
-        InitializeBossBar();
+        initHologram();
+        initBossBar();
 
+        // クールダウン用タスク
+        TaskUtils.runTaskTimerAsync(count -> {
+            if (useCookCoolTime > 0) useCookCoolTime--;
+            for (Map.Entry<ItemPotionType, Integer> entry : PotionCoolTime.entrySet()) {
+                PotionCoolTime.merge(entry.getKey(), -1, Integer::sum);
+            }
+            PotionCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
+            MultiThread.sleepTick(20);
+            return playerWhileCheck(this);
+        }, 0, 20);
+
+        MultiThread.TaskRun(this::sendMenuPacket, "UserMenuPacket");
+    }
+
+    public Hologram hologram;
+    public String holoTitle;
+    public int HoloWait = 0;
+    public int HoloAnim = 0;
+
+    public void sendMenuPacket() {
         ArrayList<WrapperPlayServerSetSlot> packets = new ArrayList<>();
         packets.add(new WrapperPlayServerSetSlot(0, 0, 1,
                 SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_ItemInventory)
@@ -251,91 +272,64 @@ public class PlayerData {
         for (WrapperPlayServerSetSlot packet : packets) {
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
         }
-
-        MultiThread.TaskRun(() -> {
-            while (playerWhileCheck(this)) {
-                if (useCookCoolTime > 0) useCookCoolTime--;
-                for (Map.Entry<ItemPotionType, Integer> entry : PotionCoolTime.entrySet()) {
-                    PotionCoolTime.merge(entry.getKey(), -1, Integer::sum);
-                }
-                PotionCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
-                MultiThread.sleepTick(20);
-            }
-        }, "CoolTimeTask");
     }
 
-    public Hologram hologram;
-    public String holoTitle;
-    public int HoloWait = 0;
-    public int HoloAnim = 0;
-
-    public void InitializeHologram() {
+    private void initHologram() {
         MultiThread.TaskRunSynchronized(() -> {
             if (hologram != null && !hologram.isDisabled()) hologram.delete();
             hologram = SomCore.instance.createHologram(playerHoloLocation());
             if (!HoloSelfView) hologram.setHidePlayer(player);
-            //System.out.println("Hologram Initialized");
             DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
             DHAPI.addHologramLine(hologram, "NameTag");
             DHAPI.addHologramLine(hologram, "HealthBar");
-            MultiThread.TaskRun(() -> {
-                while (playerWhileCheck(this)) {
-                    if (hologram.isDefaultVisibleState()) {
-                        hologram.getShowPlayers().clear();
-                        hologram.getHidePlayers().clear();
 
-                        if (HoloSelfView && !isAFK()) hologram.setShowPlayer(player);
-                        else hologram.setHidePlayer(player);
-                        Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
-                        nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
-                        nonViewer.addAll(BlockListAtPlayer());
-                        if (Party != null) for (Player player : Party.Members) {
-                            if (!playerData(player).isAFK()) nonViewer.remove(player);
-                        }
-                        for (Player player : nonViewer) {
-                            hologram.setHidePlayer(player);
-                        }
+            TaskUtils.runTaskTimerAsync(count -> {
+                if (hologram.isDefaultVisibleState()) {
+                    hologram.getShowPlayers().clear();
+                    hologram.getHidePlayers().clear();
+
+                    if (HoloSelfView && !isAFK()) hologram.setShowPlayer(player);
+                    else hologram.setHidePlayer(player);
+                    Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
+                    nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
+                    nonViewer.addAll(BlockListAtPlayer());
+                    if (Party != null) for (Player player : Party.Members) {
+                        if (!playerData(player).isAFK()) nonViewer.remove(player);
                     }
-                    MultiThread.sleepTick(30);
+                    for (Player player : nonViewer) {
+                        hologram.setHidePlayer(player);
+                    }
                 }
-            }, "HologramViewDistance");
-            MultiThread.TaskRun(() -> {
-                while (playerWhileCheck(this)) {
-                    if (titleManager.Title.flame > 1) {
-                        if (titleManager.Title.flame - 1 > HoloAnim) {
-                            HoloWait++;
-                            if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
-                                HoloWait = 0;
-                                HoloAnim++;
-                            }
-                        } else {
-                            HoloWait++;
-                            if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
-                                HoloWait = 0;
-                                HoloAnim = 0;
-                            }
+                return playerWhileCheck(this);
+            }, 0, 30);
+
+            TaskUtils.runTaskTimerAsync(count -> {
+                if (titleManager.Title.flame > 1) {
+                    if (titleManager.Title.flame - 1 > HoloAnim) {
+                        HoloWait++;
+                        if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
+                            HoloWait = 0;
+                            HoloAnim++;
                         }
-                        holoTitle = titleManager.Title.Display[HoloAnim];
                     } else {
-                        holoTitle = titleManager.Title.Display[0];
-                    }
-                    MultiThread.sleepTick(1);
-                }
-            }, "PlayerHolo");
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (player.isOnline() && !hologram.isDisabled()) {
-                        if (holoTitle != null) {
-                            DHAPI.setHologramLine(hologram, 0, holoTitle);
+                        HoloWait++;
+                        if (HoloWait > titleManager.Title.waitTick[HoloAnim]) {
+                            HoloWait = 0;
+                            HoloAnim = 0;
                         }
-                        DHAPI.moveHologram(hologram, playerHoloLocation());
-                    } else {
-                        if (!hologram.isDisabled()) hologram.delete();
-                        this.cancel();
                     }
+                    holoTitle = titleManager.Title.Display[HoloAnim];
+                } else {
+                    holoTitle = titleManager.Title.Display[0];
                 }
-            }.runTaskTimer(instance, 0, 1);
+
+                if (holoTitle != null) {
+                    DHAPI.setHologramLine(hologram, 0, holoTitle);
+                }
+                DHAPI.moveHologram(hologram, playerHoloLocation());
+
+                return playerWhileCheck(this);
+            }, 0, 1);
         }, "HologramInitialize");
     }
 
@@ -343,7 +337,7 @@ public class PlayerData {
     public BossBar BossBarOther = BossBar.bossBar(Component.text(), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
     public BossBar BossBarTimer = BossBar.bossBar(Component.text(), 1, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
     public BossBar BossBarSkillProgress = BossBar.bossBar(Component.text(), 0, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
-    public void InitializeBossBar() {
+    public void initBossBar() {
         player.showBossBar(BossBarTargetInfo);
         MultiThread.TaskRun(() -> {
             while (playerWhileCheck(this)) {
@@ -1067,6 +1061,7 @@ public class PlayerData {
                 player.getInventory().setItem(26, UserMenuIcon());
                 player.getInventory().setItem(17, UpScrollItem);
                 player.getInventory().setItem(35, DownScrollItem);
+                sendMenuPacket();
             }
             isNextViewUpdate = false;
         }, 1, "NextViewUpdate");

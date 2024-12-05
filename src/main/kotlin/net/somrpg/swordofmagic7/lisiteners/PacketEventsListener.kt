@@ -23,7 +23,7 @@ class PacketEventsListener : PacketListener {
                 val packet = WrapperPlayServerBlockChange(e)
                 val loc = Location(p.world, packet.blockPosition.x.toDouble(), packet.blockPosition.y.toDouble(), packet.blockPosition.z.toDouble())
                 if (p.gameMode != GameMode.CREATIVE && ChangeBlock(p).checkLocation(loc)) {
-                    val material = ChangeBlock(p).get(loc)
+                    val material = ChangeBlock(p)[loc]
                     packet.blockState = WrappedBlockState.getDefaultState(StateTypes.getByName(material.name))
                 }
             }

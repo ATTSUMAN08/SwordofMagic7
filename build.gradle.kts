@@ -46,10 +46,10 @@ dependencies {
 remotes {
     withGroovyBuilder {
         "create"("devServer") {
-            setProperty("host", properties["TEMP_SFTP_HOST"]!!)
-            setProperty("port", properties["TEMP_SFTP_PORT"]!!.toString().toInt())
-            setProperty("user", properties["TEMP_SFTP_USER"]!!)
-            setProperty("password", properties["TEMP_SFTP_PASSWORD"]!!)
+            setProperty("host", properties["SFTP_HOST_LOCAL"]!!)
+            setProperty("port", properties["SFTP_PORT"]!!.toString().toInt())
+            setProperty("user", properties["SFTP_USER_SOM7"]!!)
+            setProperty("password", properties["SFTP_PASSWORD_LOCAL"]!!)
         }
     }
 }
@@ -105,22 +105,22 @@ bukkit {
             default = BukkitPluginDescription.Permission.Default.OP
             description = "SOM7の開発者権限"
         }
-        
+
         register("som7.builder") {
             default = BukkitPluginDescription.Permission.Default.OP
             description = "SOM7の建築者権限"
         }
-        
+
         register("som7.data.reload") {
             default = BukkitPluginDescription.Permission.Default.OP
             description = "SOM7のデータリロード権限"
         }
-        
+
         register("som7.title.editor") {
             default = BukkitPluginDescription.Permission.Default.OP
             description = "SOM7のタイトルエディタ権限"
         }
-        
+
         register("som7.user") {
             default = BukkitPluginDescription.Permission.Default.TRUE
             description = "SOM7のユーザー権限"
@@ -170,10 +170,6 @@ bukkit {
         }
 
         register("loadedPlayer") {
-            permission = "som7.developer"
-        }
-
-        register("SomReload") {
             permission = "som7.developer"
         }
 

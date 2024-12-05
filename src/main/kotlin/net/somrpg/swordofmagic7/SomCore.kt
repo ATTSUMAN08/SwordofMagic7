@@ -34,7 +34,6 @@ import swordofmagic7.Command.Developer.Save
 import swordofmagic7.Command.Developer.SendData
 import swordofmagic7.Command.Developer.SetNick
 import swordofmagic7.Command.Developer.SkillCTReset
-import swordofmagic7.Command.Developer.SomReload
 import swordofmagic7.Command.Player.AuctionCommand
 import swordofmagic7.Command.Player.BlockPlayer
 import swordofmagic7.Command.Player.EffectInfo
@@ -103,8 +102,8 @@ class SomCore : SuspendingJavaPlugin() {
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
         fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
     }
-    lateinit var packetEventsListener: PacketListenerCommon
-    val hologramMap = HashMap<String, Hologram>()
+    private lateinit var packetEventsListener: PacketListenerCommon
+    private val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
     
@@ -115,7 +114,7 @@ class SomCore : SuspendingJavaPlugin() {
         return hologram
     }
 
-    fun createTouchHologram(display: String, location: Location, action: (Player) -> Unit) {
+    private fun createTouchHologram(display: String, location: Location, action: (Player) -> Unit) {
         val hologram = createHologram(location)
         DHAPI.addHologramLine(hologram, display)
         hologramTouchActions[hologram.id] = action
@@ -133,9 +132,13 @@ class SomCore : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(Som7Vote(), this)
 
         // Initialize folders
-        if (!dataFolder.exists()) createFolder(dataFolder)
+        if (!dataFolder.exists()) {
+            createFolder(dataFolder)
+        }
         val marketFolder = File(dataFolder, "Market")
-        if (!marketFolder.exists()) createFolder(marketFolder)
+        if (!marketFolder.exists()) {
+            createFolder(marketFolder)
+        }
 
         DataLoad()
 
@@ -274,7 +277,6 @@ class SomCore : SuspendingJavaPlugin() {
 
     private fun commandRegister() {
         //Developer
-        SomCommand.register("SomReload", SomReload())
         SomCommand.register("SendData", SendData())
         SomCommand.register("getItem", GetItem())
         SomCommand.register("getRune", GetRune())
