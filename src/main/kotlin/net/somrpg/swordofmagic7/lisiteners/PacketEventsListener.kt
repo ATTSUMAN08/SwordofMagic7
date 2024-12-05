@@ -15,7 +15,7 @@ import swordofmagic7.Life.Gathering.ChangeBlock
 class PacketEventsListener : PacketListener {
 
     override fun onPacketSend(e: PacketSendEvent) {
-        val p = e.getPlayer<Player>() ?: return
+        val p: Player = e.getPlayer() ?: return
         if (!p.isOnline) return
 
         when (e.packetType) {
@@ -23,7 +23,7 @@ class PacketEventsListener : PacketListener {
                 val packet = WrapperPlayServerBlockChange(e)
                 val loc = Location(p.world, packet.blockPosition.x.toDouble(), packet.blockPosition.y.toDouble(), packet.blockPosition.z.toDouble())
                 if (p.gameMode != GameMode.CREATIVE && ChangeBlock(p).checkLocation(loc)) {
-                    val material = ChangeBlock(p).get(loc);
+                    val material = ChangeBlock(p).get(loc)
                     packet.blockState = WrappedBlockState.getDefaultState(StateTypes.getByName(material.name))
                 }
             }

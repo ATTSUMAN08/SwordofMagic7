@@ -1,6 +1,7 @@
 package net.somrpg.swordofmagic7
 
 import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.event.PacketListenerCommon
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.google.gson.Gson
@@ -102,6 +103,7 @@ class SomCore : SuspendingJavaPlugin() {
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
         fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
     }
+    lateinit var packetEventsListener: PacketListenerCommon
     val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
@@ -150,7 +152,7 @@ class SomCore : SuspendingJavaPlugin() {
         Dungeon.Initialize()
         PlayerList.load()
 
-        PacketEvents.getAPI().eventManager.registerListener(PacketEventsListener(), PacketListenerPriority.NORMAL)
+        packetEventsListener = PacketEvents.getAPI().eventManager.registerListener(PacketEventsListener(), PacketListenerPriority.NORMAL)
 
         WarpGateList.values.forEach { it.start() }
 
@@ -258,6 +260,8 @@ class SomCore : SuspendingJavaPlugin() {
         Log("CleanEnemy: $count")
         Bukkit.getScheduler().cancelTasks(this)
         Log("Plugin Task Cancelled")
+        PacketEvents.getAPI().eventManager.unregisterListener(packetEventsListener)
+        Log("PacketListener unregister")
     }
 
     private fun deleteHolograms() {
