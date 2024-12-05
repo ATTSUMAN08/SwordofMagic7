@@ -4,6 +4,7 @@ shadow = "8.3.5"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
 grgit = "5.3.0"
+sonarqube = "6.0.1.5171"
 
 paperApi = "1.21.3-R0.1-SNAPSHOT"
 packetEvents = "2.6.0"
@@ -27,6 +28,7 @@ shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 pluginYml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginYml" }
 hidetakeSSH = { id = "org.hidetake.ssh", version.ref = "hidetakeSSH" }
 grgit = { id = "org.ajoberstar.grgit", version.ref = "grgit" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 
 [libraries]
 paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }

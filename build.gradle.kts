@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.hidetakeSSH)
     alias(libs.plugins.grgit)
+    alias(libs.plugins.sonarqube)
 }
 
 group = "swordofmagic7"
@@ -79,6 +80,14 @@ fun versionMetadata(): String {
         return ""
     }
     return "${grgit.head().abbreviatedId}"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "ATTSUMAN08_SwordofMagic7")
+        property("sonar.organization", "attsuman08")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 bukkit {
