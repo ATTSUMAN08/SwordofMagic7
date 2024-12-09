@@ -79,7 +79,7 @@ fun versionMetadata(): String {
     if (tag != null) {
         return ""
     }
-    return "${grgit.head().abbreviatedId}"
+    return grgit.head().abbreviatedId
 }
 
 sonar {
@@ -223,20 +223,6 @@ bukkit {
 
         register("killMob") {
             permission = "som7.developer"
-        }
-
-        register("gm") {
-            permission = "som7.builder"
-        }
-
-        register("flySpeed") {
-            permission = "som7.builder"
-            aliases = listOf("fs")
-        }
-
-        register("playMode") {
-            permission = "som7.builder"
-            aliases = listOf("pm")
         }
 
         register("dataReload") {

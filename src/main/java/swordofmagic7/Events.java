@@ -169,7 +169,7 @@ public class Events implements Listener {
     void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             playerData.Menu.MenuClick(event);
             playerData.viewUpdate();
         } else if (event.getCurrentItem() != null) {
@@ -181,7 +181,7 @@ public class Events implements Listener {
     void onInventoryOpen(InventoryOpenEvent event) {
         Player player = (Player) event.getPlayer();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             playerData.viewUpdate();
         }
     }
@@ -192,7 +192,7 @@ public class Events implements Listener {
             Player player = (Player) event.getPlayer();
             if (player.isOnline()) {
                 PlayerData playerData = playerData(player);
-                if (playerData.PlayMode) {
+                if (playerData.playMode) {
                     playerData.viewUpdate();
                     playerData.Menu.MenuClose(event);
                     playerData.Status.StatusUpdate();
@@ -247,7 +247,7 @@ public class Events implements Listener {
         if (!playerData.interactTick) {
             playerData.interactTick = true;
             MultiThread.TaskRun(() -> {
-                if (playerData.PlayMode && player.getGameMode() != GameMode.SPECTATOR) {
+                if (playerData.playMode && player.getGameMode() != GameMode.SPECTATOR) {
                     if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
                         DimensionLibraryB1.use(player);
                         switch (action) {
@@ -308,7 +308,7 @@ public class Events implements Listener {
         PlayerData playerData = playerData(player);
         Entity entity = event.getRightClicked();
         if (player.getGameMode() != GameMode.CREATIVE && ignoreEntity(entity)) event.setCancelled(true);
-        if (playerData.PlayMode && event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
+        if (playerData.playMode && event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
             event.setCancelled(true);
             NPCRegistry npcRegistry = CitizensAPI.getNPCRegistry();
             if (npcRegistry.isNPC(entity)) {
@@ -389,7 +389,7 @@ public class Events implements Listener {
     void onToolChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             if (Function.isHoldFishingRod(player)) {
                 switch (event.getNewSlot()) {
                     case 0 -> playerData.Gathering.inputFishingCommand(FishingCommand.Shift);
@@ -472,7 +472,7 @@ public class Events implements Listener {
     void onOffHandSwitch(PlayerSwapHandItemsEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             if (playerData.CastMode.isLegacy()) {
                 if (player.isSneaking()) {
                     playerData.HotBar.use(5);
@@ -491,7 +491,7 @@ public class Events implements Listener {
     void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             event.setCancelled(true);
             if (isHoldFishingRod(player) || event.getItemDrop().getItemStack().getType() == Material.FISHING_ROD) {
                 playerData.Gathering.inputFishingCommand(FishingCommand.Drop);
@@ -525,7 +525,7 @@ public class Events implements Listener {
     @EventHandler
     void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission("som7.builder") || playerData(player).PlayMode) {
+        if (!player.hasPermission("som7.builder") || playerData(player).playMode) {
             event.setCancelled(true);
         }
     }
@@ -534,7 +534,7 @@ public class Events implements Listener {
     void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        if (!player.hasPermission("som7.builder") || playerData(player).PlayMode) {
+        if (!player.hasPermission("som7.builder") || playerData(player).playMode) {
             event.setCancelled(true);
             PlayerData playerData = playerData(player);
             playerData.Gathering.BlockBreak(playerData, block);

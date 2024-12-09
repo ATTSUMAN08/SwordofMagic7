@@ -82,7 +82,7 @@ public class HotBar {
     }
 
     public void UpdateHotBar() {
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             if (playerData.ViewInventory.isHotBar()) viewTop();
             viewBottom();
         }
@@ -132,7 +132,7 @@ public class HotBar {
     }
 
     public void viewBottom() {
-        if (playerData.PlayMode && player.getGameMode() == GameMode.SURVIVAL) {
+        if (playerData.playMode && player.getGameMode() == GameMode.SURVIVAL) {
             int offset = 0;
             if (playerData.CastMode.isRenewed()) {
                 if (player.isSneaking()) offset += 8;
@@ -149,7 +149,7 @@ public class HotBar {
     }
 
     public void viewTop() {
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             playerData.ViewInventory = ViewInventoryType.HotBar;
             int slot = 9;
             for (int i = 8; i < 32; i++) {

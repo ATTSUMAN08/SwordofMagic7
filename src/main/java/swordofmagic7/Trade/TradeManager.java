@@ -47,7 +47,7 @@ public class TradeManager {
             if (target != null && target.isOnline() && target != player) {
                 PlayerData targetData = PlayerData.playerData(target);
                 if (CheckBlockPlayer(playerData, targetData)) return;
-                if (false && args.length == 1) {
+                if (args.length == 1) {
                     TradeData tradeData = new TradeData(player, target);
                     tradeData.requestTrade();
                     TradeRequest.put(target, tradeData);

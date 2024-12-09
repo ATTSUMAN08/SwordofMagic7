@@ -50,7 +50,7 @@ public class InstantBuff {
         this.playerData = playerData;
         MultiThread.TaskRun(() -> {
             while (playerWhileCheck(playerData)) {
-                if (InstantBuffs.size() > 0) {
+                if (!InstantBuffs.isEmpty()) {
                     for (Map.Entry<String, InstantBuffData> data : InstantBuffs.entrySet()) {
                         data.getValue().time--;
                     }

@@ -11,75 +11,32 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.GameRule
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import swordofmagic7.Command.Builder.FlySpeed
-import swordofmagic7.Command.Builder.GameModeChange
-import swordofmagic7.Command.Builder.PlayMode
-import swordofmagic7.Command.Developer.AddTitle
-import swordofmagic7.Command.Developer.BukkitTasks
-import swordofmagic7.Command.Developer.ClassSelect
-import swordofmagic7.Command.Developer.GetClassExp
-import swordofmagic7.Command.Developer.GetEffect
-import swordofmagic7.Command.Developer.GetExp
-import swordofmagic7.Command.Developer.GetItem
-import swordofmagic7.Command.Developer.GetLevel
-import swordofmagic7.Command.Developer.GetRune
-import swordofmagic7.Command.Developer.Load
-import swordofmagic7.Command.Developer.LoadedPlayer
-import swordofmagic7.Command.Developer.MobSpawn
-import swordofmagic7.Command.Developer.Save
-import swordofmagic7.Command.Developer.SendData
-import swordofmagic7.Command.Developer.SetNick
-import swordofmagic7.Command.Developer.SkillCTReset
-import swordofmagic7.Command.Player.AuctionCommand
-import swordofmagic7.Command.Player.BlockPlayer
-import swordofmagic7.Command.Player.EffectInfo
-import swordofmagic7.Command.Player.ItemInfo
-import swordofmagic7.Command.Player.MarketCommand
-import swordofmagic7.Command.Player.MobInfo
-import swordofmagic7.Command.Player.Party
-import swordofmagic7.Command.Player.ReqExp
-import swordofmagic7.Command.Player.ReqLifeExp
-import swordofmagic7.Command.Player.RuneFilter
-import swordofmagic7.Command.Player.RuneInfo
-import swordofmagic7.Command.Player.TagGameCommand
-import swordofmagic7.Command.Player.playerInfo
+import swordofmagic7.*
+import swordofmagic7.Command.Developer.*
+import swordofmagic7.Command.Player.*
 import swordofmagic7.Command.SomCommand
-import swordofmagic7.Data.DataBase.DataBasePath
-import swordofmagic7.Data.DataBase.DataLoad
-import swordofmagic7.Data.DataBase.MapList
-import swordofmagic7.Data.DataBase.ServerId
-import swordofmagic7.Data.DataBase.SpawnLocation
-import swordofmagic7.Data.DataBase.TitleDataList
-import swordofmagic7.Data.DataBase.WarpGateList
+import swordofmagic7.Data.DataBase.*
 import swordofmagic7.Data.DataLoader
 import swordofmagic7.Data.Editor
 import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.Dungeon.DefenseBattle
 import swordofmagic7.Dungeon.Dungeon
-import swordofmagic7.Events
-import swordofmagic7.Function.BroadCast
-import swordofmagic7.Function.Log
-import swordofmagic7.Function.createFolder
-import swordofmagic7.Function.decoLore
-import swordofmagic7.Function.ignoreEntity
-import swordofmagic7.Function.sendMessage
-import swordofmagic7.Function.teleportServer
+import swordofmagic7.Function.*
 import swordofmagic7.Mob.MobManager
 import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
-import swordofmagic7.PlayerList
-import swordofmagic7.Som7Vote
 import swordofmagic7.Sound.CustomSound.playSound
 import swordofmagic7.Sound.SoundList
-import swordofmagic7.TagGame
 import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
-import swordofmagic7.Tutorial
 import swordofmagic7.redis.RedisManager
 import java.io.*
 import java.net.HttpURLConnection
@@ -195,7 +152,7 @@ class SomCore : SuspendingJavaPlugin() {
                 } else {
                     val playerData = playerData(player)
                     playerLastLocation[player]?.let { location ->
-                        if (location.distance(player.location) < 2) {
+                        if (location.world == player.location.world && location.distance(player.location) < 2) {
                             playerData.AFKTime += AFK_TIME_PERIOD
                             playerData.statistics.AFKTime += AFK_TIME_PERIOD
                             if (playerData.isAFK) {
@@ -293,10 +250,6 @@ class SomCore : SuspendingJavaPlugin() {
         SomCommand.register("classSelect", ClassSelect())
         SomCommand.register("skillCTReset", SkillCTReset())
         SomCommand.register("addTitle", AddTitle())
-        //Builder
-        SomCommand.register("gm", GameModeChange())
-        SomCommand.register("playMode", PlayMode())
-        SomCommand.register("flySpeed", FlySpeed())
         //Player
         SomCommand.register("reqExp", ReqExp())
         SomCommand.register("reqLifeExp", ReqLifeExp())

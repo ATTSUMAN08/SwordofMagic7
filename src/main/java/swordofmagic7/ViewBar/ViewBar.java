@@ -157,7 +157,7 @@ public class ViewBar {
         tickUpdate = true;
         player.setHealthScaled(true);
         player.setGlowing(false);
-        if (playerData.PlayMode) {
+        if (playerData.playMode) {
             player.setFlying(false);
             player.setAllowFlight(false);
             player.setGameMode(GameMode.SURVIVAL);
@@ -177,7 +177,7 @@ public class ViewBar {
             if (status.Mana < 0) status.Mana = status.MaxMana;
             while (playerWhileCheck(playerData)) {
                 try {
-                    if (playerData.PlayMode && playerData.isLoaded) {
+                    if (playerData.playMode && playerData.isLoaded) {
                         if (playerData.HealthRegenDelay > 0) {
                             playerData.HealthRegenDelay -= period;
                         } else {

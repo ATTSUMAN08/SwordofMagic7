@@ -90,7 +90,7 @@ public class HotBarData implements Cloneable {
                 }
                 item = itemParameter.viewItem(1, format).clone();
                 ItemMeta meta = item.getItemMeta();
-                if (addLore.size() > 0) {
+                if (!addLore.isEmpty()) {
                     List<String> Lore = new ArrayList<>(meta.getLore());
                     Lore.addAll(addLore);
                     meta.setLore(Lore);

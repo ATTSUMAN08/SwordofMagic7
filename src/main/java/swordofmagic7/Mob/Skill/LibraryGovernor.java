@@ -171,7 +171,7 @@ public class LibraryGovernor {
                         PlayerData.playerData(player).dead();
                     }
                 } else if (hashInt == 1) {
-                    if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).size() == 0) {
+                    if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).isEmpty()) {
                         sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.Tick);
                     } else {
                         sendMessage(player, "§c「一人でいたいときに、周りに人がいるのは不快です」", SoundList.Nope);

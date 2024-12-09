@@ -149,7 +149,7 @@ public class PlayerData {
     public boolean ExpLog = false;
     public DropLogType DropLog = DropLogType.None;
     public boolean PvPMode = false;
-    public boolean PlayMode = true;
+    public boolean playMode = true;
     public StrafeType StrafeMode = StrafeType.DoubleJump;
     public CastType CastMode = CastType.Hold;
     public int Mel = 10000;
@@ -750,7 +750,7 @@ public class PlayerData {
         else data.set("Setting.HoloSelfView", "HIDDEN");
         data.set("Others.FishingCombo", Gathering.FishingComboBoost);
         data.set("Others.FishingSetCombo", Gathering.FishingSetCombo);
-        data.set("Setting.PlayMode", PlayMode);
+        data.set("Setting.PlayMode", playMode);
         data.set("Setting.ViewFormat", ViewFormat);
         data.set("Setting.ParticleDensity", ParticleDensity);
         data.set("Setting.NaturalMessage", NaturalMessage);
@@ -888,7 +888,7 @@ public class PlayerData {
             Gathering.FishingComboBoost = data.getInt("Others.FishingCombo", 0);
             Gathering.FishingSetCombo = data.getInt("Others.FishingSetCombo", 0);
             Gathering.FishingUseCombo = data.getBoolean("Setting.FishingUseCombo", true);
-            PlayMode = data.getBoolean("Setting.PlayMode", true);
+            playMode = data.getBoolean("Setting.PlayMode", true);
             ViewFormat = data.getInt("Setting.ViewFormat",0);
             ParticleDensity = data.getInt("Setting.ParticleDensity",100);
             NaturalMessage = data.getBoolean("Setting.NaturalMessage",true);
@@ -979,7 +979,7 @@ public class PlayerData {
             }
             useCookCoolTime = data.getInt("CoolTime.Cook");
 
-            if (PlayMode) {
+            if (playMode) {
                 viewUpdate();
                 World world = player.getWorld();
                 double x = data.getDouble("Location.x", SpawnLocation.getX());
@@ -1049,7 +1049,7 @@ public class PlayerData {
         if (isNextViewUpdate) return;
         isNextViewUpdate = true;
         MultiThread.TaskRunLater(() -> {
-            if (PlayMode) {
+            if (playMode) {
                 switch (ViewInventory) {
                     case ItemInventory -> ItemInventory.viewInventory();
                     case RuneInventory -> RuneInventory.viewRune();

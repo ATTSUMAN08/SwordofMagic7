@@ -1,2 +1,1 @@
-# SwordofMagic7
-SwordofMagic7の基幹Plugin
+# Sword of Magic 7 Plugin

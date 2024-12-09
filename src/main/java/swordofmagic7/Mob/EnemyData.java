@@ -339,7 +339,7 @@ public class EnemyData {
                         }
                     }
                     if (!mobData.NonDespawn && !isDefenseBattle && mobData.enemyType.isNormal() && !mobData.NoAI && !mobData.Invisible) {
-                        if (PlayerList.getNearNonDead(entity.getLocation(), 64+mobData.Search).size() == 0 || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
+                        if (PlayerList.getNearNonDead(entity.getLocation(), 64+mobData.Search).isEmpty() || SpawnLocation.distance(entity.getLocation()) > mobData.Search + 64) {
                             delete();
                         }
                     }

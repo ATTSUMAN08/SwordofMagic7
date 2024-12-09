@@ -2,6 +2,9 @@ package net.somrpg.swordofmagic7.commands
 
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import net.somrpg.swordofmagic7.SomCore
+import net.somrpg.swordofmagic7.commands.builder.FlySpeedCommand
+import net.somrpg.swordofmagic7.commands.builder.GmCommand
+import net.somrpg.swordofmagic7.commands.builder.PlayModeCommand
 import net.somrpg.swordofmagic7.commands.developer.SomCommand
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -26,7 +29,17 @@ class CommandManager {
         val annotationParser = createAnnotationParser(commandManager)
         annotationParser.installCoroutineSupport(context = SomCore.instance.asyncDispatcher)
 
-        annotationParser.parse(SomCommand())
+        // Builder
+        annotationParser.parse(
+            GmCommand(),
+            FlySpeedCommand(),
+            PlayModeCommand()
+        )
+
+        // Developer
+        annotationParser.parse(
+            SomCommand()
+        )
     }
 
     private fun createCommandManager(): LegacyPaperCommandManager<CommandSender> {
