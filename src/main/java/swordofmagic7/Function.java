@@ -199,15 +199,7 @@ public final class Function {
     }
 
     public static void BroadCast(String str, SoundList sound, boolean isNatural) {
-        for (Player player : PlayerList.get()) {
-            if (player.isOnline()) {
-                PlayerData playerData = PlayerData.playerData(player);
-                if (playerData.NaturalMessage || !isNatural) {
-                    player.sendMessage(str);
-                    if (sound != null) playSound(player, sound);
-                }
-            }
-        }
+        BroadCast(Component.text(str), sound, isNatural);
     }
 
     public static void BroadCast(Component text) {

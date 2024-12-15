@@ -41,6 +41,7 @@ import swordofmagic7.redis.RedisManager
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
+import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
 import kotlin.math.pow
@@ -82,8 +83,8 @@ class SomCore : SuspendingJavaPlugin() {
         saveDefaultConfig()
         reloadConfig()
         instance = this
-        random = Random()
-        world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
+        random = SecureRandom()
+        world = Bukkit.getWorld("world_flat") ?: throw IllegalStateException("World not found")
         ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
         server.pluginManager.registerEvents(Som7Vote(), this)
@@ -117,17 +118,18 @@ class SomCore : SuspendingJavaPlugin() {
         WarpGateList.values.forEach { it.start() }
 
         world.apply {
-            setGameRule(GameRule.DO_WEATHER_CYCLE, false)
-            setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false)
-            setGameRule(GameRule.DO_MOB_SPAWNING, false)
-            setGameRule(GameRule.DO_FIRE_TICK, false)
-            setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false)
-            setGameRule(GameRule.DO_PATROL_SPAWNING, false)
-            setGameRule(GameRule.SHOW_DEATH_MESSAGES, false)
-            setGameRule(GameRule.NATURAL_REGENERATION, false)
-            setGameRule(GameRule.MOB_GRIEFING, false)
-            setGameRule(GameRule.DO_MOB_LOOT, false)
-            setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+            setGameRule<Boolean>(GameRule.DO_WEATHER_CYCLE, false)
+            setGameRule<Boolean>(GameRule.COMMAND_BLOCK_OUTPUT, false)
+            setGameRule<Boolean>(GameRule.DO_MOB_SPAWNING, false)
+            setGameRule<Boolean>(GameRule.DO_FIRE_TICK, false)
+            setGameRule<Boolean>(GameRule.SEND_COMMAND_FEEDBACK, false)
+            setGameRule<Boolean>(GameRule.DO_PATROL_SPAWNING, false)
+            setGameRule<Boolean>(GameRule.SHOW_DEATH_MESSAGES, false)
+            setGameRule<Boolean>(GameRule.NATURAL_REGENERATION, false)
+            setGameRule<Boolean>(GameRule.MOB_GRIEFING, false)
+            setGameRule<Boolean>(GameRule.DO_MOB_LOOT, false)
+            setGameRule<Boolean>(GameRule.DO_DAYLIGHT_CYCLE, false)
+            setGameRule<Int>(GameRule.RANDOM_TICK_SPEED, 0)
             this.time = 6000L
         }
 
@@ -185,10 +187,10 @@ class SomCore : SuspendingJavaPlugin() {
         ParticleManager.onLoad()
 
         // Initialize holograms
-        createTouchHologram("§e§lForge", Location(world, 1149.5, 97.75, 17.5)) { player ->
+        createTouchHologram("", Location(world, 12.5, -60.5, -12.8)) { player ->
             playerData(player).Menu.Smith.SmithMenuView()
         }
-        createTouchHologram("§e§lKitchen", Location(world, 1159.5, 94.5, 66.5)) { player ->
+        createTouchHologram("", Location(world, 17.5, -60.5, -12.8)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
 

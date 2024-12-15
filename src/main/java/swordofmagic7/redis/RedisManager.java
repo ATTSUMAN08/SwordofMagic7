@@ -33,9 +33,9 @@ public class RedisManager {
         MultiThread.TaskRun(redisSubscriber, "RedisSubscriber");
     }
 
-    public static void publishObject(String channel, List<String> message) {
+    public static void publishObject(String channel, Object object) {
         try (Jedis jedis = getJedis()) {
-            jedis.publish(channel, SomCore.Companion.getGson().toJson(new RedisMessageObject(DataBase.ServerId, message)));
+            jedis.publish(channel, SomCore.Companion.getGson().toJson(new RedisMessageObject(DataBase.ServerId, SomCore.Companion.getGson().toJson(object))));
         }
     }
 

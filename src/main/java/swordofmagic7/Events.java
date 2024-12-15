@@ -672,7 +672,7 @@ public class Events implements Listener {
             Player player = event.getPlayer();
             @NotNull Function1<@NotNull Player, @NotNull Unit> action = SomCore.instance.getHologramTouchActions().get(event.getHologram().getName());
             if (action != null) {
-                action.invoke(player);
+                MultiThread.TaskRunSynchronized(() -> action.invoke(player));
             }
         }
     }
@@ -680,7 +680,7 @@ public class Events implements Listener {
     @EventHandler
     void onRedisMessage(RedisMessageEvent e) {
         if (Objects.equals(e.getChannel(), "SNC")) {
-            Client.Trigger(e.getMessage().getFirst());
+            Client.Trigger(e.get(String.class));
         }
     }
 }

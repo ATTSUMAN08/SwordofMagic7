@@ -1,8 +1,11 @@
 @file:Suppress("unused")
 package net.somrpg.swordofmagic7.commands.developer
 
+import net.somrpg.swordofmagic7.translater.JapanizeType
+import net.somrpg.swordofmagic7.translater.Japanizer
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import swordofmagic7.Data.PlayerData.playerData
@@ -43,5 +46,13 @@ class SomCommand {
         MultiThread.TaskRunSynchronizedLater({
             Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
         }, 5)
+    }
+
+    @Command("som lunachat <message>")
+    @Permission("som7.developer")
+    fun somLunaChat(sender: CommandSender, @Argument("message") message: String) {
+        sender.sendMessage("メッセージ: $message")
+        sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME, emptyMap())}")
+        sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
     }
 }

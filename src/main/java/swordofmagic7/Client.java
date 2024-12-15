@@ -49,7 +49,7 @@ public class Client {
     }
 
     public static void send(String str) {
-        RedisManager.publishObject("SNC", List.of(str));
+        RedisManager.publishObject("SNC", str);
     }
 
     public static void Trigger(String packet) {

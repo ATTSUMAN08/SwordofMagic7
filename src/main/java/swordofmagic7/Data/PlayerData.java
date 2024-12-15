@@ -247,7 +247,7 @@ public class PlayerData {
             return playerWhileCheck(this);
         }, 0, 20);
 
-        MultiThread.TaskRun(this::sendMenuPacket, "UserMenuPacket");
+        //MultiThread.TaskRun(this::sendMenuPacket, "UserMenuPacket");
     }
 
     public Hologram hologram;
