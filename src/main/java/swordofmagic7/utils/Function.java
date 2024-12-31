@@ -1,4 +1,4 @@
-package swordofmagic7;
+package net.somrpg.swordofmagic7.utils;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;

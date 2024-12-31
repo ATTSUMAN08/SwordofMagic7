@@ -18,7 +18,7 @@ import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import swordofmagic7.*
+import net.somrpg.swordofmagic7.utils.*
 import swordofmagic7.Command.Developer.*
 import swordofmagic7.Command.Player.*
 import swordofmagic7.Command.SomCommand
@@ -29,7 +29,7 @@ import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.Dungeon.DefenseBattle
 import swordofmagic7.Dungeon.Dungeon
-import swordofmagic7.Function.*
+import net.somrpg.swordofmagic7.utils.*
 import swordofmagic7.Mob.MobManager
 import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
