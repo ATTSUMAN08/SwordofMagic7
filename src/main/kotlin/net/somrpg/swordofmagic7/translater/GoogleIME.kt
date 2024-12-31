@@ -2,20 +2,22 @@ package net.somrpg.swordofmagic7.translater
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 
 class GoogleIME {
 
-    protected constructor()
+    init {
+        throw UnsupportedOperationException("Utility Classはインスタンス化できません")
+    }
 
-    /**
-     * GoogleIMEの最初の変換候補を抽出して結合します
-     *
-     * @param json 変換元のJson形式の文字列
-     * @return 変換後の文字列
-     * @since 2.8.10
-     */
     companion object {
+
+        /**
+         * GoogleIMEの最初の変換候補を抽出して結合します
+         *
+         * @param json 変換元のJson形式の文字列
+         * @return 変換後の文字列
+         * @since 2.8.10
+         */
         @JvmStatic
         fun parseJson(json: String): String {
             val result = StringBuilder()
@@ -24,5 +26,6 @@ class GoogleIME {
             }
             return result.toString()
         }
+
     }
 }
