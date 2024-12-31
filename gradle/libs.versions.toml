@@ -1,13 +1,13 @@
 [versions]
 kotlin = "2.1.0"
-shadow = "8.3.5"
+shadow = "9.0.0-beta4"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
 grgit = "5.3.0"
 sonarqube = "6.0.1.5171"
 
-paperApi = "1.21.3-R0.1-SNAPSHOT"
-packetEvents = "2.6.0"
+paperApi = "1.21.4-R0.1-SNAPSHOT"
+packetEvents = "2.7.0"
 libsDisguises = "10.0.44-SNAPSHOT"
 nuVotifier = "2.7.2"
 kotlinSerializationJson = "1.7.3"
