@@ -1,4 +1,4 @@
-package swordofmagic7.ViewBar.SideBarToDo;
+package swordofmagic7.viewBar.SideBarToDo;
 
 public class SideBarToDoData {
     public SideBarToDoType type;

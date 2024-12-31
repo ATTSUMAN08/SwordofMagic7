@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Classes.Classes.MaxSlot;
+import static swordofmagic7.classes.Classes.maxSlot;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.Menu.Data.TriggerMenuDisplay;
@@ -54,7 +54,7 @@ public class Trigger {
         this.scroll = scroll;
         playerData.setView(ViewInventoryType.HotBar, false);
         int slot = 0;
-        for (int i = 0; i < MaxSlot; i++) {
+        for (int i = 0; i < maxSlot; i++) {
             if (playerData.Classes.classSlot[i] != null) {
                 for (SkillData skill : playerData.Classes.classSlot[i].SkillList) {
                     if (skill.SkillType.isActive()) {

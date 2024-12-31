@@ -1,4 +1,4 @@
-package swordofmagic7.Classes;
+package swordofmagic7.classes;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

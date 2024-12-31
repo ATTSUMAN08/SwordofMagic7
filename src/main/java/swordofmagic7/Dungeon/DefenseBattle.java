@@ -16,7 +16,7 @@ import swordofmagic7.PlayerList;
 import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
-import swordofmagic7.ViewBar.ViewBar;
+import swordofmagic7.viewBar.ViewBar;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

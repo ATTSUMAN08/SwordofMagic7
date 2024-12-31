@@ -13,7 +13,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
-import swordofmagic7.ViewBar.ViewBar;
+import swordofmagic7.viewBar.ViewBar;
 
 import java.util.ArrayList;
 import java.util.HashSet;

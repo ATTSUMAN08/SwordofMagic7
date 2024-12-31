@@ -1,4 +1,4 @@
-package swordofmagic7.Classes;
+package swordofmagic7.classes;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,30 +17,31 @@ import static swordofmagic7.Function.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
-    public static final int MaxSlot = 4;
-    public static final int MaxLevel = 25;
-    public static final int[] SlotReqLevel = {1, 10, 30, 50};
+    public static final int maxSlot = 4;
+    public static final int maxLevel = 25;
+    public static final int[] slotReqLevel = {1, 10, 30, 50};
     public static final ClassData defaultClass = getClassData("Novice");
     private final Player player;
     private final PlayerData playerData;
-    private final HashMap<ClassData, Integer> ClassLevel = new HashMap<>();
-    private final HashMap<ClassData, Integer> ClassExp = new HashMap<>();
-    public ClassData[] classSlot = new ClassData[MaxSlot];
+    private final HashMap<ClassData, Integer> classLevels = new HashMap<>();
+    private final HashMap<ClassData, Integer> classExp = new HashMap<>();
+    public ClassData[] classSlot = new ClassData[maxSlot];
     public Classes(Player player, PlayerData playerData) {
         this.player = player;
         this.playerData = playerData;
         for (ClassData classData : DataBase.getClassList().values()) {
-            ClassLevel.put(classData, 1);
-            ClassExp.put(classData, 0);
+            classLevels.put(classData, 1);
+            classExp.put(classData, 0);
         }
         classSlot[0] = defaultClass;
     }
 
-    public static int[] ReqExp;
-    public static int ReqExp(int Level) {
-        if (ReqExp == null) {
-            ReqExp = new int[PlayerData.MaxLevel+1];
-            for (int level = 0; level < ReqExp.length; level++) {
+    public static int[] reqExpList;
+
+    public static int reqExp(int Level) {
+        if (reqExpList == null) {
+            reqExpList = new int[PlayerData.MaxLevel+1];
+            for (int level = 0; level < reqExpList.length; level++) {
                 double reqExp = 100f;
                 reqExp *= Math.pow(level, 1.8);
                 reqExp *= Math.ceil(level/10f);
@@ -48,12 +49,12 @@ public class Classes {
                 if (level >= 50) reqExp *= 4;
                 if (level >= 60) reqExp *= 4;
                 if (level >= 65) reqExp *= 2;
-                ReqExp[level] = (int) Math.round(reqExp);
+                Classes.reqExpList[level] = (int) Math.round(reqExp);
             }
         }
         if (Level < 0) return 100;
         if (Level > PlayerData.MaxLevel) return Integer.MAX_VALUE;
-        return ReqExp[Level];
+        return reqExpList[Level];
     }
 
     public ClassData lastClass() {
@@ -67,61 +68,61 @@ public class Classes {
     }
 
     public void setClassLevel(ClassData classData, int level) {
-        ClassLevel.put(classData, level);
+        classLevels.put(classData, level);
     }
 
     public void addClassLevel(ClassData classData, int addLevel) {
-        ClassLevel.put(classData, getClassLevel(classData) + addLevel);
-        if (getClassLevel(classData) >= MaxLevel) {
+        classLevels.put(classData, getClassLevel(classData) + addLevel);
+        if (getClassLevel(classData) >= maxLevel) {
             setClassExp(classData, 0);
         }
     }
 
     public int getClassLevel(ClassData classData) {
-        if (ClassLevel.getOrDefault(classData, 0) <= 0) {
-            ClassLevel.put(classData, 1);
+        if (classLevels.getOrDefault(classData, 0) <= 0) {
+            classLevels.put(classData, 1);
         }
-        return ClassLevel.get(classData);
+        return classLevels.get(classData);
     }
 
     public void setClassExp(ClassData classData, int exp) {
-        ClassExp.put(classData, exp);
+        classExp.put(classData, exp);
     }
 
     public synchronized void addClassExp(ClassData classData, int addExp) {
-        if (getClassLevel(classData) >= MaxLevel) {
-            ClassExp.put(classData, 0);
+        if (getClassLevel(classData) >= maxLevel) {
+            classExp.put(classData, 0);
             addExp = 0;
         } else {
-            ClassExp.put(classData, getClassExp(classData) + addExp);
+            classExp.put(classData, getClassExp(classData) + addExp);
         }
         int Level = getClassLevel(classData);
-        if (ReqExp(Level) <= getClassExp(classData)) {
+        if (reqExp(Level) <= getClassExp(classData)) {
             int addLevel = 0;
-            while (ReqExp(Level+addLevel) <= getClassExp(classData)) {
-                removeExp(classData, ReqExp(Level+addLevel));
+            while (reqExp(Level+addLevel) <= getClassExp(classData)) {
+                removeExp(classData, reqExp(Level+addLevel));
                 addLevel++;
             }
             addClassLevel(classData, addLevel);
             BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました", true);
             playSound(player, SoundList.LevelUp);
         }
-        if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/Classes.ReqExp(getClassLevel(classData))*100) + "%)");
+        if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/Classes.reqExp(getClassLevel(classData))*100) + "%)");
     }
 
     public void removeExp(ClassData classData, int addExp) {
-        ClassExp.put(classData, getClassExp(classData) - addExp);
+        classExp.put(classData, getClassExp(classData) - addExp);
     }
 
     public int getClassExp(ClassData classData) {
-        if (!ClassExp.containsKey(classData)) {
-            ClassExp.put(classData, 0);
+        if (!classExp.containsKey(classData)) {
+            classExp.put(classData, 0);
         }
-        return ClassExp.get(classData);
+        return classExp.get(classData);
     }
 
     public String viewExpPercent(ClassData classData) {
-        return String.format("%.3f", (float) getClassExp(classData)/ ReqExp(getClassLevel(classData))*100) + "%";
+        return String.format("%.3f", (float) getClassExp(classData)/ reqExp(getClassLevel(classData))*100) + "%";
     }
 
     public Set<SkillData> getPassiveSkillList() {
@@ -189,9 +190,9 @@ public class Classes {
         Inventory inv = decoInv("クラスカウンター", size);
         if (isSlotMenu) {
             SelectSlot = -1;
-            for (int i = 0; i < SlotReqLevel.length; i++) {
+            for (int i = 0; i < slotReqLevel.length; i++) {
                 List<String> lore = new ArrayList<>();
-                lore.add(decoLore("必要レベル") + SlotReqLevel[i]);
+                lore.add(decoLore("必要レベル") + slotReqLevel[i]);
                 if (classSlot[i] != null) {
                     lore.add(decoLore("使用状況") + classSlot[i].getDisplay());
                 } else {
@@ -210,10 +211,10 @@ public class Classes {
         player.openInventory(inv);
     }
 
-    public void ClassSelectClick(InventoryView view, int slot) {
+    public void classSelectClick(InventoryView view, int slot) {
         if (equalInv(view, "クラスカウンター")) {
             if (SelectSlot == -1 && slot < classSlot.length) {
-                if (SlotReqLevel[slot] <= playerData.Level) {
+                if (slotReqLevel[slot] <= playerData.Level) {
                     SelectSlot = slot;
                     ClassSelectView(false);
                 } else {

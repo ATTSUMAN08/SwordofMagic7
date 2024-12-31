@@ -2,7 +2,7 @@ package swordofmagic7.Data;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import swordofmagic7.Classes.ClassData;
+import swordofmagic7.classes.ClassData;
 import swordofmagic7.Dungeon.Ashark.AsharkB2;
 import swordofmagic7.Dungeon.Ashark.AsharkB4;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;

@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
@@ -117,7 +117,7 @@ public class PetParameter implements Cloneable {
     }
 
     int ReqExp() {
-        double reqExp = Classes.ReqExp(Level)/2f;
+        double reqExp = Classes.reqExp(Level)/2f;
         if (petData.BossPet) reqExp *= 2;
         return (int) Math.round(reqExp);
     }

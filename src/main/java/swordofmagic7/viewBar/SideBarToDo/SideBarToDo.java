@@ -1,7 +1,7 @@
-package swordofmagic7.ViewBar.SideBarToDo;
+package swordofmagic7.viewBar.SideBarToDo;
 
 import org.bukkit.entity.Player;
-import swordofmagic7.Classes.ClassData;
+import swordofmagic7.classes.ClassData;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;

@@ -1,4 +1,4 @@
-package swordofmagic7.ViewBar;
+package swordofmagic7.viewBar;
 
 import eu.decentsoftware.holograms.api.DHAPI;
 import net.kyori.adventure.text.Component;
@@ -7,7 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
@@ -188,7 +188,7 @@ public class ViewBar {
                         }
                         int Level = playerData.Level;
                         int Exp = playerData.Exp;
-                        int ReqExp = Classes.ReqExp(Level);
+                        int ReqExp = Classes.reqExp(Level);
                         float ExpPercent = (float) Exp / ReqExp;
                         if (Float.isNaN(ExpPercent)) ExpPercent = 0.999f;
                         ExpPercent = Math.min(0.001f, Math.max(0.999f, ExpPercent));

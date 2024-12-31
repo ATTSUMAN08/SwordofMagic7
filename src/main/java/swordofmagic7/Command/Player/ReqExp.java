@@ -2,7 +2,7 @@ package swordofmagic7.Command.Player;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Data.PlayerData;
 
@@ -17,7 +17,7 @@ public class ReqExp implements SomCommand {
         if (args.length == 1) {
             try {
                 int level = Integer.parseInt(args[0]);
-                int reqExp = Classes.ReqExp(level);
+                int reqExp = Classes.reqExp(level);
                 sender.sendMessage("§eLv" + level + "§7: §a" + reqExp);
             } catch (Exception ignored) {
                 sender.sendMessage("§e/reqExp <Level>");

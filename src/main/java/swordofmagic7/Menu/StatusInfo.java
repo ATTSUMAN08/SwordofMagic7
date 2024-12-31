@@ -7,8 +7,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Attribute.AttributeType;
-import swordofmagic7.Classes.ClassData;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -85,7 +85,7 @@ public class StatusInfo {
                 statusMeta.setLore(statusLore);
                 statusIcon.setItemMeta(statusMeta);
                 List<String> classLore = new ArrayList<>();
-                for (int i = 0; i < Classes.MaxSlot; i++) {
+                for (int i = 0; i < Classes.maxSlot; i++) {
                     ClassData classData = playerData.Classes.classSlot[i];
                     if (classData != null) {
                         classLore.add(decoLore("クラス[" + (i+1) + "]") + classData.Color + "§l" + classData.Display);
@@ -96,7 +96,7 @@ public class StatusInfo {
                 classLore.add(decoText("§e§lクラス情報"));
                 for (String str : DataBase.ClassDataMap.values()) {
                     ClassData classData = getClassData(str);
-                    if (classData != null) classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + Classes.MaxLevel + " §a§l" + playerData.Classes.viewExpPercent(classData));
+                    if (classData != null) classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + Classes.maxLevel + " §a§l" + playerData.Classes.viewExpPercent(classData));
                 }
                 List<String> lifeLore = new ArrayList<>();
                 for (LifeType type : LifeType.values()) {

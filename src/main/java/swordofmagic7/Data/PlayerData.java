@@ -21,8 +21,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
-import swordofmagic7.Classes.ClassData;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.Type.DamageLogType;
 import swordofmagic7.Data.Type.DropLogType;
 import swordofmagic7.Data.Type.StrafeType;
@@ -68,15 +68,14 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Title.TitleManager;
 import swordofmagic7.Tutorial;
-import swordofmagic7.ViewBar.SideBarToDo.SideBarToDo;
-import swordofmagic7.ViewBar.ViewBar;
+import swordofmagic7.viewBar.SideBarToDo.SideBarToDo;
+import swordofmagic7.viewBar.ViewBar;
 
 import java.io.File;
 import java.time.Duration;
 import java.util.*;
 
-import static swordofmagic7.Classes.Classes.MaxSlot;
-import static swordofmagic7.Classes.Classes.ReqExp;
+import static swordofmagic7.classes.Classes.maxSlot;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Function.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
@@ -618,7 +617,7 @@ public class PlayerData {
     }
 
     public String viewExpPercent() {
-        return String.format("%.3f", (float)Exp/ ReqExp(Level) * 100);
+        return String.format("%.3f", (float)Exp/ swordofmagic7.classes.Classes.reqExp(Level) * 100);
     }
 
     public boolean isPvPModeNonMessage() {
@@ -652,10 +651,10 @@ public class PlayerData {
 
     public synchronized void addPlayerExp(int addExp) {
         Exp += addExp;
-        if (ReqExp(Level) <= Exp) {
+        if (swordofmagic7.classes.Classes.reqExp(Level) <= Exp) {
             int addLevel = 0;
-            while (ReqExp(Level) <= Exp) {
-                Exp -= ReqExp(Level);
+            while (swordofmagic7.classes.Classes.reqExp(Level) <= Exp) {
+                Exp -= swordofmagic7.classes.Classes.reqExp(Level);
                 addLevel++;
             }
             if (Level >= 60) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv60"), 1);
@@ -664,7 +663,7 @@ public class PlayerData {
             else if (Level >= 10) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv10"), 1);
             if (Level < MaxLevel) addPlayerLevel(addLevel);
         }
-        if (ExpLog) player.sendMessage("§e経験値[キャラ]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/ReqExp(Level)*100) + "%)");
+        if (ExpLog) player.sendMessage("§e経験値[キャラ]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/ swordofmagic7.classes.Classes.reqExp(Level)*100) + "%)");
     }
 
     private boolean isNonSave = false;
@@ -784,7 +783,7 @@ public class PlayerData {
             data.set("ClassData." + classData.getKey() + ".Exp", Classes.getClassExp(classData.getValue()));
         }
 
-        for (int i = 0; i <= MaxSlot-1; i++) {
+        for (int i = 0; i <= maxSlot -1; i++) {
             if (Classes.classSlot[i] != null) {
                 data.set("Class.Slot" + i, Classes.classSlot[i].Id);
             } else {
@@ -924,7 +923,7 @@ public class PlayerData {
                 Classes.setClassExp(classData.getValue(), data.getInt("ClassData." + classData.getKey() + ".Exp"));
             }
 
-            for (int i = 0; i <= MaxSlot-1; i++) {
+            for (int i = 0; i <= maxSlot -1; i++) {
                 String id = data.getString("Class.Slot" + i, "None");
                 if (!id.equalsIgnoreCase("None"))
                     Classes.classSlot[i] = getClassData(id);

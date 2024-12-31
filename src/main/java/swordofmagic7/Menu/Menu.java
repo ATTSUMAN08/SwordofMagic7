@@ -268,7 +268,7 @@ public class Menu {
             playerData.Shop.ShopSellClick(view, ClickInventory, clickType, index, Slot);
             SmithEquipment.SmeltMenuClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
-                playerData.Classes.ClassSelectClick(view, Slot);
+                playerData.Classes.classSelectClick(view, Slot);
                 playerData.Attribute.AttributeMenuClick(view, clickType, currentItem);
                 playerData.Skill.SkillMenuClick(view, Slot);
                 playerData.Shop.ShopClick(view, currentItem, clickType, Slot, index);

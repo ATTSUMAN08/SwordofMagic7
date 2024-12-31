@@ -13,8 +13,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import swordofmagic7.Classes.ClassData;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Client;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -39,7 +39,6 @@ import swordofmagic7.TextView.TextView;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static swordofmagic7.Classes.Classes.ReqExp;
 import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
@@ -457,7 +456,7 @@ public class EnemyData {
                             pet.addExp(decayExp(exp, pet.Level, Level));
                         }
                         List<String> Holo = new ArrayList<>();
-                        Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp / ReqExp(Level) * 100) + "%)");
+                        Holo.add("§e§lEXP §a§l+" + exp + " §7(" + String.format(format, (double) exp / Classes.reqExp(Level) * 100) + "%)");
                         if (!isDefenseBattle) {
                             for (DropItemData dropData : DropItemTable) {
                                 if ((dropData.MinLevel == 0 && dropData.MaxLevel == 0) || (dropData.MinLevel <= Level && Level <= dropData.MaxLevel)) {

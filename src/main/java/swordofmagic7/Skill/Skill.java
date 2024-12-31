@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
-import swordofmagic7.Classes.ClassData;
-import swordofmagic7.Classes.Classes;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectType;
@@ -524,7 +524,7 @@ public class Skill {
     private final HashMap<Integer, String> SkillMenuCache = new HashMap<>();
     public void SkillMenuView() {
         SkillMenuCache.clear();
-        Inventory inv = decoInv(SkillMenuDisplay, Classes.MaxSlot);
+        Inventory inv = decoInv(SkillMenuDisplay, Classes.maxSlot);
         int slotActive = 0;
         int slotPassive = 8;
         int slot = 0;

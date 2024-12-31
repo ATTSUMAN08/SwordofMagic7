@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import swordofmagic7.Classes.ClassData;
+import swordofmagic7.classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemParameter;

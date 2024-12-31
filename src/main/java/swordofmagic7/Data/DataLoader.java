@@ -6,7 +6,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
-import swordofmagic7.Classes.ClassData;
+import swordofmagic7.classes.ClassData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
