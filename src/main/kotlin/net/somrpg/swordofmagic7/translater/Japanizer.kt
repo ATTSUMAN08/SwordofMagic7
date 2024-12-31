@@ -1,8 +1,5 @@
 package net.somrpg.swordofmagic7.translater
 
-import java.util.HashMap
-import java.util.Map
-
 /**
  * ローマ字表記を漢字変換して返すユーティリティ
  */
@@ -18,7 +15,7 @@ object Japanizer {
      * @return 日本語化したメッセージ
      */
     @JvmStatic
-    fun japanize(org: String, type: JapanizeType, dictionary: Map<String, String>): String {
+    fun japanize(org: String, type: JapanizeType, dictionary: Map<String, String> = emptyMap()): String {
         // 変換不要なら空文字列を返す
         if (type == JapanizeType.NONE || !isNeedToJapanize(org)) {
             return ""
@@ -28,7 +25,7 @@ object Japanizer {
         val deletedURL = org.replace(REGEX_URL.toRegex(), " ")
 
         // キーワードをロック
-        val keywordMap = HashMap<String, String>()
+        val keywordMap: MutableMap<String, String> = mutableMapOf()
         var index = 0
         var keywordLocked = deletedURL
         for (dickey in dictionary.keys) {

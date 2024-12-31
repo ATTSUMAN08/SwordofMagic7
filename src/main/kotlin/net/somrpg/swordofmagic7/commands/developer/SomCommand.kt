@@ -52,7 +52,7 @@ class SomCommand {
     @Permission("som7.developer")
     fun somLunaChat(sender: CommandSender, @Argument("message") message: String) {
         sender.sendMessage("メッセージ: $message")
-        sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME, emptyMap())}")
+        sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME)}")
         sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
     }
 }
