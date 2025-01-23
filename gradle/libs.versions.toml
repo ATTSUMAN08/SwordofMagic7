@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.0"
-shadow = "9.0.0-beta4"
+shadow = "9.0.0-beta6"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
 grgit = "5.3.0"
