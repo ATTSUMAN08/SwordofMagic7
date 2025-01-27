@@ -1,5 +1,6 @@
 package swordofmagic7.Item;
 
+import com.google.common.collect.MultimapBuilder;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NbtApiException;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
@@ -147,9 +148,8 @@ public class ItemParameter implements Cloneable {
         }
         meta.setUnbreakable(true);
         meta.setLore(Lore);
-        for (ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
-        }
+        meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         if (Icon == Material.PLAYER_HEAD) {
             try {
                 NBT.modifyComponents(item, nbt -> {

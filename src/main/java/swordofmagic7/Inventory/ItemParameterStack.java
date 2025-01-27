@@ -19,17 +19,18 @@ import static swordofmagic7.Function.Log;
 
 public class ItemParameterStack implements Cloneable {
         public ItemParameter itemParameter;
+        public int Amount = 0;
+
         public ItemParameterStack() {
-        this.itemParameter = new ItemParameter();
+                this.itemParameter = new ItemParameter();
         }
 
         public ItemParameterStack(ItemParameter itemParameter) {
-        this.itemParameter = itemParameter;
+                this.itemParameter = itemParameter;
         }
-        public int Amount = 0;
 
         public boolean isEmpty() {
-        return itemParameter.Icon == Material.BARRIER;
+                return itemParameter.Icon == Material.BARRIER;
         }
 
         @Override
@@ -46,8 +47,9 @@ public class ItemParameterStack implements Cloneable {
                                         }
                                 }
                                 for (RuneParameter runeParameter : itemParameter.itemEquipmentData.Rune) {
-                                        if (!runeParameter.toString().equals("None"))
+                                        if (!runeParameter.toString().equals("None")) {
                                                 data.append(",Rune:").append(runeParameter);
+                                        }
                                 }
                         }
                 } else {
