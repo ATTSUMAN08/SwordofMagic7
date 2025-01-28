@@ -147,6 +147,14 @@ public class Menu {
                 }
             }
         } catch (Exception ignored) {}
+        if (ClickInventory.getType() == InventoryType.CRAFTING) {
+            switch (Slot) {
+                case 1 -> playerData.setView(ViewInventoryType.ItemInventory);
+                case 2 -> playerData.setView(ViewInventoryType.RuneInventory);
+                case 3 -> playerData.setView(ViewInventoryType.PetInventory);
+                case 4 -> playerData.setView(ViewInventoryType.HotBar);
+            }
+        }
         if (currentItem != null && ClickInventory == view.getBottomInventory()) {
             switch (Slot) {
                 case 0,1,2,3,4,5,6,7 -> {

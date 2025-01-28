@@ -12,22 +12,26 @@ public class CustomSound {
     }
 
     public static void playSound(Player player, Location location, SoundList sound) {
-        if (sound.data instanceof Sound data) {
-            player.playSound(location, data, sound.category, 1, sound.pitch);
-        }
-        if (sound.data instanceof String data) {
-            player.playSound(location, data, sound.category, 1, sound.pitch);
-        }
+        MultiThread.TaskRunSynchronized(() -> {
+            if (sound.data instanceof Sound data) {
+                player.playSound(location, data, sound.category, 1, sound.pitch);
+            }
+            if (sound.data instanceof String data) {
+                player.playSound(location, data, sound.category, 1, sound.pitch);
+            }
+        }, "playSound");
     }
 
     public static void playSound(Location location, SoundList sound) {
-        final World world = location.getWorld();
-        if (sound.data instanceof Sound data) {
-            world.playSound(location, data, sound.category, 1, sound.pitch);
-        }
-        if (sound.data instanceof String data) {
-            world.playSound(location, data, sound.category, 1, sound.pitch);
-        }
+        MultiThread.TaskRunSynchronized(() -> {
+            final World world = location.getWorld();
+            if (sound.data instanceof Sound data) {
+                world.playSound(location, data, sound.category, 1, sound.pitch);
+            }
+            if (sound.data instanceof String data) {
+                world.playSound(location, data, sound.category, 1, sound.pitch);
+            }
+        }, "playSound");
     }
 
     public static void playSound(Player player, SoundList sound, int count, int wait) {

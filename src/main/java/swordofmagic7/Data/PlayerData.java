@@ -266,7 +266,7 @@ public class PlayerData {
                 SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_PetInventory)
         ));
         packets.add(new WrapperPlayServerSetSlot(0, 0, 4,
-                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_SkillMenuIcon)
+                SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_HotBar)
         ));
         for (WrapperPlayServerSetSlot packet : packets) {
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
@@ -995,6 +995,7 @@ public class PlayerData {
 
             statistics.load(data);
         } else {
+            // 初回ログイン
             MultiThread.TaskRunSynchronizedLater(() -> {
                 Status.Health = Status.MaxHealth;
                 Status.Mana = Status.MaxMana;
@@ -1005,7 +1006,8 @@ public class PlayerData {
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスシールド"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
-                Tutorial.tutorialTrigger(player, 0);
+                player.teleport(SpawnLocation);
+                // Tutorial.tutorialTrigger(player, 0);
             }, 10, "TutorialTrigger");
         }
         MultiThread.TaskRunSynchronizedLater(() -> {
@@ -1246,7 +1248,7 @@ public class PlayerData {
                 ));
                 deadTime = 1200;
                 Hologram hologram = SomCore.instance.createHologram(player.getEyeLocation());
-                DHAPI.addHologramLine(hologram, hologram.getPage(0).getLine(1).getText());
+                DHAPI.addHologramLine(hologram, this.hologram.getPage(0).getLine(1).getText());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
                 DHAPI.addHologramLine(hologram, head);

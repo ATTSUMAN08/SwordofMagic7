@@ -84,7 +84,7 @@ class SomCore : SuspendingJavaPlugin() {
         reloadConfig()
         instance = this
         random = SecureRandom()
-        world = Bukkit.getWorld("world_flat") ?: throw IllegalStateException("World not found")
+        world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
         ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
         server.pluginManager.registerEvents(Som7Vote(), this)

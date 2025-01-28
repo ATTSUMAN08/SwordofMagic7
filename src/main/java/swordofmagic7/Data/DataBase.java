@@ -49,7 +49,7 @@ public final class DataBase {
     public static final int MaxStackAmount = 100;
     public static final String Som7VIP = "som7.VIP";
     public static final String Som7Premium = "som7.Premium";
-    public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 1200.5, 100, 0.5, 0, 0);
+    public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 27.5, -60, -11.5, 45, 0);
     public static final ItemStack AirItem = new ItemStack(Material.AIR);
     public static ItemStack FlameItem(int i) {
         return new ItemStackData(Material.IRON_BARS, "§7§l空スロット[" + i + "]", 1).view();

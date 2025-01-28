@@ -11,8 +11,8 @@ public record Data() {
     public static final ItemStack UserMenu_ItemInventory = new ItemStackData(Material.CHEST, decoText("アイテムインベントリ"), "§a§lインベントリ表示を[アイテムインベントリ]に切り替えます").view();
     public static final ItemStack UserMenu_RuneInventory = new ItemStackData(Material.ENDER_CHEST, decoText("ルーンインベントリ"), "§a§lインベントリ表示を[ルーンインベントリ]に切り替えます").view();
     public static final ItemStack UserMenu_PetInventory = new ItemStackData(Material.NOTE_BLOCK, decoText("ペットケージ"), "§a§lインベントリ表示を[ペットケージ]に切り替えます").view();
-    static final ItemStack UserMenu_HotBar = new ItemStackData(Material.ITEM_FRAME, decoText("スキルスロット"), "§a§lインベントリ表示を[スキルスロット]に切り替えます").view();
-    public static final ItemStack UserMenu_SkillMenuIcon = new ItemStackData(Material.ENCHANTED_BOOK, decoText("スキルメニュー"), "§a§lスキルメニューを開きます").view();
+    public static final ItemStack UserMenu_HotBar = new ItemStackData(Material.ITEM_FRAME, decoText("スキルスロット"), "§a§lインベントリ表示を[スキルスロット]に切り替えます").view();
+    static final ItemStack UserMenu_SkillMenuIcon = new ItemStackData(Material.ENCHANTED_BOOK, decoText("スキルメニュー"), "§a§lスキルメニューを開きます").view();
     static final ItemStack UserMenu_RuneMenuIcon = new ItemStackData(Material.PAPER, decoText("ルーンメニュー"), "§a§lルーンメニューを開きます").view();
     static final ItemStack UserMenu_TriggerMenuIcon = new ItemStackData(Material.COMPARATOR, decoText("トリガーメニュー"), "§a§lトリガーメニューを開きます").view();
     static final ItemStack UserMenu_AttributeMenuIcon = new ItemStackData(Material.RED_DYE, decoText("アトリビュートメニュー"), "§a§lアトリビュートメニューを開きます").view();

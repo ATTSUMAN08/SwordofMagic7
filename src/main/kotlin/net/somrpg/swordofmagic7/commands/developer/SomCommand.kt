@@ -5,9 +5,11 @@ import net.somrpg.swordofmagic7.translater.JapanizeType
 import net.somrpg.swordofmagic7.translater.Japanizer
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
+import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.MultiThread.MultiThread
 
@@ -54,5 +56,12 @@ class SomCommand {
         sender.sendMessage("メッセージ: $message")
         sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME)}")
         sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
+    }
+
+    @Command("som test")
+    @Permission("som7.developer")
+    fun somTest(sender: CommandSender) {
+        if (sender !is Player) return;
+        PlayerData.playerData(sender).dead()
     }
 }
