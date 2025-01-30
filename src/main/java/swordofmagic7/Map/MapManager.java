@@ -52,7 +52,7 @@ public class MapManager {
                 if (!teleport.DefaultActive && !playerData.ActiveTeleportGate.contains(teleport.Id)) {
                     playerData.ActiveTeleportGate.add(teleport.Id);
                     player.sendMessage("§e[" + teleport.Display + "]§aを§b[有効化]§aしました");
-                    playSound(player, SoundList.LevelUp);
+                    playSound(player, SoundList.LEVEL_UP);
                 }
                 lastTeleportGate = teleport.Id;
                 TeleportGateMenuView();
@@ -70,7 +70,7 @@ public class MapManager {
             inv.setItem(gui.getKey(), teleport.view());
         }
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     public void TeleportGateMenuClick(InventoryView view, int Slot) {
@@ -81,7 +81,7 @@ public class MapManager {
                     playerData.Mel -= gate.Mel;
                     TeleportGateUse(gate);
                 } else {
-                    sendMessage(player, "§eメル§aが足りません §c[" + gate.Mel + "メル]", SoundList.Nope);
+                    sendMessage(player, "§eメル§aが足りません §c[" + gate.Mel + "メル]", SoundList.NOPE);
                 }
             }
         }
@@ -92,13 +92,13 @@ public class MapManager {
             MultiThread.TaskRunSynchronizedLater(() -> {
                 player.teleportAsync(teleport.Location);
                 player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
-                playSound(player, SoundList.LevelUp);
+                playSound(player, SoundList.LEVEL_UP);
                 lastTeleportGate = teleport.Id;
                 playerData.Map = teleport.Map;
             }, 1);
         } else {
             player.sendMessage("§e[転移門]§aが§b[有効化]§aされていません");
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 

@@ -330,7 +330,7 @@ public final class Damage {
                 int time = victimEffectManager.getData(EffectType.CrossGuard).getInt(0);
                 victimEffectManager.addEffect(EffectType.CrossGuardCounter, time);
                 victimEffectManager.removeEffect(EffectType.CrossGuard);
-                sendMessage(player,"§e[" + EffectType.CrossGuardCounter.Display + "]§aが発動しました", SoundList.Counter);
+                sendMessage(player,"§e[" + EffectType.CrossGuardCounter.Display + "]§aが発動しました", SoundList.COUNTER);
                 RuneParameter rune = playerData.Equipment.equippedRune("反転切りのルーン");
                 if (rune != null) makeDamage(victim, attacker, DamageCause.ATK, rune.Id, rune.AdditionParameterValue(0)/100, 1);
             }
@@ -441,7 +441,7 @@ public final class Damage {
             if (victimEffectManager.hasEffect(EffectType.Muleta)) {
                 Damage.makeDamage(victim, attacker, DamageCause.ATK, EffectType.Muleta.toString(), victimEffectManager.getData(EffectType.Muleta).getDouble(0), 1);
                 victimEffectManager.removeEffect(EffectType.Muleta);
-                if (victim instanceof Player player) sendMessage(player,"§e[" + EffectType.Muleta.Display + "]§aが発動しました", SoundList.Counter);
+                if (victim instanceof Player player) sendMessage(player,"§e[" + EffectType.Muleta.Display + "]§aが発動しました", SoundList.COUNTER);
             }
         }
 

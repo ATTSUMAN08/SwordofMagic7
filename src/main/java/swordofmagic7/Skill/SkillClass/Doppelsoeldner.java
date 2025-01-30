@@ -38,7 +38,7 @@ public class Doppelsoeldner extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.DeedsOfValor, (int) skillData.Parameter.get(0).Value * 20);
             ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Howl);
+            playSound(player, SoundList.HOWL);
             skillProcess.SkillRigid(skillData);
         }, "DeedsOfValor");
     }
@@ -66,7 +66,7 @@ public class Doppelsoeldner extends BaseSkillClass {
                     ParticleManager.CircleParticle(particleData, origin, radius/2, 15);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(origin, radius, skillProcess.Predicate()));
                     Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id,  value,1, 2);
-                    playSound(player, SoundList.AttackWeak);
+                    playSound(player, SoundList.ATTACK_WEAK);
                     MultiThread.sleepTick(hitRate);
                 }
             } else {
@@ -74,7 +74,7 @@ public class Doppelsoeldner extends BaseSkillClass {
                     ParticleManager.CircleParticle(particleData, player.getLocation(), radius/2, 15);
                     Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(player.getLocation(), radius, skillProcess.Predicate()));
                     Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id,  value,1, 2);
-                    playSound(player, SoundList.AttackWeak);
+                    playSound(player, SoundList.ATTACK_WEAK);
                     MultiThread.sleepTick(hitRate);
                 }
                 skillProcess.SkillRigid(skillData);
@@ -110,7 +110,7 @@ public class Doppelsoeldner extends BaseSkillClass {
             } else {
                 skill.resetSkillCoolTimeWaited(skillData);
                 player.sendMessage("§e[" + reqEffect.Display + "]§aが§c必要§aです");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
             }
             skillProcess.SkillRigid(skillData);
         }, skillDataBase.Id);

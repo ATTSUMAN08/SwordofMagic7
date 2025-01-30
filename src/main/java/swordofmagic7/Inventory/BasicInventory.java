@@ -24,14 +24,14 @@ public class BasicInventory {
     public void upScrollTick() {
         if (ScrollTick > 0) {
             this.ScrollTick--;
-            CustomSound.playSound(player, SoundList.Click);
+            CustomSound.playSound(player, SoundList.CLICK);
         }
     }
     public void downScrollTick(int size) {
         double scroll = size/8f;
         if (ScrollTick+3 < scroll) {
             this.ScrollTick++;
-            CustomSound.playSound(player, SoundList.Click);
+            CustomSound.playSound(player, SoundList.CLICK);
         }
         else if (ScrollTick > scroll) this.ScrollTick = (int) Math.floor(scroll);
     }

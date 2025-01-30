@@ -76,11 +76,11 @@ public class Upgrade {
                     if (upgradeIcon == UpgradeStone.Icon) {
                         if (playerData.ItemInventory.hasItemParameter(UpgradeProtect, 1)) {
                             upgradeIcon = UpgradeProtect.Icon;
-                            sendMessage(player, "§e強化値保護§aを§b有効§aにしました", SoundList.Tick);
+                            sendMessage(player, "§e強化値保護§aを§b有効§aにしました", SoundList.TICK);
                         }
                     } else {
                         upgradeIcon = UpgradeStone.Icon;
-                        sendMessage(player, "§e強化値保護§aを§c無効§aにしました", SoundList.Tick);
+                        sendMessage(player, "§e強化値保護§aを§c無効§aにしました", SoundList.TICK);
                     }
                 } else if (Slot == AnvilUISlot[2]) {
                     if (UpgradeCache[0] != null) {
@@ -105,7 +105,7 @@ public class Upgrade {
                                         playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                                         UpgradeCache[0] = null;
                                     }
-                                    sendMessage(player, itemText + suffix, SoundList.LevelUp);
+                                    sendMessage(player, itemText + suffix, SoundList.LEVEL_UP);
                                     for (int i = 15; i <= 25; i++) {
                                         if (plus >= i) playerData.titleManager.addTitle("装備強化+" + i);
                                     }
@@ -121,7 +121,7 @@ public class Upgrade {
                                             sendMessage(player, "§e[" + UpgradeCache[0].Display + "]§aの§e強化値§aが§e+10§aに落ちました");
                                         }
                                     }
-                                    playSound(player, SoundList.Tick);
+                                    playSound(player, SoundList.TICK);
                                 }
                                 upgradeIcon = UpgradeStone.Icon;
                                 player.sendMessage("§e[強化石]§aを§e[" + removeCost + "個]§a消費しました");
@@ -135,17 +135,17 @@ public class Upgrade {
                                 }
                             } else {
                                 player.sendMessage("§e[強化石]§aが§e[" + cost + "個]§a必要です");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         } else {
                             player.sendMessage("§e" + mel + "メル§a必要です");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 } else if (Slot == AnvilUISlot[0] && UpgradeCache[0] != null) {
                     playerData.ItemInventory.addItemParameter(UpgradeCache[0], 1);
                     UpgradeCache[0] = null;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
             } else if (index > -1) {
                 ItemParameter itemParameter = playerData.ItemInventory.getItemParameter(index);
@@ -156,9 +156,9 @@ public class Upgrade {
                         }
                         playerData.ItemInventory.removeItemParameter(itemParameter, 1);
                         UpgradeCache[0] = itemParameter;
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     } else {
-                        sendMessage(player, "§c強化上限§aです", SoundList.Nope);
+                        sendMessage(player, "§c強化上限§aです", SoundList.NOPE);
                     }
                 }
             }

@@ -48,7 +48,7 @@ public class Shadowmancer extends BaseSkillClass {
                 ParticleManager.CircleParticle(particleData, player.getLocation().clone().add(0, offset, 0), 1, 12);
                 MultiThread.sleepTick(2);
             }
-            playSound(player, SoundList.Shoot);
+            playSound(player, SoundList.SHOOT);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -64,7 +64,7 @@ public class Shadowmancer extends BaseSkillClass {
 
             playerData.changeShield(playerData.Status.Health*value, time);
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -130,9 +130,9 @@ public class Shadowmancer extends BaseSkillClass {
             if (ray.isHitEntity()) {
                 ParticleManager.LineParticle(particleData, playerHandLocation(player), ray.HitEntity.getEyeLocation(), 0, 5);
                 EffectManager.addEffect(ray.HitEntity, EffectType.ShadowFatter, time, player, new Object[]{ray.HitEntity.getLocation()});
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
             } else {
-                sendMessage(player, "§c対象§aがいません", SoundList.Nope);
+                sendMessage(player, "§c対象§aがいません", SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);

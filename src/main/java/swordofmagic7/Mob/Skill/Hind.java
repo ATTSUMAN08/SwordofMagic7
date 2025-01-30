@@ -93,7 +93,7 @@ public class Hind extends EnemySkillBase {
     public void TheStartOfHope() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「変な動きしないで」", SoundList.DungeonTrigger);
+            radiusMessage("§c「変な動きしないで」", SoundList.DUNGEON_TRIGGER);
             ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.05f);
             double max = 18;
             double min = 7;
@@ -125,7 +125,7 @@ public class Hind extends EnemySkillBase {
     public void LeaveBehind() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「どこにいるの」", SoundList.DungeonTrigger);
+            radiusMessage("§c「どこにいるの」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
                 Set<EnemyData> enemyList = new HashSet<>();
@@ -157,7 +157,7 @@ public class Hind extends EnemySkillBase {
     public void Understanding() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「...」", SoundList.DungeonTrigger);
+            radiusMessage("§c「...」", SoundList.DUNGEON_TRIGGER);
 
             for (LivingEntity victim : Function.NearEntityByEnemy(entity().getLocation(), radius)) {
                 EffectManager.addEffect(victim, EffectType.AttackProhibited, 800, null);
@@ -171,7 +171,7 @@ public class Hind extends EnemySkillBase {
     public void CouldNotHelp() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「誰か止めて」", SoundList.DungeonTrigger);
+            radiusMessage("§c「誰か止めて」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
                 EnemyData enemyData = MobManager.mobSpawn(DataBase.getMobData("執行装置"), enemyData().Level, new Location(world, 6929, 117, 1415));
@@ -193,7 +193,7 @@ public class Hind extends EnemySkillBase {
     public void JustLooking() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「なんで助けないの」", SoundList.DungeonTrigger);
+            radiusMessage("§c「なんで助けないの」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
                 Location loc = new Location(world, 6905, 117, 1415, 90, 0);
@@ -209,7 +209,7 @@ public class Hind extends EnemySkillBase {
     public void JustHopeButNot() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「あの人が帰ってきますように」", SoundList.DungeonTrigger);
+            radiusMessage("§c「あの人が帰ってきますように」", SoundList.DUNGEON_TRIGGER);
 
             Set<Player> players = PlayerList.getNearNonDead(pivot, radius);
             for (Player victim : players) {
@@ -234,7 +234,7 @@ public class Hind extends EnemySkillBase {
     public void HeWasKindness() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「あの人は優しかった」", SoundList.DungeonTrigger);
+            radiusMessage("§c「あの人は優しかった」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
                 EnemyData enemyData = MobManager.mobSpawn(DataBase.getMobData("回収"), enemyData().Level, locations[random.nextInt(locations.length)]);
@@ -244,7 +244,7 @@ public class Hind extends EnemySkillBase {
                             EffectManager.addEffect(target(), EffectType.CanBeSedated, 21, null);
                             LivingEntity target = target();
                             if (target != null && entity().getLocation().distance(target.getLocation()) < 4) {
-                                radiusMessage("§c「なんでこんな場所にいたんでしょう」", SoundList.Tick);
+                                radiusMessage("§c「なんでこんな場所にいたんでしょう」", SoundList.TICK);
                                 return;
                             }
                         }
@@ -263,7 +263,7 @@ public class Hind extends EnemySkillBase {
 
     EnemyData nias;
     public void SummonNias() {
-        radiusMessage("§c「ナイアスが召喚されました」", SoundList.DungeonTrigger);
+        radiusMessage("§c「ナイアスが召喚されました」", SoundList.DUNGEON_TRIGGER);
         MultiThread.TaskRunSynchronized(() -> {
             if (nias != null) nias.delete();
             nias = MobManager.mobSpawn(DataBase.getMobData("ナイアス2"), enemyData().Level, entity().getLocation());
@@ -272,7 +272,7 @@ public class Hind extends EnemySkillBase {
 
     public void SummonNiasCheck() {
         if (nias != null && nias.isAlive()) {
-            radiusMessage("§c「まだ希望を捨てきれていない」", SoundList.DungeonTrigger);
+            radiusMessage("§c「まだ希望を捨てきれていない」", SoundList.DUNGEON_TRIGGER);
             for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
                 PlayerData.playerData(victim).dead();
             }

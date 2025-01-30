@@ -35,7 +35,7 @@ public class TitleMenu {
         playerData.statistics.checkTitle();
         Inventory inv = decoInv(TitleMenuDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunSynchronizedLater(() -> TitleMenuView(0), 1, "TitleMenuView");
     }
 
@@ -85,7 +85,7 @@ public class TitleMenu {
             if (Scroll > 0) itemStacks[8] = UpScrollItem;
             if ((MaxTitleSlot-index+HiddenTitleDataList.size()+9) > 0) itemStacks[53] = DownScrollItem;
             player.getOpenInventory().getTopInventory().setContents(itemStacks);
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 

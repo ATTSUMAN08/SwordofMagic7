@@ -39,7 +39,7 @@ public class Shop {
         else msg += "§c[無効]";
         msg += "§aにしました";
         player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
     }
 
     public static ItemStack ItemFlame(int i) {
@@ -81,7 +81,7 @@ public class Shop {
         if (AmountReset) SellAmount = 1;
         Inventory inv = SellInventory.viewInventory(SellAmount);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     private int BuyAmount = 1;
@@ -120,24 +120,24 @@ public class Shop {
                         }
                         playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), data.Amount*BuyAmount);
                         player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + data.Amount*BuyAmount +"§e]§aを§b" + buyText + "§aしました");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
                     } else {
                         player.sendMessage(decoText("必要物リスト"));
                         for (String message : reqList) {
                             player.sendMessage(message);
                         }
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
             } else {
                 if (equalItem(currentItem, NextPageItem)) {
                     currentPage++;
                     view.getTopInventory().setContents(ShopDataCache.view(currentPage, playerData.ViewFormat()).getStorageContents());
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else if (equalItem(currentItem, PreviousPageItem)) {
                     currentPage--;
                     view.getTopInventory().setContents(ShopDataCache.view(currentPage, playerData.ViewFormat()).getStorageContents());
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else {
                     int buyAmount = 0;
                     switch (Slot) {
@@ -152,7 +152,7 @@ public class Shop {
                     if (buyAmount != 0) BuyAmount += buyAmount;
                     if (BuyAmount < 1) BuyAmount = 1;
                     if (BuyAmount > MaxSelectAmount) BuyAmount = MaxSelectAmount;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(ShopBuyPrefix, BuyAmount));
             }
@@ -173,10 +173,10 @@ public class Shop {
                             playerData.ItemInventory.addItemParameter(stack.itemParameter.clone(), Amount);
                             SellInventory.removeItemParameter(stack.itemParameter, Amount);
                             player.sendMessage("§e[" + stack.itemParameter.Display + "§ax" + Amount +"§e]§aを§b買戻§aしました §c[-" + Mel + "メル]");
-                            playSound(player, SoundList.LevelUp);
+                            playSound(player, SoundList.LEVEL_UP);
                         } else {
                             player.sendMessage(NonMel +  " §c不足[" + (Mel-playerData.Mel) + "メル]");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 } else {
@@ -193,7 +193,7 @@ public class Shop {
                     if (sellAmount != 0) SellAmount += sellAmount;
                     if (SellAmount < 1) SellAmount = 1;
                     if (SellAmount > MaxSelectAmount) SellAmount = MaxSelectAmount;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
             } else if (ClickInventory == player.getInventory() && index > -1) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
@@ -202,10 +202,10 @@ public class Shop {
                 if (clickType.isRightClick()) {
                     if (item.Category.isEquipment()) {
                         if (item.itemEquipmentData.Plus >= 10) {
-                            sendMessage(player, "§e装備§aの§c強化値§aが§b+10§a以上です", SoundList.Nope);
+                            sendMessage(player, "§e装備§aの§c強化値§aが§b+10§a以上です", SoundList.NOPE);
                             return;
                         } else if (!item.itemEquipmentData.Rune.isEmpty()) {
-                            sendMessage(player, "§e装備§aに§eルーン§aが§e装着§aされています", SoundList.Nope);
+                            sendMessage(player, "§e装備§aに§eルーン§aが§e装着§aされています", SoundList.NOPE);
                             return;
                         }
                     }
@@ -216,7 +216,7 @@ public class Shop {
                 int Mel = item.Sell * Amount;
                 playerData.Mel += Mel;
                 player.sendMessage("§e[" + item.Display + "§ax" + Amount +"§e]§aを§c売却§aしました §e[+" + Mel + "メル]");
-                playSound(player, SoundList.LevelUp);
+                playSound(player, SoundList.LEVEL_UP);
             }
             view.getTopInventory().setContents(SellInventory.viewInventory(SellAmount).getStorageContents());
         }

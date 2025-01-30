@@ -34,7 +34,7 @@ public class RuneInfo {
     public void RuneInfoView() {
         Inventory inv = decoInv(RuneInfoDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunSynchronizedLater(() -> RuneInfoView(0), 1, "RuneInfoView");
     }
 

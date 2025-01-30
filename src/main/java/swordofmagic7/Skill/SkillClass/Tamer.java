@@ -15,7 +15,7 @@ import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.Heal;
+import static swordofmagic7.Sound.SoundList.HEAL;
 
 public class Tamer extends BaseSkillClass {
 
@@ -35,7 +35,7 @@ public class Tamer extends BaseSkillClass {
                 if (pet.entity.getLocation().distance(target.getLocation()) <= skillData.Parameter.get(1).Value) {
                     ParticleManager.RandomVectorParticle(new ParticleData(Particle.CRIT), target.getLocation(), 30);
                     Damage.makeDamage(pet.entity, target, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, 1);
-                    playSound(target.getLocation(), SoundList.AttackWeak);
+                    playSound(target.getLocation(), SoundList.ATTACK_WEAK);
                 }
             }
             skillProcess.SkillRigid(skillData);
@@ -52,7 +52,7 @@ public class Tamer extends BaseSkillClass {
             if (pet != null) {
                 pet.changeHealth((int) Math.round(playerData.Status.HLP * skillData.Parameter.get(0).Value / 100));
                 ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), pet.entity.getLocation(), 1.5, 1, 3, 3);
-                playSound(player, Heal);
+                playSound(player, HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, "PetHeal");
@@ -69,7 +69,7 @@ public class Tamer extends BaseSkillClass {
             if (pet != null) {
                 pet.getEffectManager().addEffect(EffectType.PetBoost, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORK), pet.entity.getLocation(), 1.5, 1, 3, 3);
-                playSound(player, Heal);
+                playSound(player, HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, "PetBoost");

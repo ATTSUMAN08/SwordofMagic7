@@ -96,7 +96,7 @@ public class Cryomancer extends BaseSkillClass {
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, EffectManager.hasEffect(victim, EffectType.Freeze) ? count : 1);
                 ParticleManager.LineParticle(particleData, player.getEyeLocation(), victim.getEyeLocation(), 1, 5);
             }
-            playSound(player, SoundList.DeBuff);
+            playSound(player, SoundList.DEBUFF);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -140,7 +140,7 @@ public class Cryomancer extends BaseSkillClass {
                 playerData.EffectManager.addEffect(EffectType.IceThorns, time);
             } else playerData.EffectManager.addEffect(EffectType.SubzeroShield, time, new Object[]{freezePercent, time2});
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

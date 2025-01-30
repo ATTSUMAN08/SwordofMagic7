@@ -50,7 +50,7 @@ public class PlagueDoctor extends BaseSkillClass {
                 ParticleManager.LineParticle(new ParticleData(Particle.HEART), player.getLocation(), target.getEyeLocation(), 1, 2);
                 PlayerData targetData = playerData(target);
                 EffectManager.addEffect(target, EffectType.HealingFactor, time, player);
-                playSound(target, SoundList.Heal);
+                playSound(target, SoundList.HEAL);
                 MultiThread.TaskRun(() -> {
                     double maxHealth = targetData.Status.Health;
                     for (int i = 0; i < time; i += hitRate) {
@@ -64,7 +64,7 @@ public class PlagueDoctor extends BaseSkillClass {
                 }, skillData.Id);
             } else {
                 player.sendMessage("§e対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -172,7 +172,7 @@ public class PlagueDoctor extends BaseSkillClass {
                 if (bool) EffectManager.addEffect(player, EffectType.NonKnockBack, time2, this.player);
                 EffectManager.addEffect(player, EffectType.Modafinil, time, this.player);
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

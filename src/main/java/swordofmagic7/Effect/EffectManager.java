@@ -95,7 +95,7 @@ public class EffectManager {
                                         playerData.changeMana(-mana);
                                         if (playerData.Status.Mana < mana) {
                                             removeEffect(EffectType.Brutality);
-                                            sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.Tick);
+                                            sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.TICK);
                                         }
                                     }
                                     case SubzeroShield -> {
@@ -190,17 +190,17 @@ public class EffectManager {
     public boolean addEffect(EffectType effectType, int time, Object[] objectData, int stack) {
         EffectType effectType2 = EffectType.Stop;
         if (hasEffect(effectType2)) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
             return false;
         }
         effectType2 = EffectType.PainBarrier;
         if (hasEffect(effectType2) && effectType == EffectType.Stun) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
             return false;
         }
         effectType2 = EffectType.SubzeroShield;
         if (hasEffect(effectType2) && effectType == EffectType.Freeze) {
-            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+            if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
             return false;
         }
         if (!effectType.Buff && effectType.effectRank.isNormal()) {
@@ -208,17 +208,17 @@ public class EffectManager {
             if (hasEffect(effectType2)) {
                 Effect.get(effectType2).stack--;
                 if (Effect.get(effectType2).stack < 1) Effect.remove(effectType2);
-                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
                 return false;
             }
             effectType2 = EffectType.Profesy;
             if (hasEffect(effectType2)) {
-                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
                 return false;
             }
             effectType2 = EffectType.BeakMask;
             if (hasEffect(effectType2) && effectType != EffectType.Stun && effectType != EffectType.Slow) {
-                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.Tick);
+                if (entity instanceof Player player) sendMessage(player, "§e[" + effectType2.Display + "]§aの効果より§c[" + effectType.Display + "]§aを無効化しました", SoundList.TICK);
                 return false;
             }
         }

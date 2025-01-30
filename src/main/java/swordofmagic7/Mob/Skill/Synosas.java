@@ -33,7 +33,7 @@ public class Synosas {
     private void radiusMessage(List<String> message) {
         for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 48)) {
             Function.sendMessage(player, message);
-            playSound(player, SoundList.DungeonTrigger);
+            playSound(player, SoundList.DUNGEON_TRIGGER);
         }
     }
 
@@ -116,7 +116,7 @@ public class Synosas {
                     for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                         ParticleManager.LineParticle(particleData, Manager.enemyData.entity.getEyeLocation(), player.getEyeLocation(), 1, 3);
                         ParticleManager.spawnParticle(particleData2, player.getEyeLocation());
-                        playSound(player, SoundList.Explosion);
+                        playSound(player, SoundList.EXPLOSION);
                         PlayerData playerData = PlayerData.playerData(player);
                         playerData.changeHealth(-playerData.Status.MaxHealth/2);
                     }
@@ -174,7 +174,7 @@ public class Synosas {
                         playerData.dead();
                         MultiThread.sleepTick(1);
                     }
-                    playSound(TarnetB3.OverLocation[TarnetB3.selectOver], SoundList.Explosion);
+                    playSound(TarnetB3.OverLocation[TarnetB3.selectOver], SoundList.EXPLOSION);
                     break;
                 }
                 i += Manager.period;

@@ -25,7 +25,7 @@ public class ItemCook {
     public void useCook(Player player, ItemParameter currentItem) {
         PlayerData playerData = PlayerData.playerData(player);
         if (playerData.useCookCoolTime > 0) {
-            if (playerData.NaturalMessage) Function.sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.useCookCoolTime + "秒]§aです", SoundList.Nope);
+            if (playerData.NaturalMessage) Function.sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.useCookCoolTime + "秒]§aです", SoundList.NOPE);
         } else {
             if (isBuff) {
                 InstantBuffData instantBuffData = new InstantBuffData(Fixed, Multiply, BuffTime);
@@ -34,10 +34,10 @@ public class ItemCook {
                 playerData.changeHealth(Health);
                 playerData.changeMana(Mana);
             }
-            Function.sendMessage(player, "§e[" + currentItem.Display + "]§aを使用しました", SoundList.Eat);
+            Function.sendMessage(player, "§e[" + currentItem.Display + "]§aを使用しました", SoundList.EAT);
             playerData.ItemInventory.removeItemParameter(currentItem, 1);
             playerData.useCookCoolTime = CoolTime;
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             MultiThread.TaskRunSynchronized(() -> player.setCooldown(currentItem.Icon, CoolTime*20));
 
         }

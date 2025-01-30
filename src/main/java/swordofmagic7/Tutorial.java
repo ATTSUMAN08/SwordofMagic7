@@ -54,7 +54,7 @@ public class Tutorial {
             if (start || TutorialProcess.getOrDefault(player, -1)+1 == i) {
                 if (TutorialLocation[i] != null) player.teleportAsync(TutorialLocation[i]);
                 TutorialProcess.put(player, i);
-                MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LevelUp), 1);
+                MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LEVEL_UP), 1);
                 for (TutorialData data : TutorialList) {
                     if (data.end() == i) {
                         TutorialProcess.remove(player);
@@ -67,7 +67,7 @@ public class Tutorial {
 
     public static void tutorialHub(Player player) {
         player.teleportAsync(TutorialLocation[4]);
-        MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LevelUp), 1);
+        MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LEVEL_UP), 1);
     }
 }
 

@@ -38,7 +38,7 @@ public class Novaha4 {
                     Time = StartTime;
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§cヴァノセト§aを討伐せよ", null, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§cヴァノセト§aを討伐せよ", null, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
@@ -54,10 +54,10 @@ public class Novaha4 {
                     ViewBar.resetBossBarOverrideTargetInfo(Players);
                     Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("Novaha1_to_Vieta").getLocation());
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LEVEL_UP, getWarpGate("Novaha1_to_Vieta").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("Novaha3_to_Novaha4").getLocation());
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DUNGEON_TRIGGER, getWarpGate("Novaha3_to_Novaha4").getLocation());
                     }
                     Enemy.skillManager.vanoset.Altar.delete();
                     Players.clear();

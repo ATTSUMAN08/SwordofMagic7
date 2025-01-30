@@ -38,7 +38,7 @@ public class Psychokino extends BaseSkillClass {
             skill.setCastReady(false);
 
             if (!playerData.EffectManager.hasEffect(EffectType.PsychicPressure)) {
-                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure.Display + "]§aが§b有効§aではありません", SoundList.Nope);
+                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure.Display + "]§aが§b有効§aではありません", SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
 
@@ -70,10 +70,10 @@ public class Psychokino extends BaseSkillClass {
 
             if (playerData.EffectManager.hasEffect(EffectType.PsychicPressure)) {
                 playerData.EffectManager.removeEffect(EffectType.PsychicPressure);
-                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure + "]§aを§c無効化§aしました", SoundList.Tick);
+                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure + "]§aを§c無効化§aしました", SoundList.TICK);
             } else {
                 playerData.EffectManager.addEffect(EffectType.PsychicPressure, 1, value);
-                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure + "]§aを§b有効化§aしました", SoundList.Tick);
+                Function.sendMessage(player, "§e[" + EffectType.PsychicPressure + "]§aを§b有効化§aしました", SoundList.TICK);
             }
 
             skillProcess.SkillRigid(skillData);

@@ -78,7 +78,7 @@ public class OutLaw extends BaseSkillClass {
                 if (random.nextDouble() < percent) EffectManager.addEffect(entity, EffectType.Concussion, time, player);
                 EffectManager.addEffect(entity, EffectType.BreakBrick, time2, player);
             }
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -93,7 +93,7 @@ public class OutLaw extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.Bully, time);
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

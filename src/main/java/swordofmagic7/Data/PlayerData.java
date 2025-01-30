@@ -444,7 +444,7 @@ public class PlayerData {
     void DamageLog(DamageLogType bool) {
         DamageLog = bool;
         String msg = "§c[ダメージログ]§aを§b[" + DamageLog.Display + "]§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void ExpLog() {
@@ -454,7 +454,7 @@ public class PlayerData {
     void ExpLog(boolean bool) {
         ExpLog = bool;
         String msg = "§e[経験値ログ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void DropLog() {
@@ -470,7 +470,7 @@ public class PlayerData {
     void DropLog(DropLogType bool) {
         DropLog = bool;
         String msg = "§e[ドロップログ]§aを§b[" + DropLog.Display + "]§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void PvPMode() {
@@ -482,7 +482,7 @@ public class PlayerData {
         String msg = "§e[PvPモード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
         Status.StatusUpdate();
         updateBlockPlayer();
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void DamageHolo() {
@@ -492,7 +492,7 @@ public class PlayerData {
     void DamageHolo(boolean bool) {
         DamageHolo = bool;
         String msg = "§e[ダメージホログラム]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void PetTame() {
@@ -502,7 +502,7 @@ public class PlayerData {
     void PetTame(boolean bool) {
         PetTame = bool;
         String msg = "§e[懐柔モード]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void EffectLog() {
@@ -513,7 +513,7 @@ public class PlayerData {
         EffectLog = bool;
         String msg = "§e[効果ログ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
         Status.StatusUpdate();
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void NaturalMessage() {
@@ -523,7 +523,7 @@ public class PlayerData {
     void NaturalMessage(boolean bool) {
         NaturalMessage = bool;
         String msg = "§e[当たり前条件メッセージ]§aを" + (bool ? "§b[有効]" : "§c[無効]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void StrafeMode() {
@@ -537,7 +537,7 @@ public class PlayerData {
     void StrafeMode(StrafeType mode) {
         StrafeMode = mode;
         String msg = "§e[ストレイフ条件]§aを§b[" + StrafeMode.Display + "]§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void CastMode() {
@@ -551,7 +551,7 @@ public class PlayerData {
     void CastMode(CastType bool) {
         CastMode = bool;
         String msg = "§e[キャストモード]§aを§b[" + CastMode.Display + "]§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void FishingDisplayNum() {
@@ -561,7 +561,7 @@ public class PlayerData {
     void FishingDisplayNum(boolean bool) {
         FishingDisplayNum = bool;
         String msg = "§e[釣獲コンボ表記]§aを" + (bool ? "§b[数字]" : "§c[アルファベット]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void FishingUseCombo() {
@@ -570,12 +570,12 @@ public class PlayerData {
 
     void FishingUseCombo(boolean bool) {
         if (Gathering.FishingInProgress) {
-            sendMessage(player, "§e釣獲中§aは切り替えできません", SoundList.Nope);
+            sendMessage(player, "§e釣獲中§aは切り替えできません", SoundList.NOPE);
             return;
         }
         Gathering.FishingUseCombo = bool;
         String msg = "§e[釣獲モード]§aを" + (bool ? "§b[エンドレス]" : "§c[タイムアタック]") + "§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public void HoloSelfView() {
@@ -588,7 +588,7 @@ public class PlayerData {
         else hologram.setHidePlayer(player);
         if (message) {
             String msg = "§e[自視点ステータスバー]§aを" + (bool ? "§b[表示]" : "§c[非表示]") + "§aにしました";
-            sendMessage(player, msg, SoundList.Click);
+            sendMessage(player, msg, SoundList.CLICK);
         }
     }
 
@@ -602,7 +602,7 @@ public class PlayerData {
     void ParticleDensity(int density) {
         ParticleDensity = density;
         String msg = "§c[パーティクル密度]§aを§b[" + ParticleDensity + "%]§aにしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
     }
 
     public String ViewFormat() {
@@ -612,7 +612,7 @@ public class PlayerData {
     public void setViewFormat(int ViewFormat) {
         this.ViewFormat = ViewFormat;
         String msg = "§e表記小数桁数§aを§e[" + ViewFormat + "桁]§aに§e設定§aしました";
-        sendMessage(player, msg, SoundList.Click);
+        sendMessage(player, msg, SoundList.CLICK);
         viewUpdate();
     }
 
@@ -621,7 +621,7 @@ public class PlayerData {
     }
 
     public boolean isPvPModeNonMessage() {
-        if (PvPMode) sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.Nope);
+        if (PvPMode) sendMessage(player,"§c[PvP中]§aは使用できません", SoundList.NOPE);
         return PvPMode;
     }
 
@@ -643,7 +643,7 @@ public class PlayerData {
             BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました", true);
             Attribute.addPoint(addLevel * 5);
             if (Level == MaxLevel) Exp = 0;
-            playSound(player, SoundList.LevelUp);
+            playSound(player, SoundList.LEVEL_UP);
         }
     }
 
@@ -1228,7 +1228,7 @@ public class PlayerData {
     public int deadTime = 0;
     public synchronized void dead() {
         if (EffectManager.hasEffect(EffectType.ShadowPool)) {
-            sendMessage(player, "§e[" + EffectType.ShadowPool.Display + "]§aの効果により§c死§aを防ぎました", SoundList.Tick);
+            sendMessage(player, "§e[" + EffectType.ShadowPool.Display + "]§aの効果により§c死§aを防ぎました", SoundList.TICK);
             return;
         }
         if (!isDead) {

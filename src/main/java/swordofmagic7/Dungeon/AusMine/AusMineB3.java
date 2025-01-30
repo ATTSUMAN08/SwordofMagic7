@@ -46,7 +46,7 @@ public class AusMineB3 {
                 Health = StartHealth;
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DungeonTrigger);
+                Message(Players, DungeonQuestTrigger, "§e動力結晶§aを防衛せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                 while (Time > 0 && Health > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
@@ -85,10 +85,10 @@ public class AusMineB3 {
                 if (Health > 0 && !list.isEmpty()) {
                     Able = true;
                     getWarpGate("AusMineB3_to_AusMineB4").ActiveAtTime(ElevatorActiveTime);
-                    Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
+                    Message(Players, DungeonQuestClear, "", ClearText, SoundList.LEVEL_UP);
                     MultiThread.sleepTick(ElevatorActiveTime);
                 } else {
-                    Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                 }
                 Players.clear();
                 Able = false;

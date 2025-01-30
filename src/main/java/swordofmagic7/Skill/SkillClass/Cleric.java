@@ -21,7 +21,7 @@ import static swordofmagic7.Damage.Damage.makeHeal;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.Heal;
+import static swordofmagic7.Sound.SoundList.HEAL;
 
 public class Cleric extends BaseSkillClass {
 
@@ -48,11 +48,11 @@ public class Cleric extends BaseSkillClass {
             if (targetData.Status.Health < targetData.Status.MaxHealth) {
                 ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), target.getLocation(), 1, 2, 3, 3);
                 makeHeal(player, target, skillData.Id, value);
-                playSound(player, SoundList.Heal);
-                playSound(target, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
+                playSound(target, SoundList.HEAL);
             } else {
                 player.sendMessage("§e対象§aの§cHP§aが§e最大§aです");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -86,11 +86,11 @@ public class Cleric extends BaseSkillClass {
             }
             if (!cured) {
                 player.sendMessage("§e対象§aに§cデバフ§aが付与されていません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             } else {
-                playSound(player, SoundList.Heal);
-                playSound(target, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
+                playSound(target, SoundList.HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, "Cure");
@@ -106,11 +106,11 @@ public class Cleric extends BaseSkillClass {
             if (playerData.Party != null) {
                 for (Player player : playerData.Party.Members) {
                     playerData(player).EffectManager.addEffect(EffectType.Covert, skillData.ParameterValueInt(0) * 20);
-                    playSound(player, SoundList.Shoot);
+                    playSound(player, SoundList.SHOOT);
                 }
             } else {
                 playerData.EffectManager.addEffect(EffectType.Covert, skillData.ParameterValueInt(0) * 20);
-                playSound(player, SoundList.Shoot);
+                playSound(player, SoundList.SHOOT);
             }
             skillProcess.SkillRigid(skillData);
         }, "Fade");
@@ -129,7 +129,7 @@ public class Cleric extends BaseSkillClass {
                 ParticleManager.LineParticle(new ParticleData(Particle.END_ROD), player.getEyeLocation(), target.getEyeLocation(), 0, 10);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.END_ROD), target.getLocation(), 1, 2, 3, 3);
                 targetData.revival();
-                playSound(target.getLocation(), Heal);
+                playSound(target.getLocation(), HEAL);
                 RuneParameter rune = playerData.Equipment.equippedRune("再生促進のルーン");
                 if (rune != null) {
                     double value = rune.AdditionParameterValue(1)/100;
@@ -141,7 +141,7 @@ public class Cleric extends BaseSkillClass {
                 }
             } else {
                 player.sendMessage("§b[蘇生対象]§aを選択してください");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);

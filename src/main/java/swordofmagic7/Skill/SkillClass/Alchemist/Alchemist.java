@@ -46,7 +46,7 @@ public class Alchemist {
         MultiThread.TaskRunSynchronized(() -> {
             Inventory inv = decoInv(AlchemyShopDisplay, 6);
             player.openInventory(inv);
-            playSound(player, SoundList.MenuOpen);
+            playSound(player, SoundList.MENU_OPEN);
             MultiThread.TaskRunSynchronizedLater(() -> AlchemyView(0), 1, "AlchemyView");
         });
     }
@@ -79,7 +79,7 @@ public class Alchemist {
             if (page < MaxPage()) itemStacks[53] = NextPageItem;
             itemStacks[49] = ItemFlameAmount(AlchemyPrefix, AlchemyAmount);
             player.getOpenInventory().getTopInventory().setContents(itemStacks);
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 
@@ -112,17 +112,17 @@ public class Alchemist {
                                 player.sendMessage("§e[" + item.Display + "§ax" + Amount + "§e]§aを§e調合§aしました");
                                 playerData.Classes.addClassExp(DataBase.getClassData("Alchemist"), data.Exp * AlchemyAmount);
                                 playerData.statistics.MakePotionCount += AlchemyAmount;
-                                playSound(player, SoundList.LevelUp);
+                                playSound(player, SoundList.LEVEL_UP);
                             } else {
                                 player.sendMessage(decoText("必要物リスト"));
                                 for (String message : reqList) {
                                     player.sendMessage(message);
                                 }
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         } else {
                             player.sendMessage("§e[レベル]§aが足りません");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 }
@@ -144,7 +144,7 @@ public class Alchemist {
                     }
                     if (AlchemyAmount < 1) AlchemyAmount = 1;
                     if (AlchemyAmount > 10000) AlchemyAmount = 10000;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(AlchemyPrefix, AlchemyAmount));
             }

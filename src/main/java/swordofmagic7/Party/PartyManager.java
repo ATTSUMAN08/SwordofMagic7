@@ -46,11 +46,11 @@ public class PartyManager {
                         PartyList.put(Name, playerData.Party);
                     } else {
                         player.sendMessage("§aすでに§e[" + Name + "]§aは使用されています");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else {
                     player.sendMessage("§e[" + playerData.Party.Display + "]§aに参加しています");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
                 return;
             } else if (args[0].equalsIgnoreCase("join") && args.length == 2) {
@@ -61,11 +61,11 @@ public class PartyManager {
                         partyData.Join(player);
                     } else {
                         player.sendMessage("§e[" + Name + "]§aは§c[非公開]§aです");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else {
                     player.sendMessage("§a存在しない§eパーティ§aです");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
                 return;
             } else if (args[0].equalsIgnoreCase("list")) {
@@ -88,7 +88,7 @@ public class PartyManager {
                         sendMessage(player, "§eチャットモード§aを§e[" + (playerData.isPTChat ? "パーティ" : "全体") + "]§aにしました");
                     }
                 } else {
-                    Function.sendMessage(player, "§eパーティ§aに参加していません", SoundList.Tick);
+                    Function.sendMessage(player, "§eパーティ§aに参加していません", SoundList.TICK);
                 }
                 return;
             }
@@ -100,7 +100,7 @@ public class PartyManager {
                 } else if (args[0].equalsIgnoreCase("decline")) {
                     PartyInvites.get(player).Message(playerData.getNick() + "§aさんが§e招待§aを§c拒否§aしました");
                     PartyInvites.remove(player);
-                    playSound(player, SoundList.Tick);
+                    playSound(player, SoundList.TICK);
                     return;
                 }
             }
@@ -122,11 +122,11 @@ public class PartyManager {
                                     playerData.Party.Invite(invite);
                                 } else {
                                     player.sendMessage("§aすでに§e[" + playerData.Party.Display + "]§aに参加しています");
-                                    playSound(player, SoundList.Nope);
+                                    playSound(player, SoundList.NOPE);
                                 }
                             } else {
                                 player.sendMessage("§a存在しない§eプレイヤー§aです");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         }
                         return;
@@ -136,7 +136,7 @@ public class PartyManager {
                             playerData.Party.Promote(promote);
                         } else {
                             player.sendMessage("§e[" + playerData.Party.Display + "]§aに参加していない§eプレイヤー§aです");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                         return;
                     } else if (args[0].equalsIgnoreCase("kick") && args.length == 2) {
@@ -146,13 +146,13 @@ public class PartyManager {
                             playerData.Party.Quit(kick);
                         } else {
                             player.sendMessage("§e[" + playerData.Party.Display + "]§aに参加していない§eプレイヤー§aです");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                         return;
                     } else if (args[0].equalsIgnoreCase("lore") && args.length == 2) {
                         playerData.Party.setLore(args[1]);
                         player.sendMessage("§e説明文§aを更新しました");
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                         return;
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         PartyData party = playerData.Party;

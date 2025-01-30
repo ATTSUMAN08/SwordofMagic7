@@ -39,10 +39,10 @@ public class RuneInventory extends BasicInventory {
     public void addRuneParameter(RuneParameter runeParameter) {
         if (List.size() < MaxSlot) {
             if (List.size() >= MaxSlot-10) {
-                sendMessage(player, "§e[ルーンインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
+                sendMessage(player, "§e[ルーンインベントリ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.TICK);
             }
         } else {
-            sendMessage(player, "§e[ルーンインベントリ]§aが§c満杯§aです", SoundList.Nope);
+            sendMessage(player, "§e[ルーンインベントリ]§aが§c満杯§aです", SoundList.NOPE);
             SomCore.instance.spawnPlayer(player);
         }
         List.add(runeParameter.clone());
@@ -65,7 +65,7 @@ public class RuneInventory extends BasicInventory {
             case Quality -> Sort = RuneSortType.Name;
         }
         player.sendMessage("§e[ルーンインベントリ]§aの§e[ソート方法]§aを§e[" + Sort.Display + "]§aにしました");
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 
@@ -76,7 +76,7 @@ public class RuneInventory extends BasicInventory {
         else msg += "§c[降順]";
         msg += "§aにしました";
         player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 

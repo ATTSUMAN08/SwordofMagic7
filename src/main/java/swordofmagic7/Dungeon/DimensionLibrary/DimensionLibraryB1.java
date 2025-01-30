@@ -65,7 +65,7 @@ public class DimensionLibraryB1 {
                 message.add("§c次元の歪みが生じました...");
                 message.add("§b「全ての結果を一つ増やすことが鍵かもしれません」");
                 message.add("§a本を見てみると「" + text[data.root[data.progress]] + "」と書かれてました");
-                sendMessage(player, message, SoundList.Tick);
+                sendMessage(player, message, SoundList.TICK);
             }
             Location loc = player.getLocation();
             int i = 0;
@@ -82,9 +82,9 @@ public class DimensionLibraryB1 {
                     List<String> message = new ArrayList<>();
                     message.add("§c次元の歪みが大きくなっています... [" + data.progress + "/" + data.root.length + "]");
                     message.add("§a本を見てみると「" + text[data.root[data.progress]] + "」と書かれてました");
-                    sendMessage(player, message, SoundList.Tick);
+                    sendMessage(player, message, SoundList.TICK);
                 } else {
-                    sendMessage(player, "§c次元の歪みに吸い込まれます...", SoundList.Tick);
+                    sendMessage(player, "§c次元の歪みに吸い込まれます...", SoundList.TICK);
                     MultiThread.TaskRunSynchronized(() -> {
                         player.teleportAsync(locationB2);
                         DataBase.getMapData("DimensionLibraryB2").enter(player);

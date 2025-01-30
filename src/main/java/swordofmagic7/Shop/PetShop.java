@@ -85,24 +85,24 @@ public class PetShop {
                         PetParameter petParameter = new PetParameter(player, playerData, petData, 1, 30, 0, 1);
                         playerData.PetInventory.addPetParameter(petParameter);
                         player.sendMessage("§e[" + petData.Display + "]§aを受け取りました");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
                     } else {
                         player.sendMessage(NonMel);
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else {
                     player.sendMessage("§aすでに§eペット§aを所持しています");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             } else if (equalItem(currentItem, PetSynthetic)) {
                 PetSyntheticOpen();
-                playSound(player, SoundList.MenuOpen);
+                playSound(player, SoundList.MENU_OPEN);
             } else if (equalItem(currentItem, PetEvolution)) {
                 playerData.PetEvolution.PetEvolutionView();
-                playSound(player, SoundList.MenuOpen);
+                playSound(player, SoundList.MENU_OPEN);
             } else if (equalItem(currentItem, PetSellItem)) {
                 PetSellView();
-                playSound(player, SoundList.MenuOpen);
+                playSound(player, SoundList.MENU_OPEN);
             }
         } else if (equalInv(view, PetSellDisplay) && playerData.ViewInventory.isPet()) {
             if (view.getTopInventory() == ClickInventory) {
@@ -114,10 +114,10 @@ public class PetShop {
                             playerData.PetInventory.addPetParameter(pet);
                             PetSell.remove(pet);
                             player.sendMessage("§e[" + pet.petData.Display + "§e]§aを§b買戻§aしました §c[-" + Mel + "メル]");
-                            playSound(player, SoundList.LevelUp);
+                            playSound(player, SoundList.LEVEL_UP);
                         } else {
                             player.sendMessage(NonMel + " §c不足[" + (Mel-playerData.Mel) + "メル]");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 }
@@ -130,7 +130,7 @@ public class PetShop {
                     PetSell.removeFirst();
                 }
                 player.sendMessage("§e[" + pet.petData.Display + "§e]§aを§c売却§aしました §e[+" + Mel + "メル]");
-                playSound(player, SoundList.LevelUp);
+                playSound(player, SoundList.LEVEL_UP);
             }
             view.getTopInventory().setContents(PetSellInv().getStorageContents());
         } else if (equalInv(view, PetSyntheticDisplay)) {
@@ -144,7 +144,7 @@ public class PetShop {
                             PetSyntheticCache[i] = null;
                         }
                     }
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else if (Slot == AnvilUISlot[2] && PetSyntheticCache[2] != null) {
                     int mel = (int) Math.round(PetSyntheticCache[2].Level*PetSyntheticCache[2].GrowthRate*5+100);
                     if (playerData.Mel >= mel) {
@@ -155,9 +155,9 @@ public class PetShop {
                             PetSyntheticCache[i] = null;
                         }
                         player.sendMessage("§e[ペット]§aを§b配合§aしました §c[-" + mel + "メル]");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
                     } else {
-                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
+                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.NOPE);
                     }
                 }
             } else if (index > -1) {
@@ -166,20 +166,20 @@ public class PetShop {
                     if (PetSyntheticCache[0] == null) {
                         PetSyntheticCache[0] = pet;
                         playerData.PetInventory.removePetParameter(index);
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     } else if (PetSyntheticCache[1] == null) {
                         if (PetSyntheticCache[0].petData.Id.equals(pet.petData.Id)) {
                             PetSyntheticCache[1] = pet.clone();
                             playerData.PetInventory.removePetParameter(index);
-                            playSound(player, SoundList.Click);
+                            playSound(player, SoundList.CLICK);
                         } else {
                             player.sendMessage("§e[同種]§aの§e[ペット]§aを選択してください");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 } else {
                     player.sendMessage("§e[ペット]§aを§e[ケージ]§aに戻してください");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             }
             for (int i = 0; i < 2; i++) {

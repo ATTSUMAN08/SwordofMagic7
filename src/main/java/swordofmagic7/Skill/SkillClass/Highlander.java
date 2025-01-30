@@ -50,7 +50,7 @@ public class Highlander extends BaseSkillClass {
                 ParticleManager.RandomVectorParticle(particleData, victim.getEyeLocation(), 30);
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, value, 1);
             }
-            playSound(player, SoundList.Explosion);
+            playSound(player, SoundList.EXPLOSION);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -71,7 +71,7 @@ public class Highlander extends BaseSkillClass {
             Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 2, 1);
             ShapedParticle(particleData, player.getLocation(), radius, angle, angle/2, 1, true);
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -90,7 +90,7 @@ public class Highlander extends BaseSkillClass {
                 Damage.makeDamage(player, ray.HitEntity, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Concussion, time, player);
             }
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -112,7 +112,7 @@ public class Highlander extends BaseSkillClass {
                 Damage.makeDamage(player, victim, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                 Function.setVelocity(victim, vector);
             }
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -129,7 +129,7 @@ public class Highlander extends BaseSkillClass {
             ParticleManager.CylinderParticle(particleActivate, player.getLocation(), 1, 2, 3, 3);
             playerData.EffectManager.addEffect(EffectType.CrossGuard, time, time2);
 
-            playSound(player, SoundList.Rock);
+            playSound(player, SoundList.ROCK);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

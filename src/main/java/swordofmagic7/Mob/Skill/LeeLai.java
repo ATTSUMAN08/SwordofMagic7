@@ -38,7 +38,7 @@ public class LeeLai {
     private void radiusMessage(List<String> message) {
         for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 48)) {
             Function.sendMessage(player, message);
-            playSound(player, SoundList.DungeonTrigger);
+            playSound(player, SoundList.DUNGEON_TRIGGER);
         }
     }
 

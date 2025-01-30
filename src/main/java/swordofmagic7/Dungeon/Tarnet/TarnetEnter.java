@@ -84,7 +84,7 @@ public class TarnetEnter {
                     }
                 }
             }
-        playSound(EventLocation, SoundList.Rock);
+        playSound(EventLocation, SoundList.ROCK);
         });
     }
 }

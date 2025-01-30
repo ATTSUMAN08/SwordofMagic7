@@ -39,7 +39,7 @@ public class Smelt {
     public void SmeltMenuView() {
         Inventory inv = decoInv(SmeltMenuDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunLater(() -> SmeltMenuView(0), 1, "SmithMenuView");
     }
 
@@ -74,7 +74,7 @@ public class Smelt {
             if (page < MaxPage()) itemStacks[53] = NextPageItem;
             itemStacks[49] = ItemFlameAmount(SmeltPrefix, SmeltAmount);
             player.getOpenInventory().getTopInventory().setContents(itemStacks);
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 
@@ -105,17 +105,17 @@ public class Smelt {
                                 playerData.ItemInventory.addItemParameter(data.itemParameter.clone(), data.Amount * SmeltAmount);
                                 playerData.LifeStatus.addLifeExp(LifeType.Smith, data.Exp * SmeltAmount);
                                 player.sendMessage("§e[" + data.itemParameter.Display + "§ax" + data.Amount * SmeltAmount + "§e]§aを§e精錬§aしました");
-                                playSound(player, SoundList.LevelUp);
+                                playSound(player, SoundList.LEVEL_UP);
                             } else {
                                 player.sendMessage(decoText("必要素材リスト"));
                                 for (String message : reqList) {
                                     player.sendMessage(message);
                                 }
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         } else {
                             player.sendMessage("§e[鍛冶レベル]§aが足りません");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 }
@@ -137,7 +137,7 @@ public class Smelt {
                     }
                     if (SmeltAmount < 1) SmeltAmount = 1;
                     if (SmeltAmount > 10000) SmeltAmount = 10000;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(SmeltPrefix, SmeltAmount));
             }

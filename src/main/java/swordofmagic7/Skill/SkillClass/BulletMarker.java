@@ -18,7 +18,7 @@ import swordofmagic7.Skill.SkillProcess;
 import static swordofmagic7.Function.playerHandLocation;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.GunAttack;
+import static swordofmagic7.Sound.SoundList.GUN_ATTACK;
 
 public class BulletMarker extends BaseSkillClass {
 
@@ -52,7 +52,7 @@ public class BulletMarker extends BaseSkillClass {
             }
             for (int i = 0; i < count; i++) {
                 ParticleManager.LineParticle(particleData, playerHandLocation(player), loc, 0, 8);
-                playSound(player, GunAttack);
+                playSound(player, GUN_ATTACK);
                 MultiThread.sleepTick(1);
             }
             skillProcess.SkillRigid(skillData);
@@ -77,7 +77,7 @@ public class BulletMarker extends BaseSkillClass {
                 else EffectManager.addEffect(ray.HitEntity, EffectType.Freeze, time, player);
                 Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, value, count);
             }
-            playSound(player, GunAttack);
+            playSound(player, GUN_ATTACK);
             skillProcess.SkillRigid(skillData);
         }, "FreezeBullet");
     }

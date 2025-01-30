@@ -30,9 +30,9 @@ public class MobInfo implements SomCommand, SomTabComplete {
                 if (args.length == 2) {
                     message.addAll(EnemyData.enemyLore(mobData, Integer.parseInt(args[1])));
                 }
-                sendMessage(player, message, SoundList.Nope);
+                sendMessage(player, message, SoundList.NOPE);
             } else {
-                sendMessage(player, "§a存在しない§cエネミー§aです", SoundList.Nope);
+                sendMessage(player, "§a存在しない§cエネミー§aです", SoundList.NOPE);
             }
         } else {
             playerData.Menu.mobInfo.MobInfoView();

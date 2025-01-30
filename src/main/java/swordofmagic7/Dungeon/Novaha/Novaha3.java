@@ -36,7 +36,7 @@ public class Novaha3 {
                 Count = StartCount;
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                Message(Players, DungeonQuestTrigger, "§cエネミ§aを§c" + Count + "体§a討伐せよ", new String[]{"§c祭壇を起動するために生贄を捧げてください"}, SoundList.DungeonTrigger);
+                Message(Players, DungeonQuestTrigger, "§cエネミ§aを§c" + Count + "体§a討伐せよ", new String[]{"§c祭壇を起動するために生贄を捧げてください"}, SoundList.DUNGEON_TRIGGER);
                 while (Time > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
@@ -56,10 +56,10 @@ public class Novaha3 {
                 Function.setPlayDungeonQuest(Players, false);
                 if (Able) {
                     getWarpGate("Novaha3_to_Novaha4").ActiveAtTime(ElevatorActiveTime);
-                    Message(Players, DungeonQuestClear, "", new String[]{"§c祭壇への道が開かれました"}, SoundList.LevelUp);
+                    Message(Players, DungeonQuestClear, "", new String[]{"§c祭壇への道が開かれました"}, SoundList.LEVEL_UP);
                     MultiThread.sleepTick(ElevatorActiveTime);
                 } else {
-                    Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                 }
                 Players.clear();
                 Able = false;

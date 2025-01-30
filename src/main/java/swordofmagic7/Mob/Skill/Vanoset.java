@@ -65,7 +65,7 @@ public class Vanoset {
                         particleData.spawn(player.getEyeLocation());
                         PlayerData.playerData(player).dead();
 
-                        sendMessage(player, "§c祭壇が崩壊しました...", SoundList.Explosion);
+                        sendMessage(player, "§c祭壇が崩壊しました...", SoundList.EXPLOSION);
                     }
                 }
             }, "SoulSyncAlterAndBoss");
@@ -100,7 +100,7 @@ public class Vanoset {
         MultiThread.TaskRun(() -> {
             LivingEntity target = Manager.enemyData.target;
             if (target != null) {
-                radiusMessage("§c竜巻波が来ます！避けてください！", SoundList.DungeonTrigger);
+                radiusMessage("§c竜巻波が来ます！避けてください！", SoundList.DUNGEON_TRIGGER);
                 Manager.CastSkill(true);
                 Manager.enemyData.effectManager.addEffect(EffectType.Invincible, CastTime+60);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f, Function.VectorUp);
@@ -123,7 +123,7 @@ public class Vanoset {
                     for (LivingEntity victim : victims) {
                         Function.setVelocity(victim, Function.VectorUp.clone().setY(2));
                         Damage.makeDamage(entity, victim, DamageCause.ATK, "Tornado", 4, 1);
-                        if (victim instanceof Player player) playSound(player, SoundList.Explosion);
+                        if (victim instanceof Player player) playSound(player, SoundList.EXPLOSION);
                     }
                     MultiThread.sleepTick(7);
                 }
@@ -157,7 +157,7 @@ public class Vanoset {
                 Vector vector = victim.getLocation().toVector().subtract(origin.toVector()).setY(1);
                 Function.setVelocity(victim, vector);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "Squall", 6, 1);
-                if (victim instanceof Player player) playSound(player, SoundList.Explosion);
+                if (victim instanceof Player player) playSound(player, SoundList.EXPLOSION);
             }
 
             MultiThread.sleepTick(10);
@@ -167,7 +167,7 @@ public class Vanoset {
 
     public void WrongedFaith(int CastTime) {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「盲信的な信仰は正しいものなのでしょうか？」", SoundList.DungeonTrigger);
+            radiusMessage("§c「盲信的な信仰は正しいものなのでしょうか？」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.DUST);
 
@@ -183,7 +183,7 @@ public class Vanoset {
             for (LivingEntity entity : Function.NearEntityByEnemy(entity.getLocation(), 96)) {
                 EffectManager.addEffect(entity, EffectType.Confusion, 300, null);
                 EffectManager.addEffect(entity, EffectType.Stun, 10, null);
-                if (entity instanceof  Player player) playSound(player, SoundList.Rock);
+                if (entity instanceof  Player player) playSound(player, SoundList.ROCK);
             }
 
             MultiThread.sleepTick(10);
@@ -193,7 +193,7 @@ public class Vanoset {
 
     public void UnderTheSky(int CastTime) {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「周囲に対抗魔法陣が生成されます」", SoundList.DungeonTrigger);
+            radiusMessage("§c「周囲に対抗魔法陣が生成されます」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.01f, Function.VectorUp);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
@@ -242,7 +242,7 @@ public class Vanoset {
                 ParticleManager.CircleParticle(particleData2, entity.getLocation(), radius, 24);
                 for (LivingEntity entity2 : Function.NearEntityByEnemy(entity.getLocation(), radius)) {
                     Damage.makeDamage(this.entity, entity2, DamageCause.ATK, "UnderTheSky", 7, 1);
-                    if (entity2 instanceof  Player player) playSound(player, SoundList.Explosion);
+                    if (entity2 instanceof  Player player) playSound(player, SoundList.EXPLOSION);
                 }
             }
 
@@ -254,7 +254,7 @@ public class Vanoset {
     public int SacrificeCount = -1;
     public void Sacrifice() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「祭壇が生贄を吸収しようとしています」", SoundList.DungeonTrigger);
+            radiusMessage("§c「祭壇が生贄を吸収しようとしています」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
 
@@ -277,7 +277,7 @@ public class Vanoset {
                             if (Altar.entity.getLocation().distance(enemyData.entity.getLocation()) < 8) {
                                 SacrificeCount++;
                                 particleData.spawn(enemyData.entity.getEyeLocation());
-                                playSound(enemyData.entity.getEyeLocation(), SoundList.Explosion);
+                                playSound(enemyData.entity.getEyeLocation(), SoundList.EXPLOSION);
                                 enemyData.delete();
                             }
                         }
@@ -286,13 +286,13 @@ public class Vanoset {
                                 if (entity instanceof  Player player) PlayerData.playerData(player).dead();
                             }
                             isAlive = false;
-                            radiusMessage("§c「祭壇が起動しました」", SoundList.Explosion);
+                            radiusMessage("§c「祭壇が起動しました」", SoundList.EXPLOSION);
                             break;
                         }
                         MultiThread.sleepTick(20);
                     }
                     SacrificeCount = -1;
-                    if (isAlive) radiusMessage("§c「祭壇の起動を阻止しました」", SoundList.Tick);
+                    if (isAlive) radiusMessage("§c「祭壇の起動を阻止しました」", SoundList.TICK);
                     MultiThread.sleepTick(10);
                     Manager.CastSkill(false);
                 }, "Sacrifice");
@@ -302,7 +302,7 @@ public class Vanoset {
 
     public void Vortex() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「ときに人は、何かに引き込まれてしまうものです」", SoundList.DungeonTrigger);
+            radiusMessage("§c「ときに人は、何かに引き込まれてしまうものです」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.CRIT);
 
@@ -323,7 +323,7 @@ public class Vanoset {
 
     public void Unconscious() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「自分では、自分が狂っていることはわからないものです」", SoundList.DungeonTrigger);
+            radiusMessage("§c「自分では、自分が狂っていることはわからないものです」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             for (Player player : PlayerList.getNearNonDead(entity.getLocation(), 96)) {
                 PlayerData.playerData(player).EffectManager.addEffect(EffectType.Unconscious, 400);
@@ -346,7 +346,7 @@ public class Vanoset {
 
     public void Decay() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", SoundList.DungeonTrigger);
+            radiusMessage("§c「一度なにかに縋ってしまうと、それ以外何も見えなくなってしまうのは良くないところです」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             MultiThread.sleepTick(30);
             Manager.CastSkill(false);
@@ -359,7 +359,7 @@ public class Vanoset {
                 for (Player player : PlayerList.getNearNonDead(entity.getLocation(), 96)) {
                     if (!RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 0, entity -> entity == this.entity).isHitEntity()) {
                         Damage.makeDamage(this.entity, player, DamageCause.MAT, "Decay", 100, 1, 0.5, true);
-                        sendMessage(player, "§c[崩壊]により致死ダメージを受けました", SoundList.Nope);
+                        sendMessage(player, "§c[崩壊]により致死ダメージを受けました", SoundList.NOPE);
                     }
                 }
                 MultiThread.sleepTick(40);
@@ -369,7 +369,7 @@ public class Vanoset {
 
     public void CantLook() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「ときに同調圧力は、文明を滅ぼします」", SoundList.DungeonTrigger);
+            radiusMessage("§c「ときに同調圧力は、文明を滅ぼします」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             MultiThread.sleepTick(30);
             Manager.CastSkill(false);
@@ -382,7 +382,7 @@ public class Vanoset {
                 for (Player player : PlayerList.getNearNonDead(entity.getLocation(), 96)) {
                     if (RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 2, entity -> entity == this.entity).isHitEntity()) {
                         Damage.makeDamage(this.entity, player, DamageCause.MAT, "CantLook", 100, 1, 0.5, true);
-                        sendMessage(player, "§c[見堪]により致死ダメージを受けました", SoundList.Nope);
+                        sendMessage(player, "§c[見堪]により致死ダメージを受けました", SoundList.NOPE);
                     }
                 }
                 MultiThread.sleepTick(40);
@@ -392,7 +392,7 @@ public class Vanoset {
 
     public void JustHistory(int CastTime) {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「本当にこれが、ただの歴史だと言えるのでしょうか？」", SoundList.DungeonTrigger);
+            radiusMessage("§c「本当にこれが、ただの歴史だと言えるのでしょうか？」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.FIREWORK);
             double radius = 15;
@@ -406,12 +406,12 @@ public class Vanoset {
 
             Set<Player> victims = PlayerList.getNearNonDead(location, 96);
             for (Player player : PlayerList.getNearNonDead(location, radius)) {
-                sendMessage(player, "§c[ただの歴史]による死を回避しました", SoundList.Tick);
+                sendMessage(player, "§c[ただの歴史]による死を回避しました", SoundList.TICK);
                 victims.remove(player);
             }
             victims.removeAll(PlayerList.getNearNonDead(location, radius));
             for (Player player : victims) {
-                sendMessage(player, "§c[ただの歴史]により死を迎えました", SoundList.Nope);
+                sendMessage(player, "§c[ただの歴史]により死を迎えました", SoundList.NOPE);
                 PlayerData.playerData(player).dead();
             }
 
@@ -422,7 +422,7 @@ public class Vanoset {
 
     private void Potential() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「引き込まれてしまうものほど、危険なものなことが多いです」", SoundList.DungeonTrigger);
+            radiusMessage("§c「引き込まれてしまうものほど、危険なものなことが多いです」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.LAVA);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
@@ -447,7 +447,7 @@ public class Vanoset {
 
     private void PastFacts() {
         MultiThread.TaskRun(() -> {
-            radiusMessage("§c「結局のところ、全てはただの歴史です」", SoundList.DungeonTrigger);
+            radiusMessage("§c「結局のところ、全てはただの歴史です」", SoundList.DUNGEON_TRIGGER);
             Manager.CastSkill(true);
             ParticleData particleData = new ParticleData(Particle.DUST);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
@@ -465,10 +465,10 @@ public class Vanoset {
             Set<Player> victims2 = PlayerList.getNearNonDead(location, radius);
             victims.removeAll(victims2);
             for (Player player : victims) {
-                sendMessage(player, "§c[過去の事実]による死を回避しました", SoundList.Tick);
+                sendMessage(player, "§c[過去の事実]による死を回避しました", SoundList.TICK);
             }
             for (Player player : victims2) {
-                sendMessage(player, "§c[過去の事実]により死を迎えました", SoundList.Nope);
+                sendMessage(player, "§c[過去の事実]により死を迎えました", SoundList.NOPE);
                 PlayerData.playerData(player).dead();
             }
 

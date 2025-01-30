@@ -43,7 +43,7 @@ public class Cook {
         playerData.statistics.checkTitle();
         Inventory inv = decoInv(CookMenuDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunLater(() -> CookMenuView(0), 1, "CookMenuView");
     }
 
@@ -78,7 +78,7 @@ public class Cook {
             if (page < MaxPage()) itemStacks[53] = NextPageItem;
             itemStacks[49] = ItemFlameAmount(CookPrefix, CookAmount);
             MultiThread.TaskRunSynchronized(() -> player.getOpenInventory().getTopInventory().setContents(itemStacks));
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 
@@ -123,18 +123,18 @@ public class Cook {
                                         player.sendMessage("§e[" + item.Display + "§ax" + reward.getValue() + "§e]§aを§e料理§aしました");
                                     }
                                     playerData.LifeStatus.addLifeExp(LifeType.Cook, data.Exp * CookAmount);
-                                    playSound(player, SoundList.LevelUp);
+                                    playSound(player, SoundList.LEVEL_UP);
                                 }, "Cook");
                             } else {
                                 player.sendMessage(decoText("必要物リスト"));
                                 for (String message : reqList) {
                                     player.sendMessage(message);
                                 }
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         } else {
                             player.sendMessage("§e[料理レベル]§aが足りません");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     }
                 }
@@ -159,7 +159,7 @@ public class Cook {
                     if (cookAmount != 0) CookAmount += cookAmount;
                     if (CookAmount < 1) CookAmount = 1;
                     if (CookAmount > Shop.MaxSelectAmount) CookAmount = Shop.MaxSelectAmount;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(CookPrefix, CookAmount));
             }

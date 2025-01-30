@@ -50,7 +50,7 @@ public class Oracle extends BaseSkillClass {
             for (Player player : players) {
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
                 EffectManager.addEffect(player, EffectType.ArcaneEnergy, time, this.player);
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
                 MultiThread.sleepTick(1);
             }
             skillProcess.SkillRigid(skillData);
@@ -178,7 +178,7 @@ public class Oracle extends BaseSkillClass {
                     }
                 }
                 EffectManager.addEffectMessage(player, target, skillData.Display, "§e");
-                playSound(target, SoundList.Heal);
+                playSound(target, SoundList.HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

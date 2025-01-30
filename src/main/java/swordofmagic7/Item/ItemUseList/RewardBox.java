@@ -65,7 +65,7 @@ public class RewardBox {
                 TextView textView = new TextView(playerData.getNick() + "§aさんが");
                 textView.addView(item.getTextView(1, playerData.ViewFormat())).addText("§aから");
                 textView.addView(getItem.getTextView(rewardBoxData.amount, playerData.ViewFormat())).addText("§aを§b獲得§aしました");
-                textView.setSound(SoundList.Tick);
+                textView.setSound(SoundList.TICK);
                 Client.sendDisplay(playerData.player, textView);
             }
         } else if (RuneList.containsKey(rewardBoxData.id)) {
@@ -96,6 +96,6 @@ public class RewardBox {
         } else {
             message.add("§c設定ミスのアイテムがあります。運営に報告してください -> " + rewardBoxData.id);
         }
-        sendMessage(playerData.player, message, SoundList.LevelUp);
+        sendMessage(playerData.player, message, SoundList.LEVEL_UP);
     }
 }

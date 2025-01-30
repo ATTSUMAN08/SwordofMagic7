@@ -115,7 +115,7 @@ public class Trigger {
                             HotBarData hotBar = TriggerMenuCache.get(index);
                             if (hotBar.category == HotBarCategory.Skill && getSkillData(hotBar.Icon).SkillType.isPassive()) {
                                 player.sendMessage("§e[" + getSkillData(hotBar.Icon).Display + "]§aは§eパッシブスキル§aです");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             } else {
                                 playerData.HotBar.setHotBar(playerData.HotBar.getSelectSlot(), TriggerMenuCache.get(index));
                                 Tutorial.tutorialTrigger(player, 6);
@@ -124,10 +124,10 @@ public class Trigger {
                         playerData.HotBar.unSelectSlot();
                         TriggerMenuCache.clear();
                         TriggerMenuView();
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     } else {
                         player.sendMessage("§eスロット§aを§e選択§aしてください");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
             }

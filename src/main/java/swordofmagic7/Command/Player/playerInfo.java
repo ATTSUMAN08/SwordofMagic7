@@ -26,7 +26,7 @@ public class playerInfo implements SomCommand, SomTabComplete {
             if (CheckBlockPlayer(player, target)) return true;
             playerData.Menu.StatusInfo.StatusInfoView(target);
         } else {
-            sendMessage(player, "§c無効なプレイヤーです", SoundList.Nope);
+            sendMessage(player, "§c無効なプレイヤーです", SoundList.NOPE);
         }
         return true;
     }

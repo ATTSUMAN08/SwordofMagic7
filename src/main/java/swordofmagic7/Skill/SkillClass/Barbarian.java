@@ -50,7 +50,7 @@ public class Barbarian extends BaseSkillClass {
                     Function.setVelocity(player, player.getLocation().getDirection().setY(0).normalize().multiply(-1).setY(0.5));
                 }, 15, skillData.Id);
             }
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -76,7 +76,7 @@ public class Barbarian extends BaseSkillClass {
                 }
             }
 
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -101,7 +101,7 @@ public class Barbarian extends BaseSkillClass {
                 if (bool) Function.setVelocity(victim, player.getLocation().getDirection().clone().normalize().multiply(2.5).setY(1));
             }
 
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -128,7 +128,7 @@ public class Barbarian extends BaseSkillClass {
             }
             playerData.EffectManager.addEffect(EffectType.Warcry, time, null, stack);
 
-            playSound(player, SoundList.AttackSweep);
+            playSound(player, SoundList.ATTACK_SWEEP);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

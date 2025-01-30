@@ -107,7 +107,7 @@ public class Gathering {
                         }
                     } else {
                         player.sendMessage("§e[採掘レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else if (playerTool == Material.IRON_AXE && LumberDataList.containsKey(key)) {
                     LumberData data = LumberDataList.get(key);
@@ -126,7 +126,7 @@ public class Gathering {
                         }
                     } else {
                         player.sendMessage("§e[伐採レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else if (playerTool == Material.SHEARS && HarvestDataList.containsKey(key)) {
                     HarvestData data = HarvestDataList.get(key);
@@ -144,7 +144,7 @@ public class Gathering {
                         }
                     } else {
                         player.sendMessage("§e[採取レベル]§aが§e[Lv" + data.ReqLevel + "]§a以上必要です");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
                 if (material != null) {
@@ -288,7 +288,7 @@ public class Gathering {
                         MultiThread.TaskRunLater(() -> {
                             if (!hook.isDead()) FishingHit(hook);
                         }, 60, "FishingHookHit");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
 
                         if (playerData.statistics.MaxFishingCombo < FishingComboBoost) {
                             playerData.statistics.MaxFishingCombo = FishingComboBoost;
@@ -319,7 +319,7 @@ public class Gathering {
                         if (FishingComboBoost < 0) FishingComboBoost = 0;
                     }
                     player.sendMessage("§e釣獲§aに§c失敗§aしました");
-                    playSound(player, SoundList.Tick);
+                    playSound(player, SoundList.TICK);
                     MultiThread.TaskRunSynchronized(hook::remove);
                 }
             }, "Fishing");
@@ -331,10 +331,10 @@ public class Gathering {
             if (inputFishingCommand[inputProgress] == null) {
                 if (requestFishingCommand[inputProgress] == command) {
                     inputProgress++;
-                    playSound(player, SoundList.Tick);
+                    playSound(player, SoundList.TICK);
                 } else {
                     FishingMissCount++;
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             }
         }

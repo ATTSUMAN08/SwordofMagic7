@@ -42,18 +42,18 @@ public class BlockPlayer implements SomCommand, SomTabComplete {
             if (!playerData.BlockList.contains(uuid)) {
                 if (playerData.BlockList.size() < limit) {
                     playerData.BlockList.add(uuid);
-                    sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしました", SoundList.Tick);
+                    sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしました", SoundList.TICK);
                 } else {
-                    sendMessage(player, "§c" + limit + "人§aまでしか§4Block§a出来ません", SoundList.Nope);
+                    sendMessage(player, "§c" + limit + "人§aまでしか§4Block§a出来ません", SoundList.NOPE);
                 }
             } else {
                 playerData.BlockList.remove(uuid);
-                sendMessage(player, "§e" + targetData.Nick + "§aの§4Block§aを§b解除§aしました", SoundList.Tick);
+                sendMessage(player, "§e" + targetData.Nick + "§aの§4Block§aを§b解除§aしました", SoundList.TICK);
             }
             playerData.updateBlockPlayer();
             targetData.updateBlockPlayer();
         } else {
-            sendMessage(player, "§c無効なプレイヤーです", SoundList.Nope);
+            sendMessage(player, "§c無効なプレイヤーです", SoundList.NOPE);
         }
         return true;
     }

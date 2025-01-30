@@ -387,7 +387,7 @@ public class EnemyData {
         MultiThread.TaskRun(() -> {
             if (entity != null) {
                 ParticleManager.RandomVectorParticle(new ParticleData(Particle.FIREWORK, 0.22f), entity.getLocation(), 50);
-                playSound(entity.getLocation(), SoundList.Death);
+                playSound(entity.getLocation(), SoundList.DEATH);
                 Involved.addAll(PlayerList.getNear(entity.getLocation(), 32));
             }
             delete();
@@ -422,7 +422,7 @@ public class EnemyData {
                         perMessage.add(decoText("個人戦績"));
                         perMessage.add(decoLore("ダメージ") + "§c" + String.format("%.0f", TotalDamageTable.get(player)));
                         perMessage.add(decoLore("ヘイト値") + "§c" + String.format("%.0f", Priority.get(player)));
-                        sendMessage(player, perMessage, SoundList.Tick);
+                        sendMessage(player, perMessage, SoundList.TICK);
                     }
                 }
             }
@@ -475,7 +475,7 @@ public class EnemyData {
                                             TextView text = new TextView(playerData.getNick() + "§aさんが");
                                             text.addView(dropData.itemParameter.getTextView(amount, playerData.ViewFormat()));
                                             text.addText("§aを§e獲得§aしました");
-                                            text.setSound(SoundList.Tick);
+                                            text.setSound(SoundList.TICK);
                                             Client.sendDisplay(player, text);
                                         }
                                     }
@@ -509,7 +509,7 @@ public class EnemyData {
                                                 TextView text = new TextView(playerData.getNick() + "§aさんが");
                                                 text.addView(dropData.runeParameter.getTextView(playerData.ViewFormat()));
                                                 text.addText("§aを§e獲得§aしました");
-                                                text.setSound(SoundList.Tick);
+                                                text.setSound(SoundList.TICK);
                                                 Client.sendDisplay(player, text);
                                             }
                                         }
@@ -534,14 +534,14 @@ public class EnemyData {
                                         PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
                                         playerData.PetInventory.addPetParameter(pet);
                                         TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
-                                        text.setSound(SoundList.Tick);
+                                        text.setSound(SoundList.TICK);
                                         Client.sendDisplay(player, text);
                                     }
                                 } else {
                                     if (playerData.PetTame && random.nextDouble() <= 0.01 * percentMultiply) {
                                         PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
                                         playerData.PetInventory.addPetParameter(pet);
-                                        Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.Tick);
+                                        Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.TICK);
                                     }
                                 }
                             }

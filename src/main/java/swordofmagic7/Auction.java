@@ -36,7 +36,7 @@ public class Auction {
                                 stack.Amount = Integer.parseInt(args[2]);
                             }
                             if (!playerData.ItemInventory.hasItemParameter(stack) || stack.Amount < 1) {
-                                Function.sendMessage(player, "§e所持数§a以上は§b出品§aできません", SoundList.Nope);
+                                Function.sendMessage(player, "§e所持数§a以上は§b出品§aできません", SoundList.NOPE);
                                 return;
                             }
                             if (args.length >= 4) {
@@ -46,7 +46,7 @@ public class Auction {
                             int StartMel = Mel;
                             int reqMel = (int) Math.ceil(Mel * 0.01);
                             if (playerData.Mel < reqMel) {
-                                Function.sendMessage(player, "§e出品手数料§aが足りません §e[" + reqMel + "]", SoundList.Nope);
+                                Function.sendMessage(player, "§e出品手数料§aが足りません §e[" + reqMel + "]", SoundList.NOPE);
                                 return;
                             } else {
                                 Function.sendMessage(player, "§c[出品手数料]§e" + reqMel + "メル");
@@ -89,15 +89,15 @@ public class Auction {
                                     } else if (Better != null && Better.Mel < Mel) {
                                         Better = null;
                                         Mel = StartMel;
-                                        Function.BroadCast("§e入札者§aの§eメル残高§a§e入札額§a下回ったため§eオークション§aの§b入札§aを取り消します", SoundList.Tick);
+                                        Function.BroadCast("§e入札者§aの§eメル残高§a§e入札額§a下回ったため§eオークション§aの§b入札§aを取り消します", SoundList.TICK);
                                     } else if (Better != null && !Better.player.isOnline()) {
                                         Better = null;
                                         Mel = StartMel;
-                                        Function.BroadCast("§e入札者§aの§c失踪§aしたため§eオークション§aの§b入札§aを取り消します", SoundList.Tick);
+                                        Function.BroadCast("§e入札者§aの§c失踪§aしたため§eオークション§aの§b入札§aを取り消します", SoundList.TICK);
                                     }
                                 }
                                 if (error != null) {
-                                    Function.BroadCast(error, SoundList.Tick);
+                                    Function.BroadCast(error, SoundList.TICK);
                                 } else if (Better != null) {
                                     int reqMel2 = (int) Math.ceil(Mel * 0.05);
                                     text = new TextView(Better.getNick() + "§aさんが");
@@ -112,7 +112,7 @@ public class Auction {
                                     Better.viewUpdate();
                                     Owner.viewUpdate();
                                 } else {
-                                    Function.BroadCast("§e入札者§aが現れなかったため§eオークション§aが§c終了§aしました", SoundList.Tick);
+                                    Function.BroadCast("§e入札者§aが現れなかったため§eオークション§aが§c終了§aしました", SoundList.TICK);
                                 }
                                 for (Player loopPlayer : PlayerList.PlayerList) {
                                     if (loopPlayer.isOnline()) {
@@ -124,7 +124,7 @@ public class Auction {
                                 Auctioning = false;
                             }, "Auction");
                         } else {
-                            Function.sendMessage(player, "§aすでに§eオークション§aが開催されています", SoundList.Nope);
+                            Function.sendMessage(player, "§aすでに§eオークション§aが開催されています", SoundList.NOPE);
                         }
                         return;
                     } else if (type.equalsIgnoreCase("bet")) {
@@ -136,21 +136,21 @@ public class Auction {
                                     if (playerData.Mel >= index) {
                                         Better = playerData;
                                         Mel = index;
-                                        Function.BroadCast(Better.getNick() + "§aさんが§e" + index + "メル§aで§b入札§aしました", SoundList.Tick);
+                                        Function.BroadCast(Better.getNick() + "§aさんが§e" + index + "メル§aで§b入札§aしました", SoundList.TICK);
                                         if (time < 10) time = 10;
                                     } else {
-                                        Function.sendMessage(player, "§eメル§aが足りません", SoundList.Nope);
+                                        Function.sendMessage(player, "§eメル§aが足りません", SoundList.NOPE);
                                     }
                                 } else {
-                                    Function.sendMessage(player, "§e" + reqMel + "メル§a以上でないと§b入札§a出来ません", SoundList.Nope);
+                                    Function.sendMessage(player, "§e" + reqMel + "メル§a以上でないと§b入札§a出来ません", SoundList.NOPE);
                                 }
                             } else {
                                 player.sendMessage("§a自身の§eオークション§aには§e入札§a出来ません");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                         } else {
                             player.sendMessage("§eオークション§aが開催されていません");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                         return;
                     }
@@ -161,7 +161,7 @@ public class Auction {
             player.sendMessage(Function.decoLore("/auction bet <メル>"));
         } else {
             player.sendMessage("§cあなたはオークションの利用が制限されています");
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 }

@@ -37,7 +37,7 @@ public class KingSlime {
     private void radiusMessage(String message) {
         for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 48)) {
             Function.sendMessage(player, message);
-            playSound(player, SoundList.DungeonTrigger);
+            playSound(player, SoundList.DUNGEON_TRIGGER);
         }
     }
 
@@ -51,7 +51,7 @@ public class KingSlime {
                 ParticleData particleData = new ParticleData(Particle.ITEM_SLIME);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, target, DamageCause.ATK, "SlimeLaser", 1.5, 1);
-                if (target instanceof Player player) playSound(player, SoundList.Slime);
+                if (target instanceof Player player) playSound(player, SoundList.SLIME);
             }
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
@@ -78,7 +78,7 @@ public class KingSlime {
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), target.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, target, DamageCause.ATK, "Crush", 4, 1);
                 Function.setVelocity(target, entity.getLocation().getDirection().setY(1));
-                if (target instanceof Player player) playSound(player, SoundList.Slime);
+                if (target instanceof Player player) playSound(player, SoundList.SLIME);
             }
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);
@@ -107,7 +107,7 @@ public class KingSlime {
                 EffectManager.addEffect(victim, EffectType.Adhesive, 600, null);
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), victim.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "Adhesive", 2, 1);
-                if (victim instanceof Player player) playSound(player, SoundList.Slime);
+                if (victim instanceof Player player) playSound(player, SoundList.SLIME);
             }
             Manager.CastSkill(false);
         }, "Adhesive");
@@ -157,7 +157,7 @@ public class KingSlime {
             for (LivingEntity victim : ParticleManager.FanShapedCollider(Manager.enemyData.entity.getLocation(), Function.NearEntityByEnemy(Manager.enemyData.entity.getLocation(), length), angle)) {
                 ParticleManager.LineParticle(particleData, entity.getEyeLocation(), victim.getEyeLocation(), 1, 10);
                 Damage.makeDamage(entity, victim, DamageCause.ATK, "InsaneRush", 10000, 1, 0.5);
-                if (victim instanceof Player player) playSound(player, SoundList.Explosion);
+                if (victim instanceof Player player) playSound(player, SoundList.EXPLOSION);
             }
             Manager.CastSkill(false);
         }, "InsaneRush");

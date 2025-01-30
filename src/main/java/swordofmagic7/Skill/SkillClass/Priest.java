@@ -39,7 +39,7 @@ public class Priest extends BaseSkillClass {
             for (Player target : PlayerList.getNearNonDead(player.getLocation(), radius)) {
                 if (skillProcess.isAllies(target) || target == player) {
                     makeHeal(player, target, skillData.Id, skillData.ParameterValue(0) / 100);
-                    playSound(target, SoundList.Heal);
+                    playSound(target, SoundList.HEAL);
                 }
             }
             skillProcess.SkillRigid(skillData);
@@ -59,7 +59,7 @@ public class Priest extends BaseSkillClass {
             for (Player target : Targets) {
                 if (skillProcess.isAllies(target) || target == player) {
                     EffectManager.addEffect(target, effectType, skillData.ParameterValueInt(0)*20, player);
-                    playSound(target, SoundList.Heal);
+                    playSound(target, SoundList.HEAL);
                 }
             }
             skillProcess.SkillRigid(skillData);
@@ -76,9 +76,9 @@ public class Priest extends BaseSkillClass {
             if (ray.isHitEntity()) {
                 ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), 20, 0, 10);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Monstrance, skillData.ParameterValueInt(0) * 20, player);
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
             } else {
-                sendMessage(player, "§c対象§aがいません", SoundList.Nope);
+                sendMessage(player, "§c対象§aがいません", SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -103,7 +103,7 @@ public class Priest extends BaseSkillClass {
             for (Player target : Targets) {
                 if (skillProcess.isAllies(target) || target == player) {
                     EffectManager.addEffect(target, EffectType.Revive, time, player, time2);
-                    playSound(target, SoundList.Heal);
+                    playSound(target, SoundList.HEAL);
                 }
             }
             skillProcess.SkillRigid(skillData);

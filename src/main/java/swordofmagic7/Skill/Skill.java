@@ -156,11 +156,11 @@ public class Skill {
                                     if (skillData.SkillType.isPetSkill()) {
                                         if (playerData.getPetSelect() == null) {
                                             player.sendMessage("§a指揮する§e[ペット]§aを選択してください");
-                                            playSound(player, SoundList.Nope);
+                                            playSound(player, SoundList.NOPE);
                                             return;
                                         } else if (skillData.SkillType.isPetAttack() && playerData.getPetSelect().target == null) {
                                             player.sendMessage(ReqAttackTarget);
-                                            playSound(player, SoundList.Nope);
+                                            playSound(player, SoundList.NOPE);
                                             return;
                                         }
                                     }
@@ -180,7 +180,7 @@ public class Skill {
                                         switch (skillData.Id) {
                                             case "Revive" -> skillData.CoolTime = 20 * 60 * 5;
                                             case "BackMasking", "Stop" -> {
-                                                sendMessage(player, "§a現在の§eマップ§aでは使用できません", SoundList.Nope);
+                                                sendMessage(player, "§a現在の§eマップ§aでは使用できません", SoundList.NOPE);
                                                 return;
                                             }
                                         }
@@ -401,24 +401,24 @@ public class Skill {
                                         setSkillCoolTime(skillData, skillData.CoolTime);
                                     }  catch (NoClassDefFoundError e) {
                                         e.printStackTrace();
-                                        sendMessage(player, "§cNoClassDefFoundErrorが発生しました。別CHへ移動してください", SoundList.Nope);
+                                        sendMessage(player, "§cNoClassDefFoundErrorが発生しました。別CHへ移動してください", SoundList.NOPE);
                                         resetSkillCoolTimeWaited(skillData);
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        sendMessage(player, "§cスキル発動中にエラーが発生しました", SoundList.Nope);
+                                        sendMessage(player, "§cスキル発動中にエラーが発生しました", SoundList.NOPE);
                                         resetSkillCoolTimeWaited(skillData);
                                     }
                                 } else {
-                                    sendMessage(player, "§c[デバフ効果]§aによりスキルを発動できません", SoundList.Nope);
+                                    sendMessage(player, "§c[デバフ効果]§aによりスキルを発動できません", SoundList.NOPE);
                                 }
                             } else {
-                                sendMessage(player, "§b[マナ]§aが足りません", SoundList.Nope);
+                                sendMessage(player, "§b[マナ]§aが足りません", SoundList.NOPE);
                             }
                         } else if (playerData.NaturalMessage) {
-                            sendMessage(player, "§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです", SoundList.Nope);
+                            sendMessage(player, "§e[" + skillData.Display + "]§aを§b[使用可能]§aまで§c[" + getSkillCoolTime(skillData) / 20f + "秒]§aです", SoundList.NOPE);
                         }
                     } else {
-                        sendMessage(player, "§a現在の§eクラス§aでは使用出来ないか§eクラスレベル§aが足りません", SoundList.Nope);
+                        sendMessage(player, "§a現在の§eクラス§aでは使用出来ないか§eクラスレベル§aが足りません", SoundList.NOPE);
                     }
                 }
             }
@@ -516,7 +516,7 @@ public class Skill {
         if (check) {
             return true;
         } else {
-            if (!isPassive) sendMessage(player, "§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります", SoundList.Nope);
+            if (!isPassive) sendMessage(player, "§aこの§e[スキル]§aの§b発動§aには§e" + slot.Display + "§aに§e[" + Display + "]§aを§e装備§aしてる§c必要§aがあります", SoundList.NOPE);
             return false;
         }
     }
@@ -554,10 +554,10 @@ public class Skill {
             SkillData skillData = getSkillData(SkillMenuCache.get(Slot));
             if (skillData.SkillType.isActive()) {
                 playerData.Menu.Trigger.TriggerMenuView();
-                playSound(player, SoundList.Click);
+                playSound(player, SoundList.CLICK);
             } else {
                 player.sendMessage("§e[" + skillData.Display + "]§aは§eパッシブスキル§aです");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
             }
         }
     }

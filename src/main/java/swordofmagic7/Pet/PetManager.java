@@ -64,10 +64,10 @@ public class PetManager {
             if (pet.player == player) {
                 playerData.setPetSelect(pet);
                 playerData.getPetSelect().entity = entity;
-                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました§b[" + pet.getSummonId() + "]", SoundList.Click);
+                sendMessage(player, "§e[" + pet.petData.Display + "]§aを選択しました§b[" + pet.getSummonId() + "]", SoundList.CLICK);
             }
         } else {
-            sendMessage(player, ReqPetSelect, SoundList.Nope);
+            sendMessage(player, ReqPetSelect, SoundList.NOPE);
         }
     }
 
@@ -82,7 +82,7 @@ public class PetManager {
 
     public void PetAISelect(PetParameter pet, PetAIState aiState) {
         pet.AIState = aiState;
-        sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.getSummonId() + "]", SoundList.Click);
+        sendMessage(player, "§e[" + pet.petData.Display + "]§aに§b[" + pet.AIState.Display + "]§aを指示しました§b[" + pet.getSummonId() + "]", SoundList.CLICK);
     }
 
     public void PetAISelect() {
@@ -101,7 +101,7 @@ public class PetManager {
                 }
             }
         } else {
-            sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
+            sendMessage(player, ReqCommandPetSelect, SoundList.NOPE);
         }
     }
 
@@ -120,19 +120,19 @@ public class PetManager {
                     } else if (PetManager.isPet(ray.HitEntity)) {
                         Display = PetManager.PetParameter(ray.HitEntity).petData.Display;
                     } else {
-                        sendMessage(player, ReqAttackTarget, SoundList.Nope);
+                        sendMessage(player, ReqAttackTarget, SoundList.NOPE);
                     }
                     if (Display != null) {
                         pet.target = ray.HitEntity;
                         player.sendMessage("§c[" + Display + "]§aを§c[攻撃対象]§aにしました§b[" + pet.getSummonId() + "]");
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     }
                 } else {
-                    sendMessage(player, ReqAttackTarget, SoundList.Nope);
+                    sendMessage(player, ReqAttackTarget, SoundList.NOPE);
                 }
             }
         } else {
-            sendMessage(player, ReqCommandPetSelect, SoundList.Nope);
+            sendMessage(player, ReqCommandPetSelect, SoundList.NOPE);
         }
     }
 }

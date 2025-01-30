@@ -45,7 +45,7 @@ public class AusMineB1 {
                 Count = StartCount;
                 Players = PlayerList.getNear(EventLocation, Radius);
                 Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                Message(Players, DungeonQuestTrigger, "§cゴブリン§aを§c" + Count + "体§a討伐せよ", EnterTextData, SoundList.DungeonTrigger);
+                Message(Players, DungeonQuestTrigger, "§cゴブリン§aを§c" + Count + "体§a討伐せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                 while (Time > 0 && !list.isEmpty() && instance.isEnabled()) {
                     list = PlayerList.getNear(EventLocation, Radius);
                     Players.addAll(list);
@@ -82,10 +82,10 @@ public class AusMineB1 {
                 EnemyList.clear();
                 if (Able) {
                     getWarpGate("AusMineB1_to_AusMineB2").ActiveAtTime(ElevatorActiveTime);
-                    Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
+                    Message(Players, DungeonQuestClear, "", ClearText, SoundList.LEVEL_UP);
                     MultiThread.sleepTick(ElevatorActiveTime);
                 } else {
-                    Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                 }
                 Players.clear();
                 Able = false;

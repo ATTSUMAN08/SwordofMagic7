@@ -40,7 +40,7 @@ public class SmithMake {
     public void MakeMenuView() {
         Inventory inv = decoInv(MakeMenuDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunLater(() -> MakeMenuView(0), 1, "MakeMenuView");
     }
 
@@ -67,7 +67,7 @@ public class SmithMake {
             if (Scroll > 0) itemStacks[8] = UpScrollItem;
             if (MaxMakeSlot/9-5 > 0) itemStacks[53] = DownScrollItem;
             player.getOpenInventory().getTopInventory().setContents(itemStacks);
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 
@@ -110,17 +110,17 @@ public class SmithMake {
                             playerData.LifeStatus.addLifeExp(LifeType.Smith, data.Exp);
                             playerData.statistics.MakeEquipmentCount++;
                             player.sendMessage("§e[" + item.Display + "§ax" + amount + "§e]§aを§e制作§aしました");
-                            playSound(player, SoundList.LevelUp);
+                            playSound(player, SoundList.LEVEL_UP);
                         } else {
                             player.sendMessage(decoText("必要素材リスト"));
                             for (String message : reqList) {
                                 player.sendMessage(message);
                             }
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         }
                     } else {
                         player.sendMessage("§e[鍛冶レベル]§aが足りません");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 } else {
                     if (equalItem(currentItem, PreviousPageItem)) {

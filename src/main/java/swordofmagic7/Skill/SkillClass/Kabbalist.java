@@ -47,7 +47,7 @@ public class Kabbalist extends BaseSkillClass {
                 if (skillProcess.isAllies(target) || target == player) {
                     EffectManager.addEffectMessage(player, target, EffectType.Nachash);
                     EffectManager.getEffectManager(target).addEffect(EffectType.Nachash, time, value);
-                    playSound(target, SoundList.Heal);
+                    playSound(target, SoundList.HEAL);
                 }
             }
             skillProcess.SkillRigid(skillData);

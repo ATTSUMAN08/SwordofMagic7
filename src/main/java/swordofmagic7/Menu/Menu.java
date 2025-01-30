@@ -163,7 +163,7 @@ public class Menu {
                     } else {
                         playerData.HotBar.setSelectSlot(slotToIndex(Slot));
                         Trigger.TriggerMenuView();
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     }
                 }
                 case 8 -> playerData.Equipment.unEquip(EquipmentSlot.MainHand);
@@ -187,17 +187,17 @@ public class Menu {
                                     Client.sendPlayerChat(player, clickedItem.getTextView(clickedItemStack.Amount, playerData.ViewFormat()));
                                 } else if (EquipAble() && clickedItem.Category.isEquipment()) {
                                     playerData(player).Equipment.Equip(clickedItem.itemEquipmentData.EquipmentSlot, clickedItem);
-                                    playSound(player, SoundList.Click);
+                                    playSound(player, SoundList.CLICK);
                                 } else if (EquipAble() && clickedItem.Category.isPetEgg()) {
                                     clickedItem.itemPetEgg.usePetEgg(player, clickedItem);
-                                    playSound(player, SoundList.Click);
+                                    playSound(player, SoundList.CLICK);
                                 } else if (EquipAble() && clickedItem.Category.isPotion()) {
                                     clickedItem.itemPotion.usePotion(player, clickedItem);
                                 } else if (EquipAble() && clickedItem.Category.isCook()) {
                                     clickedItem.itemCook.useCook(player, clickedItem);
                                 } else if (EquipAble() && clickedItem.Category.isTool()) {
                                     playerData(player).Equipment.Equip(EquipmentSlot.MainHand, clickedItem);
-                                    playSound(player, SoundList.Click);
+                                    playSound(player, SoundList.CLICK);
                                 } else if (EquipAble() && clickedItem.Category.isPetFood()) {
                                     clickedItem.itemPetFood.usePetFood(player, clickedItem);
                                 } else if (EquipAble() && clickedItem.Category.isItem()) {
@@ -244,7 +244,7 @@ public class Menu {
                             } else {
                                 playerData.HotBar.setSelectSlot(slotToIndex(Slot));
                                 Trigger.TriggerMenuView();
-                                playSound(player, SoundList.Click);
+                                playSound(player, SoundList.CLICK);
                             }
                         }
                     }
@@ -259,10 +259,10 @@ public class Menu {
                         case PetInventory -> playerData.setView(ViewInventoryType.HotBar);
                         case HotBar -> playerData.setView(ViewInventoryType.ItemInventory);
                     }
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else {
                     playerData.Menu.UserMenuView();
-                    playSound(player, SoundList.MenuOpen);
+                    playSound(player, SoundList.MENU_OPEN);
                 }
             }
         }
@@ -325,10 +325,10 @@ public class Menu {
                         if (playerData.isPvPModeNonMessage()) return;
                         if (Tutorial.TutorialProcess.containsKey(player)) {
                             player.sendMessage("§eチュートリアル中§aは使用できません");
-                            playSound(player, SoundList.Nope);
+                            playSound(player, SoundList.NOPE);
                         } else SomCore.instance.spawnPlayer(player);
                     }
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
             }
         }
@@ -354,7 +354,7 @@ public class Menu {
         MultiThread.TaskRun(() -> {
             MultiThread.sleepTick(1);
             if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
-                playSound(player, SoundList.MenuClose);
+                playSound(player, SoundList.MENU_CLOSE);
                 if (EquipAble()) {
                     if (ViewInventoryCache != null && playerData.ViewInventory != ViewInventoryCache) {
                         playerData.setView(ViewInventoryCache, false);

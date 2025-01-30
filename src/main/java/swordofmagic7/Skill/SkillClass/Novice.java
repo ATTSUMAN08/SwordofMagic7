@@ -25,7 +25,7 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.*;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.GunAttack;
+import static swordofmagic7.Sound.SoundList.GUN_ATTACK;
 
 public class Novice extends BaseSkillClass {
 
@@ -100,7 +100,7 @@ public class Novice extends BaseSkillClass {
             ParticleManager.LineParticle(new ParticleData(Particle.CRIT), playerHandLocation(player), 20, 0, 10);
             Ray ray = rayLocationEntity(player.getEyeLocation(), 20, 0.5, skillProcess.Predicate());
             if (ray.isHitEntity()) Damage.makeDamage(player, ray.HitEntity, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0)/100, count);
-            playSound(player, GunAttack, count, 2);
+            playSound(player, GUN_ATTACK, count, 2);
             skillProcess.SkillRigid(skillData);
         }, "TriggerShot");
     }
@@ -135,7 +135,7 @@ public class Novice extends BaseSkillClass {
             ParticleManager.RandomVectorParticle(particleData, ray.HitPosition, 100);
             Set<LivingEntity> victims = new HashSet<>(Function.NearLivingEntity(ray.HitPosition, skillData.Parameter.get(1).Value, skillProcess.Predicate()));
             Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, 1, 1);
-            playSound(player, SoundList.Fire);
+            playSound(player, SoundList.FIRE);
             skillProcess.SkillRigid(skillData);
         }, "FireBall");
     }

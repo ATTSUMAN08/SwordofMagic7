@@ -101,7 +101,7 @@ public class DefenseBattle {
             wave = i;
             Health = 10000 + 1000*(i-1);
             EnemyCount = 50 + wave*5;
-            Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DungeonTrigger);
+            Message(PlayerList.getNear(targetLocation, Radius), "§c§l《Wave" + wave + "》", "§c生命の樹§aを防衛せよ", null, SoundList.DUNGEON_TRIGGER);
             Set<Player> Players = new HashSet<>();
             MultiThread.TaskRunSynchronized(() -> {
                 EnemyData enemyData = MobManager.mobSpawn(getMobData("アイアロン"), wave * 5, spawnLocation[random.nextInt(spawnLocation.length)]);
@@ -138,7 +138,7 @@ public class DefenseBattle {
                         isAttack= true;
                     }
                 }
-                if (isAttack) Message(Players, " ", "§e§l生命の樹§aが攻撃されています！", null, SoundList.Nope, true);
+                if (isAttack) Message(Players, " ", "§e§l生命の樹§aが攻撃されています！", null, SoundList.NOPE, true);
                 time--;
                 if (EnemyCount == 0 && EnemyList.isEmpty()) break;
                 List<String> textData = new ArrayList<>();
@@ -154,7 +154,7 @@ public class DefenseBattle {
                     if (inList.size()+EnemyCount < 10) {
                         if (!last) {
                             last = true;
-                            Message(finalPlayers, " ", "§e§lエネミーをハイライトします", null, SoundList.Tick);
+                            Message(finalPlayers, " ", "§e§lエネミーをハイライトします", null, SoundList.TICK);
                         }
                         for (LivingEntity entity : inList) {
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 21, 0, false, false));
@@ -176,13 +176,13 @@ public class DefenseBattle {
                     PlayerData playerData = playerData(player);
                     if (!playerData.isAFK()) playerData.ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/1.5));
                 }
-                Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LevelUp);
+                Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LEVEL_UP);
                 MultiThread.sleepTick(200);
                 wave++;
                 startWave(wave);
             } else {
                 isStarted = false;
-                Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DungeonTrigger);
+                Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DUNGEON_TRIGGER);
                 Client.sendBroadCast(new TextView("§c防衛戦§aが終了しました"));
             }
         }, "DefenseBattle");

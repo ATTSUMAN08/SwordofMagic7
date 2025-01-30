@@ -36,7 +36,7 @@ public class AccessoryShop {
         inv.setMaxStackSize(128);
         inv.setItem(0, ReLotteryIcon);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     public void ReLotteryView() {
@@ -56,7 +56,7 @@ public class AccessoryShop {
             if (equalItem(currentItem, ReLotteryIcon)) {
                 ReLotteryView();
             }
-            playSound(player, SoundList.Click);
+            playSound(player, SoundList.CLICK);
         } else if (equalInv(view, ReLotteryDisplay) && playerData.ViewInventory.isItem()) {
             if (ClickInventory == view.getBottomInventory()) {
                 ItemParameterStack stack = playerData.ItemInventory.getItemParameterStack(index);
@@ -72,11 +72,11 @@ public class AccessoryShop {
                         playerData.ItemInventory.addItemParameter(addItem, 1);
                         playerData.Mel -= Mel;
                         playerData.ItemInventory.removeItemParameter(ReLotteryItem, Amount);
-                        sendMessage(player, "§e[" + item.Display + "]§aを§e再抽選§aしました §c[-" + Mel + "メル]", SoundList.LevelUp);
+                        sendMessage(player, "§e[" + item.Display + "]§aを§e再抽選§aしました §c[-" + Mel + "メル]", SoundList.LEVEL_UP);
                     } else {
-                        sendMessage(player, "§e" + Mel + "メル§aと§e" + ReLotteryItem.Display + "§aが§c必要§aです", SoundList.Nope);
+                        sendMessage(player, "§e" + Mel + "メル§aと§e" + ReLotteryItem.Display + "§aが§c必要§aです", SoundList.NOPE);
                     }
-                } else sendMessage(player, "§eアクセサリ§aを§e選択§aしてください", SoundList.Nope);
+                } else sendMessage(player, "§eアクセサリ§aを§e選択§aしてください", SoundList.NOPE);
             }
         }
     }

@@ -18,7 +18,7 @@ public class ItemUse {
         } else if (item.Id.equalsIgnoreCase("スライムの王冠")) {
             KingSlime.trigger(playerData, item);
         } else {
-            sendMessage(playerData.player, "§a使用できない§eアイテム§aです", SoundList.Nope);
+            sendMessage(playerData.player, "§a使用できない§eアイテム§aです", SoundList.NOPE);
         }
     }
 }

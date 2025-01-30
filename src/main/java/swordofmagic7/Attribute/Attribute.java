@@ -162,17 +162,17 @@ public class Attribute {
                     } else if (clickType.isRightClick()) {
                         if (playerData.Map.Safe) {
                             attr.revAttribute(attrType, x);
-                        } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
+                        } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.NOPE);
                     }
                 }
             }
             if (currentItem.getType() == Material.EXPERIENCE_BOTTLE) {
                 if (playerData.Map.Safe) {
                     attr.resetAttribute();
-                } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
+                } else Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.NOPE);
             }
             AttributeMenuLoad();
-            playSound(player, SoundList.Click);
+            playSound(player, SoundList.CLICK);
         }
     }
 }

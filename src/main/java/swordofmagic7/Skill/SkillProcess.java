@@ -30,7 +30,7 @@ import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.GunAttack;
+import static swordofmagic7.Sound.SoundList.GUN_ATTACK;
 
 public class SkillProcess {
 
@@ -193,20 +193,20 @@ public class SkillProcess {
                     }
                     case Rod -> {
                         normalAttackParticle(victim, Particle.CRIT, 0, 25);
-                        playSound(player, SoundList.RodAttack);
+                        playSound(player, SoundList.ROD_ATTACK);
                         normalAttackCoolTime = 12;
                     }
                     case ActGun -> {
                         normalAttackParticle(victim, Particle.CRIT, 0, 25);
-                        playSound(player, GunAttack);
+                        playSound(player, GUN_ATTACK);
                         normalAttackCoolTime = playerData.EffectManager.hasEffect(EffectType.DoubleGunStance) ? 7 : 10;
                     }
                     case Baton -> {
                         if (playerData.PetSummon.isEmpty()) {
-                            sendMessage(player, "§e[ペット]§aが§e召喚§aされていません", SoundList.Nope);
+                            sendMessage(player, "§e[ペット]§aが§e召喚§aされていません", SoundList.NOPE);
                         }
                     }
-                    default -> sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.Nope);
+                    default -> sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.NOPE);
                 }
                 double damageMultiply = 1;
                 if (playerData.EffectManager.hasEffect(EffectType.CoveringFire)) damageMultiply += playerData.EffectManager.getData(EffectType.CoveringFire).getDouble(0);
@@ -219,7 +219,7 @@ public class SkillProcess {
                 }
             }
         } else {
-            sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.Nope);
+            sendMessage(player, "§e[武器]§aが§e装備§aされていません", SoundList.NOPE);
         }
     }
 
@@ -231,7 +231,7 @@ public class SkillProcess {
 
             playerData.EffectManager.addEffect(effectType, time);
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -248,7 +248,7 @@ public class SkillProcess {
             for (Player player : players) {
                 EffectManager.addEffect(player, effectType, time, this.player);
                 ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             }
             SkillRigid(skillData);
         }, skillData.Id);

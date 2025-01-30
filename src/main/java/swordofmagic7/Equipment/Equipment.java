@@ -128,7 +128,7 @@ public class Equipment {
                 for (String msg : reqText) {
                     player.sendMessage(msg);
                 }
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 return false;
             }
 

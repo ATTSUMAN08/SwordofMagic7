@@ -188,7 +188,7 @@ public class Griphia extends EnemySkillBase {
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                 player.sendMessage("§c強力な攻撃§aの準備をしています！");
                 player.sendMessage("§c有効なロウソク§aの所へ§c避難§aしてください！");
-                playSound(player, SoundList.DungeonTrigger);
+                playSound(player, SoundList.DUNGEON_TRIGGER);
             }
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
@@ -199,7 +199,7 @@ public class Griphia extends EnemySkillBase {
                     final Set<LivingEntity> victims = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 64);
                     for (Player player : PlayerList.getNearNonDead(TargetCandle, 14)) {
                         player.sendMessage("§c強力な攻撃§aを§e回避§aしました！");
-                        playSound(player, SoundList.Tick);
+                        playSound(player, SoundList.TICK);
                         victims.remove(player);
                     }
                     for (LivingEntity player : victims) {
@@ -232,7 +232,7 @@ public class Griphia extends EnemySkillBase {
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 64)) {
                 player.sendMessage("§cとても強力な攻撃§aの準備をしています！");
                 player.sendMessage("§c安全エリア§aへ§c避難§aしてください！");
-                playSound(player, SoundList.DungeonTrigger);
+                playSound(player, SoundList.DUNGEON_TRIGGER);
             }
             int i = 0;
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
@@ -241,7 +241,7 @@ public class Griphia extends EnemySkillBase {
                 } else {
                     for (Player player : PlayerList.getNearNonDead(SafeLocation, 5)) {
                         player.sendMessage("§cとても強力な攻撃§aを§e回避§aしました！");
-                        playSound(player, SoundList.Tick);
+                        playSound(player, SoundList.TICK);
                         victims.remove(player);
                     }
                     for (LivingEntity player : victims) {

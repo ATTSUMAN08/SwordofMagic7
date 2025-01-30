@@ -60,7 +60,7 @@ public class Sage extends BaseSkillClass {
             MultiThread.TaskRunSynchronized(() -> {
                 for (Player player : players) {
                     player.teleportAsync(origin);
-                    playSound(player, SoundList.LevelUp);
+                    playSound(player, SoundList.LEVEL_UP);
                 }
             });
             skillProcess.SkillRigid(skillData);
@@ -174,7 +174,7 @@ public class Sage extends BaseSkillClass {
                 if (skillProcess.isAllies(player) || player == this.player) {
                     ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 10, 3);
                     EffectManager.addEffect(player, EffectType.MissileHole, time, this.player);
-                    playSound(player, SoundList.Heal);
+                    playSound(player, SoundList.HEAL);
                     MultiThread.sleepTick(1);
                 }
             }

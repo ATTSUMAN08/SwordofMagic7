@@ -26,7 +26,7 @@ import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.GunAttack;
+import static swordofmagic7.Sound.SoundList.GUN_ATTACK;
 
 public class Sheriff extends BaseSkillClass {
 
@@ -42,7 +42,7 @@ public class Sheriff extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.HeadShot, skillData.ParameterValueInt(1) * 20);
             ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, "HeadShot");
     }
@@ -57,10 +57,10 @@ public class Sheriff extends BaseSkillClass {
 
                 playerData.EffectManager.addEffect(EffectType.Redemption, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             } else {
                 player.sendMessage("§e[" + EffectType.RedemptionAble.Display + "]§aが必要です");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -89,13 +89,13 @@ public class Sheriff extends BaseSkillClass {
                 count = rune.AdditionParameterValueInt(0);
                 Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, value, count, 1);
                 ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);
-                playSound(player, GunAttack, 5, 1);
+                playSound(player, GUN_ATTACK, 5, 1);
             } else {
                 for (int i = 0; i < time; i += hitRate) {
                     Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
                     Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, value, count, 1);
                     ShapedParticle(particleData, player.getLocation(), radius, angle, angle, 1, true);
-                    playSound(player, GunAttack, 5, 1);
+                    playSound(player, GUN_ATTACK, 5, 1);
                     MultiThread.sleepTick(hitRate);
                 }
             }
@@ -124,7 +124,7 @@ public class Sheriff extends BaseSkillClass {
                     EffectManager.addEffect(target, EffectType.PeaceMaker, time, player);
                 }
             }
-            playSound(player, GunAttack);
+            playSound(player, GUN_ATTACK);
             skillProcess.SkillRigid(skillData);
         }, "PeaceMaker");
     }

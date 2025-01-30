@@ -36,7 +36,7 @@ public class SmithEquipment {
         Inventory inv = decoAnvil(SmeltEquipmentMaterializationDisplay);
         playerData.setView(ViewInventoryType.ItemInventory, false);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     EquipmentCategory selectCategory = EquipmentCategory.Blade;
@@ -46,7 +46,7 @@ public class SmithEquipment {
         inv.setItem(1, ItemFlame);
         playerData.setView(ViewInventoryType.ItemInventory, false);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     public void SmeltMenuClick(InventoryView view, Inventory ClickInventory, int index, int Slot) {
@@ -58,7 +58,7 @@ public class SmithEquipment {
                     MaterializationCache[1] = null;
                 } else if (Slot == AnvilUISlot[2] && MaterializationCache[0] != null && MaterializationCache[1] != null) {
                     playerData.ItemInventory.addItemParameter(MaterializationCache[1], MaterializationCache[0].itemEquipmentData.EquipmentSlot == EquipmentSlot.MainHand ? 2 : 1);
-                    Function.sendMessage(player, "§e[" + MaterializationCache[0].Display + "]§aを素材化しました", SoundList.LevelUp);
+                    Function.sendMessage(player, "§e[" + MaterializationCache[0].Display + "]§aを素材化しました", SoundList.LEVEL_UP);
                     if (MaterializationCache[0].Category.isEquipment()) {
                         int plus = MaterializationCache[0].itemEquipmentData.Plus;
                         if (plus >= 10) {
@@ -75,7 +75,7 @@ public class SmithEquipment {
                 MaterializationCache[1] = null;
                 ItemParameter item = playerData.ItemInventory.getItemParameter(index);
                 if (item.itemEquipmentData.Rune.size() > 0) {
-                    Function.sendMessage(player, "§eルーン§aを外してください", SoundList.Nope);
+                    Function.sendMessage(player, "§eルーン§aを外してください", SoundList.NOPE);
                     return;
                 }
                 if (item.Materialization != null) {
@@ -86,10 +86,10 @@ public class SmithEquipment {
                         MaterializationCache[0] = item;
                         playerData.ItemInventory.removeItemParameter(item, 1);
                     } else {
-                        Function.sendMessage(player, "§a素材化アイテムが未実装です", SoundList.Nope);
+                        Function.sendMessage(player, "§a素材化アイテムが未実装です", SoundList.NOPE);
                     }
                 } else {
-                    Function.sendMessage(player, "§aこの装備は素材化出来ません", SoundList.Nope);
+                    Function.sendMessage(player, "§aこの装備は素材化出来ません", SoundList.NOPE);
                 }
             }
             if (MaterializationCache[0] != null && MaterializationCache[1] != null) {
@@ -124,7 +124,7 @@ public class SmithEquipment {
                     DecryptionCache[0] = item;
                 } else {
                     player.sendMessage("§e素材化装備§aを選択してください");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             }
             if (DecryptionCache[0] != null) {

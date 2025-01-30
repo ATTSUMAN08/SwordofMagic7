@@ -40,7 +40,7 @@ public class AsharkB4 {
                     Time = StartTime;
                     Players = PlayerList.getNearNonDead(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§c" + mobName + "§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§c" + mobName + "§aを討伐せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
@@ -54,10 +54,10 @@ public class AsharkB4 {
                     ViewBar.resetBossBarOverrideTargetInfo(Players);
                     Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AsharkB1_to_Gitis").getLocation());
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LEVEL_UP, getWarpGate("AsharkB1_to_Gitis").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AsharkB3_to_AsharkB4").getLocation());
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DUNGEON_TRIGGER, getWarpGate("AsharkB3_to_AsharkB4").getLocation());
                     }
                     Players.clear();
                     Able = false;

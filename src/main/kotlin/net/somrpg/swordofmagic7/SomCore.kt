@@ -350,17 +350,17 @@ class SomCore : SuspendingJavaPlugin() {
             when (cmd.name.lowercase()) {
                 "menu", "m" -> {
                     playerData.Menu.UserMenuView()
-                    playSound(sender, SoundList.MenuOpen)
+                    playSound(sender, SoundList.MENU_OPEN)
                     return true
                 }
                 "skill" -> {
                     playerData.Skill.SkillMenuView()
-                    playSound(sender, SoundList.MenuOpen)
+                    playSound(sender, SoundList.MENU_OPEN)
                     return true
                 }
                 "attribute" -> {
                     playerData.Attribute.AttributeMenuView()
-                    playSound(sender, SoundList.MenuOpen)
+                    playSound(sender, SoundList.MENU_OPEN)
                     return true
                 }
                 "damageholo" -> {
@@ -488,12 +488,12 @@ class SomCore : SuspendingJavaPlugin() {
                             playerData.titleManager.setTitle(title)
                         } else {
                             sender.sendMessage("§a存在しない称号です")
-                            playSound(sender, SoundList.Nope)
+                            playSound(sender, SoundList.NOPE)
                         }
                     } else {
                         playerData.titleManager.Title = TitleDataList["称号無し"]
                         sender.sendMessage("§a称号を外しました")
-                        playSound(sender, SoundList.Tick)
+                        playSound(sender, SoundList.TICK)
                     }
                     return true
                 }
@@ -522,12 +522,12 @@ class SomCore : SuspendingJavaPlugin() {
                     } else {
                         sender.sendMessage("§a現在の§e[釣獲モード]§aでは利用できません")
                     }
-                    playSound(sender, SoundList.Tick)
+                    playSound(sender, SoundList.TICK)
                     return true
                 }
                 "ch" -> {
                     if (playerData.isPlayDungeonQuest) {
-                        sendMessage(sender, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.Nope)
+                        sendMessage(sender, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.NOPE)
                         return true
                     }
                     if (args.size == 1) {
@@ -553,7 +553,7 @@ class SomCore : SuspendingJavaPlugin() {
                 }
                 "nickreset" -> {
                     playerData.Nick = sender.name
-                    sendMessage(sender, "§eプレイヤ名§aを§e[${playerData.nick}]§aに§cリセット§aしました", SoundList.Tick)
+                    sendMessage(sender, "§eプレイヤ名§aを§e[${playerData.nick}]§aに§cリセット§aしました", SoundList.TICK)
                     return true
                 }
                 "skillslot" -> {
@@ -612,19 +612,19 @@ class SomCore : SuspendingJavaPlugin() {
                 }
                 "itemsearch" -> {
                     playerData.ItemInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[${playerData.ItemInventory.wordSearch ?: "すべて"}]", SoundList.Tick)
+                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[${playerData.ItemInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
                     playerData.viewUpdate()
                     return true
                 }
                 "runesearch" -> {
                     playerData.RuneInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[${playerData.RuneInventory.wordSearch ?: "すべて"}]", SoundList.Tick)
+                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[${playerData.RuneInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
                     playerData.viewUpdate()
                     return true
                 }
                 "petsearch" -> {
                     playerData.PetInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[${playerData.PetInventory.wordSearch ?: "すべて"}]", SoundList.Tick)
+                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[${playerData.PetInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
                     playerData.viewUpdate()
                     return true
                 }

@@ -84,7 +84,7 @@ public class SideBarToDo {
                     }
                     list.addAll(data);
                 } else {
-                    Function.sendMessage(player, "§a正しい§eクラス名§aを入力してください", SoundList.Nope);
+                    Function.sendMessage(player, "§a正しい§eクラス名§aを入力してください", SoundList.NOPE);
                 }
             } else if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("c")) {
                 if (args.length >= 2) {

@@ -42,7 +42,7 @@ public class TarnetB1 {
                     Time = StartTime;
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§cリーライ§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§cリーライ§aを討伐せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
@@ -58,11 +58,11 @@ public class TarnetB1 {
                     if (Enemy.isDead()) {
                         Able = true;
                         getWarpGate("TarnetB1BOSS_to_TarnetB2").ActiveAtTime(ElevatorActiveTime);
-                        Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
+                        Message(Players, DungeonQuestClear, "", ClearText, SoundList.LEVEL_UP);
                         MultiThread.sleepTick(ElevatorActiveTime);
                     } else {
                         Enemy.delete();
-                        Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        Message(Players, DungeonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                     }
                     Players.clear();
                     Able = false;

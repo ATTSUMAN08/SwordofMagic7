@@ -12,7 +12,7 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.Heal;
+import static swordofmagic7.Sound.SoundList.HEAL;
 
 public class DualStar extends BaseSkillClass {
 
@@ -31,7 +31,7 @@ public class DualStar extends BaseSkillClass {
             if (pet != null) {
                 pet.getEffectManager().addEffect(effectType, time);
                 ParticleManager.CylinderParticle(new ParticleData(Particle.FIREWORK), pet.entity.getLocation(), 1.5, 1, 3, 3);
-                playSound(player, Heal);
+                playSound(player, HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);

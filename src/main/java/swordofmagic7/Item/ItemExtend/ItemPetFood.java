@@ -19,14 +19,14 @@ public class ItemPetFood implements Cloneable{
             if (pet.Stamina < pet.MaxStamina) {
                 pet.changeStamina(Stamina);
                 playerData.ItemInventory.removeItemParameter(CurrentItem, 1);
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             } else {
                 player.sendMessage("§e[ペット]§aの§eスタミナ§aが§c最大§aです");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
             }
         } else {
             player.sendMessage(ReqPetSelect);
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 

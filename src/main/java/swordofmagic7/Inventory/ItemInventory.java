@@ -43,7 +43,7 @@ public class ItemInventory extends BasicInventory {
             case Amount -> Sort = ItemSortType.Name;
         }
         player.sendMessage("§e[アイテムインベントリ]§aの§e[ソート方法]§aを§e[" + Sort.Display + "]§aにしました");
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 
@@ -54,7 +54,7 @@ public class ItemInventory extends BasicInventory {
         else msg += "§c[降順]";
         msg += "§aにしました";
         player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 
@@ -153,10 +153,10 @@ public class ItemInventory extends BasicInventory {
     public synchronized void addItemParameter(ItemParameter param, int addAmount) {
         if (list.size() < MaxSlot) {
             if (list.size() >= MaxSlot-10) {
-                sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - list.size()) +"スロット§aです", SoundList.Tick);
+                sendMessage(player, "§e[アイテムインベントリ]§aが§c残り" + (MaxSlot - list.size()) +"スロット§aです", SoundList.TICK);
             }
         } else {
-            sendMessage(player, "§e[アイテムインベントリ]§aが§c満杯§aです", SoundList.Nope);
+            sendMessage(player, "§e[アイテムインベントリ]§aが§c満杯§aです", SoundList.NOPE);
             SomCore.instance.spawnPlayer(player);
         }
         ItemParameterStack stack = getItemParameterStack(param);

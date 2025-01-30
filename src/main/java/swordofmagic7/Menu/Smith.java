@@ -29,7 +29,7 @@ public class Smith {
         inv.setItem(3, SmithMenu_MaterializationIcon);
         inv.setItem(4, SmithMenu_DecryptionIcon);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     public void SmithMenuClick(InventoryView view, ItemStack currentItem) {
@@ -45,7 +45,7 @@ public class Smith {
             } else if (equalItem(currentItem, SmithMenu_DecryptionIcon)) {
                 playerData.Menu.SmithEquipment.Decryption();
             }
-            playSound(player, SoundList.Click);
+            playSound(player, SoundList.CLICK);
         }
     }
 }

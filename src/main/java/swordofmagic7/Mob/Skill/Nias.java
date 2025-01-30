@@ -68,7 +68,7 @@ public class Nias extends EnemySkillBase {
                 enemyList.clear();
             }
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「ここにいる全員があなたを標的にします」", SoundList.DungeonTrigger);
+            radiusMessage("§c「ここにいる全員があなたを標的にします」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
                 for (Location loc : locations) {
@@ -84,7 +84,7 @@ public class Nias extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
             LivingEntity entity = Manager.enemyData.entity;
-            radiusMessage("§c「あなたは過去を振り返ったことがありますか？」", SoundList.DungeonTrigger);
+            radiusMessage("§c「あなたは過去を振り返ったことがありますか？」", SoundList.DUNGEON_TRIGGER);
 
             int time = 200;
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, time);
@@ -99,8 +99,8 @@ public class Nias extends EnemySkillBase {
                 Location location = data.getValue();
                 if (Math.abs(angle(location.getDirection()) % 360 - angle(player.getLocation().getDirection()) % 360) < 170) {
                     Damage.makeDamage(entity, player, DamageCause.ATK, "Regret", 100, 1, 0.5, true);
-                    sendMessage(player, "§c「たまには過去を振り返ってみるべきです」", SoundList.Nope);
-                } else sendMessage(player, "§c「過去を振り返ってみてどうでしたか？」", SoundList.Tick);
+                    sendMessage(player, "§c「たまには過去を振り返ってみるべきです」", SoundList.NOPE);
+                } else sendMessage(player, "§c「過去を振り返ってみてどうでしたか？」", SoundList.TICK);
             }
 
             Manager.CastSkillIgnoreAI(false);
@@ -138,7 +138,7 @@ public class Nias extends EnemySkillBase {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
 
-            radiusMessage("§c「嫌だ...」", SoundList.DungeonTrigger);
+            radiusMessage("§c「嫌だ...」", SoundList.DUNGEON_TRIGGER);
             int time = 200;
             Manager.enemyData.effectManager.addEffect(EffectType.Invincible, time);
             Set<Player> players = new HashSet<>();

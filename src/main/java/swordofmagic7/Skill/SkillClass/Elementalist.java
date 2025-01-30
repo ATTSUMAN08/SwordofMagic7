@@ -30,7 +30,7 @@ import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.RodAttack;
+import static swordofmagic7.Sound.SoundList.ROD_ATTACK;
 
 public class Elementalist extends BaseSkillClass {
 
@@ -46,7 +46,7 @@ public class Elementalist extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.ElementalBurst, (int) skillData.Parameter.get(0).Value*20);
             ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT), player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, "ElementalBurst");
     }
@@ -125,7 +125,7 @@ public class Elementalist extends BaseSkillClass {
                 Damage.makeDamage(player, data.getKey(), DamageCause.MAT, skillData.Id, skillData.Parameter.get(0).Value / 100, data.getValue());
                 MultiThread.sleepTick(1);
             }
-            playSound(player, SoundList.Fire, 6, 1);
+            playSound(player, SoundList.FIRE, 6, 1);
             skillProcess.SkillRigid(skillData);
         }, "FireClaw");
     }
@@ -159,7 +159,7 @@ public class Elementalist extends BaseSkillClass {
                         MultiThread.sleepTick(2);
                     } else break;
                 }
-                playSound(player, RodAttack);
+                playSound(player, ROD_ATTACK);
             }
             skillProcess.SkillRigid(skillData);
         }, "Electrocute");

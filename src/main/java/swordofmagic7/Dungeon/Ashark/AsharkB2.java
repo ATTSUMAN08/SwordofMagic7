@@ -43,7 +43,7 @@ public class AsharkB2 {
                     Time = StartTime;
                     Players = PlayerList.getNearNonDead(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNearNonDead(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§c" + mobName + "§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§c" + mobName + "§aを討伐せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNearNonDead(EventLocation, Radius);
                         Players.addAll(list);
@@ -59,11 +59,11 @@ public class AsharkB2 {
                     if (Enemy.isDead()) {
                         Able = true;
                         getWarpGate("AsharkB2_to_AsharkB3").ActiveAtTime(ElevatorActiveTime);
-                        Message(Players, DungeonQuestClear, "", ClearText, SoundList.LevelUp);
+                        Message(Players, DungeonQuestClear, "", ClearText, SoundList.LEVEL_UP);
                         MultiThread.sleepTick(ElevatorActiveTime);
                     } else {
                         Enemy.delete();
-                        Message(Players, DungeonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        Message(Players, DungeonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                     }
                     Players.clear();
                     Able = false;

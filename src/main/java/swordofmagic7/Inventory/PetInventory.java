@@ -64,10 +64,10 @@ public class PetInventory extends BasicInventory {
     public void addPetParameter(PetParameter pet) {
         if (List.size() < MaxSlot) {
             if (List.size() >= MaxSlot-10) {
-                sendMessage(player, "§e[ペットケージ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.Tick);
+                sendMessage(player, "§e[ペットケージ]§aが§c残り" + (MaxSlot - List.size()) +"スロット§aです", SoundList.TICK);
             }
         } else {
-            sendMessage(player, "§e[ペットケージ]§aが§c満杯§aです", SoundList.Nope);
+            sendMessage(player, "§e[ペットケージ]§aが§c満杯§aです", SoundList.NOPE);
             SomCore.instance.spawnPlayer(player);
         }
         HashMap.put(pet.petUUID, pet);
@@ -100,7 +100,7 @@ public class PetInventory extends BasicInventory {
             case GrowthRate -> Sort = PetSortType.Name;
         }
         player.sendMessage("§e[ペットケージ]§aの§e[ソート方法]§aを§e[" + Sort.Display + "]§aにしました");
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 
@@ -111,7 +111,7 @@ public class PetInventory extends BasicInventory {
         else msg += "§c[降順]";
         msg += "§aにしました";
         player.sendMessage(msg);
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         playerData.viewUpdate();
     }
 

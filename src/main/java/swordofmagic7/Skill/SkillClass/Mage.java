@@ -65,7 +65,7 @@ public class Mage extends BaseSkillClass {
                 origin.setDirection(player.getLocation().getDirection());
                 MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
             }
-            playSound(player, SoundList.Warp);
+            playSound(player, SoundList.WARP);
             skillProcess.SkillRigid(skillData);
         }, "Teleportation");
     }
@@ -87,7 +87,7 @@ public class Mage extends BaseSkillClass {
             for (int i = -2; i < 2; i++) {
                 Location lineLocation = player.getEyeLocation().clone().add(VectorUp).add(getRightDirection(player.getEyeLocation().clone()).multiply(i));
                 ParticleManager.LineParticle(particleData, lineLocation, ray.HitPosition, 0, 10);
-                playSound(player, SoundList.RodAttack);
+                playSound(player, SoundList.ROD_ATTACK);
                 MultiThread.sleepTick(2);
             }
         }, skillData.Id);

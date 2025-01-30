@@ -45,10 +45,10 @@ public class Corsair extends BaseSkillClass {
             } else {
                 if (playerData.EffectManager.hasEffect(EffectType.Brutality)) {
                     playerData.EffectManager.removeEffect(EffectType.Brutality);
-                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§c無効化§aしました", SoundList.Tick);
+                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§c無効化§aしました", SoundList.TICK);
                 } else {
                     playerData.EffectManager.addEffect(EffectType.Brutality, 1, mana);
-                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§b有効化§aしました", SoundList.Tick);
+                    Function.sendMessage(player, "§e[" + EffectType.Brutality + "]§aを§b有効化§aしました", SoundList.TICK);
                 }
             }
             skillProcess.SkillRigid(skillData);
@@ -66,7 +66,7 @@ public class Corsair extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.CoveringFire, time, value);
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -112,11 +112,11 @@ public class Corsair extends BaseSkillClass {
                     if (player.getLocation().distance(origin) < radius) {
                         PlayerData.playerData(player).EffectManager.addEffect(EffectType.JollyRoger, time2);
                         ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
-                        playSound(player, SoundList.Heal);
+                        playSound(player, SoundList.HEAL);
                     }
                 }
             } else {
-                sendMessage(player, "§eコンボ§aを達成できませんでした...", SoundList.Tick);
+                sendMessage(player, "§eコンボ§aを達成できませんでした...", SoundList.TICK);
             }
         }, skillData.Id);
     }
@@ -134,10 +134,10 @@ public class Corsair extends BaseSkillClass {
                 ParticleManager.LineParticle(new ParticleData(Particle.SMOKE), playerHandLocation(player), 20, 0, 10);
                 EffectManager.addEffect(ray.HitEntity, EffectType.IronHook, time, player);
                 IronHookEntity = ray.HitEntity;
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
             } else {
                 player.sendMessage("§c対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -155,10 +155,10 @@ public class Corsair extends BaseSkillClass {
                 EffectManager effectManager = EffectManager.getEffectManager(IronHookEntity);
                 effectManager.addEffect(EffectType.Keelhauling, time, new Object[]{player.getLocation()});
                 effectManager.removeEffect(EffectType.IronHook);
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
             } else {
                 player.sendMessage("§c対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             IronHookEntity = null;

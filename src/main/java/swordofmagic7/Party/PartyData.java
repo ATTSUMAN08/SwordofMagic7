@@ -35,7 +35,7 @@ public class PartyData {
         Members.add(player);
         this.Display = Display;
         setLore(Lore);
-        Function.sendMessage(player, "§e[" + Display + "]§aを作成しました", SoundList.Click);
+        Function.sendMessage(player, "§e[" + Display + "]§aを作成しました", SoundList.CLICK);
     }
 
     public void setLore(String lore) {
@@ -53,10 +53,10 @@ public class PartyData {
                 playerData.Party = this;
                 PartyInvites.remove(player);
             } else {
-                Function.sendMessage(player, MaxPlayerError, SoundList.Nope);
+                Function.sendMessage(player, MaxPlayerError, SoundList.NOPE);
             }
         } else {
-            Function.sendMessage(player, "§e[" + playerData.Party.Display + "]§aに参加しています", SoundList.Nope);
+            Function.sendMessage(player, "§e[" + playerData.Party.Display + "]§aに参加しています", SoundList.NOPE);
         }
     }
 
@@ -68,7 +68,7 @@ public class PartyData {
             playerData.Party = null;
             if (Members.isEmpty()) {
                 PartyList.remove(Display);
-                Function.sendMessage(player, "§e[" + Display + "]§aを§c解散§aしました", SoundList.Tick);
+                Function.sendMessage(player, "§e[" + Display + "]§aを§c解散§aしました", SoundList.TICK);
             } else if (Leader == player) {
                 Promote(Members.getFirst());
             }
@@ -85,26 +85,26 @@ public class PartyData {
                         .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"));
                 inviteMessage = inviteMessage.append(accept);
                 player.sendMessage(inviteMessage);
-                playSound(player, SoundList.Tick);
+                playSound(player, SoundList.TICK);
                 PartyInvites.put(player, this);
                 MultiThread.TaskRunSynchronizedLater(() -> {
                     if (PartyInvites.containsKey(player)) {
                         Message(playerData.getNick() + "§aさんへの§e招待§aが§cタイムアウト§aしました");
-                        Function.sendMessage(player, "§e[" + Display + "]§aからの§e招待§aが§cタイムアウト§aしました", SoundList.Tick);
+                        Function.sendMessage(player, "§e[" + Display + "]§aからの§e招待§aが§cタイムアウト§aしました", SoundList.TICK);
                         PartyInvites.remove(player);
                     }
                 }, 600);
             } else {
-                Function.sendMessage(Leader, MaxPlayerError, SoundList.Nope);
+                Function.sendMessage(Leader, MaxPlayerError, SoundList.NOPE);
             }
         } else {
-            Function.sendMessage(Leader, playerData.getNick() + "§aは§e[" + PartyInvites.get(player).Display + "]§aからの§e招待§aに返答中です", SoundList.Nope);
+            Function.sendMessage(Leader, playerData.getNick() + "§aは§e[" + PartyInvites.get(player).Display + "]§aからの§e招待§aに返答中です", SoundList.NOPE);
         }
     }
 
     public void Message(String msg) {
         for (Player player : Members) {
-            Function.sendMessage(player, msg, SoundList.Tick);
+            Function.sendMessage(player, msg, SoundList.TICK);
         }
     }
 
@@ -144,7 +144,7 @@ public class PartyData {
 
     public void chat(PlayerData playerData, String message) {
         for (Player member : playerData.Party.Members) {
-            Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(message, "§f"), SoundList.Tick);
+            Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(message, "§f"), SoundList.TICK);
         }
     }
 }

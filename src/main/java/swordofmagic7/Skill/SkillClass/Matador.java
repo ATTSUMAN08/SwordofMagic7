@@ -46,10 +46,10 @@ public class Matador extends BaseSkillClass {
             if (ray.isHitEntity()) {
                 EffectManager.addEffect(ray.HitEntity, EffectType.Capote, time, player, new Object[]{player});
             } else {
-                sendMessage(player, "§c対象§aがいません", SoundList.Nope);
+                sendMessage(player, "§c対象§aがいません", SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
-            playSound(player, SoundList.Howl);
+            playSound(player, SoundList.HOWL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -69,7 +69,7 @@ public class Matador extends BaseSkillClass {
                 LivingEntity victim = ray.HitEntity;
                 if (MobManager.isEnemy(victim)) {
                     if (MobManager.EnemyTable(victim.getUniqueId()).target != player) {
-                        sendMessage(player, "§cトップヘイト§aではありません", SoundList.Nope);
+                        sendMessage(player, "§cトップヘイト§aではありません", SoundList.NOPE);
                         skill.resetSkillCoolTimeWaited(skillData);
                         skillProcess.SkillRigid(skillData);
                         return;
@@ -77,10 +77,10 @@ public class Matador extends BaseSkillClass {
                 }
                 playerData.EffectManager.addEffect(EffectType.Ole, time);
             } else {
-                sendMessage(player, "§c対象§aがいません", SoundList.Nope);
+                sendMessage(player, "§c対象§aがいません", SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
-            playSound(player, SoundList.Howl);
+            playSound(player, SoundList.HOWL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -100,7 +100,7 @@ public class Matador extends BaseSkillClass {
             if (ray.isHitEntity()) {
                 Damage.makeDamage(player, ray.HitEntity, DamageCause.ATK, skillData.Id, value, count);
             }
-            playSound(player, SoundList.AttackSweep, count/2, 1);
+            playSound(player, SoundList.ATTACK_SWEEP, count/2, 1);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -117,7 +117,7 @@ public class Matador extends BaseSkillClass {
             ParticleManager.CylinderParticle(particleData, player.getLocation(), 1, 2, 3, 3);
             playerData.EffectManager.addEffect(EffectType.Muleta, time, value);
             if (playerData.Equipment.isEquipRune("ボルテージのルーン")) playerData.EffectManager.addEffect(EffectType.AbsolutelyEVA, time);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -139,7 +139,7 @@ public class Matador extends BaseSkillClass {
 
             victims = RectangleCollider(player.getLocation(), length, width, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, value, 1, 1);
-            playSound(player, SoundList.Howl);
+            playSound(player, SoundList.HOWL);
 
             MultiThread.sleepTick(20);
             origin = origin.add(origin.getDirection().clone().setY(0).normalize().multiply(length));
@@ -151,7 +151,7 @@ public class Matador extends BaseSkillClass {
 
             victims = RectangleCollider(origin, length, width, skillProcess.Predicate(), false);
             Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, value, 1, 1);
-            playSound(player, SoundList.Howl);
+            playSound(player, SoundList.HOWL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }

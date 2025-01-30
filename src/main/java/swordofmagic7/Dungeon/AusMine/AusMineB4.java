@@ -40,7 +40,7 @@ public class AusMineB4 {
                     Time = StartTime;
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§cグリフィア§aを討伐せよ", null, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§cグリフィア§aを討伐せよ", null, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
@@ -54,10 +54,10 @@ public class AusMineB4 {
                     ViewBar.resetBossBarOverrideTargetInfo(Players);
                     Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("AusForest_to_AusMineB1").getLocation());
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LEVEL_UP, getWarpGate("AusForest_to_AusMineB1").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("AusMineB4_to_AusMineB4Boss").getLocation());
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DUNGEON_TRIGGER, getWarpGate("AusMineB4_to_AusMineB4Boss").getLocation());
                     }
                     Players.clear();
                     Start = false;

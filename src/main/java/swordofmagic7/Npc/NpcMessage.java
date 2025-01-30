@@ -18,13 +18,13 @@ public class NpcMessage {
                 reading.put(player, npc.getId());
                 for (String str : getNpcData(npc.getId()).Message) {
                     player.sendMessage(npc.getFullName() + "§7: §a" + str);
-                    playSound(player, SoundList.Tick);
+                    playSound(player, SoundList.TICK);
                     MultiThread.sleepTick(20 + str.length() * 3L);
                 }
                 reading.remove(player);
             } else {
                 player.sendMessage("§aNPCの話を聞いています");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
             }
         }, "ShowMessage");
     }

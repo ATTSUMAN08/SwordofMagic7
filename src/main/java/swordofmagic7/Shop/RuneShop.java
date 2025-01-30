@@ -63,7 +63,7 @@ public class RuneShop {
         inv.setItem(2, RuneShopMenu_RuneUpgrade);
         inv.setItem(3, RuneShopMenu_RunePolish);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     private final List<RuneParameter> RuneCrashed = new ArrayList<>();
@@ -131,7 +131,7 @@ public class RuneShop {
             } else if (equalItem(currentItem, RuneShopMenu_RunePolish)) {
                 RunePolishView();
             }
-            playSound(player, SoundList.Click);
+            playSound(player, SoundList.CLICK);
         } else if (equalInv(view, RuneCrashDisplay) && playerData.ViewInventory.isRune()) {
             if (ClickInventory == view.getTopInventory()) {
                 if (Slot == 53) {
@@ -149,9 +149,9 @@ public class RuneShop {
                     }
                     if (runePower > 0) {
                         playerData.ItemInventory.addItemParameter(RunePowder, runePower);
-                        sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LevelUp);
+                        sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LEVEL_UP);
                     } else {
-                        sendMessage(player, "§e品質" + maxQuality*100 + "%§a未満の§bルーン§aがありません", SoundList.Nope);
+                        sendMessage(player, "§e品質" + maxQuality*100 + "%§a未満の§bルーン§aがありません", SoundList.NOPE);
                     }
                 } else {
                     if (playerData.ItemInventory.hasItemParameter(RunePowder, 1)) {
@@ -160,10 +160,10 @@ public class RuneShop {
                         playerData.RuneInventory.addRuneParameter(rune);
                         playerData.ItemInventory.removeItemParameter(RunePowder, 1);
                         player.sendMessage("§e[ルーン]§aを§b復元§aしました");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
                     } else {
                         player.sendMessage("§e[ルーンの粉]§aが必要です");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
             } else if (index > -1) {
@@ -183,18 +183,18 @@ public class RuneShop {
                         runePower++;
                     }
                     playerData.ItemInventory.addItemParameter(RunePowder, runePower);
-                    sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LevelUp);
+                    sendMessage(player, "§e[ルーン§ax" + runePower + "§e]§aを§c粉砕§aしました", SoundList.LEVEL_UP);
                 } else {
                     RuneParameter rune = playerData.RuneInventory.getRuneParameter(index).clone();
                     if (clickType.isRightClick() && rune.Quality >= maxQuality) {
-                        sendMessage(player, "§e品質§aが§e" + (maxQuality*100) + "%§a以上です", SoundList.Nope);
+                        sendMessage(player, "§e品質§aが§e" + (maxQuality*100) + "%§a以上です", SoundList.NOPE);
                     } else {
                         RuneCrashed.addFirst(rune);
                         if (RuneCrashed.size() > 53) RuneCrashed.remove(53);
                         playerData.RuneInventory.removeRuneParameter(index);
                         playerData.ItemInventory.addItemParameter(RunePowder, 1);
                         player.sendMessage("§e[ルーン]§aを§c粉砕§aしました");
-                        playSound(player, SoundList.LevelUp);
+                        playSound(player, SoundList.LEVEL_UP);
                     }
                 }
             }
@@ -209,7 +209,7 @@ public class RuneShop {
                         RuneCache = playerData.ItemInventory.getItemParameter(index);
                         playerData.ItemInventory.removeItemParameter(RuneCache, 1);
                         playerData.setView(ViewInventoryType.RuneInventory, false);
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     } else if (playerData.ViewInventory.isRune()) {
                         if (RuneCache != null) {
                             RuneParameter rune = playerData.RuneInventory.getRuneParameter(index);
@@ -221,22 +221,22 @@ public class RuneShop {
                                 }
                             }
                             if (isSetSpecial) {
-                                sendMessage(player, "§e特殊ルーン§aは§c重複§aしません", SoundList.Nope);
+                                sendMessage(player, "§e特殊ルーン§aは§c重複§aしません", SoundList.NOPE);
                             } else {
                                 if (RuneCache.itemEquipmentData.equipmentCategory == EquipmentCategory.Accessory && !rune.isSpecial) {
-                                    sendMessage(player, "§eアクセサリ§aは§e特殊ルーン§aのみ装着出来ます", SoundList.Nope);
+                                    sendMessage(player, "§eアクセサリ§aは§e特殊ルーン§aのみ装着出来ます", SoundList.NOPE);
                                 } else {
                                     if (RuneCache.itemEquipmentData.getRuneSize() < RuneCache.itemEquipmentData.RuneSlot) {
                                         playerData.RuneInventory.removeRuneParameter(index);
                                         RuneCache.itemEquipmentData.addRune(rune);
-                                        playSound(player, SoundList.Click);
+                                        playSound(player, SoundList.CLICK);
                                     } else {
-                                        sendMessage(player, "§eルーンスロット§aに空きがありません", SoundList.Nope);
+                                        sendMessage(player, "§eルーンスロット§aに空きがありません", SoundList.NOPE);
                                     }
                                 }
                             }
                         } else {
-                            sendMessage(player, "§e装備§aを§eセット§aしてください", SoundList.Nope);
+                            sendMessage(player, "§e装備§aを§eセット§aしてください", SoundList.NOPE);
                         }
                     }
                 }
@@ -245,7 +245,7 @@ public class RuneShop {
                     playerData.ItemInventory.addItemParameter(RuneCache, 1);
                     RuneCache = null;
                     playerData.setView(ViewInventoryType.ItemInventory, false);
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else if ((14 <= Slot && Slot <= 16) || (23 <= Slot && Slot <= 25) || (32 <= Slot && Slot <= 34)) {
                     int RuneIndex;
                     if (Slot <= 16) {
@@ -258,7 +258,7 @@ public class RuneShop {
                     if (RuneIndex < RuneCache.itemEquipmentData.getRuneSize()) {
                         playerData.RuneInventory.addRuneParameter(RuneCache.itemEquipmentData.getRune(RuneIndex));
                         RuneCache.itemEquipmentData.removeRune(RuneIndex);
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     }
                 }
             }
@@ -291,7 +291,7 @@ public class RuneShop {
                             RuneUpgradeCache[i] = null;
                         }
                     }
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else if (Slot == AnvilUISlot[2] && RuneUpgradeCache[2] != null) {
                     int mel = runeCost(RuneUpgradeCache[2]);
                     if (playerData.Mel >= mel) {
@@ -299,9 +299,9 @@ public class RuneShop {
                         RuneUpgradeCache[0] = RuneUpgradeCache[2];
                         RuneUpgradeCache[1] = null;
                         RuneUpgradeCache[2] = null;
-                        sendMessage(player, "§e[ルーン]§aを§b合成§aしました §c[-" + mel + "メル]", SoundList.LevelUp);
+                        sendMessage(player, "§e[ルーン]§aを§b合成§aしました §c[-" + mel + "メル]", SoundList.LEVEL_UP);
                     } else {
-                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
+                        sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.NOPE);
                     }
                 }
             } else if (index > -1) {
@@ -310,22 +310,22 @@ public class RuneShop {
                     if (RuneUpgradeCache[0] == null) {
                         RuneUpgradeCache[0] = rune;
                         playerData.RuneInventory.removeRuneParameter(index);
-                        playSound(player, SoundList.Click);
+                        playSound(player, SoundList.CLICK);
                     } else if (RuneUpgradeCache[1] == null) {
                         if (RuneUpgradeCache[0].Id.equals(rune.Id)) {
                             if (RuneUpgradeCache[0].Level >= rune.Level) {
                                 RuneUpgradeCache[1] = rune.clone();
                                 playerData.RuneInventory.removeRuneParameter(index);
-                                playSound(player, SoundList.Click);
+                                playSound(player, SoundList.CLICK);
                             } else {
-                                sendMessage(player, "§e素体ルーン§aより§e高レベル§aな§eルーン§aは素材に出来ません", SoundList.Nope);
+                                sendMessage(player, "§e素体ルーン§aより§e高レベル§aな§eルーン§aは素材に出来ません", SoundList.NOPE);
                             }
                         } else {
-                            sendMessage(player, "§e[同名]§aの§e[ルーン]§aを選択してください", SoundList.Nope);
+                            sendMessage(player, "§e[同名]§aの§e[ルーン]§aを選択してください", SoundList.NOPE);
                         }
                     }
                 } else {
-                    sendMessage(player, "§e[特殊ルーン]§aは§b合成§a出来ません", SoundList.Nope);
+                    sendMessage(player, "§e[特殊ルーン]§aは§b合成§a出来ません", SoundList.NOPE);
                 }
             }
             for (int i = 0; i < 2; i++) {
@@ -369,27 +369,27 @@ public class RuneShop {
                             }
                             playerData.ItemInventory.removeItemParameter(RunePowder, amount);
                             player.sendMessage("§e[ルーン]§aを§b研磨§aしました §c[-" + mel + "メル]");
-                            playSound(player, SoundList.LevelUp);
+                            playSound(player, SoundList.LEVEL_UP);
                         } else {
-                            sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.Nope);
+                            sendMessage(player, "§eメル§aが足りません §c[" + mel + "メル]", SoundList.NOPE);
                         }
                     } else {
-                        sendMessage(player, "§e[" + RunePowder.Display + "]§aが足りません", SoundList.Nope);
+                        sendMessage(player, "§e[" + RunePowder.Display + "]§aが足りません", SoundList.NOPE);
                     }
                 } else if (RuneUpgradeCache[0] != null) {
                     playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
                     RuneUpgradeCache[0] = null;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
             } else if (index > -1) {
                 if (RuneUpgradeCache[0] != null) playerData.RuneInventory.addRuneParameter(RuneUpgradeCache[0]);
                 RuneUpgradeCache[0] = playerData.RuneInventory.getRuneParameter(index).clone();
                 if (RuneUpgradeCache[0].Quality < maxQuality) {
                     playerData.RuneInventory.removeRuneParameter(index);
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 } else {
                     RuneUpgradeCache[0] = null;
-                    sendMessage(player, "§e[品質]§aが§e[" + String.format("%.0f", maxQuality*100) + "%以上]§aです", SoundList.Nope);
+                    sendMessage(player, "§e[品質]§aが§e[" + String.format("%.0f", maxQuality*100) + "%以上]§aです", SoundList.NOPE);
                 }
             }
             if (RuneUpgradeCache[0] != null) {

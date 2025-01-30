@@ -318,7 +318,7 @@ public class Events implements Listener {
                 String shop = unColored(entity.getCustomName());
                 if (ShopList.containsKey(shop)) {
                     playerData.Shop.ShopOpen(getShopData(shop));
-                    playSound(player, SoundList.MenuOpen);
+                    playSound(player, SoundList.MENU_OPEN);
                 } else if (shop.equalsIgnoreCase("ペットショップ")) {
                     playerData.PetShop.PetShopOpen();
                 } else if (shop.equalsIgnoreCase("ルーン職人")) {
@@ -337,7 +337,7 @@ public class Events implements Listener {
                     playerData.Status.Health = playerData.Status.MaxHealth;
                     playerData.Status.Mana = playerData.Status.MaxMana;
                     ParticleManager.CylinderParticle(new ParticleData(Particle.HAPPY_VILLAGER), player.getLocation(), 1, 2, 3, 3);
-                    playSound(player, SoundList.Heal);
+                    playSound(player, SoundList.HEAL);
                 } else if (shop.equalsIgnoreCase("マーケット")) {
                     playerData.Menu.Market.MarketMenuView();
                 } else if (shop.equalsIgnoreCase("チュートリアル最低限編")) {
@@ -362,7 +362,7 @@ public class Events implements Listener {
                 Material Under1 = event.getClickedBlock().getLocation().add(0, -1,0).getBlock().getType();
                 Material Under2 = event.getClickedBlock().getLocation().add(0, -2,0).getBlock().getType();
                 if (Under1 == Material.IRON_BLOCK) {
-                    playSound(player, SoundList.Shoot);
+                    playSound(player, SoundList.SHOOT);
                     player.setVelocity(player.getLocation().getDirection().multiply(0.4).setY(0.5));
                 } else if (Under1 == Material.GOLD_BLOCK || Under2 == Material.GOLD_BLOCK) {
                     event.setCancelled(true);
@@ -374,13 +374,13 @@ public class Events implements Listener {
                             MultiThread.sleepTick(1);
                         }
                     }, "PressurePlate");
-                    playSound(player, SoundList.Shoot);
+                    playSound(player, SoundList.SHOOT);
 
                 } else if (Under1 == Material.EMERALD_BLOCK || Under2 == Material.EMERALD_BLOCK) {
                     event.setCancelled(true);
                     Vector vec = new Vector(0, 2.8, 0);
                     player.setVelocity(vec);
-                    playSound(player, SoundList.Shoot);
+                    playSound(player, SoundList.SHOOT);
 
                 }
             }

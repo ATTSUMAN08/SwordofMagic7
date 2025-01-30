@@ -5,7 +5,6 @@ import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.exceptions.SomStackTraceException;
@@ -83,11 +82,11 @@ public final class Function {
         Player player = playerData.player;
         Player target = targetData.player;
         if (targetData.isBlockFromPlayer(player)) {
-            sendMessage(player, "§c" + playerData.Nick + "§aから§4Block§aされています", SoundList.Nope);
+            sendMessage(player, "§c" + playerData.Nick + "§aから§4Block§aされています", SoundList.NOPE);
             return true;
         }
         if (playerData.isBlockPlayer(target)) {
-            sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしています", SoundList.Nope);
+            sendMessage(player, "§c" + targetData.Nick + "§aを§4Block§aしています", SoundList.NOPE);
             return true;
         }
         return false;

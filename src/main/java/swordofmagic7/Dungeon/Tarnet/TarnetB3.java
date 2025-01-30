@@ -54,7 +54,7 @@ public class TarnetB3 {
     public static void radiusMessage(String message) {
         for (Player player : Players) {
             Function.sendMessage(player, message);
-            playSound(player, SoundList.DungeonTrigger);
+            playSound(player, SoundList.DUNGEON_TRIGGER);
         }
     }
 
@@ -71,7 +71,7 @@ public class TarnetB3 {
                     Time = StartTime;
                     Players = PlayerList.getNear(EventLocation, Radius);
                     Set<Player> list = PlayerList.getNear(EventLocation, Radius);
-                    Message(Players, DungeonQuestTrigger, "§cシノサス§aを討伐せよ", EnterTextData, SoundList.DungeonTrigger);
+                    Message(Players, DungeonQuestTrigger, "§cシノサス§aを討伐せよ", EnterTextData, SoundList.DUNGEON_TRIGGER);
                     while (Time > 0 && Enemy.isAlive() && !list.isEmpty() && instance.isEnabled()) {
                         list = PlayerList.getNear(EventLocation, Radius);
                         Players.addAll(list);
@@ -102,10 +102,10 @@ public class TarnetB3 {
                     ViewBar.resetBossBarOverrideTargetInfo(Players);
                     Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
-                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LevelUp, getWarpGate("TarnetB1_to_Nefritas").getLocation());
+                        MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LEVEL_UP, getWarpGate("TarnetB1_to_Nefritas").getLocation());
                     } else {
                         Enemy.delete();
-                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DungeonTrigger, getWarpGate("TarnetB2_to_TarnetB3BOSS").getLocation());
+                        MessageTeleport(list, DungeonQuestFailed, null, SoundList.DUNGEON_TRIGGER, getWarpGate("TarnetB2_to_TarnetB3BOSS").getLocation());
                     }
 
                     Players.clear();

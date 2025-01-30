@@ -30,10 +30,10 @@ public class QuestManager {
         if (QuestList.size() < MaxQuest) {
             QuestList.put(questData, new QuestProcess(questData));
             player.sendMessage("§e[" + questData.Display + "]§aを§b受注§aしました");
-            playSound(player, SoundList.Accept);
+            playSound(player, SoundList.ACCEPT);
         } else {
             player.sendMessage("§e[クエスト]§aは同時に§c[" + MaxQuest + "個]§aまでしか受けれません");
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 
@@ -41,7 +41,7 @@ public class QuestManager {
         if (QuestList.containsKey(questData)) {
             QuestList.remove(questData);
             player.sendMessage("§e[" + questData.Display + "]§aを§c破棄§aしました");
-            playSound(player, SoundList.Accept);
+            playSound(player, SoundList.ACCEPT);
         }
     }
 

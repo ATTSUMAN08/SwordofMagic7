@@ -25,7 +25,7 @@ public class ItemPotion implements Cloneable {
             multiply += DataBase.getSkillData("PotionSommelier").ParameterValue(0)/100;
         }
         if (playerData.PotionCoolTime.containsKey(PotionType)) {
-            if (playerData.NaturalMessage) sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.PotionCoolTime.get(PotionType) + "秒]§aです", SoundList.Nope);
+            if (playerData.NaturalMessage) sendMessage(player, "§c[使用可能]§aまで§c[" + playerData.PotionCoolTime.get(PotionType) + "秒]§aです", SoundList.NOPE);
         } else {
             if (PotionType.isHealth()) {
                 if (playerData.Status.Health < playerData.Status.MaxHealth) {
@@ -39,7 +39,7 @@ public class ItemPotion implements Cloneable {
                     used = true;
                 } else {
                     player.sendMessage("§e[体力]§aが減っていません");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             }
             boolean isSprinkleManaPotion = playerData.Skill.hasSkill("SprinkleManaPotion");
@@ -62,14 +62,14 @@ public class ItemPotion implements Cloneable {
                     used = true;
                 } else {
                     player.sendMessage("§e[マナ]§aが減っていません");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             }
         }
         if (used) {
             playerData.ItemInventory.removeItemParameter(currentItem, 1);
             playerData.PotionCoolTime.put(PotionType, CoolTime);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             MultiThread.TaskRunSynchronized(() -> player.setCooldown(Material.GLASS_BOTTLE, CoolTime*20));
         }
     }

@@ -1,8 +1,1 @@
 serverId: Dev
-
-redis:
-  host: localhost
-  port: 6379
-  username: null
-  password: null
-  ssl: false

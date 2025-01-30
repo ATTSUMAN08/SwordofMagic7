@@ -24,19 +24,19 @@ public class TradeManager {
     public static final String nonTradeMessage = "§cトレード不可§aです";
     public static boolean nonTrade(Player player, ItemParameter param) {
         if (param.isNonTrade) {
-            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.NOPE);
             return true;
         } else return false;
     }
     public static boolean nonTrade(Player player, RuneParameter param) {
         if (param.isNonTrade) {
-            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            sendMessage(player, "§e[" + param.Display + "]§aは" + nonTradeMessage, SoundList.NOPE);
             return true;
         } else return false;
     }
     public static boolean nonTrade(Player player, PetParameter param) {
         if (param.petData.isNonTrade) {
-            sendMessage(player, "§e[" + param.petData.Display + "]§aは" + nonTradeMessage, SoundList.Nope);
+            sendMessage(player, "§e[" + param.petData.Display + "]§aは" + nonTradeMessage, SoundList.NOPE);
             return true;
         } else return false;
     }
@@ -69,19 +69,19 @@ public class TradeManager {
                                         target.sendMessage(playerData.getNick() + "§aさんから§e[" + item.Display + "§ax" + Amount + "§e]§aが送られてきました");
                                         playerData.viewUpdate();
                                         targetData.viewUpdate();
-                                        playSound(player, SoundList.Tick);
-                                        playSound(target, SoundList.Tick);
+                                        playSound(player, SoundList.TICK);
+                                        playSound(target, SoundList.TICK);
                                     } else {
                                         player.sendMessage("§c所持数§aが足りません");
-                                        playSound(player, SoundList.Nope);
+                                        playSound(player, SoundList.NOPE);
                                     }
                                 } else {
                                     player.sendMessage("§c不正§aな§eスロット§aです");
-                                    playSound(player, SoundList.Nope);
+                                    playSound(player, SoundList.NOPE);
                                 }
                             } else {
                                 player.sendMessage("§c不正§aな§eスロット§aです");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                             return;
                         } else if (args[1].equalsIgnoreCase("sendRune") || args[1].equalsIgnoreCase("sR")) {
@@ -97,11 +97,11 @@ public class TradeManager {
                                 }
                                 playerData.viewUpdate();
                                 targetData.viewUpdate();
-                                playSound(player, SoundList.Tick);
-                                playSound(target, SoundList.Tick);
+                                playSound(player, SoundList.TICK);
+                                playSound(target, SoundList.TICK);
                             } else {
                                 player.sendMessage("§c不正§aな§eスロット§aです");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                             return;
                         } else if (args[1].equalsIgnoreCase("sendPet") || args[1].equalsIgnoreCase("sP")) {
@@ -117,15 +117,15 @@ public class TradeManager {
                                     target.sendMessage(playerData.getNick() + "§aさんから§e[" + pet.petData.Display + "§e]§aが送られてきました");
                                     playerData.viewUpdate();
                                     targetData.viewUpdate();
-                                    playSound(player, SoundList.Tick);
-                                    playSound(target, SoundList.Tick);
+                                    playSound(player, SoundList.TICK);
+                                    playSound(target, SoundList.TICK);
                                 } else {
                                     player.sendMessage("§e[ペット]§aが召喚されています");
-                                    playSound(player, SoundList.Nope);
+                                    playSound(player, SoundList.NOPE);
                                 }
                             } else {
                                 player.sendMessage("§c不正§aな§eスロット§aです");
-                                playSound(player, SoundList.Nope);
+                                playSound(player, SoundList.NOPE);
                             }
                             return;
                         } else if (index > 0) {
@@ -135,11 +135,11 @@ public class TradeManager {
                                     playerData.Mel -= index;
                                     player.sendMessage(targetData.getNick() + "§aさんに§e[" + index + "メル]§aを送りました");
                                     target.sendMessage(playerData.getNick() + "§aさんから§e[" + index + "メル]§aが送られてきました");
-                                    playSound(player, SoundList.Tick);
-                                    playSound(target, SoundList.Tick);
+                                    playSound(player, SoundList.TICK);
+                                    playSound(target, SoundList.TICK);
                                 } else {
                                     player.sendMessage(NonMel);
-                                    playSound(player, SoundList.Nope);
+                                    playSound(player, SoundList.NOPE);
                                 }
                             }
                             return;

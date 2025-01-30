@@ -24,7 +24,7 @@ import static swordofmagic7.Function.playerHandLocation;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.RodAttack;
+import static swordofmagic7.Sound.SoundList.ROD_ATTACK;
 
 public class Pardoner extends BaseSkillClass {
 
@@ -45,7 +45,7 @@ public class Pardoner extends BaseSkillClass {
             for (Player target : PlayerList.getNearNonDead(player.getLocation(), radius)) {
                 if (skillProcess.isAllies(target) || target == player) {
                     playerData(target).EffectManager.addEffect(EffectType.Indulgendia, time, heal);
-                    playSound(target, SoundList.Heal);
+                    playSound(target, SoundList.HEAL);
                 }
             }
             skillProcess.SkillRigid(skillData);
@@ -81,10 +81,10 @@ public class Pardoner extends BaseSkillClass {
                         sendMessage(player, "§c[" + data.getKey().Display + "]§aを延長しました");
                     }
                 }
-                playSound(player, RodAttack);
+                playSound(player, ROD_ATTACK);
             } else {
                 player.sendMessage("§e対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -126,11 +126,11 @@ public class Pardoner extends BaseSkillClass {
             }
             if (!cured) {
                 player.sendMessage("§e対象§aに§cデバフ§aが付与されていません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             } else {
-                playSound(player, SoundList.Heal);
-                playSound(target, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
+                playSound(target, SoundList.HEAL);
             }
             skillProcess.SkillRigid(skillData);
         }, "Forgiveness");
@@ -155,7 +155,7 @@ public class Pardoner extends BaseSkillClass {
             }
 
             EffectManager.addEffect(target, effectType, time, stack, player);
-            playSound(target, RodAttack);
+            playSound(target, ROD_ATTACK);
             skillProcess.SkillRigid(skillData);
         }, "Indulgence");
     }

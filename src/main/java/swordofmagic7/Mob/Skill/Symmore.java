@@ -52,7 +52,7 @@ public class Symmore {
             while (Manager.enemyData.isAlive() && !Manager.setCancel) {
                 if (i < list.size()*2) {
                     i++;
-                    playSound(Manager.enemyData.entity.getLocation(), SoundList.Howl, 3, 1);
+                    playSound(Manager.enemyData.entity.getLocation(), SoundList.HOWL, 3, 1);
                     ParticleManager.RandomVectorParticle(new ParticleData(Particle.CRIT), Manager.enemyData.entity.getLocation(), 100);
                     final LivingEntity target = (LivingEntity) Function.GetRandom(list);
                     if (target != null) {
@@ -88,7 +88,7 @@ public class Symmore {
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), 32)) {
                 player.sendMessage("§c強力な攻撃§aの準備をしています！");
                 player.sendMessage("§c攻撃§aして§c阻止§aしてください！");
-                playSound(player, SoundList.DungeonTrigger);
+                playSound(player, SoundList.DUNGEON_TRIGGER);
             }
             final Set<LivingEntity> list = PlayerList.getNearLivingEntity(Manager.enemyData.entity.getLocation(), 32);
             ParticleData particleData = new ParticleData(Particle.WITCH, 0.5f);
@@ -103,12 +103,12 @@ public class Symmore {
                         ParticleManager.RandomVectorParticle(Manager.particleCasting, Manager.enemyData.entity.getLocation(), 100);
                         for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 32)) {
                             player.sendMessage("§c強力な攻撃§aを防ぎました！");
-                            playSound(player, SoundList.Tick);
+                            playSound(player, SoundList.TICK);
                         }
                     } else {
                         for (Player player : PlayerList.getNear(Manager.enemyData.entity.getLocation(), 32)) {
                             player.sendMessage("§c強力な攻撃§aを防げませんでした...");
-                            playSound(player, SoundList.Tick);
+                            playSound(player, SoundList.TICK);
                         }
                         ParticleManager.RandomVectorParticle(particleData, Manager.enemyData.entity.getLocation(), 100);
                         ParticleManager.RandomVectorParticle(particleData1, Manager.enemyData.entity.getLocation(), 10);
@@ -116,7 +116,7 @@ public class Symmore {
                             ParticleManager.RandomVectorParticle(particleData1, entity.getLocation(), 10);
                             Damage.makeDamage(Manager.enemyData.entity, entity, DamageCause.MAT, "MagicExplosion", 100, 1, 0.75, true);
                         }
-                        playSound(Manager.enemyData.entity.getLocation(), SoundList.Explosion, 10, 1);
+                        playSound(Manager.enemyData.entity.getLocation(), SoundList.EXPLOSION, 10, 1);
                     }
                     break;
                 }

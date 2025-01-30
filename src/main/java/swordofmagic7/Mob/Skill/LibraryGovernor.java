@@ -53,14 +53,14 @@ public class LibraryGovernor {
     public void ToBow() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c「まずはお辞儀しましょう」", SoundList.DungeonTrigger);
+            radiusMessage("§c「まずはお辞儀しましょう」", SoundList.DUNGEON_TRIGGER);
             MultiThread.sleepTick(50);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 if (!player.isSneaking() || player.getEyeLocation().getPitch() < 70) {
                     PlayerData.playerData(player).setHealth(1);
-                    sendMessage(player, "§cルールや手順を誤ると待っているのは死です。次からは気をつけましょう", SoundList.Nope);
+                    sendMessage(player, "§cルールや手順を誤ると待っているのは死です。次からは気をつけましょう", SoundList.NOPE);
                 } else {
-                    sendMessage(player, "§c勝利の糸口はルールや手順を守ることです", SoundList.Nope);
+                    sendMessage(player, "§c勝利の糸口はルールや手順を守ることです", SoundList.NOPE);
                 }
             }
             MultiThread.sleepTick(10);
@@ -71,7 +71,7 @@ public class LibraryGovernor {
     public void ItsGlory() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「栄光とはどのようなことを指すのでしょうか」", SoundList.DungeonTrigger);
+            radiusMessage("§c「栄光とはどのようなことを指すのでしょうか」", SoundList.DUNGEON_TRIGGER);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 EffectManager.addEffect(player, EffectType.Glory, 900, null);
             }
@@ -83,7 +83,7 @@ public class LibraryGovernor {
     public void ExcessiveTreatment() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c「治療は適度に行うべきです。過剰な治療は時に死ぬを招くこともあります」", SoundList.DungeonTrigger);
+            radiusMessage("§c「治療は適度に行うべきです。過剰な治療は時に死ぬを招くこともあります」", SoundList.DUNGEON_TRIGGER);
             MultiThread.sleepTick(50);
             Set<PlayerData> playerDataSet = new HashSet<>();
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
@@ -97,7 +97,7 @@ public class LibraryGovernor {
                     playerData.changeHealth(playerData.Status.MaxHealth/100);
                     if (playerData.Status.Health == playerData.Status.MaxHealth) {
                         playerData.dead();
-                        sendMessage(playerData.player, "§c「過剰な治療は時に死ぬ招くこともあります」", SoundList.Nope);
+                        sendMessage(playerData.player, "§c「過剰な治療は時に死ぬ招くこともあります」", SoundList.NOPE);
                     }
                 }
                 playerDataSet.removeIf(playerData -> playerData.isDead);
@@ -106,9 +106,9 @@ public class LibraryGovernor {
             for (PlayerData playerData : playerDataSet) {
                 if (playerData.Status.Health < playerData.Status.MaxHealth*0.8) {
                     playerData.dead();
-                    sendMessage(playerData.player, "§c「どうして適度な治療を行わなかったのでしょうか」", SoundList.Nope);
+                    sendMessage(playerData.player, "§c「どうして適度な治療を行わなかったのでしょうか」", SoundList.NOPE);
                 } else {
-                    sendMessage(playerData.player, "§c「適度な治療とはこのようなことを言うのです」", SoundList.Tick);
+                    sendMessage(playerData.player, "§c「適度な治療とはこのようなことを言うのです」", SoundList.TICK);
                 }
             }
             MultiThread.sleepTick(10);
@@ -119,7 +119,7 @@ public class LibraryGovernor {
     public void UnpleasantOmen() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c「どこかから嫌な気配を感じます」", SoundList.DungeonTrigger);
+            radiusMessage("§c「どこかから嫌な気配を感じます」", SoundList.DUNGEON_TRIGGER);
             ParticleData particleData = new ParticleData(Particle.FLAME);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 PlayerData.playerData(player).EffectManager.addEffect(EffectType.Unconscious, 50);
@@ -146,9 +146,9 @@ public class LibraryGovernor {
                 if (location != null) {
                     ParticleManager.LineParticle(particleData, location, player.getEyeLocation(), 1, 2);
                     PlayerData.playerData(player).dead();
-                    sendMessage(player, "§c「嫌な気配の正体は死だったようです」", SoundList.Nope);
+                    sendMessage(player, "§c「嫌な気配の正体は死だったようです」", SoundList.NOPE);
                 } else {
-                    sendMessage(player, "§c「嫌な気配は無くなりました」", SoundList.Tick);
+                    sendMessage(player, "§c「嫌な気配は無くなりました」", SoundList.TICK);
                 }
             }
             MultiThread.sleepTick(10);
@@ -159,22 +159,22 @@ public class LibraryGovernor {
     public void DifferenceInInertia() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「寂しがりやな人、一人でいたい人、それぞれ感性の違いというものがあります」", SoundList.DungeonTrigger);
+            radiusMessage("§c「寂しがりやな人、一人でいたい人、それぞれ感性の違いというものがあります」", SoundList.DUNGEON_TRIGGER);
             MultiThread.sleepTick(80);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 int hashInt = Function.StringToHashInt(player.getName(), 2);
                 if (hashInt == 0) {
                     if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).size() > 0) {
-                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.Tick);
+                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.TICK);
                     } else {
-                        sendMessage(player, "§c「寂しさは、時に人を死に追いやります」", SoundList.Nope);
+                        sendMessage(player, "§c「寂しさは、時に人を死に追いやります」", SoundList.NOPE);
                         PlayerData.playerData(player).dead();
                     }
                 } else if (hashInt == 1) {
                     if (Function.NearLivingEntity(player.getLocation(), 3, Function.otherPredicate(player)).isEmpty()) {
-                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.Tick);
+                        sendMessage(player, "§c「自分が傍に居たいからって、相手も自分の傍にいたいなんて思ってはいけません」", SoundList.TICK);
                     } else {
-                        sendMessage(player, "§c「一人でいたいときに、周りに人がいるのは不快です」", SoundList.Nope);
+                        sendMessage(player, "§c「一人でいたいときに、周りに人がいるのは不快です」", SoundList.NOPE);
                         PlayerData.playerData(player).dead();
                     }
                 }
@@ -187,12 +187,12 @@ public class LibraryGovernor {
     public void GovernorSave() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c記録を開始します", SoundList.DungeonTrigger);
+            radiusMessage("§c記録を開始します", SoundList.DUNGEON_TRIGGER);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 EffectManager.addEffect(player, EffectType.Fixed, 30, null, player.getLocation());
             }
             MultiThread.sleepTick(30);
-            radiusMessage("§c記録が完了しました", SoundList.Tick);
+            radiusMessage("§c記録が完了しました", SoundList.TICK);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 saveLoad.put(player, player.getLocation().clone());
             }
@@ -204,13 +204,13 @@ public class LibraryGovernor {
     public void GovernorLoad() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c記録から読込を開始します", SoundList.DungeonTrigger);
+            radiusMessage("§c記録から読込を開始します", SoundList.DUNGEON_TRIGGER);
             MultiThread.sleepTick(100);
-            radiusMessage("§c読込が完了しました", SoundList.Tick);
+            radiusMessage("§c読込が完了しました", SoundList.TICK);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 if (!saveLoad.containsKey(player) || saveLoad.get(player).distance(player.getLocation()) > 2) {
                     PlayerData.playerData(player).dead();
-                    sendMessage(player, "§c情報が一致しないため該当データを破棄します", SoundList.Tick);
+                    sendMessage(player, "§c情報が一致しないため該当データを破棄します", SoundList.TICK);
                 }
             }
             MultiThread.sleepTick(10);
@@ -221,7 +221,7 @@ public class LibraryGovernor {
     public void NecessarySacrifice() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「必要な犠牲はいつしも付きまといます」", SoundList.DungeonTrigger);
+            radiusMessage("§c「必要な犠牲はいつしも付きまといます」", SoundList.DUNGEON_TRIGGER);
             double radius = 2.5;
             double x = random.nextDouble()*5;
             double z = random.nextDouble()*5;
@@ -237,7 +237,7 @@ public class LibraryGovernor {
                 Damage.makeDamage(entity, player, DamageCause.ATK, "NecessarySacrifice", 5, 1, 0, true, true);
             } else {
                 for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), this.radius)) {
-                    sendMessage(player, "§c「なにも犠牲にしないことは出来ないのです」", SoundList.Nope);
+                    sendMessage(player, "§c「なにも犠牲にしないことは出来ないのです」", SoundList.NOPE);
                     PlayerData.playerData(player).dead();
                 }
             }
@@ -249,7 +249,7 @@ public class LibraryGovernor {
     public void LetsShutUp() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「すこし黙りましょう」", SoundList.DungeonTrigger);
+            radiusMessage("§c「すこし黙りましょう」", SoundList.DUNGEON_TRIGGER);
             for (Player player : PlayerList.getNearNonDead(Manager.enemyData.entity.getLocation(), radius)) {
                 int time = Function.StringToHashInt(player.getName(), 200) + 100;
                 EffectManager.addEffect(player, EffectType.Silence, time, null);
@@ -263,7 +263,7 @@ public class LibraryGovernor {
         String id = "IndividualityConcrete";
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c「人には全く違うものや似通った個性があります」", SoundList.DungeonTrigger);
+            radiusMessage("§c「人には全く違うものや似通った個性があります」", SoundList.DUNGEON_TRIGGER);
             LivingEntity entity = Manager.enemyData.entity;
             EffectType effectType = EffectType.IndividualityConcrete;
             for (Player player : PlayerList.getNearNonDead(entity.getLocation(), radius)) {
@@ -305,7 +305,7 @@ public class LibraryGovernor {
                             for (int i = 0; i < 12; i++) {
                                 if (!RayTrace.rayLocationEntity(player.getEyeLocation(), 100, 0, entityPre -> entityPre == entity).isHitEntity()) {
                                     Damage.makeDamage(entity, player, DamageCause.MAT, id, 100, 1, 0.5, true);
-                                    sendMessage(player, "§c[" + effectType.Display + "]により致死ダメージを受けました", SoundList.Nope);
+                                    sendMessage(player, "§c[" + effectType.Display + "]により致死ダメージを受けました", SoundList.NOPE);
                                 }
                                 MultiThread.sleepTick(40);
                             }

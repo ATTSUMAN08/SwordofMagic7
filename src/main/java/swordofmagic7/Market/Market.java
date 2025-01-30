@@ -34,7 +34,7 @@ public class Market {
     public static void marketCommand(PlayerData playerData, String[] args) {
         Player player = playerData.player;
         if (!playerData.Map.Safe) {
-            Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.Nope);
+            Function.sendMessage(player, "§eセーフゾーン§aでのみ使用可能です", SoundList.NOPE);
             return;
         }
         if (args.length >= 1) {
@@ -54,10 +54,10 @@ public class Market {
                 Function.sendMessage(player, message);
                 if (args.length >= 2 && args[1].equalsIgnoreCase("confirm")) {
                     playerData.Mel += addMel;
-                    Function.sendMessage(player, "§b[+]§e" + addMel + "メル§", SoundList.LevelUp);
+                    Function.sendMessage(player, "§b[+]§e" + addMel + "メル§", SoundList.LEVEL_UP);
                     market.Mel = 0;
                     market.save();
-                } else playSound(player, SoundList.Tick);
+                } else playSound(player, SoundList.TICK);
                 return;
             }
             if (args.length >= 2) {
@@ -67,7 +67,7 @@ public class Market {
                     if (ItemList.containsKey(args[1])) {
                         sendMessage(player, "§7・§e" + args[1] + "§7: §a" + (data.isSet(args[1]) ? data.getInt(args[1]) + "メル" : "§7過去取引無し"));
                     } else {
-                        sendMessage(player, "§a存在しない§eアイテム§aです", SoundList.Nope);
+                        sendMessage(player, "§a存在しない§eアイテム§aです", SoundList.NOPE);
                     }
                     return;
                 }
@@ -84,7 +84,7 @@ public class Market {
                                     if (amount > 0 && stack.Amount >= amount) {
                                         stack.Amount = amount;
                                     } else {
-                                        Function.sendMessage(player, "§a所持数以上は出品できません", SoundList.Nope);
+                                        Function.sendMessage(player, "§a所持数以上は出品できません", SoundList.NOPE);
                                         return;
                                     }
                                 }
@@ -99,17 +99,17 @@ public class Market {
                                     playerData.ItemInventory.removeItemParameter(stack);
                                     Function.sendMessage(player, "§e[" + stack.itemParameter.Display + "§ax" + stack.Amount + "§e]§aを§e" + Mel + "メル/個§aで出品しました §e[出品手数料" + reqMel + "]");
                                     playerData.Mel -= reqMel;
-                                    playSound(player, SoundList.Tick);
+                                    playSound(player, SoundList.TICK);
                                     playerData.viewUpdate();
                                     market.save();
                                 } else {
-                                    Function.sendMessage(player, "§e出品手数料§aが足りません §e[" + reqMel + "メル]", SoundList.Nope);
+                                    Function.sendMessage(player, "§e出品手数料§aが足りません §e[" + reqMel + "メル]", SoundList.NOPE);
                                 }
                             } else {
-                                Function.sendMessage(player, "§eSlotID§aが不正です", SoundList.Nope);
+                                Function.sendMessage(player, "§eSlotID§aが不正です", SoundList.NOPE);
                             }
                         } else {
-                            Function.sendMessage(player, "§e出品枠§aが一杯です", SoundList.Nope);
+                            Function.sendMessage(player, "§e出品枠§aが一杯です", SoundList.NOPE);
                         }
                         return;
                     } else if (index > -1 && type.equalsIgnoreCase("cancel")) {
@@ -119,10 +119,10 @@ public class Market {
                             String itemText = "§e[" + marketData.itemParameterStack.itemParameter.Display + "§ax" + marketData.itemParameterStack.Amount + "§e]";
                             playerData.ItemInventory.addItemParameter(market.marketData.get(index).itemParameterStack);
                             market.marketData.remove(index);
-                            Function.sendMessage(player, itemText + "§aを取り下げました", SoundList.Tick);
+                            Function.sendMessage(player, itemText + "§aを取り下げました", SoundList.TICK);
                             market.save();
                         } else {
-                            Function.sendMessage(player, "§e使用中枠: 0 -> " + (market.marketData.size() - 1), SoundList.Tick);
+                            Function.sendMessage(player, "§e使用中枠: 0 -> " + (market.marketData.size() - 1), SoundList.TICK);
                         }
                         return;
                     } else if (index > -1 && type.equalsIgnoreCase("info")) {
@@ -138,9 +138,9 @@ public class Market {
                                 player.sendMessage(str);
                             }
                         } else {
-                            Function.sendMessage(player, "§e使用中枠: 0 -> " + (market.marketData.size() - 1), SoundList.Tick);
+                            Function.sendMessage(player, "§e使用中枠: 0 -> " + (market.marketData.size() - 1), SoundList.TICK);
                         }
-                        playSound(player, SoundList.Tick);
+                        playSound(player, SoundList.TICK);
                         return;
                     }
                 } catch (Exception e) {
@@ -177,7 +177,7 @@ public class Market {
     public void MarketMenuView() {
         Inventory inv = decoInv(MarketMenuDisplay, 6);
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
         MultiThread.TaskRunLater(() -> MarketMenuView(0), 1, "MarketMenuView");
     }
 
@@ -189,7 +189,7 @@ public class Market {
             inv.setItem(i+6, Cancel);
         }
         player.openInventory(inv);
-        playSound(player, SoundList.MenuOpen);
+        playSound(player, SoundList.MENU_OPEN);
     }
 
     public static final String MarketPriceYml = "MarketPrice.yml";
@@ -234,7 +234,7 @@ public class Market {
             itemStacks[53] = page < Math.floor(marketList.size()/45f) ? NextPageItem : ShopFlame;
             itemStacks[49] = ItemFlameAmount(MarketPrefix, BuyAmount);
             MultiThread.TaskRunSynchronized(() -> player.getOpenInventory().getTopInventory().setContents(itemStacks));
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 
@@ -248,7 +248,7 @@ public class Market {
                         int index = marketCache.index;
                         MarketData marketData = market.marketData.get(index);
                         if (!marketCache.marketData.uuid.toString().equals(marketData.uuid.toString())) {
-                            Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.Nope);
+                            Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.NOPE);
                             return;
                         }
                         int amount = BuyAmount;
@@ -268,7 +268,7 @@ public class Market {
                             market.Mel += marketData.Mel * amount;
                             market.save();
                             MarketMenuView(page);
-                            playSound(player, SoundList.LevelUp);
+                            playSound(player, SoundList.LEVEL_UP);
                             File file = new File(DataBasePath, "Market/" + MarketPriceYml);
                             FileConfiguration data = YamlConfiguration.loadConfiguration(file);
                             String id = marketData.itemParameterStack.itemParameter.Id;
@@ -281,10 +281,10 @@ public class Market {
                             }
                             MarketMenuView();
                         } else {
-                            sendMessage(player, "§eメル§aが足りません", SoundList.Nope);
+                            sendMessage(player, "§eメル§aが足りません", SoundList.NOPE);
                         }
                     } else {
-                        Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.Nope);
+                        Function.sendMessage(player, "§aすでに§e購入§aされているか§e出品§aが取り消されました", SoundList.NOPE);
                     }
                 } else if (equalItem(currentItem, Cancel)) {
                     marketCache = null;
@@ -317,7 +317,7 @@ public class Market {
                     }
                     if (BuyAmount < 1) BuyAmount = 1;
                     if (BuyAmount > 10000) BuyAmount = 10000;
-                    playSound(player, SoundList.Click);
+                    playSound(player, SoundList.CLICK);
                 }
                 view.getTopInventory().setItem(49, ItemFlameAmount(MarketPrefix, BuyAmount));
             }

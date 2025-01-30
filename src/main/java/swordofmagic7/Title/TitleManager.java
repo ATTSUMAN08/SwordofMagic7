@@ -31,10 +31,10 @@ public class TitleManager {
         if (TitleList.contains(title.Id) || player.hasPermission("som7.title.editor")) {
             Title = title;
             player.sendMessage("§a称号を§e[" + title.Id + "§e]§aに変更しました");
-            playSound(player, SoundList.LevelUp);
+            playSound(player, SoundList.LEVEL_UP);
         } else {
             player.sendMessage("§a所持していない称号です");
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 
@@ -48,7 +48,7 @@ public class TitleManager {
             if (title.attributePoint > 0) playerData.Attribute.addPoint(title.attributePoint);
             TitleList.add(title.Id);
             player.sendMessage("§e称号[" + title.Id + "§e]§aを獲得しました");
-            playSound(player, SoundList.Tick);
+            playSound(player, SoundList.TICK);
         }
     }
 

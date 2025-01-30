@@ -53,7 +53,7 @@ public class Exta extends EnemySkillBase {
                 Damage.makeDamage(entity(), target(), DamageCause.ATK, "Launch", 2, 1);
                 Function.setVelocity(target(), new Vector(0, 2, 0));
                 particleData2.spawn(target().getLocation());
-                playSound(target().getLocation(), SoundList.Explosion);
+                playSound(target().getLocation(), SoundList.EXPLOSION);
 
                 MultiThread.sleepTick(10);
                 Manager.CastSkillIgnoreAI(false);
@@ -64,7 +64,7 @@ public class Exta extends EnemySkillBase {
     public void Impact(int CastTime) {
         MultiThread.TaskRun(() -> {
             if (target() != null) {
-                radiusMessage("§c衝撃波が来ます！避けてください！", SoundList.DungeonTrigger);
+                radiusMessage("§c衝撃波が来ます！避けてください！", SoundList.DUNGEON_TRIGGER);
                 Manager.CastSkill(true);
                 effectManager().addEffect(EffectType.Invincible, CastTime+60);
                 ParticleData particleData = new ParticleData(Particle.FLAME, 0.05f, Function.VectorUp);
@@ -87,7 +87,7 @@ public class Exta extends EnemySkillBase {
                         Function.setVelocity(victim, vector);
                         Damage.makeDamage(entity(), victim, DamageCause.ATK, "Impact", 4, 1);
                         EffectManager.addEffect(victim, EffectType.Concussion, 60, null);
-                        if (victim instanceof Player player) playSound(player, SoundList.Explosion);
+                        if (victim instanceof Player player) playSound(player, SoundList.EXPLOSION);
                     }
                     MultiThread.sleepTick(10);
                 }
@@ -101,7 +101,7 @@ public class Exta extends EnemySkillBase {
     public void Starting() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c祭壇が起動しようとしています！阻止してください！", SoundList.DungeonTrigger);
+            radiusMessage("§c祭壇が起動しようとしています！阻止してください！", SoundList.DUNGEON_TRIGGER);
             effectManager().addEffect(EffectType.Invincible, 300);
             ParticleData particleData = new ParticleData(Particle.EXPLOSION_EMITTER);
             ParticleData particleData2 = new ParticleData(Particle.WITCH).setRandomOffset().setRandomOffset(2);
@@ -126,9 +126,9 @@ public class Exta extends EnemySkillBase {
                 for (EnemyData enemyData : enemyList){
                     enemyData.delete();
                 }
-                radiusMessage("§c祭壇が起動してしまいました...", SoundList.Explosion);
+                radiusMessage("§c祭壇が起動してしまいました...", SoundList.EXPLOSION);
             } else {
-                radiusMessage("§c祭壇の起動を防ぎました！", SoundList.Tick);
+                radiusMessage("§c祭壇の起動を防ぎました！", SoundList.TICK);
             }
 
             MultiThread.sleepTick(10);
@@ -139,7 +139,7 @@ public class Exta extends EnemySkillBase {
     public void Thought(int CastTime) {
         MultiThread.TaskRun(() -> {
             Manager.CastSkill(true);
-            radiusMessage("§c遠くにいる人を見つめています！", SoundList.DungeonTrigger);
+            radiusMessage("§c遠くにいる人を見つめています！", SoundList.DUNGEON_TRIGGER);
             ParticleData particleData = new ParticleData(Particle.SMOKE, 0.05f);
             ParticleData particleData2 = new ParticleData(Particle.EXPLOSION_EMITTER);
             Location origin = entity().getLocation();
@@ -161,7 +161,7 @@ public class Exta extends EnemySkillBase {
     public void Acceleration() {
         MultiThread.TaskRun(() -> {
             Manager.CastSkillIgnoreAI(true);
-            radiusMessage("§c移動速度が早くなっています！気を付けてください！", SoundList.DungeonTrigger);
+            radiusMessage("§c移動速度が早くなっています！気を付けてください！", SoundList.DUNGEON_TRIGGER);
             enemyData().MovementMultiply = 1.5;
             MultiThread.sleepTick(10);
             Manager.CastSkillIgnoreAI(false);

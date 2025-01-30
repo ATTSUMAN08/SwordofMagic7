@@ -34,7 +34,7 @@ import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.RodAttack;
+import static swordofmagic7.Sound.SoundList.ROD_ATTACK;
 
 public class Chronomancer extends BaseSkillClass {
     
@@ -59,14 +59,14 @@ public class Chronomancer extends BaseSkillClass {
                 int time2 = rune.AdditionParameterValueInt(0)*20;
                 double percent = rune.AdditionParameterValue(1)/100;
                 playerData.EffectManager.addEffect(EffectType.EnchantSlow, time2, new Object[]{percent,time});
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             } else {
                 ParticleManager.CircleParticle(new ParticleData(Particle.LARGE_SMOKE, 0.2f, Function.VectorUp), origin, radius, 20);
                 Set<LivingEntity> Targets = Function.NearLivingEntity(origin, radius, skillProcess.Predicate());
                 for (LivingEntity target : Targets) {
                     EffectManager.addEffect(target, EffectType.Slow, time, player);
                 }
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
             }
             skillProcess.SkillRigid(skillData);
         }, "Slow");
@@ -85,15 +85,15 @@ public class Chronomancer extends BaseSkillClass {
             if (rune != null) {
                 time = rune.AdditionParameterValueInt(0)*20;
                 playerData.EffectManager.addEffect(EffectType.Stop, time, player.getLocation());
-                playSound(player, SoundList.Heal);
+                playSound(player, SoundList.HEAL);
             } else if (ray.isHitEntity()) {
                 ParticleManager.LineParticle(particleData, playerHandLocation(player), ray.HitPosition, 0, 10);
                 ParticleManager.RandomVectorParticle(particleData, ray.HitPosition, 30);
                 EffectManager.addEffect(ray.HitEntity, EffectType.Stop, time, player, ray.HitEntity.getLocation());
-                playSound(player, RodAttack);
+                playSound(player, ROD_ATTACK);
             } else {
                 player.sendMessage("§e対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -128,7 +128,7 @@ public class Chronomancer extends BaseSkillClass {
                     }
                 }
             }
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, "Path");
     }
@@ -184,14 +184,14 @@ public class Chronomancer extends BaseSkillClass {
                 if (forwards.size() >= maxCount) break;
             }
             if (forwards.size() > 0) {
-                playSound(player, SoundList.DeBuff);
+                playSound(player, SoundList.DEBUFF);
                 for (LivingEntity entity : forwards) {
                     EffectManager.addEffectMessage(player, entity, skillData.Display, "§c");
                     EffectManager.addEffect(entity, EffectType.TimeForward, skillData.CoolTime, player);
                 }
             } else {
                 player.sendMessage("§e対象§aがいません");
-                playSound(player, SoundList.Nope);
+                playSound(player, SoundList.NOPE);
                 skill.resetSkillCoolTimeWaited(skillData);
             }
             skillProcess.SkillRigid(skillData);
@@ -220,14 +220,14 @@ public class Chronomancer extends BaseSkillClass {
                         player.teleportAsync(BackMaskingLocation);
                         BackMaskingMapData.enter(player);
                         player.sendMessage("§a情報を巻き戻しました");
-                        playSound(player, SoundList.Warp);
+                        playSound(player, SoundList.WARP);
                         MultiThread.TaskRunSynchronizedLater(this::BackMaskingReset, 1);
                     }
                 });
             } else {
                 BackMaskingSet();
                 player.sendMessage("§a現在の情報を記録しました");
-                playSound(player, SoundList.Tick);
+                playSound(player, SoundList.TICK);
                 skillProcess.SkillCastTime = skillData.CastTime;
                 skill.resetSkillCoolTimeWaited(skillData);
             }

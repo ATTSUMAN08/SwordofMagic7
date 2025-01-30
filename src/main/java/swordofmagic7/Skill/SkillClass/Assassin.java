@@ -27,7 +27,7 @@ import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static swordofmagic7.Sound.SoundList.GunAttack;
+import static swordofmagic7.Sound.SoundList.GUN_ATTACK;
 
 public class Assassin extends BaseSkillClass {
 
@@ -55,7 +55,7 @@ public class Assassin extends BaseSkillClass {
             if (victims.size() == 1) {
                 playerData.Skill.resetSkillCoolTime("Cloaking");
             }
-            playSound(player, SoundList.Shun);
+            playSound(player, SoundList.SHUN);
             if (!playerData.Equipment.isEquipRune("手練のルーン")) {
                 MultiThread.TaskRunSynchronized(() -> {
                     player.teleportAsync(origin);
@@ -118,7 +118,7 @@ public class Assassin extends BaseSkillClass {
                 Damage.makeDamage(player, victim, DamageCause.MAT, skillData.Id, value, count, perforate, true);
                 EffectManager.addEffect(victim, EffectType.RecoveryInhibition, time, player);
             }
-            playSound(player, GunAttack);
+            playSound(player, GUN_ATTACK);
             skillProcess.SkillRigid(skillData);
         }, "PeaceMaker");
     }
@@ -133,7 +133,7 @@ public class Assassin extends BaseSkillClass {
             playerData.EffectManager.addEffect(EffectType.Covert, time);
             playerData.EffectManager.addEffect(EffectType.Cloaking, time);
             playerData.showHide(time);
-            playSound(player, SoundList.Shoot);
+            playSound(player, SoundList.SHOOT);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -159,7 +159,7 @@ public class Assassin extends BaseSkillClass {
                 }
                 Damage.makeDamage(player, victims, DamageCause.MAT, skillData.Id, skillData.ParameterValue(0)/100, count, 1);
                 ParticleManager.CircleParticle(particleData, player.getLocation(), radius, 10);
-                playSound(player, SoundList.Shun);
+                playSound(player, SoundList.SHUN);
                 MultiThread.sleepTick(hitRate);
             }
 

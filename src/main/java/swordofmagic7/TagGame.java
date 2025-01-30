@@ -41,7 +41,7 @@ public class TagGame {
         for (Player temp : Joined) {
             if (temp.isOnline()) {
                 temp.sendMessage(Prefix + message);
-                Dungeon.Message(new HashSet<>(Joined), message, "", null, SoundList.Tick);
+                Dungeon.Message(new HashSet<>(Joined), message, "", null, SoundList.TICK);
             }
         }
     }

@@ -105,7 +105,7 @@ public class Classes {
             }
             addClassLevel(classData, addLevel);
             BroadCast(playerData.getNick() + "§aさんの§e[" + classData.Display.replace("§l", "") + "§e]§aが§eLv" + getClassLevel(classData) + "§aになりました", true);
-            playSound(player, SoundList.LevelUp);
+            playSound(player, SoundList.LEVEL_UP);
         }
         if (playerData.ExpLog) player.sendMessage("§e経験値[" + classData.Color + classData.Display + "§e]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/Classes.reqExp(getClassLevel(classData))*100) + "%)");
     }
@@ -172,13 +172,13 @@ public class Classes {
             for (int i = 0; i < petSummoned; i++) {
                 playerData.PetSummon.getFirst().cage();
             }
-            playSound(player, SoundList.LevelUp);
+            playSound(player, SoundList.LEVEL_UP);
         } else {
             player.sendMessage(decoText("§c転職条件"));
             for (String str : reqText) {
                 player.sendMessage(str);
             }
-            playSound(player, SoundList.Nope);
+            playSound(player, SoundList.NOPE);
         }
     }
 
@@ -207,7 +207,7 @@ public class Classes {
                 inv.setItem(data.getKey(), classData.view());
             }
         }
-        playSound(player, SoundList.Click);
+        playSound(player, SoundList.CLICK);
         player.openInventory(inv);
     }
 
@@ -219,13 +219,13 @@ public class Classes {
                     ClassSelectView(false);
                 } else {
                     player.sendMessage("§aレベルが足りません");
-                    playSound(player, SoundList.Nope);
+                    playSound(player, SoundList.NOPE);
                 }
             } else if (ClassSelectCache[slot] != null) {
                 for (ClassData classData : classSlot) {
                     if (classData == ClassSelectCache[slot]) {
                         player.sendMessage("§aすでに[" + classData.Color + classData.Display + "]§aは使用されています");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                         return;
                     }
                 }

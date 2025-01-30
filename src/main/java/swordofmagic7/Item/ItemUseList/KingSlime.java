@@ -75,18 +75,18 @@ public class KingSlime {
                             message.add(decoLore(stack.itemParameter.Display + "§ax" + stack.Amount));
                             playerData.ItemInventory.addItemParameter(stack);
                         }
-                        sendMessage(playerData.player, message, SoundList.LevelUp);
+                        sendMessage(playerData.player, message, SoundList.LEVEL_UP);
                     } else {
                         Enemy.delete();
-                        Message(Players, SummonQuestFailed, "", null, SoundList.DungeonTrigger);
+                        Message(Players, SummonQuestFailed, "", null, SoundList.DUNGEON_TRIGGER);
                     }
                     Players.clear();
                 }, "KingSlime");
             } else {
-                sendMessage(playerData.player, "§aすでに開始されています", SoundList.Nope);
+                sendMessage(playerData.player, "§aすでに開始されています", SoundList.NOPE);
             }
         } else {
-            sendMessage(playerData.player, "§e[ベア湧水地]§aの§e魔結晶§aの付近で使用できます", SoundList.Nope);
+            sendMessage(playerData.player, "§e[ベア湧水地]§aの§e魔結晶§aの付近で使用できます", SoundList.NOPE);
         }
     }
 }

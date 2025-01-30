@@ -28,7 +28,7 @@ public class Swordman extends BaseSkillClass {
             playerData.EffectManager.addEffect(EffectType.PainBarrier, time);
             if (playerData.Equipment.isEquipRune("仁王立ちのルーン")) playerData.EffectManager.addEffect(EffectType.NonKnockBack, time);
             ParticleManager.CylinderParticle(new ParticleData(Particle.WITCH), player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, skillData.Id);
     }
@@ -41,7 +41,7 @@ public class Swordman extends BaseSkillClass {
 
             playerData.EffectManager.addEffect(EffectType.Invincible, (int) skillData.Parameter.get(0).Value*20);
             ParticleManager.CylinderParticle(new ParticleData(Particle.CRIT), player.getLocation(), 1, 2, 3, 3);
-            playSound(player, SoundList.Heal);
+            playSound(player, SoundList.HEAL);
             skillProcess.SkillRigid(skillData);
         }, "Feint");
     }

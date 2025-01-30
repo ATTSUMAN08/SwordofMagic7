@@ -51,7 +51,7 @@ public class HotBar {
                         playerData.PetInventory.getHashMap().get(UUID.fromString(HotBarData[index].Icon)).spawn();
                     } else {
                         player.sendMessage("§e[ペットケージ]§aに居ません");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
                 case Item -> {
@@ -70,14 +70,14 @@ public class HotBar {
                         }
                     } else {
                         player.sendMessage("§e[アイテム]§aがありません");
-                        playSound(player, SoundList.Nope);
+                        playSound(player, SoundList.NOPE);
                     }
                 }
                 default -> player.sendMessage("§e[ホットバー" + (index + 1) + "]§aは§eセット§aされていません");
             }
             UpdateHotBar();
         } else if (playerData.NaturalMessage) {
-            sendMessage(player, "§e[硬直]§a中は使用できません", SoundList.Nope);
+            sendMessage(player, "§e[硬直]§a中は使用できません", SoundList.NOPE);
         }
     }
 
@@ -164,14 +164,14 @@ public class HotBar {
         HotBarData[] HotBarDataOld = HotBarData.clone();
         System.arraycopy(HotBarDataOld, 8, HotBarData, 0, 24);
         System.arraycopy(HotBarDataOld, 0, HotBarData, 24, 8);
-        playSound(player, SoundList.Tick);
+        playSound(player, SoundList.TICK);
     }
 
     public void ScrollDown() {
         HotBarData[] HotBarDataOld = HotBarData.clone();
         System.arraycopy(HotBarDataOld, 0, HotBarData, 8, 24);
         System.arraycopy(HotBarDataOld, 24, HotBarData, 0, 8);
-        playSound(player, SoundList.Tick);
+        playSound(player, SoundList.TICK);
     }
 
     public void SkillSlotCommand(String[] args) {

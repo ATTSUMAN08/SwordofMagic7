@@ -44,7 +44,7 @@ public class WarpGateParameter {
 
     public void usePlayer(Player player) {
         if (!isTrigger && NextMap.ReqCombatPower > PlayerData.playerData(player).Status.getCombatPower()) {
-            Function.sendMessage(player, "§e[戦闘力]§aが足りません §c[必要戦闘力:" + NextMap.ReqCombatPower + "]", SoundList.Nope);
+            Function.sendMessage(player, "§e[戦闘力]§aが足りません §c[必要戦闘力:" + NextMap.ReqCombatPower + "]", SoundList.NOPE);
             return;
         }
         if (Trigger != null) {
@@ -73,7 +73,7 @@ public class WarpGateParameter {
         player.teleportAsync(TargetLocation);
         MultiThread.TaskRun(() -> {
             MultiThread.sleepTick(1);
-            playSound(player, SoundList.Warp);
+            playSound(player, SoundList.WARP);
         }, "WarpGateTeleport");
     }
 

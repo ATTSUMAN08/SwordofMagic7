@@ -90,8 +90,8 @@ public class TradeData {
         player[0].sendMessage(playerData[0].getNick() + "§aさんが§e[トレード申請]§aを§b承認§aしました");
         player[1].sendMessage(playerData[0].getNick() + "§aさんからの§e[トレード申請]§aを§b承認§aしました");
         TradeManager.TradeRequest.remove(player[1]);
-        playSound(player[0], SoundList.Tick);
-        playSound(player[1], SoundList.Tick);
+        playSound(player[0], SoundList.TICK);
+        playSound(player[1], SoundList.TICK);
         TradeManager.TradeList.put(uuid, this);
         startTrade();
     }
@@ -100,7 +100,7 @@ public class TradeData {
         player[0].sendMessage(playerData[0].getNick() + "§aさんが§e[トレード申請]§aを§c拒否§aしました");
         player[1].sendMessage(playerData[0].getNick() + "§aさんからの§e[トレード申請]§aを§c拒否§aしました");
         TradeManager.TradeRequest.remove(player[1]);
-        playSound(player[0], SoundList.Tick);
-        playSound(player[1], SoundList.Tick);
+        playSound(player[0], SoundList.TICK);
+        playSound(player[1], SoundList.TICK);
     }
 }

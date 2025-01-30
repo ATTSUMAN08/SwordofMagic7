@@ -40,7 +40,7 @@ public class Ranger extends BaseSkillClass {
                     Damage.makeDamage(pet.entity, victim, DamageCause.ATK, skillData.Id, skillData.ParameterValue(0) / 100, 1);
                     MultiThread.sleepTick(2);
                 }
-                playSound(player, SoundList.AttackWeak);
+                playSound(player, SoundList.ATTACK_WEAK);
             }
             skillProcess.SkillRigid(skillData);
         }, "PetAttack");
