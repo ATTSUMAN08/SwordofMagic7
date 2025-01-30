@@ -38,13 +38,14 @@ dependencies {
     compileOnly(libs.abyssLib)
 }
 
+
 remotes {
     withGroovyBuilder {
         "create"("devServer") {
-            setProperty("host", properties["SFTP_HOST"]!!)
-            setProperty("port", properties["SFTP_PORT"]!!.toString().toInt())
-            setProperty("user", properties["SFTP_USER_SOM7"]!!)
-            setProperty("password", properties["SFTP_PASSWORD"]!!)
+            setProperty("host", properties["SFTP_HOST"] ?: "localhost")
+            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
+            setProperty("user", properties["SFTP_USER_SOM7"] ?: "som7")
+            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
     }
 }
