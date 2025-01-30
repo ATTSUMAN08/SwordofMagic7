@@ -147,7 +147,7 @@ public class Menu {
                 }
             }
         } catch (Exception ignored) {}
-        if (ClickInventory.getType() == InventoryType.CRAFTING) {
+        if (ClickInventory != null && ClickInventory.getType() == InventoryType.CRAFTING) {
             switch (Slot) {
                 case 1 -> playerData.setView(ViewInventoryType.ItemInventory);
                 case 2 -> playerData.setView(ViewInventoryType.RuneInventory);

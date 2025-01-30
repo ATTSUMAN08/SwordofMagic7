@@ -1,9 +1,9 @@
 package swordofmagic7.Item;
 
 import com.google.common.collect.MultimapBuilder;
-import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.NbtApiException;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import me.attsuman08.abysslib.shade.nbtapi.NBT;
+import me.attsuman08.abysslib.shade.nbtapi.NbtApiException;
+import me.attsuman08.abysslib.shade.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;

@@ -5,7 +5,10 @@ import com.google.common.io.ByteStreams;
 import net.citizensnpcs.api.CitizensAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.exceptions.SomStackTraceException;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -57,7 +60,7 @@ public final class Function {
         }
         if (stackTrace) {
             try {
-                throw new Exception();
+                throw new SomStackTraceException();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -220,6 +223,7 @@ public final class Function {
                 }
             }
         }
+        Bukkit.getConsoleSender().sendMessage(PlainTextComponentSerializer.plainText().serialize(text));
     }
 
     public static Inventory decoInv(String name, int size) {

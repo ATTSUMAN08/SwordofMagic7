@@ -37,7 +37,6 @@ import swordofmagic7.Sound.CustomSound.playSound
 import swordofmagic7.Sound.SoundList
 import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
-import swordofmagic7.redis.RedisManager
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
@@ -99,14 +98,6 @@ class SomCore : SuspendingJavaPlugin() {
         }
 
         DataLoad()
-
-        RedisManager.connect(
-            config.getString("redis.host") ?: "localhost",
-            config.getInt("redis.port", 6379),
-            config.getString("redis.username") ?: "null",
-            config.getString("redis.password") ?: "null",
-            config.getBoolean("redis.ssl", false)
-        )
 
         Tutorial.onLoad()
         Events(this)

@@ -46,7 +46,7 @@ public final class DataBase {
     public static List<String> IgnoreIPList = new ArrayList<>();
     public static final String DataBasePath = SomCore.instance.getDataFolder().getPath();
     public static final String format = "%.3f";
-    public static final int MaxStackAmount = 100;
+    public static final int MaxStackAmount = 99;
     public static final String Som7VIP = "som7.VIP";
     public static final String Som7Premium = "som7.Premium";
     public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 27.5, -60, -11.5, 45, 0);

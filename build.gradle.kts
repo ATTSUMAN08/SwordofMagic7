@@ -4,7 +4,6 @@ import org.hidetake.groovy.ssh.session.SessionHandler
 
 plugins {
     alias(libs.plugins.pluginYml)
-    alias(libs.plugins.shadow)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.hidetakeSSH)
@@ -17,12 +16,13 @@ version = "0.1.0+${versionMetadata()}"
 
 repositories {
     mavenCentral()
-    maven(url = "https://repo.papermc.io/repository/maven-public/")
-    maven(url = "https://oss.sonatype.org/content/groups/public/")
-    maven(url = "https://repo.md-5.net/content/groups/public/") // LibsDisguises
+    maven(url = "https://repo.papermc.io/repository/maven-public")
+    maven(url = "https://oss.sonatype.org/content/groups/public")
+    maven(url = "https://repo.md-5.net/content/groups/public") // LibsDisguises
     maven(url = "https://jitpack.io") // NuVotifier, DecentHolograms
     maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
-    maven(url = "https://repo.codemc.io/repository/maven-public/") // ItemNBTAPI, PacketEvents
+    maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
+    maven(url = "https://repo.ith.f5.si/releases") // AbyssLib
 }
 
 dependencies {
@@ -35,21 +35,16 @@ dependencies {
         exclude(group = "*", module = "*")
     }
 
-    implementation(libs.itemNbtApi)
-    implementation(libs.kotlinSerializationJson)
-    implementation(libs.bundles.coroutines)
-    implementation(libs.bundles.cloud)
-
-    bukkitLibrary(libs.jedis)
+    compileOnly(libs.abyssLib)
 }
 
 remotes {
     withGroovyBuilder {
         "create"("devServer") {
-            setProperty("host", properties["SFTP_HOST_LOCAL"]!!)
+            setProperty("host", properties["SFTP_HOST"]!!)
             setProperty("port", properties["SFTP_PORT"]!!.toString().toInt())
             setProperty("user", properties["SFTP_USER_SOM7"]!!)
-            setProperty("password", properties["SFTP_PASSWORD_LOCAL"]!!)
+            setProperty("password", properties["SFTP_PASSWORD"]!!)
         }
     }
 }
@@ -95,10 +90,10 @@ bukkit {
     version = "${project.version}"
     description = "Sword of Magic 7のプラグインのFork"
     authors = listOf("MomiNeko", "SomNetworkMembers", "ATTSUMAN08")
-    apiVersion = "1.21"
+    apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    softDepend = listOf("DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier")
+    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier")
 
     permissions {
         register("som7.developer") {
@@ -124,6 +119,11 @@ bukkit {
         register("som7.user") {
             default = BukkitPluginDescription.Permission.Default.TRUE
             description = "SOM7のユーザー権限"
+        }
+
+        register("som7.chat") {
+            default = BukkitPluginDescription.Permission.Default.TRUE
+            description = "チャットする権限"
         }
     }
 
@@ -496,25 +496,6 @@ bukkit {
     }
 }
 
-val targetJavaVersion = 21
 kotlin {
-    jvmToolchain(targetJavaVersion)
-}
-
-tasks.build {
-    dependsOn("shadowJar")
-}
-
-tasks.shadowJar {
-    archiveClassifier.set("")
-    relocate("de.tr7zw.changeme.nbtapi", "net.somrpg.swordofmagic7.shade.nbtapi")
-}
-
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-        expand(props)
-    }
+    jvmToolchain(21)
 }

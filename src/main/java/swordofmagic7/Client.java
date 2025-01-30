@@ -1,16 +1,15 @@
 package swordofmagic7;
 
+import me.attsuman08.abysslib.RedisManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
-import swordofmagic7.redis.RedisManager;
-
-import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
@@ -30,7 +29,7 @@ public class Client {
                 .setUUID(player.getUniqueId())
                 .setSender(player.getName())
                 .setDisplay(displayName)
-                .setMute(!player.hasPermission("snc.chat"))
+                .setMute(!player.hasPermission("som7.chat"))
                 .setFrom(ServerId)
                 .toString());
     }
@@ -43,13 +42,13 @@ public class Client {
                 .setUUID(player.getUniqueId())
                 .setSender(player.getName())
                 .setDisplay(displayName)
-                .setMute(!player.hasPermission("snc.chat"))
+                .setMute(!player.hasPermission("som7.chat"))
                 .setFrom(ServerId)
                 .toString());
     }
 
     public static void send(String str) {
-        RedisManager.publishObject("SNC", str);
+        RedisManager.Companion.getAPI().publishMessage("SNC", str);
     }
 
     public static void Trigger(String packet) {
@@ -90,22 +89,22 @@ public class Client {
                 if (data[0].equals("Display")) text = text.append(Component.text("§b[" + from + "] §r"));
                 text = text.append(textComponentFromPacket(data));
                 for (Player player : PlayerList.get()) {
-                    if (player.isOnline()) {
-                        if (isMute) {
-                            if (player.isOp()) {
-                                TextComponent textMuted = Component.empty();
-                                textMuted = textMuted.append(Component.text("§4[M]"));
-                                textMuted = textMuted.append(text);
-                                sendMessage(player, textMuted);
-                            } else if (player.getUniqueId().toString().equals(uuid)) {
-                                sendMessage(player, text);
-                            }
-                        } else {
-                            PlayerData playerData = PlayerData.playerData(player);
-                            if (uuid == null || !playerData.BlockListAtString().contains(uuid)) sendMessage(player, text);
-                        }
+                    if (!player.isOnline()) continue;
+
+                    if (isMute && player.isOp()) {
+                        TextComponent textMuted = Component.empty();
+                        textMuted = textMuted.append(Component.text("§4[M]"));
+                        textMuted = textMuted.append(text);
+                        sendMessage(player, textMuted);
+                    } else if (isMute && player.getUniqueId().toString().equals(uuid)) {
+                        sendMessage(player, text);
+                    } else {
+                        PlayerData playerData = PlayerData.playerData(player);
+                        if (uuid == null || !playerData.BlockListAtString().contains(uuid)) sendMessage(player, text);
                     }
                 }
+
+                Bukkit.getConsoleSender().sendMessage(PlainTextComponentSerializer.plainText().serialize(text) + " [ミュート: " + isMute + "]");
             }
             case "Check" -> {}
             default -> Log("§c無効なパケット -> " + packet);

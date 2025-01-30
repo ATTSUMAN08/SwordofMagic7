@@ -7,11 +7,11 @@ import eu.decentsoftware.holograms.api.actions.ClickType;
 import eu.decentsoftware.holograms.event.HologramClickEvent;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
+import me.attsuman08.abysslib.paper.events.RedisMessageReceivedEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.somrpg.swordofmagic7.SomCore;
-import net.somrpg.swordofmagic7.api.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -156,13 +156,15 @@ public class Events implements Listener {
             PartyManager.PartyRejoin.put(player.getUniqueId().toString(), playerData.Party.Display);
             playerData.Party.Quit(player);
         }
-        if (playerData.hologram != null) playerData.hologram.delete();
         playerData.saveCloseInventory();
         PlayerList.load();
         if (TagGame.isPlayer(player)) {
             TagGame.leave(player);
         }
-        playerData.remove();
+        MultiThread.TaskRunLater(() -> {
+            if (playerData.hologram != null) playerData.hologram.delete();
+            playerData.remove();
+        }, 5, "PlayerQuit");
     }
 
     @EventHandler
@@ -678,9 +680,9 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    void onRedisMessage(RedisMessageEvent e) {
+    void onRedisMessage(RedisMessageReceivedEvent e) {
         if (Objects.equals(e.getChannel(), "SNC")) {
-            Client.Trigger(e.get(String.class));
+            Client.Trigger(e.getMessage());
         }
     }
 }

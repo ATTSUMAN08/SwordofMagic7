@@ -1,6 +1,5 @@
 [versions]
-kotlin = "2.1.0"
-shadow = "9.0.0-beta4"
+kotlin = "2.1.10"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
 grgit = "5.3.0"
@@ -10,21 +9,13 @@ paperApi = "1.21.4-R0.1-SNAPSHOT"
 packetEvents = "2.7.0"
 libsDisguises = "10.0.44-SNAPSHOT"
 nuVotifier = "2.7.2"
-kotlinSerializationJson = "1.8.0"
 decentHolograms = "2.8.12"
 citizens = "2.0.35-SNAPSHOT"
-itemNbtApi = "2.14.1"
-jedis = "5.2.0"
-kotlinCoroutines = "1.10.1"
-mcCoroutine = "2.20.0"
-
-cloud = "2.0.0"
-cloudMinecraft = "2.0.0-SNAPSHOT"
+abyssLib = "1.0.0-SNAPSHOT"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 pluginYml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginYml" }
 hidetakeSSH = { id = "org.hidetake.ssh", version.ref = "hidetakeSSH" }
 grgit = { id = "org.ajoberstar.grgit", version.ref = "grgit" }
@@ -35,21 +26,6 @@ paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "pape
 packetEvents = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetEvents" }
 libsDisguises = { group = "LibsDisguises", name = "LibsDisguises", version.ref = "libsDisguises" }
 nuVotifier = { group = "com.github.NuVotifier", name = "NuVotifier", version.ref = "nuVotifier" }
-kotlinSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }
 decentHolograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentHolograms" }
 citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
-itemNbtApi = { group = "de.tr7zw", name = "item-nbt-api", version.ref = "itemNbtApi" }
-jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
-kotlinCoroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
-mcCoroutineApi = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-api", version.ref = "mcCoroutine" }
-mcCoroutineCore = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mcCoroutine" }
-
-# Cloud
-cloudPaper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloudMinecraft" }
-cloudMinecraftExtras = { group = "org.incendo", name = "cloud-minecraft-extras", version.ref = "cloudMinecraft" }
-cloudAnnotations = { group = "org.incendo", name = "cloud-annotations", version.ref = "cloud" }
-cloudKotlinCoroutinesAnnotations = { group = "org.incendo", name = "cloud-kotlin-coroutines-annotations", version.ref = "cloud" }
-
-[bundles]
-cloud = ["cloudAnnotations", "cloudKotlinCoroutinesAnnotations", "cloudPaper", "cloudMinecraftExtras"]
-coroutines = ["kotlinCoroutinesCore", "mcCoroutineApi", "mcCoroutineCore"]
+abyssLib = { group = "me.attsuman08", name = "abysslib-paper", version.ref = "abyssLib" }
