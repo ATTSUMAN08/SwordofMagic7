@@ -1,6 +1,7 @@
 package swordofmagic7.Item;
 
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.google.common.collect.MultimapBuilder;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -95,9 +96,9 @@ public class ItemStackData {
         }
         meta.displayName(Component.text(displayName));
         meta.lore(lore.stream().map(Component::text).toList());
-        for (ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
-        }
+        meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         meta.setUnbreakable(true);
         item.setItemMeta(meta);
         return item;

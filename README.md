@@ -6,5 +6,13 @@
 - [ ] システムを簡単に拡張出来るようにする
 - [ ] SQLに移行する
 
-# プラグインの起動
-プラグインの起動にはAbyssLibが必要です。DMくれたら渡します。
+# プラグインの使用
+何があっても責任は取りません。
+
+依存関係リスト
+- AbyssLib (DMくれたら渡します。)
+- Citizens
+- DecentHolograms
+- LibsDisguises
+- PacketEvents
+- Votifier

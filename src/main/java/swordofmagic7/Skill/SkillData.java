@@ -1,5 +1,6 @@
 package swordofmagic7.Skill;
 
+import com.google.common.collect.MultimapBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -56,9 +57,9 @@ public class SkillData implements Cloneable {
             Lore.add("§7・§e§l" + category.Display);
         }
         meta.setLore(Lore);
-        for (ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
-        }
+        meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         item.setItemMeta(meta);
         return item;
     }

@@ -26,7 +26,7 @@ public class AusMineB1 {
     private static final int StartTime = 300;
     private static int Count;
     private static final int StartCount = 30;
-    private static final Location EventLocation = new Location(world,1145, 141, 1293);
+    private static final Location EventLocation = new Location(world,2477, 8,-89);
     private static final Set<EnemyData> EnemyList = new HashSet<>();
     private static Set<Player> Players = new HashSet<>();
     private static final String[] EnterTextData = new String[]{

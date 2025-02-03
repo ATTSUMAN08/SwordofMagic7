@@ -1,6 +1,8 @@
 package swordofmagic7.Mob;
 
+import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import swordofmagic7.Dungeon.Novaha.Novaha3;
 import swordofmagic7.MultiThread.MultiThread;
@@ -49,7 +51,7 @@ public class MobSpawnerData {
                             data.resetPriority();
                         }
                     }
-                    if (SpawnedList.size() < MaxMob) {
+                    if (SpawnedList.size() < MaxMob && !PlayerList.getNearNonDead(location, Radius + mobData.Search).isEmpty()) {
                         MultiThread.TaskRunSynchronized(() -> {
                             for (int i = 0; i < PerSpawn; i++) {
                                 spawn();

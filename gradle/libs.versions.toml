@@ -12,6 +12,7 @@ nuVotifier = "2.7.2"
 decentHolograms = "2.8.12"
 citizens = "2.0.35-SNAPSHOT"
 abyssLib = "1.0.0-SNAPSHOT"
+worldBorderApi = "1.214.0"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -29,3 +30,4 @@ nuVotifier = { group = "com.github.NuVotifier", name = "NuVotifier", version.ref
 decentHolograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentHolograms" }
 citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
 abyssLib = { group = "me.attsuman08", name = "abysslib-paper", version.ref = "abyssLib" }
+worldBorderApi = { group = "com.github.yannicklamprecht", name = "worldborderapi", version.ref = "worldBorderApi" }

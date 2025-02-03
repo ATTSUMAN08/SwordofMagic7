@@ -109,22 +109,24 @@ class SomCore : SuspendingJavaPlugin() {
         WarpGateList.values.forEach { it.start() }
 
         world.apply {
-            setGameRule<Boolean>(GameRule.DO_WEATHER_CYCLE, false)
-            setGameRule<Boolean>(GameRule.COMMAND_BLOCK_OUTPUT, false)
-            setGameRule<Boolean>(GameRule.DO_MOB_SPAWNING, false)
-            setGameRule<Boolean>(GameRule.DO_FIRE_TICK, false)
-            setGameRule<Boolean>(GameRule.SEND_COMMAND_FEEDBACK, false)
-            setGameRule<Boolean>(GameRule.DO_PATROL_SPAWNING, false)
-            setGameRule<Boolean>(GameRule.SHOW_DEATH_MESSAGES, false)
-            setGameRule<Boolean>(GameRule.NATURAL_REGENERATION, false)
-            setGameRule<Boolean>(GameRule.MOB_GRIEFING, false)
-            setGameRule<Boolean>(GameRule.DO_MOB_LOOT, false)
-            setGameRule<Boolean>(GameRule.DO_DAYLIGHT_CYCLE, false)
-            setGameRule<Int>(GameRule.RANDOM_TICK_SPEED, 0)
+            setGameRule(GameRule.DO_WEATHER_CYCLE, false)
+            setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false)
+            setGameRule(GameRule.DO_MOB_SPAWNING, false)
+            setGameRule(GameRule.DO_FIRE_TICK, false)
+            setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false)
+            setGameRule(GameRule.DO_PATROL_SPAWNING, false)
+            setGameRule(GameRule.SHOW_DEATH_MESSAGES, false)
+            setGameRule(GameRule.NATURAL_REGENERATION, false)
+            setGameRule(GameRule.MOB_GRIEFING, false)
+            setGameRule(GameRule.DO_MOB_LOOT, false)
+            setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+            setGameRule(GameRule.RANDOM_TICK_SPEED, 0)
+            setGameRule(GameRule.SPAWN_RADIUS, 0)
             this.time = 6000L
         }
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
+            val start = System.currentTimeMillis()
             BroadCast("§e[オートセーブ]§aを§b開始§aします")
             PlayerList.ResetPlayer.clear()
             val playerDataList = PlayerData.getPlayerData().values.toSet()
@@ -134,7 +136,7 @@ class SomCore : SuspendingJavaPlugin() {
                     if (player.isOnline) data.save() else PlayerData.remove(player)
                 }
             }
-            BroadCast("§e[オートセーブ]§aが§b完了§aしました")
+            BroadCast("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
         }, 200, 6000)
 
         MultiThread.TaskRunTimer({
@@ -178,10 +180,10 @@ class SomCore : SuspendingJavaPlugin() {
         ParticleManager.onLoad()
 
         // Initialize holograms
-        createTouchHologram("", Location(world, 12.5, -60.5, -12.8)) { player ->
+        createTouchHologram("", Location(world, 12.5, 0.5, -13.9)) { player ->
             playerData(player).Menu.Smith.SmithMenuView()
         }
-        createTouchHologram("", Location(world, 17.5, -60.5, -12.8)) { player ->
+        createTouchHologram("", Location(world, 17.5, 0.5, -13.9)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
 

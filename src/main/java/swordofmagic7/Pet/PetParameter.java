@@ -1,6 +1,7 @@
 package swordofmagic7.Pet;
 
 import com.destroystokyo.paper.entity.Pathfinder;
+import com.google.common.collect.MultimapBuilder;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -356,9 +357,9 @@ public class PetParameter implements Cloneable {
                 Lore.add(decoLore(effect.getKey().Display) + String.format(playerData.ViewFormat(), effect.getValue().time/20f) + "秒");
             }
         }
-        for (ItemFlag flag : ItemFlag.values()) {
-            meta.addItemFlags(flag);
-        }
+        meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         meta.setLore(Lore);
         item.setItemMeta(meta);
         item.setAmount(Math.min(100, Level));

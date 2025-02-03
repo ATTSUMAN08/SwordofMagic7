@@ -365,7 +365,7 @@ public class PlayerData {
 
     public Location playerHoloLocation() {
         Location loc = player.getEyeLocation().clone();
-        loc.setY(loc.getY()+1.1);
+        loc.setY(loc.getY()+1.3);
         return loc;
     }
 
@@ -997,8 +997,6 @@ public class PlayerData {
         } else {
             // 初回ログイン
             MultiThread.TaskRunSynchronizedLater(() -> {
-                Status.Health = Status.MaxHealth;
-                Status.Mana = Status.MaxMana;
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスブレード"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスメイス"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスロッド"), 1);
@@ -1015,6 +1013,9 @@ public class PlayerData {
             MultiThread.TaskRunSynchronizedLater(() -> {
                 Status.StatusUpdate();
                 ViewBar.tickUpdate();
+                Status.Health = Status.MaxHealth;
+                Status.Mana = Status.MaxMana;
+                viewUpdate();
             }, 20, "LoadUpdate");
         }, 5);
     }

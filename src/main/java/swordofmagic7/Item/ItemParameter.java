@@ -150,6 +150,7 @@ public class ItemParameter implements Cloneable {
         meta.setLore(Lore);
         meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         if (Icon == Material.PLAYER_HEAD) {
             try {
                 NBT.modifyComponents(item, nbt -> {

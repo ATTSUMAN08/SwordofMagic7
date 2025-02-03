@@ -23,6 +23,7 @@ repositories {
     maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
     maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
     maven(url = "https://repo.ith.f5.si/releases") // AbyssLib
+    maven(url = "https://eldonexus.de/repository/maven-releases/") // WorldBorderAPI
 }
 
 dependencies {
@@ -34,8 +35,12 @@ dependencies {
     compileOnly(libs.citizens) {
         exclude(group = "*", module = "*")
     }
-
     compileOnly(libs.abyssLib)
+    compileOnly(libs.worldBorderApi) {
+        artifact {
+            classifier = "dev"
+        }
+    }
 }
 
 
