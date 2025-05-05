@@ -13,7 +13,7 @@ decentHolograms = "2.8.14"
 citizens = "2.0.35-SNAPSHOT"
 abyssLib = "1.0.0-SNAPSHOT"
 worldBorderApi = "1.214.0"
-fawe = "2.12.3"
+fawe = "2.13.0"
 blueMap = "2.7.4"
 
 [plugins]
