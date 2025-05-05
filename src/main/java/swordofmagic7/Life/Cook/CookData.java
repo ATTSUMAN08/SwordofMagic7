@@ -32,7 +32,10 @@ public class CookData {
     public ItemStack view(int Level, String format) {
         ItemStack item = viewItem.viewItem(viewAmount, format);
         ItemMeta meta = item.getItemMeta();
-        List<String> Lore = new ArrayList<>(meta.getLore());
+        List<String> Lore = new ArrayList<>();
+        if (meta.getLore() != null) {
+            Lore.addAll(meta.getLore());
+        }
         Lore.add(Function.decoText("§3§l料理情報"));
         Lore.add(Function.decoLore("必要料理レベル") + ReqLevel);
         Lore.add(Function.decoLore("料理経験値") + Exp);

@@ -22,8 +22,10 @@ repositories {
     maven(url = "https://jitpack.io") // NuVotifier, DecentHolograms
     maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
     maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
-    maven(url = "https://repo.ith.f5.si/releases") // AbyssLib
+    maven(url = "https://repo.lavafuse.net/releases") // AbyssLib
     maven(url = "https://eldonexus.de/repository/maven-releases/") // WorldBorderAPI
+    maven(url = "https://maven.enginehub.org/repo/") // FastAsyncWorldEdit
+    maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
 }
 
 dependencies {
@@ -41,6 +43,9 @@ dependencies {
             classifier = "dev"
         }
     }
+    compileOnly(libs.faweCore)
+    compileOnly(libs.faweBukkit) { isTransitive = false }
+    compileOnly(libs.blueMap)
 }
 
 
@@ -99,7 +104,7 @@ bukkit {
     apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier")
+    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier", "BlueMap")
 
     permissions {
         register("som7.developer") {

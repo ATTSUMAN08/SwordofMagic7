@@ -28,10 +28,10 @@ public class GetItem implements SomCommand, SomTabComplete {
     @Override
     public boolean Command(CommandSender sender, String[] args) {
         PlayerData targetData = sender instanceof Player player ? playerData(player) : null;
-        if (args.length >= 3) {
+        /*if (args.length >= 3) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target.isOnline()) targetData = playerData(target);
-        }
+        }*/
         if (targetData != null) {
             if (getItemList().containsKey(args[0])) {
                 ItemParameterStack stack = new ItemParameterStack(getItemParameter(args[0]));

@@ -579,6 +579,7 @@ public class Events implements Listener {
     @EventHandler
     void onSneakToggle(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
+        if (player.getWorld() != SomCore.world) return;
         PlayerData playerData = playerData(player);
         if (!player.isSneaking()) {
             playerData.MapManager.WarpGateSelector();
@@ -684,5 +685,10 @@ public class Events implements Listener {
         if (Objects.equals(e.getChannel(), "SNC")) {
             Client.Trigger(e.getMessage());
         }
+    }
+
+    @EventHandler
+    void onDecay(LeavesDecayEvent e) {
+        e.setCancelled(true);
     }
 }

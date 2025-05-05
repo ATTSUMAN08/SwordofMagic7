@@ -4,12 +4,20 @@ import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerCommon
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.google.gson.Gson
+import de.bluecolored.bluemap.api.BlueMapAPI
+import de.bluecolored.bluemap.api.markers.MarkerSet
+import de.bluecolored.bluemap.api.markers.ShapeMarker
+import de.bluecolored.bluemap.api.math.Color
+import de.bluecolored.bluemap.api.math.Shape
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
+import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
+import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
@@ -54,6 +62,11 @@ class SomCore : SuspendingJavaPlugin() {
         val gson = Gson()
         const val AFK_TIME_PERIOD = 1
         const val AFK_TIME = 300
+        private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
+
+        private val blueMapApi by lazy {
+            BlueMapAPI.getInstance().get()
+        }
 
         fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
@@ -127,7 +140,7 @@ class SomCore : SuspendingJavaPlugin() {
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
             val start = System.currentTimeMillis()
-            BroadCast("§e[オートセーブ]§aを§b開始§aします")
+            broadcastNoConsole("§e[オートセーブ]§aを§b開始§aします")
             PlayerList.ResetPlayer.clear()
             val playerDataList = PlayerData.getPlayerData().values.toSet()
             playerDataList.forEach { data ->
@@ -136,7 +149,7 @@ class SomCore : SuspendingJavaPlugin() {
                     if (player.isOnline) data.save() else PlayerData.remove(player)
                 }
             }
-            BroadCast("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
+            broadcastNoConsole("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
         }, 200, 6000)
 
         MultiThread.TaskRunTimer({
@@ -193,6 +206,8 @@ class SomCore : SuspendingJavaPlugin() {
 
         commandRegister()
         CommandManager().registerCommands()
+        initBlueMap()
+
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
     }
 
@@ -217,6 +232,11 @@ class SomCore : SuspendingJavaPlugin() {
         Log("Plugin Task Cancelled")
         PacketEvents.getAPI().eventManager.unregisterListener(packetEventsListener)
         Log("PacketListener unregister")
+
+        blueMapApi.getWorld(world).get().maps.map { map ->
+            val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID]
+            markerSet?.markers?.clear()
+        }
     }
 
     private fun deleteHolograms() {
@@ -224,6 +244,47 @@ class SomCore : SuspendingJavaPlugin() {
             if (!hologram.isDisabled) {
                 DHAPI.removeHologram(hologram.id)
             }
+        }
+    }
+
+    private fun initBlueMap() {
+        launch(asyncDispatcher) {
+            for (i in 1..15) { // BlueMapの初期化を待つ 最大30秒
+                if (BlueMapAPI.getInstance().isPresent) {
+                    break
+                }
+                delay(2000)
+            }
+            blueMapApi.getWorld(world).get().maps.map { map ->
+                map.markerSets.put(BLUEMAP_SPAWNERS_MARKERS_ID, MarkerSet.builder().label("スポナー").build())
+            }
+
+            for (i in MobSpawnerList.values) {
+                val loc = i.location
+                val startX = loc.x - i.Radius
+                val endX = loc.x + i.Radius
+                val startZ = loc.z - i.Radius
+                val endZ = loc.z + i.Radius
+                val border = Shape.createRect(startX, startZ, endX, endZ)
+                val shapeMarker = ShapeMarker.builder()
+                    .label("${i.mobData.Id} (${i.Level}Lv)")
+                    .shape(border, 1F)
+                    .lineColor(Color(255, 0, 0, 1.0F))
+                    .fillColor(Color(200, 0, 0, 0.3F))
+                    .lineWidth(3)
+                    .depthTestEnabled(false)
+                    .build()
+
+                blueMapApi.getWorld(world).get().maps.map { map ->
+                    val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID] ?: throw IllegalStateException("MarkerSet not found WTF")
+
+                    markerSet.markers.put(i.Id, shapeMarker)
+
+                    map.markerSets.put(BLUEMAP_SPAWNERS_MARKERS_ID, markerSet)
+                }
+            }
+
+            logger.info("BlueMapのマーカーセットを初期化しました")
         }
     }
 

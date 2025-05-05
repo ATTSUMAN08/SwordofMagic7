@@ -13,6 +13,8 @@ decentHolograms = "2.8.12"
 citizens = "2.0.35-SNAPSHOT"
 abyssLib = "1.0.0-SNAPSHOT"
 worldBorderApi = "1.214.0"
+fawe = "2.12.3"
+blueMap = "2.7.4"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -31,3 +33,6 @@ decentHolograms = { group = "com.github.decentsoftware-eu", name = "decenthologr
 citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
 abyssLib = { group = "me.attsuman08", name = "abysslib-paper", version.ref = "abyssLib" }
 worldBorderApi = { group = "com.github.yannicklamprecht", name = "worldborderapi", version.ref = "worldBorderApi" }
+faweCore = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Core", version.ref = "fawe" }
+faweBukkit = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
+blueMap = { group = "de.bluecolored", name = "bluemap-api", version.ref = "blueMap" }

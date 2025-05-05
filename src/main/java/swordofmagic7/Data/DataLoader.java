@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
 import swordofmagic7.classes.ClassData;
 import swordofmagic7.Dungeon.DefenseBattle;
 import swordofmagic7.Equipment.EquipmentCategory;
@@ -585,11 +586,33 @@ public class DataLoader {
         SomCore.instance.getLogger().info("[DataLoader] SkillDataを読み込みました (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
+    public static void moveToTop(List<File> list, List<String> targetNames) {
+        List<File> priorityFiles = new ArrayList<>();
+
+        // 優先するファイルを targetNames の順番通りにリストへ追加
+        for (String targetName : targetNames) {
+            Iterator<File> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                File file = iterator.next();
+                if (file.getName().equals(targetName)) {
+                    priorityFiles.add(file);
+                    iterator.remove(); // 元のリストから削除
+                    break; // 同じファイル名が複数ある場合、最初のものだけ取得
+                }
+            }
+        }
+
+        // 優先ファイルを先頭に追加（targetNames の順番通り）
+        list.addAll(0, priorityFiles);
+    }
+
     public static void ClassDataLoad() {
         long start = System.currentTimeMillis();
         File classDirectories = new File(DataBasePath, "ClassData/");
         Function.createFolder(classDirectories);
-        for (File file : dumpFile(classDirectories)) {
+        List<File> classList = dumpFile(classDirectories);
+        moveToTop(classList, List.of("Novice.yml", "Swordman.yml", "Mage.yml", "Gunner.yml", "Tamer.yml", "Cleric.yml"));
+        for (File file : classList) {
             try {
                 String fileName = file.getName().replace(".yml", "");
                 FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -932,10 +955,16 @@ public class DataLoader {
     public static void ItemInfoDataLoad() {
         long start = System.currentTimeMillis();
         for (ItemParameter itemData : ItemList.values()) {
-            ItemInfoData.put(itemData.Id, new ArrayList<>());
-            if (itemData.isLoreHide) ItemInfoData.get(itemData.Id).add("§c§lこの情報へのアクセス権限がありません");
-            else ItemInfoData.get(itemData.Id).addAll(itemData.viewItem(1, "%.0f").getLore());
-            ItemInfoData.get(itemData.Id).add(decoText("§3§l入手方法"));
+            List<String> tempList = new ArrayList<>();
+            if (itemData.isLoreHide) tempList.add("§c§lこの情報へのアクセス権限がありません");
+            else {
+                ItemStack tempItem = itemData.viewItem(1, "%.0f");
+                if (tempItem != null && tempItem.hasItemMeta() && tempItem.getItemMeta().hasLore()) {
+                    tempList.addAll(tempItem.getItemMeta().getLore());
+                }
+            }
+            tempList.add(decoText("§3§l入手方法"));
+            ItemInfoData.put(itemData.Id, tempList);
         }
         for (MobData mobData : MobList.values()) {
             for (DropItemData dropData : mobData.DropItemTable) {

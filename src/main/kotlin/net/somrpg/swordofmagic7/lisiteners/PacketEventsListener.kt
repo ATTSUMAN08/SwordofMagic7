@@ -3,6 +3,7 @@ package net.somrpg.swordofmagic7.lisiteners
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
+import com.github.retrooper.packetevents.protocol.player.ClientVersion
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange
@@ -24,7 +25,10 @@ class PacketEventsListener : PacketListener {
                 val loc = Location(p.world, packet.blockPosition.x.toDouble(), packet.blockPosition.y.toDouble(), packet.blockPosition.z.toDouble())
                 if (p.gameMode != GameMode.CREATIVE && ChangeBlock(p).checkLocation(loc)) {
                     val material = ChangeBlock(p)[loc]
-                    packet.blockState = WrappedBlockState.getDefaultState(StateTypes.getByName(material.name))
+                    val stateType = StateTypes.getByName(material.name.lowercase())
+                    if (stateType != null) {
+                        packet.blockState = WrappedBlockState.getDefaultState(stateType)
+                    }
                 }
             }
             PacketType.Play.Server.PARTICLE, PacketType.Play.Server.STOP_SOUND, PacketType.Play.Server.ENTITY_SOUND_EFFECT,

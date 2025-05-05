@@ -225,6 +225,14 @@ public final class Function {
         Bukkit.getConsoleSender().sendMessage(PlainTextComponentSerializer.plainText().serialize(text));
     }
 
+    public static void broadcastNoConsole(String text) {
+        for (Player player : PlayerList.get()) {
+            if (player.isOnline()) {
+                player.sendMessage(Component.text(text));
+            }
+        }
+    }
+
     public static Inventory decoInv(String name, int size) {
         Inventory inv = Bukkit.createInventory(null, size*9, name);
         inv.setMaxStackSize(127);

@@ -18,7 +18,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
     public static final int maxSlot = 4;
-    public static final int maxLevel = 25;
+    public static final int maxLevel = 15;
     public static final int[] slotReqLevel = {1, 10, 30, 50};
     public static final ClassData defaultClass = getClassData("Novice");
     private final Player player;
