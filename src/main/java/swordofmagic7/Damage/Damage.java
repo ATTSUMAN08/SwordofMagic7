@@ -245,7 +245,7 @@ public final class Damage {
             victimEffectManager = petParameter.getEffectManager();
         } else return;
 
-        victim.playEffect(EntityEffect.HURT);
+        victim.playHurtAnimation(0F);
         if (victimEffectManager.isInvincible() && !ignoreInvincible) {
             String log = "§b§l" + EffectType.Invincible.Display;
             randomHologram(log, victim.getEyeLocation(), HoloView);

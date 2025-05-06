@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets
  */
 class IMEConverter {
     companion object {
-        private const val GOOGLE_IME_URL = "https://www.google.com/transliterate?langpair=ja-Hira|ja&text="
+        private const val GOOGLE_IME_URL = "https://www.google.com/transliterate?langpair=ja-Hira%7Cja&text="
 
         /**
          * GoogleIMEを使って変換する

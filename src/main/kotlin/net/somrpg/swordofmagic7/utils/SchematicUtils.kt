@@ -21,8 +21,8 @@ object SchematicUtils {
         if (cache.containsKey(path)) cache.remove(path)
     }
 
-    fun load(path: String): Clipboard {
-        if (cache.containsKey(path)) {
+    fun load(path: String, bypassCache: Boolean = false): Clipboard {
+        if (cache.containsKey(path) && !bypassCache) {
             return cache[path]!!
         }
         val clipboard = FileInputStream(path).use { inputStream ->
@@ -49,9 +49,9 @@ object SchematicUtils {
         }
     }
 
-    fun paste(schematicId: String, world: World, to: BlockVector3, ignoreAirBlocks: Boolean = false) {
+    fun paste(schematicId: String, world: World, to: BlockVector3, ignoreAirBlocks: Boolean = false, bypassCache: Boolean = false) {
         WorldEdit.getInstance().newEditSession(world).use { editSession ->
-            val clipboard = load("plugins/FastAsyncWorldEdit/schematics/${schematicId}.schem")
+            val clipboard = load("plugins/FastAsyncWorldEdit/schematics/${schematicId}.schem", bypassCache)
             val holder = ClipboardHolder(clipboard)
             val operation = holder.createPaste(editSession)
                 .to(to)

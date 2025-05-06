@@ -5,6 +5,11 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.math.BlockVector3
+import me.attsuman08.abysslib.shade.acf.BaseCommand
+import me.attsuman08.abysslib.shade.acf.annotation.CommandAlias
+import me.attsuman08.abysslib.shade.acf.annotation.CommandPermission
+import me.attsuman08.abysslib.shade.acf.annotation.Subcommand
+import me.attsuman08.abysslib.shade.acf.annotation.Syntax
 import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.translater.JapanizeType
@@ -15,33 +20,28 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.incendo.cloud.annotations.Argument
-import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.Permission
-import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.PlayerData
-import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.MultiThread.MultiThread
 import java.io.File
 
-@Suppress("UnstableApiUsage")
-class SomCommand {
+@CommandAlias("som")
+@CommandPermission("som7.developer")
+class SomCommand : BaseCommand() {
 
-    @Command("som info")
-    @Permission("som7.developer")
-    fun somVersion(sender: CommandSender) {
-        sender.sendMessage("§e現在のスレッド: §a${Thread.currentThread().name}")
+    @Subcommand("info")
+    fun version(sender: CommandSender) {
         sender.sendMessage("§eサーバー: §a${Bukkit.getServer().name} ${Bukkit.getServer().version}")
         sender.sendMessage("§eプレイヤー数: §a${Bukkit.getOnlinePlayers().size}/${Bukkit.getMaxPlayers()}")
-        sender.sendMessage("§eTPS: §a${String.format("%.1f", Bukkit.getTPS()[0])}")
-        sender.sendMessage("§eMSPT: §a${String.format("%.1f", Bukkit.getAverageTickTime())}")
+        sender.sendMessage("§eTPS: §a${String.format("%.1f", Bukkit.getTPS()[0])}/20")
+        sender.sendMessage("§eMSPT: §a${String.format("%.1f", Bukkit.getAverageTickTime())}/50")
         sender.sendMessage("§eプラグイン:")
-        for (depend in Bukkit.getPluginManager().plugins.map { it.name }) {
-            sender.sendMessage("§e- $depend §a(${getVersion(depend)})")
+        for (plugin in Bukkit.getPluginManager().plugins.map { it.name }) {
+            sender.sendMessage("§e- $plugin §a(${getPluginVersion(plugin)})")
         }
     }
 
-    private fun getVersion(name: String): String {
+    @Suppress("UnstableApiUsage")
+    private fun getPluginVersion(name: String): String {
         val plugin = if (name == "NuVotifier") {
             Bukkit.getPluginManager().getPlugin("Votifier")
         } else {
@@ -50,34 +50,33 @@ class SomCommand {
         return plugin?.pluginMeta?.version ?: "不明"
     }
 
-    @Command("som reload")
-    @Permission("som7.developer")
-    fun somReload(sender: CommandSender) {
+    @Subcommand("reload")
+    fun reload(sender: CommandSender) {
         for (p in Bukkit.getOnlinePlayers()) {
-            playerData(p).saveCloseInventory()
+            PlayerData.playerData(p).saveCloseInventory()
         }
         MultiThread.TaskRunSynchronizedLater({
             Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
         }, 5)
     }
 
-    @Command("som lunachat <message>")
-    @Permission("som7.developer")
-    fun somLunaChat(sender: CommandSender, @Argument("message") message: String) {
-        sender.sendMessage("メッセージ: $message")
-        sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME)}")
-        sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
+    @Subcommand("lunachat")
+    @Syntax("<message>")
+    fun somLunaChat(sender: CommandSender, message: String) {
+        SomCore.instance.launch(asyncDispatcher) {
+            sender.sendMessage("メッセージ: $message")
+            sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME)}")
+            sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
+        }
     }
 
-    @Command("som test")
-    @Permission("som7.developer")
+    @Subcommand("test")
     fun somTest(sender: CommandSender) {
         if (sender !is Player) return
         PlayerData.playerData(sender).dead()
     }
 
-    @Command("som test2")
-    @Permission("som7.developer")
+    @Subcommand("test2")
     fun somTest2(sender: CommandSender) {
         if (sender !is Player) return
 
@@ -87,8 +86,8 @@ class SomCommand {
             return
         }
 
-        file.forEachLine {
-            val locText = it.split(",").map { it.toDouble() }
+        file.forEachLine { line ->
+            val locText = line.split(",").map { text -> text.toDouble() }
             val loc = Location(sender.world, locText[0], locText[1], locText[2])
 
             SomCore.instance.launch(SomCore.instance.minecraftDispatcher) {
@@ -98,20 +97,23 @@ class SomCommand {
         sender.sendMessage("完了")
     }
 
-    @Command("som test3")
-    @Permission("som7.developer")
+    @Subcommand("test3")
     fun somTest3(sender: CommandSender) {
         if (sender !is Player) return
 
         sender.sendMessage("${sender.inventory.itemInMainHand.itemMeta.asComponentString}")
     }
 
-    @Command("som paste <schematic>")
-    @Permission("som7.developer")
-    fun somPaste(sender: CommandSender, @Argument("schematic") schematic: String) {
+    @Subcommand("paste")
+    @Syntax("<schematic>")
+    fun somPaste(sender: CommandSender, schematic: String) {
         if (sender !is Player) return
         SomCore.instance.launch(asyncDispatcher) {
-            SchematicUtils.paste(schematic, BukkitAdapter.adapt(sender.world), BlockVector3.at(sender.x, sender.y, sender.z), true)
+            SchematicUtils.paste(schematic, BukkitAdapter.adapt(sender.world), BlockVector3.at(sender.x, sender.y, sender.z),
+                ignoreAirBlocks = true,
+                bypassCache = true
+            )
         }
     }
+
 }

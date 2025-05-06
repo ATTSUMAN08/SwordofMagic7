@@ -205,7 +205,7 @@ class SomCore : SuspendingJavaPlugin() {
         }, 20)
 
         commandRegister()
-        CommandManager().registerCommands()
+        CommandManager.registerCommands()
         initBlueMap()
 
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")

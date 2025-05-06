@@ -1,75 +1,69 @@
 package net.somrpg.swordofmagic7.commands
 
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
+import me.attsuman08.abysslib.shade.acf.*
 import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.commands.builder.FlySpeedCommand
 import net.somrpg.swordofmagic7.commands.builder.GmCommand
 import net.somrpg.swordofmagic7.commands.builder.PlayModeCommand
 import net.somrpg.swordofmagic7.commands.developer.SomCommand
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
-import org.incendo.cloud.SenderMapper
-import org.incendo.cloud.annotations.AnnotationParser
-import org.incendo.cloud.bukkit.CloudBukkitCapabilities
-import org.incendo.cloud.execution.ExecutionCoordinator
-import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
-import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler
-import org.incendo.cloud.paper.LegacyPaperCommandManager
-import org.incendo.cloud.suggestion.Suggestion
-import java.util.concurrent.CompletableFuture
+import java.util.*
 
-class CommandManager {
+object CommandManager {
 
     fun registerCommands() {
-        val commandManager = createCommandManager()
+        val manager = PaperCommandManager(SomCore.instance)
+        manager.locales.defaultLocale = Locale.JAPANESE
 
-        registerMinecraftExceptionHandler(commandManager)
-        registerSuggestionProviders(commandManager)
+        registerConditions(manager)
+        registerCompletions(manager)
 
-        val annotationParser = createAnnotationParser(commandManager)
-        annotationParser.installCoroutineSupport(context = SomCore.instance.asyncDispatcher)
+        // Builder Commands
+        manager.registerCommand(GmCommand())
+        manager.registerCommand(FlySpeedCommand())
+        manager.registerCommand(PlayModeCommand())
 
-        // Builder
-        annotationParser.parse(
-            GmCommand(),
-            FlySpeedCommand(),
-            PlayModeCommand()
-        )
-
-        // Developer
-        annotationParser.parse(
-            SomCommand()
-        )
+        // Developer Commands
+        manager.registerCommand(SomCommand())
     }
 
-    private fun createCommandManager(): LegacyPaperCommandManager<CommandSender> {
-        val commandManager = LegacyPaperCommandManager(
-            SomCore.instance,
-            ExecutionCoordinator.builder<CommandSender>().build(),
-            SenderMapper.identity()
-        )
-        if (commandManager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
-            (commandManager as LegacyPaperCommandManager<*>).registerAsynchronousCompletions()
-        }
-        return commandManager
-    }
-
-    private fun registerMinecraftExceptionHandler(commandManager: LegacyPaperCommandManager<CommandSender>) {
-        MinecraftExceptionHandler.createNative<CommandSender>()
-            .defaultHandlers()
-            .decorator { component ->
-                component
+    private fun registerConditions(manager: PaperCommandManager) {
+        // Int | limits
+        manager.commandConditions.addCondition(Int::class.java, "limits",
+            CommandConditions.ParameterCondition { c: ConditionContext<BukkitCommandIssuer>, _: BukkitCommandExecutionContext, value: Int? ->
+                if (value == null) {
+                    return@ParameterCondition
+                }
+                if (c.hasConfig("min") && c.getConfigValue("min", 0) > value) {
+                    throw ConditionFailedException("値の最低値は${c.getConfigValue("min", 0)}です")
+                }
+                if (c.hasConfig("max") && c.getConfigValue("max", 3) < value) {
+                    throw ConditionFailedException("値の最高値は${c.getConfigValue("max", 3)}です")
+                }
             }
-            .registerTo(commandManager)
+        )
+
+        // Float | limits
+        manager.commandConditions.addCondition(Float::class.java, "limits",
+            CommandConditions.ParameterCondition { c: ConditionContext<BukkitCommandIssuer>, _: BukkitCommandExecutionContext, value: Float? ->
+                if (value == null) {
+                    return@ParameterCondition
+                }
+                val min = c.getConfigValue("min", "0").toFloat()
+                val max = c.getConfigValue("max", "3").toFloat()
+                if (c.hasConfig("min") && min > value) {
+                    throw ConditionFailedException("値の最低値は${min}です")
+                }
+                if (c.hasConfig("max") && max < value) {
+                    throw ConditionFailedException("値の最高値は${max}です")
+                }
+            }
+        )
     }
 
-    private fun registerSuggestionProviders(commandManager: LegacyPaperCommandManager<CommandSender>) {
-        commandManager.parserRegistry().registerSuggestionProvider("players") { _, _ ->
-            CompletableFuture.completedFuture(Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) })
+    private fun registerCompletions(manager: PaperCommandManager) {
+        manager.commandCompletions.registerCompletion("players") { _ ->
+            return@registerCompletion Bukkit.getOnlinePlayers().map { it.name }
         }
-    }
-
-    private fun createAnnotationParser(commandManager: LegacyPaperCommandManager<CommandSender>): AnnotationParser<CommandSender> {
-        return AnnotationParser(commandManager, CommandSender::class.java)
     }
 }
