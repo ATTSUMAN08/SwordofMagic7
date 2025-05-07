@@ -22,7 +22,7 @@ enum class JapanizeType(val id: String) {
         @JvmStatic
         fun fromID(id: String?, def: JapanizeType): JapanizeType {
             if (id == null) return def
-            for (type in values()) {
+            for (type in entries) {
                 if (type.id.equals(id, ignoreCase = true)) {
                     return type
                 }

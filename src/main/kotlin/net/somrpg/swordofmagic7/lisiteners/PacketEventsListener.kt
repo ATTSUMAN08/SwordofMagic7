@@ -3,7 +3,6 @@ package net.somrpg.swordofmagic7.lisiteners
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.protocol.player.ClientVersion
 import com.github.retrooper.packetevents.protocol.world.states.WrappedBlockState
 import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange
@@ -31,8 +30,7 @@ class PacketEventsListener : PacketListener {
                     }
                 }
             }
-            PacketType.Play.Server.PARTICLE, PacketType.Play.Server.STOP_SOUND, PacketType.Play.Server.ENTITY_SOUND_EFFECT,
-            PacketType.Play.Server.SOUND_EFFECT, PacketType.Play.Server.NAMED_SOUND_EFFECT -> {
+            PacketType.Play.Server.PARTICLE, PacketType.Play.Server.STOP_SOUND, PacketType.Play.Server.ENTITY_SOUND_EFFECT, PacketType.Play.Server.SOUND_EFFECT, PacketType.Play.Server.NAMED_SOUND_EFFECT -> {
                 val playerData = PlayerData.playerData(p) ?: return
                 if (playerData.isAFK) {
                     e.isCancelled = true
