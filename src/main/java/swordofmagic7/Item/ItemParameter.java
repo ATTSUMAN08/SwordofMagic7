@@ -151,6 +151,8 @@ public class ItemParameter implements Cloneable {
         meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        item.setItemMeta(meta);
+
         if (Icon == Material.PLAYER_HEAD) {
             try {
                 NBT.modifyComponents(item, nbt -> {
@@ -163,12 +165,7 @@ public class ItemParameter implements Cloneable {
             } catch (NbtApiException e) {
                 Log("プレイヤへッドのロード時にエラーが発生しました -> " + Display + " | " + e.getMessage());
             }
-        } else {
-            item.setItemMeta(meta);
         }
-        /*if (Category.isTool()) {
-            NBTItem nbtItem = new NBTItem(item);
-        }*/
 
         if (amount > MaxStackAmount) {
             amount = MaxStackAmount;

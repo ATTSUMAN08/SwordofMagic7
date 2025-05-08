@@ -647,7 +647,7 @@ public class PlayerData {
         }
     }
 
-    public static final int MaxLevel = 50;
+    public static final int MaxLevel = 40;
 
     public synchronized void addPlayerExp(int addExp) {
         Exp += addExp;

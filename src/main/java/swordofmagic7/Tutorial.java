@@ -11,13 +11,14 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.BroadCast;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Tutorial {
-    public static HashMap<Player, Integer> TutorialProcess = new HashMap<>();
+    public static Map<Player, Integer> TutorialProcess = new HashMap<>();
     public static List<TutorialData> TutorialList = new ArrayList<>();
     public static final String TutorialNonSave = "§c§lチュートリアル中はデータはセーブされません";
 

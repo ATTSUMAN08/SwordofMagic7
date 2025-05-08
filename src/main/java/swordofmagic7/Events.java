@@ -98,10 +98,10 @@ public class Events implements Listener {
                 }
             }
         }
-        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
+        /*if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
-        }
+        }*/
         int playerCount = 0;
         int vipCount = 0;
         int premiumCount = 0;

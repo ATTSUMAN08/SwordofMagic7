@@ -51,22 +51,34 @@ dependencies {
 
 remotes {
     withGroovyBuilder {
-        "create"("devServer") {
-            setProperty("host", properties["SFTP_HOST"] ?: "localhost")
+        "create"("event") {
+            setProperty("host", properties["SFTP_HOST_SOM7"] ?: "localhost")
             setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
-            setProperty("user", properties["SFTP_USER_SOM7"] ?: "som7")
+            setProperty("user", properties["SFTP_USER_SOM7_EVENT"] ?: "som7")
+            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
+        }
+        "create"("ch1") {
+            setProperty("host", properties["SFTP_HOST_SOM7"] ?: "localhost")
+            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
+            setProperty("user", properties["SFTP_USER_SOM7_CH1"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
     }
 }
 
 tasks.register("deploy") {
-    description = "Deploy the plugin to the dev server"
+    description = "Deploy the plugin to the server"
     group = JavaBasePlugin.BUILD_TASK_NAME
     dependsOn("build")
     doLast {
         ssh.run(delegateClosureOf<RunHandler> {
-            session(remotes["devServer"], delegateClosureOf<SessionHandler> {
+            session(remotes["event"], delegateClosureOf<SessionHandler> {
+                put(hashMapOf(
+                    "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
+                    "into" to "plugins/${project.name}.jar"
+                ))
+            })
+            session(remotes["ch1"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
@@ -104,7 +116,7 @@ bukkit {
     apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "NuVotifier", "BlueMap")
+    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "BlueMap")
 
     permissions {
         register("som7.developer") {

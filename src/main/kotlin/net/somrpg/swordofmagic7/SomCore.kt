@@ -63,10 +63,7 @@ class SomCore : SuspendingJavaPlugin() {
         const val AFK_TIME_PERIOD = 1
         const val AFK_TIME = 300
         private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
-
-        private val blueMapApi by lazy {
-            BlueMapAPI.getInstance().get()
-        }
+        var blueMapEnabled = false
 
         fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
@@ -99,13 +96,14 @@ class SomCore : SuspendingJavaPlugin() {
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
         ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
-        server.pluginManager.registerEvents(Som7Vote(), this)
+        // TODO 投票機能使わんから無効化
+        // server.pluginManager.registerEvents(Som7Vote(), this)
 
         // Initialize folders
         if (!dataFolder.exists()) {
             createFolder(dataFolder)
         }
-        val marketFolder = File(dataFolder, "Market")
+        val marketFolder = File(DataBasePath, "Market")
         if (!marketFolder.exists()) {
             createFolder(marketFolder)
         }
@@ -206,7 +204,11 @@ class SomCore : SuspendingJavaPlugin() {
 
         commandRegister()
         CommandManager.registerCommands()
-        initBlueMap()
+
+        if (server.pluginManager.isPluginEnabled("BlueMap")) {
+            blueMapEnabled = true
+            initBlueMap()
+        }
 
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
     }
@@ -233,9 +235,12 @@ class SomCore : SuspendingJavaPlugin() {
         PacketEvents.getAPI().eventManager.unregisterListener(packetEventsListener)
         Log("PacketListener unregister")
 
-        blueMapApi.getWorld(world).get().maps.map { map ->
-            val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID]
-            markerSet?.markers?.clear()
+        if (blueMapEnabled) {
+            val blueMapApi = BlueMapAPI.getInstance().get()
+            blueMapApi.getWorld(world).get().maps.map { map ->
+                val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID]
+                markerSet?.markers?.clear()
+            }
         }
     }
 
@@ -249,6 +254,9 @@ class SomCore : SuspendingJavaPlugin() {
 
     private fun initBlueMap() {
         launch(asyncDispatcher) {
+            val blueMapApi by lazy {
+                BlueMapAPI.getInstance().get()
+            }
             for (i in 1..15) { // BlueMapの初期化を待つ 最大30秒
                 if (BlueMapAPI.getInstance().isPresent) {
                     break
@@ -607,7 +615,7 @@ class SomCore : SuspendingJavaPlugin() {
                                 return true
                             }
                         }
-                        playerData.saveTeleportServer = "Som7$teleportServer"
+                        playerData.saveTeleportServer = "SOM7$teleportServer"
                         playerData.save()
                     } else {
                         sender.sendMessage("§e/channel <channel>")

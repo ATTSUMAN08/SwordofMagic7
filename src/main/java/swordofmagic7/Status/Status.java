@@ -293,6 +293,7 @@ public class Status {
             classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
         }
         player.displayName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
+        player.playerListName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
         player.displayName(Component.text(prefix + "§f" + playerData.Nick));
         if (playerData.hologram != null && !playerData.hologram.isDisabled()) DHAPI.setHologramLine(playerData.hologram, 1, "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower()));
         playerData.updateBlockPlayer();

@@ -26,7 +26,7 @@ public class AusMineB3 {
     private static int Health;
     private static final int StartTime = 60;
     private static final int StartHealth = 12000;
-    private static final Location EventLocation = new Location(world,945, 121, 1709);
+    private static final Location EventLocation = new Location(world,1426, 25, -22);
     private static final Set<EnemyData> EnemyList = new HashSet<>();
     private static Set<Player> Players = new HashSet<>();
     private static final String[] MobList = {"ロウスパイダー", "スケール", "レースト", "ベース"};

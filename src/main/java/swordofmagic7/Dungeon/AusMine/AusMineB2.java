@@ -20,7 +20,7 @@ import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class AusMineB2 {
 
-    private static final Location EventLocation = new Location(world,907, 81, 1457);
+    private static final Location EventLocation = new Location(world,1992, 2, 37);
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
