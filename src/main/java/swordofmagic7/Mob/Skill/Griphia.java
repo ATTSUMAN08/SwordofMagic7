@@ -27,10 +27,10 @@ public class Griphia extends EnemySkillBase {
     final Location[] Candle = new Location[4];
     public Griphia(EnemySkillManager manager) {
         super(manager);
-        Candle[0] = new Location(world, 649.5, 123, 2031.5);
-        Candle[1] = new Location(world, 652.5, 123, 1923.5);
+        Candle[0] = new Location(world, 650.5, 123, 2033.5);
+        Candle[1] = new Location(world, 649.5, 123, 1927.5);
         Candle[2] = new Location(world, 760.5, 123, 1927.5);
-        Candle[3] = new Location(world, 756.5, 123, 2035.5);
+        Candle[3] = new Location(world, 760.5, 123, 2033.5);
     }
 
     public void SingleFlameCircle(int CastTime) {

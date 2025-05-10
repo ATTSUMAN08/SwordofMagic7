@@ -37,21 +37,28 @@ import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.Dungeon.DefenseBattle
 import swordofmagic7.Dungeon.Dungeon
+import swordofmagic7.Effect.EffectManager
 import swordofmagic7.Function.*
+import swordofmagic7.Map.TeleportGateParameter
+import swordofmagic7.Map.WarpGateParameter
 import swordofmagic7.Mob.MobManager
 import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
+import swordofmagic7.Pet.PetManager
 import swordofmagic7.Sound.CustomSound.playSound
 import swordofmagic7.Sound.SoundList
 import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
+import swordofmagic7.viewBar.ViewBar
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
 
 class SomCore : SuspendingJavaPlugin() {
     companion object {
@@ -205,6 +212,11 @@ class SomCore : SuspendingJavaPlugin() {
         commandRegister()
         CommandManager.registerCommands()
 
+        initWarpGate()
+        initTeleportGate()
+        initEffectManager()
+        initPlayerThread()
+
         if (server.pluginManager.isPluginEnabled("BlueMap")) {
             blueMapEnabled = true
             initBlueMap()
@@ -257,10 +269,8 @@ class SomCore : SuspendingJavaPlugin() {
             val blueMapApi by lazy {
                 BlueMapAPI.getInstance().get()
             }
-            for (i in 1..15) { // BlueMapの初期化を待つ 最大30秒
-                if (BlueMapAPI.getInstance().isPresent) {
-                    break
-                }
+            repeat(15) { // BlueMapの初期化を待つ 最大30秒
+                if (BlueMapAPI.getInstance().isPresent) return@repeat
                 delay(2000)
             }
             blueMapApi.getWorld(world).get().maps.map { map ->
@@ -293,6 +303,187 @@ class SomCore : SuspendingJavaPlugin() {
             }
 
             logger.info("BlueMapのマーカーセットを初期化しました")
+        }
+    }
+
+    private fun initWarpGate() {
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - WarpGateParticle"
+            val counts = mutableMapOf<WarpGateParameter, Int>()
+            val increment = (2 * Math.PI) / 90
+            val radius = 2.0
+            while (isEnabled) {
+                for (warpGate in WarpGateList.values) {
+                    if (!warpGate.isStarted) continue
+                    val i = counts[warpGate] ?: 0
+                    val angle = i * increment
+                    val x = radius * cos(angle)
+                    val z = radius * sin(angle)
+                    val nLoc = Location(world, warpGate.location.x + x, warpGate.location.y, warpGate.location.z + z)
+                    val nLoc2 = Location(world, warpGate.location.x - x, warpGate.location.y, warpGate.location.z - z)
+                    ParticleManager.spawnParticle(warpGate.particleData, nLoc)
+                    ParticleManager.spawnParticle(warpGate.particleData, nLoc2)
+                    counts[warpGate] = i + 1
+                    if ((i+1) >= 90) {
+                        counts[warpGate] = 0
+                    }
+                }
+                MultiThread.sleepMillis(10)
+            }
+        }
+    }
+
+    private fun initTeleportGate() {
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - TeleportGateParticle"
+            val counts = mutableMapOf<TeleportGateParameter, Int>()
+            val increment = (2 * Math.PI) / 90
+            val radius = 1.5
+            while (isEnabled) {
+                for (teleportGate in TeleportGateList.values) {
+                    val i = counts[teleportGate] ?: 0
+                    val angle = i * increment
+                    val x = radius * cos(angle)
+                    val z = radius * sin(angle)
+                    val nLoc = Location(world, teleportGate.Location.x + x, teleportGate.Location.y, teleportGate.Location.z + z)
+                    val nLoc2 = Location(world, teleportGate.Location.x - x, teleportGate.Location.y, teleportGate.Location.z - z)
+                    ParticleManager.spawnParticle(teleportGate.particleData, nLoc)
+                    ParticleManager.spawnParticle(teleportGate.particleData, nLoc2)
+                    counts[teleportGate] = i + 1
+                    if ((i+1) >= 90) {
+                        counts[teleportGate] = 0
+                    }
+                }
+                MultiThread.sleepMillis(25)
+            }
+        }
+    }
+
+    private fun initEffectManager() {
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_EnemyData"
+            while (isEnabled) {
+                for (enemyData in MobManager.EnemyTable.values.toList()) {
+                    if (enemyData == null) continue
+                    val effectManager = enemyData.effectManager
+                    if (effectManager.isRunnable && enemyData.isAlive) {
+                        effectManager.onTaskRun()
+                    }
+                }
+                MultiThread.sleepTick(EffectManager.period);
+            }
+        }
+
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PlayerData"
+            while (isEnabled) {
+                for (data in playerData.values.toList()) {
+                    if (data == null) continue
+                    val effectManager = data.EffectManager
+                    if (effectManager.isRunnable && effectManager.playerData.player.isOnline) {
+                        effectManager.onTaskRun()
+                    }
+                }
+                MultiThread.sleepTick(EffectManager.period);
+            }
+        }
+
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PetData"
+            while (isEnabled) {
+                for (data in PetManager.PetSummonedList.values.toList()) {
+                    if (data == null) continue
+                    val effectManager = data.effectManager
+                    if (effectManager.isRunnable && effectManager.petParameter.player.isOnline) {
+                        effectManager.onTaskRun()
+                    }
+                }
+                MultiThread.sleepTick(EffectManager.period);
+            }
+        }
+    }
+
+    private fun initPlayerThread() {
+        // BossBarUpdate
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerBossBarUpdate"
+            while (isEnabled) {
+                for (playerData in playerData.values.toList()) {
+                    if (!playerData.player.isOnline) continue
+                    if (!playerData.bossBarInitialized) continue
+
+                    playerData.updateBossbar()
+                }
+                MultiThread.sleepTick(10)
+            }
+        }
+
+        // SkillCoolTimeTask
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - SkillCoolTime"
+            while (isEnabled) {
+                for (playerData in playerData.values.toList()) {
+                    if (!playerData.player.isOnline) continue
+                    if (playerData.Skill == null) continue
+
+                    playerData.Skill.onTick()
+                }
+                MultiThread.sleepTick(1)
+            }
+        }
+
+        // InstantBuff
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerInstantBuff"
+            while (isEnabled) {
+                for (playerData in playerData.values.toList()) {
+                    if (!playerData.player.isOnline) continue
+                    if (playerData.instantBuff == null) continue
+
+                    playerData.instantBuff.onSecond()
+                }
+                MultiThread.sleepTick(20)
+            }
+        }
+
+        // TickUpdate
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerTickUpdate"
+            while (isEnabled) {
+                for (playerData in playerData.values.toList()) {
+                    if (!playerData.player.isOnline) continue
+                    if (!playerData.ViewBar.tickUpdate) continue
+
+                    playerData.ViewBar.onTickUpdate()
+                }
+                MultiThread.sleepTick(ViewBar.period)
+            }
+        }
+
+        // PetInventory
+        launch(asyncDispatcher) {
+            Thread.currentThread().name = "SwordofMagic7-Thread - PetInventory"
+            while (isEnabled) {
+                for (playerData in playerData.values.toList()) {
+                    if (!playerData.player.isOnline) continue
+                    if (playerData.PetInventory == null) continue
+                    if (playerData.PetInventory.List.isEmpty()) continue
+
+                    for (pet in playerData.PetInventory.List) {
+                        if (!pet.Summoned) {
+                            pet.changeStamina(1)
+                        }
+                        pet.Health += pet.HealthRegen / 5
+                        pet.Mana += pet.ManaRegen / 5
+                        if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth
+                        if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana
+                    }
+                    if (playerData.ViewInventory.isPet) {
+                        playerData.PetInventory.viewPet()
+                    }
+                }
+                MultiThread.sleepTick(20)
+            }
         }
     }
 

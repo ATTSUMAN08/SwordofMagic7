@@ -72,6 +72,8 @@ public class Symmore {
                             }
                         }, "Howl2");
                     }
+                } else {
+                    break;
                 }
                 MultiThread.sleepTick(Manager.period);
             }

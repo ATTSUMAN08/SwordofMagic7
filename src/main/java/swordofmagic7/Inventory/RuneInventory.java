@@ -4,6 +4,7 @@ import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Item.RuneParameter;
@@ -18,11 +19,18 @@ import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class RuneInventory extends BasicInventory {
-    public final int MaxSlot = 500;
+    public int MaxSlot;
     private final java.util.List<RuneParameter> List = new ArrayList<>();
 
     public RuneInventory(Player player, PlayerData playerData) {
         super(player, playerData);
+        if (player.hasPermission(DataBase.Som7Premium)) {
+            MaxSlot = 800;
+        } else if (player.hasPermission(DataBase.Som7VIP)) {
+            MaxSlot = 600;
+        } else {
+            MaxSlot = 500;
+        }
     }
 
     public RuneSortType Sort = RuneSortType.Name;

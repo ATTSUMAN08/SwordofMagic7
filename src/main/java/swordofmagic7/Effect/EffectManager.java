@@ -47,9 +47,9 @@ public class EffectManager {
     public boolean isBlind = false;
     public Location isFixed;
 
-    private static final int period = 5;
+    public static final Long period = 5L;
 
-    public HashMap<EffectType, EffectData> Effect = new HashMap<>();
+    public Map<EffectType, EffectData> Effect = new HashMap<>();
 
     public EffectManager(LivingEntity entity, EffectOwnerType ownerType, Object ownerData) {
         this.entity = entity;
@@ -59,98 +59,92 @@ public class EffectManager {
             case Pet -> petParameter = (PetParameter) ownerData;
             case Enemy -> enemyData = (EnemyData) ownerData;
         }
-        MultiThread.TaskRun(() -> {
-            while (isRunnable && instance.isEnabled() && ((ownerType.isPlayer() && playerData.player.isOnline())
-                || (ownerType.isEnemy() && enemyData.isAlive())
-                || (ownerType.isPet() && petParameter.player.isOnline()))) {
-                try {
-                    isCrowdControl = false;
-                    isSkillsNotAvailable = false;
-                    isInvincible = false;
-                    isSlow = false;
-                    isBlind = false;
-                    isFixed = null;
-                    if (!Effect.isEmpty()) {
-                        for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
-                            EffectType effectType = effect.getKey();
-                            EffectData effectData = effect.getValue();
-                            if (!effectType.isToggle) effectData.time -= period;
-                            if (effectType.isCrowdControl()) isCrowdControl = true;
-                            if (effectType.isSkillsNotAvailable()) isSkillsNotAvailable = true;
-                            if (effectType.isInvincible()) isInvincible = true;
-                            if (effectType.isSlow()) isSlow = true;
-                            if (effectType.isBlind()) isBlind = true;
-                            if (effectType.isFixed()) isFixed = (Location) effectData.getObject(0);
-                            if (entity instanceof Player player) {
-                                switch (effectType) {
-                                    case Indulgendia -> {
-                                        if (Math.floorMod(effectData.time, 20) == 0) {
-                                            double health = effectData.getDouble(0);
-                                            if (playerData(player).PvPMode) health /= Damage.PvPHealDecay;
-                                            playerData.changeHealth(health);
-                                        }
-                                    }
-                                    case Brutality -> {
-                                        double mana = effectData.getDouble(0) / 20 * period;
-                                        playerData.changeMana(-mana);
-                                        if (playerData.Status.Mana < mana) {
-                                            removeEffect(EffectType.Brutality);
-                                            sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.TICK);
-                                        }
-                                    }
-                                    case SubzeroShield -> {
-                                        if (!playerData.Equipment.isOffHandEquip(EquipmentCategory.Shield)) removeEffect(effectType);
-                                    }
-                                    case PsychicPressure -> {
-                                        double value = effectData.getDouble(0);
-                                        double radius = 5;
-                                        double angle = 90;
-                                        ParticleManager.FanShapedParticle(particleActivate, player.getLocation(), radius, angle, 3);
-                                        Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, playerData.Skill.SkillProcess.Predicate(), false);
-                                        Damage.makeDamage(player, victims, DamageCause.MAT, "PsychicPressure", value, 1, 1);
-                                        ShapedParticle(new ParticleData(Particle.REVERSE_PORTAL), player.getLocation(), radius, angle, angle/2, 1, true);
-                                    }
+    }
+
+    public void onTaskRun() {
+        try {
+            isCrowdControl = false;
+            isSkillsNotAvailable = false;
+            isInvincible = false;
+            isSlow = false;
+            isBlind = false;
+            isFixed = null;
+            if (!Effect.isEmpty()) {
+                for (Map.Entry<EffectType, EffectData> effect : new HashMap<>(Effect).entrySet()) {
+                    EffectType effectType = effect.getKey();
+                    EffectData effectData = effect.getValue();
+                    if (!effectType.isToggle) effectData.time -= period;
+                    if (effectType.isCrowdControl()) isCrowdControl = true;
+                    if (effectType.isSkillsNotAvailable()) isSkillsNotAvailable = true;
+                    if (effectType.isInvincible()) isInvincible = true;
+                    if (effectType.isSlow()) isSlow = true;
+                    if (effectType.isBlind()) isBlind = true;
+                    if (effectType.isFixed()) isFixed = (Location) effectData.getObject(0);
+                    if (entity instanceof Player player) {
+                        switch (effectType) {
+                            case Indulgendia -> {
+                                if (Math.floorMod(effectData.time, 20) == 0) {
+                                    double health = effectData.getDouble(0);
+                                    if (playerData(player).PvPMode) health /= Damage.PvPHealDecay;
+                                    playerData.changeHealth(health);
                                 }
                             }
-                            if (effectData.time <= 0 || effectData.stack < 1) {
-                                removeEffect(effectType);
+                            case Brutality -> {
+                                double mana = effectData.getDouble(0) / 20 * period;
+                                playerData.changeMana(-mana);
+                                if (playerData.Status.Mana < mana) {
+                                    removeEffect(EffectType.Brutality);
+                                    sendMessage(player, "§cマナ枯渇§aのため§e[" + effectType.Display + "]§aを§c無効化§aしました", SoundList.TICK);
+                                }
+                            }
+                            case SubzeroShield -> {
+                                if (!playerData.Equipment.isOffHandEquip(EquipmentCategory.Shield)) removeEffect(effectType);
+                            }
+                            case PsychicPressure -> {
+                                double value = effectData.getDouble(0);
+                                double radius = 5;
+                                double angle = 90;
+                                ParticleManager.FanShapedParticle(particleActivate, player.getLocation(), radius, angle, 3);
+                                Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, playerData.Skill.SkillProcess.Predicate(), false);
+                                Damage.makeDamage(player, victims, DamageCause.MAT, "PsychicPressure", value, 1, 1);
+                                ShapedParticle(new ParticleData(Particle.REVERSE_PORTAL), player.getLocation(), radius, angle, angle/2, 1, true);
                             }
                         }
                     }
-                    if (entity != null) {
-                        MultiThread.TaskRunSynchronized(() -> {
-                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                                if (isFixed != null) entity.teleportAsync(isFixed);
-                                if (isCrowdControl) {
-                                    entity.removePotionEffect(PotionEffectType.SLOWNESS);
-                                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 255, false, false, false));
-                                }
-                            }
-                            if (isSlow) {
-                                entity.removePotionEffect(PotionEffectType.SLOWNESS);
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 2, false, false));
-                            }
-                            if (isBlind) {
-                                entity.removePotionEffect(PotionEffectType.BLINDNESS);
-                                entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
-                            }
-                        }, "EffectManagerTimer");
-                        MultiThread.TaskRun(() -> {
-                            if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                                if (isCrowdControl) for (int i = 0; i < period; i++) {
-                                    if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) break;
-                                    entity.setVelocity(Function.VectorDown);
-                                    MultiThread.sleepTick(1);
-                                }
-                            }
-                        }, "EffectManagerCrowdControl");
+                    if (effectData.time <= 0 || effectData.stack < 1) {
+                        removeEffect(effectType);
                     }
-                    MultiThread.sleepTick(period);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        }, "EffectManager");
+            if (entity != null) {
+                MultiThread.TaskRunSynchronized(() -> {
+                    if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                        if (isFixed != null) entity.teleportAsync(isFixed);
+                        if (isCrowdControl) {
+                            entity.removePotionEffect(PotionEffectType.SLOWNESS);
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 255, false, false, false));
+                        }
+                    }
+                    if (isSlow) {
+                        entity.removePotionEffect(PotionEffectType.SLOWNESS);
+                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 2, false, false));
+                    }
+                    if (isBlind) {
+                        entity.removePotionEffect(PotionEffectType.BLINDNESS);
+                        entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
+                    }
+                }, "EffectManagerTimer");
+                if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
+                    if (isCrowdControl) for (int i = 0; i < period; i++) {
+                        if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) break;
+                        entity.setVelocity(Function.VectorDown);
+                        //MultiThread.sleepTick(1);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean hasEffect(EffectType effect) {

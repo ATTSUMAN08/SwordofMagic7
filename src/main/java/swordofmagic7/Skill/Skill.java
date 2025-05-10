@@ -115,20 +115,17 @@ public class Skill {
         shadowmancer = new Shadowmancer(SkillProcess);
 
         alchemist = new Alchemist(SkillProcess);
+    }
 
-        MultiThread.TaskRun(() -> {
-            while (playerWhileCheck(playerData)) {
-                for (Map.Entry<String, Integer> data : SkillCoolTime.entrySet()) {
-                    String key = data.getKey();
-                    int cooltime = data.getValue()-1;
-                    SkillCoolTime.put(key, cooltime);
-                    if (cooltime <= 0) SkillStack.put(key, getSkillData(key).Stack);
-                }
-                SkillCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
-                if (SkillProcess.normalAttackCoolTime > 0) SkillProcess.normalAttackCoolTime--;
-                MultiThread.sleepTick(1);
-            }
-        }, "SkillCoolTimeTask");
+    public void onTick() {
+        for (Map.Entry<String, Integer> data : SkillCoolTime.entrySet()) {
+            String key = data.getKey();
+            int cooltime = data.getValue()-1;
+            SkillCoolTime.put(key, cooltime);
+            if (cooltime <= 0) SkillStack.put(key, getSkillData(key).Stack);
+        }
+        SkillCoolTime.entrySet().removeIf(entry -> entry.getValue() <= 0);
+        if (SkillProcess.normalAttackCoolTime > 0) SkillProcess.normalAttackCoolTime--;
     }
 
     public void setCastReady(boolean bool) {

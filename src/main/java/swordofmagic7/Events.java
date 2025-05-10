@@ -115,7 +115,7 @@ public class Events implements Listener {
             }
         }
         if (player.hasPermission(OverLogin)) return;
-        int normal = SomCore.Companion.isEventServer() ? 120 : 50;
+        int normal = SomCore.Companion.isEventServer() ? 100 : 20;
         boolean vip = vipCount < 5;
         boolean premium = premiumCount < 10;
         if (playerCount >= normal) {

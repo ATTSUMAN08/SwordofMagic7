@@ -230,8 +230,6 @@ public class PlayerData {
 
         Nick = player.getName();
 
-        PetInventory.start();
-
         initHologram();
         initBossBar();
 
@@ -336,31 +334,33 @@ public class PlayerData {
     public BossBar BossBarOther = BossBar.bossBar(Component.text(), 1, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
     public BossBar BossBarTimer = BossBar.bossBar(Component.text(), 1, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
     public BossBar BossBarSkillProgress = BossBar.bossBar(Component.text(), 0, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
+
+    public boolean bossBarInitialized = false;
+
     public void initBossBar() {
         player.showBossBar(BossBarTargetInfo);
-        MultiThread.TaskRun(() -> {
-            while (playerWhileCheck(this)) {
-                LivingEntity entity = overrideTargetEntity != null ? overrideTargetEntity : targetEntity;
-                if (entity != null && !entity.isDead()) {
-                    player.showBossBar(BossBarTargetInfo);
-                    float percent = (float) Math.min(Math.max(entity.getHealth()/Function.getMaxHealth(entity), 0), 1);
-                    BossBarTargetInfo.name(Component.text("§c§l" + entity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
-                    BossBarTargetInfo.progress(percent);
-                } else {
-                    player.hideBossBar(BossBarTargetInfo);
-                }
-                if (otherTargetEntity != null && !otherTargetEntity.isDead()) {
-                    player.showBossBar(BossBarOther);
-                    float percent = (float) Math.min(Math.max(otherTargetEntity.getHealth()/Function.getMaxHealth(otherTargetEntity), 0), 1);
-                    BossBarOther.name(Component.text("§c§l" + otherTargetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
-                    BossBarOther.progress(percent);
-                } else if (otherTargetEntity != null && otherTargetEntity.isDead()) {
-                    otherTargetEntity = null;
-                    player.hideBossBar(BossBarOther);
-                }
-                MultiThread.sleepTick(10);
-            }
-        }, "PlayerBossBar");
+        bossBarInitialized = true;
+    }
+
+    public void updateBossbar() {
+        LivingEntity entity = overrideTargetEntity != null ? overrideTargetEntity : targetEntity;
+        if (entity != null && !entity.isDead()) {
+            player.showBossBar(BossBarTargetInfo);
+            float percent = (float) Math.min(Math.max(entity.getHealth()/Function.getMaxHealth(entity), 0), 1);
+            BossBarTargetInfo.name(Component.text("§c§l" + entity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
+            BossBarTargetInfo.progress(percent);
+        } else {
+            player.hideBossBar(BossBarTargetInfo);
+        }
+        if (otherTargetEntity != null && !otherTargetEntity.isDead()) {
+            player.showBossBar(BossBarOther);
+            float percent = (float) Math.min(Math.max(otherTargetEntity.getHealth()/Function.getMaxHealth(otherTargetEntity), 0), 1);
+            BossBarOther.name(Component.text("§c§l" + otherTargetEntity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
+            BossBarOther.progress(percent);
+        } else if (otherTargetEntity != null && otherTargetEntity.isDead()) {
+            otherTargetEntity = null;
+            player.hideBossBar(BossBarOther);
+        }
     }
 
     public Location playerHoloLocation() {

@@ -56,19 +56,11 @@ public class Gathering {
             ChangeBlock(player).put(block.getLocation(), material);
             MultiThread.sleepTick(1);
             player.sendBlockChange(block.getLocation(), material.createBlockData());
-            int i = 0;
-            while (i < time) {
-                i++;
-                //player.sendBlockChange(block.getLocation(), mater
-                // ial.createBlockData());
-                if (!instance.isEnabled() && !player.isOnline()) {
-                    return;
-                }
-                MultiThread.sleepTick(20);
-            }
-            ChangeBlock(player).remove(block.getLocation());
-            MultiThread.sleepTick(1);
-            player.sendBlockChange(block.getLocation(), block.getBlockData());
+            MultiThread.TaskRunLater(() -> {
+                ChangeBlock(player).remove(block.getLocation());
+                MultiThread.sleepTick(1);
+                player.sendBlockChange(block.getLocation(), block.getBlockData());
+            }, time*20, "ChangeBlock");
         }, "ChangeBlock");
     }
 

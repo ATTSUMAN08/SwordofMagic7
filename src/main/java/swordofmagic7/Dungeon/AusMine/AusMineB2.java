@@ -35,6 +35,7 @@ public class AusMineB2 {
             "§c[サイモア]§aが退治されました",
             "§e[エレベーター]§aが§e[" + ElevatorActiveTime/20 + "秒間]§a稼働します",
             "§a急いで§e[エレベーター]§aを使用してください"};
+
     public static boolean Start() {
         if (!Start && (Enemy == null || Enemy.isDead())) {
             Start = true;

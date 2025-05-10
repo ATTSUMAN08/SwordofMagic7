@@ -3,6 +3,7 @@ package swordofmagic7.Map;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import net.somrpg.swordofmagic7.SomCore;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -114,21 +115,13 @@ public class WarpGateParameter {
         DHAPI.addHologramLine(hologram, "");
         DHAPI.addHologramLine(hologram, Lore);
         world = getLocation().getWorld();
-        MultiThread.TaskRun(() -> {
-            int i = 0;
-            final double increment = (2 * Math.PI) / 90;
-            final double radius = 2;
-            while (instance.isEnabled()) {
-                double angle = i * increment;
-                double x = radius * Math.cos(angle);
-                double z = radius * Math.sin(angle);
-                Location nLoc = new Location(world, Location.getX() + x, Location.getY(), Location.getZ() + z);
-                Location nLoc2 = new Location(world, Location.getX() - x, Location.getY(), Location.getZ() - z);
-                spawnParticle(particleData, nLoc);
-                spawnParticle(particleData, nLoc2);
-                i++;
-                MultiThread.sleepMillis(10);
-            }
-        }, "WarpGate");
+    }
+
+    public ParticleData getParticleData() {
+        return particleData;
+    }
+
+    public boolean isStarted() {
+        return isStarted;
     }
 }

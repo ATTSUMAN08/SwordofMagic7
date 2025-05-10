@@ -48,17 +48,15 @@ public class InstantBuff {
     public InstantBuff(PlayerData playerData) {
         player = playerData.player;
         this.playerData = playerData;
-        MultiThread.TaskRun(() -> {
-            while (playerWhileCheck(playerData)) {
-                if (!InstantBuffs.isEmpty()) {
-                    for (Map.Entry<String, InstantBuffData> data : InstantBuffs.entrySet()) {
-                        data.getValue().time--;
-                    }
-                    InstantBuffs.entrySet().removeIf(entry -> entry.getValue().time < 1);
-                }
-                MultiThread.sleepTick(20);
+    }
+
+    public void onSecond() {
+        if (!InstantBuffs.isEmpty()) {
+            for (Map.Entry<String, InstantBuffData> data : InstantBuffs.entrySet()) {
+                data.getValue().time--;
             }
-        }, "InstantBuff");
+            InstantBuffs.entrySet().removeIf(entry -> entry.getValue().time < 1);
+        }
     }
 
 }

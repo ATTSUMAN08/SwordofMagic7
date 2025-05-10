@@ -1,5 +1,6 @@
 package swordofmagic7.MultiThread;
 
+import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -31,17 +32,11 @@ public class MultiThread extends Thread {
 
     private static final boolean log = false;
 
-    public static Thread TaskRun(MultiThreadRunnable runnable, String ThreadTag) {
+    public static void TaskRun(MultiThreadRunnable runnable, String ThreadTag) {
         if (instance.isEnabled()) {
-            try {
-                if (log) Log("TaskRun -> " + ThreadTag);
-                Bukkit.getScheduler().runTaskAsynchronously(instance, runnable);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log("タスク実行に失敗しました Task -> " + ThreadTag);
-            }
+            if (log) Log("TaskRun -> " + ThreadTag);
+            NewMultiThread.INSTANCE.runTaskAsync(runnable, ThreadTag);
         }
-        return Thread.currentThread();
     }
 
     public static void TaskRunSynchronized(MultiThreadRunnable runnable) {
@@ -51,7 +46,7 @@ public class MultiThread extends Thread {
     public static void TaskRunSynchronized(MultiThreadRunnable runnable, String ThreadTag) {
         if (instance.isEnabled()) {
             try {
-                Bukkit.getScheduler().runTask(instance, runnable);
+                BukkitTask task = Bukkit.getScheduler().runTask(instance, runnable);
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);
@@ -63,7 +58,8 @@ public class MultiThread extends Thread {
         if (instance.isEnabled()) {
             try {
                 if (log) Log("TaskRunLater -> " + ThreadTag);
-                return Bukkit.getScheduler().runTaskLaterAsynchronously(instance, runnable, tick);
+                BukkitTask task = Bukkit.getScheduler().runTaskLaterAsynchronously(instance, runnable, tick);
+                return task;
             } catch (Exception e) {
                 e.printStackTrace();
                 Log("タスク実行に失敗しました Task -> " + ThreadTag);

@@ -169,77 +169,74 @@ public class ViewBar {
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
         team.addEntry(player.getName());
         team.setCanSeeFriendlyInvisibles(true);
-        int period = 5;
-        double regen = 200d/period;
         player.setMaximumNoDamageTicks(5);
-        MultiThread.TaskRun(() -> {
-            if (status.Health < 0) status.Health = status.MaxHealth;
-            if (status.Mana < 0) status.Mana = status.MaxMana;
-            while (playerWhileCheck(playerData)) {
-                try {
-                    if (playerData.playMode && playerData.isLoaded) {
-                        if (playerData.HealthRegenDelay > 0) {
-                            playerData.HealthRegenDelay -= period;
-                        } else {
-                            double regenTick = regen;
-                            if (playerData.PvPMode) regenTick *= Damage.PvPHealDecay;
-                            status.Health += status.HealthRegen / regenTick;
-                            status.Mana += status.ManaRegen / regenTick;
-                        }
-                        int Level = playerData.Level;
-                        int Exp = playerData.Exp;
-                        int ReqExp = Classes.reqExp(Level);
-                        float ExpPercent = (float) Exp / ReqExp;
-                        if (Float.isNaN(ExpPercent)) ExpPercent = 0.999f;
-                        ExpPercent = Math.min(0.001f, Math.max(0.999f, ExpPercent));
-                        status.Health = Math.min(Math.max(status.Health, 0), status.MaxHealth);
-                        status.Mana = Math.min(Math.max(status.Mana, 0), status.MaxMana);
-                        HealthPercent = status.Health / status.MaxHealth;
-                        ManaPercent = status.Mana / status.MaxMana;
-                        if (HealthPercent < 0.2) HealthPercentColor = "§c§l";
-                        else if (HealthPercent < 0.5) HealthPercentColor = "§e§l";
-                        else HealthPercentColor = "§a§l";
-                        player.setLevel(Level);
-                        player.setExp(ExpPercent);
-                        String shield = status.Shield > 0 ? "§e+" + Math.round(status.Shield) + "§c" : "";
-                        player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
-                                "§c§l《§cHealth: " + Math.round(status.Health) + shield + "/" + Math.round(status.MaxHealth) + "§c§l》" +
-                                "§b§l《§bMana: " + Math.round(status.Mana) + "/" + Math.round(status.MaxMana) + "§b§l》" +
-                                "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
-                                "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
-                        );
-
-                        if (playerData.hologram != null && !playerData.hologram.isDisabled()) {
-                            int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
-                            int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
-                            int x2 = 20 - x;
-                            if (s > 0) x2 = 0;
-                            DHAPI.setHologramLine(playerData.hologram, 2, HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
-
-                            if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
-                                if (playerData.hologram.isDefaultVisibleState()) {
-                                    playerData.hologram.setDefaultVisibleState(false);
-                                }
-                            } else if (!playerData.hologram.isDefaultVisibleState()) {
-                                playerData.hologram.setDefaultVisibleState(true);
-                            }
-                        }
-
-                        ViewSideBar();
-                        playerData.HotBar.UpdateHotBar();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                MultiThread.sleepTick(period);
-            }
-        }, "TickUpdate");
         MultiThread.TaskRunSynchronizedTimer(() -> {
             player.setAbsorptionAmount(status.Shield/status.MaxHealth*20);
             player.setMaxHealth(status.MaxHealth);
             player.setHealth(Math.min(Math.max(status.Health, 0.5), status.MaxHealth));
             player.setFoodLevel((int) Math.min(Math.max(Math.ceil(ManaPercent * 20), 0), 20));
         }, 10, "TickUpdateTimer");
+    }
+
+    public static final long period = 5;
+
+    public void onTickUpdate() {
+        double regen = 200d/period;
+        try {
+            if (playerData.playMode && playerData.isLoaded) {
+                if (playerData.HealthRegenDelay > 0) {
+                    playerData.HealthRegenDelay -= period;
+                } else {
+                    double regenTick = regen;
+                    if (playerData.PvPMode) regenTick *= Damage.PvPHealDecay;
+                    status.Health += status.HealthRegen / regenTick;
+                    status.Mana += status.ManaRegen / regenTick;
+                }
+                int Level = playerData.Level;
+                int Exp = playerData.Exp;
+                int ReqExp = Classes.reqExp(Level);
+                float ExpPercent = (float) Exp / ReqExp;
+                if (Float.isNaN(ExpPercent)) ExpPercent = 0.999f;
+                ExpPercent = Math.min(0.001f, Math.max(0.999f, ExpPercent));
+                status.Health = Math.min(Math.max(status.Health, 0), status.MaxHealth);
+                status.Mana = Math.min(Math.max(status.Mana, 0), status.MaxMana);
+                HealthPercent = status.Health / status.MaxHealth;
+                ManaPercent = status.Mana / status.MaxMana;
+                if (HealthPercent < 0.2) HealthPercentColor = "§c§l";
+                else if (HealthPercent < 0.5) HealthPercentColor = "§e§l";
+                else HealthPercentColor = "§a§l";
+                player.setLevel(Level);
+                player.setExp(ExpPercent);
+                String shield = status.Shield > 0 ? "§e+" + Math.round(status.Shield) + "§c" : "";
+                player.sendActionBar("§6§l《" + playerData.getNick() + " Lv" + Level + "§6§l》" +
+                        "§c§l《§cHealth: " + Math.round(status.Health) + shield + "/" + Math.round(status.MaxHealth) + "§c§l》" +
+                        "§b§l《§bMana: " + Math.round(status.Mana) + "/" + Math.round(status.MaxMana) + "§b§l》" +
+                        "§a§l《§aExp: " + playerData.viewExpPercent() + "%§a§l》" +
+                        "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
+                );
+
+                if (playerData.hologram != null && !playerData.hologram.isDisabled()) {
+                    int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
+                    int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
+                    int x2 = 20 - x;
+                    if (s > 0) x2 = 0;
+                    DHAPI.setHologramLine(playerData.hologram, 2, HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
+
+                    if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
+                        if (playerData.hologram.isDefaultVisibleState()) {
+                            playerData.hologram.setDefaultVisibleState(false);
+                        }
+                    } else if (!playerData.hologram.isDefaultVisibleState()) {
+                        playerData.hologram.setDefaultVisibleState(true);
+                    }
+                }
+
+                ViewSideBar();
+                playerData.HotBar.UpdateHotBar();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void ViewSideBar() {

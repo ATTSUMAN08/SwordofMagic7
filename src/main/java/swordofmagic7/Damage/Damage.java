@@ -453,7 +453,7 @@ public final class Damage {
         final String R = " §b[R:" + String.format("%.1f", (1 - (1 / Resistance)) * 100) + "%]";
         if (attacker instanceof Player player) {
             PlayerData playerData = playerData(player);
-            playerData.addDPS(damage);
+            // playerData.addDPS(damage);
             DamageLogType DamageLog = playerData.DamageLog;
             if (DamageLog.isDamageOnly()) {
                 String damageLog = "§a≫" + damageText;

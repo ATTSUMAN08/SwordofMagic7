@@ -40,6 +40,18 @@ class SomCommand : BaseCommand() {
         }
     }
 
+    @Subcommand("tasks")
+    fun tasks(sender: CommandSender) {
+        val tasks = Bukkit.getScheduler().activeWorkers.filter { bukkitWorker ->
+            bukkitWorker.owner == SomCore.instance
+        }
+
+        for (task in tasks) {
+            sender.sendMessage("§e- ${task.taskId} | ${task.thread.name}")
+        }
+        sender.sendMessage("${tasks.size} tasks")
+    }
+
     @Suppress("UnstableApiUsage")
     private fun getPluginVersion(name: String): String {
         val plugin = if (name == "NuVotifier") {

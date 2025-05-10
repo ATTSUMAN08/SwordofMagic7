@@ -4,50 +4,34 @@ import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
-import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.*;
 
 import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Function.playerWhileCheck;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetInventory extends BasicInventory {
-    public final int MaxSlot = 300;
-    private final List<PetParameter> List = new ArrayList<>();
+    public int MaxSlot;
+    public final List<PetParameter> List = new ArrayList<>();
     private final HashMap<UUID, PetParameter> HashMap = new HashMap<>();
     public PetInventory(Player player, PlayerData playerData) {
         super(player, playerData);
+        if (player.hasPermission(DataBase.Som7Premium)) {
+            MaxSlot = 600;
+        } else if (player.hasPermission(DataBase.Som7VIP)) {
+            MaxSlot = 400;
+        } else {
+            MaxSlot = 300;
+        }
     }
     public PetSortType Sort = PetSortType.Name;
     public boolean SortReverse = false;
-
-    public void start() {
-        MultiThread.TaskRun(() -> {
-            while (playerWhileCheck(playerData)) {
-                if (!List.isEmpty()) {
-                    for (PetParameter pet : List) {
-                        if (!pet.Summoned) {
-                            pet.changeStamina(1);
-                        }
-                        pet.Health += pet.HealthRegen / 5;
-                        pet.Mana += pet.ManaRegen / 5;
-                        if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth;
-                        if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana;
-                    }
-                    if (playerData.ViewInventory.isPet()) {
-                        viewPet();
-                    }
-                }
-                MultiThread.sleepTick(20);
-            }
-        }, "PetInventory");
-    }
 
     public List<PetParameter> getList() {
         return List;

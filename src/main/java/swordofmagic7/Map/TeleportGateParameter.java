@@ -39,21 +39,9 @@ public class TeleportGateParameter {
     private final ParticleData particleData = new ParticleData(Particle.FIREWORK, 0.1f, VectorUp);
     public void start() {
         world = Location.getWorld();
-        MultiThread.TaskRun(() -> {
-            int i = 0;
-            final double increment = (2 * Math.PI) / 90;
-            final double radius = 1.5;
-            while (instance.isEnabled()) {
-                i++;
-                double angle = i * increment;
-                double x = radius * Math.cos(angle);
-                double z = radius * Math.sin(angle);
-                Location nLoc = new Location(world, Location.getX() + x, Location.getY(), Location.getZ() + z);
-                Location nLoc2 = new Location(world, Location.getX() - x, Location.getY(), Location.getZ() - z);
-                spawnParticle(particleData, nLoc);
-                spawnParticle(particleData, nLoc2);
-                MultiThread.sleepMillis(25);
-            }
-        }, "TeleportGate");
+    }
+
+    public ParticleData getParticleData() {
+        return particleData;
     }
 }

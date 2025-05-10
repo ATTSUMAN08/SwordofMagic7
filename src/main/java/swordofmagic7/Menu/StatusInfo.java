@@ -3,6 +3,7 @@ package swordofmagic7.Menu;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -122,7 +123,11 @@ public class StatusInfo {
                     }
                     slot++;
                 }
-                MultiThread.TaskRunSynchronized(() -> Viewer.getOpenInventory().getTopInventory().setContents(inv.getStorageContents()));
+                MultiThread.TaskRunSynchronized(() -> {
+                    if (Viewer.getOpenInventory().getTopInventory().getType() == InventoryType.CHEST) {
+                        Viewer.getOpenInventory().getTopInventory().setStorageContents(inv.getStorageContents());
+                    }
+                });
                 MultiThread.sleepTick(30);
             }
         }, "StatusInfoView");
