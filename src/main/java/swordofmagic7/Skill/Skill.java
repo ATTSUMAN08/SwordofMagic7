@@ -25,6 +25,8 @@ import swordofmagic7.Tutorial;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.*;
@@ -39,7 +41,7 @@ public class Skill {
     private boolean CastReady = true;
     public SkillProcess SkillProcess;
     public float SkillCastProgress = 0f;
-    public final HashMap<String, Integer> SkillCoolTime = new HashMap<>();
+    public final ConcurrentMap<String, Integer> SkillCoolTime = new ConcurrentHashMap<>();
     private final HashMap<String, Integer> SkillLevel = new HashMap<>();
     public final HashMap<String, Integer> SkillStack = new HashMap<>();
     int SkillPoint = 0;

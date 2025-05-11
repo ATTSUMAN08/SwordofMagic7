@@ -74,6 +74,8 @@ import swordofmagic7.viewBar.ViewBar;
 import java.io.File;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static swordofmagic7.classes.Classes.maxSlot;
 import static swordofmagic7.Data.DataBase.*;
@@ -83,7 +85,7 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
-    public static final HashMap<Player, PlayerData> playerData = new HashMap<>();
+    public static final ConcurrentMap<Player, PlayerData> playerData = new ConcurrentHashMap<>();
     public synchronized static PlayerData playerData(Player player) {
         if (player.isOnline()) {
             if (!playerData.containsKey(player)) {
@@ -103,7 +105,7 @@ public class PlayerData {
         playerData.keySet().removeIf(key -> key.getName().equals(player.getName()));
     }
 
-    public static HashMap<Player, PlayerData> getPlayerData() {
+    public static ConcurrentMap<Player, PlayerData> getPlayerData() {
         return playerData;
     }
 

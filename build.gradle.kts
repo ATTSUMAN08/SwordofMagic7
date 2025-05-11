@@ -64,7 +64,7 @@ remotes {
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
         "create"("ch2") {
-            setProperty("host", properties["SFTP_HOST_SOM7"] ?: "localhost")
+            setProperty("host", properties["SFTP_HOST_SOM7_2"] ?: "localhost")
             setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
             setProperty("user", properties["SFTP_USER_SOM7_CH2"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")

@@ -9,13 +9,15 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static swordofmagic7.Function.Log;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public final class MobManager {
 
-    public static final HashMap<String, EnemyData> EnemyTable = new HashMap<>();
+    public static final ConcurrentMap<String, EnemyData> EnemyTable = new ConcurrentHashMap<>();
 
     public static EnemyData EnemyTable(UUID uuid) {
         if (EnemyTable.containsKey(uuid.toString())) {

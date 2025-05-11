@@ -98,10 +98,10 @@ public class Events implements Listener {
                 }
             }
         }
-        /*if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
+        if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
             return;
-        }*/
+        }
         int playerCount = 0;
         int vipCount = 0;
         int premiumCount = 0;
@@ -115,7 +115,7 @@ public class Events implements Listener {
             }
         }
         if (player.hasPermission(OverLogin)) return;
-        int normal = SomCore.Companion.isEventServer() ? 100 : 20;
+        int normal = SomCore.Companion.isEventServer() ? 100 : 30;
         boolean vip = vipCount < 5;
         boolean premium = premiumCount < 10;
         if (playerCount >= normal) {
@@ -251,7 +251,7 @@ public class Events implements Listener {
             MultiThread.TaskRun(() -> {
                 if (playerData.playMode && player.getGameMode() != GameMode.SPECTATOR) {
                     if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
-                        DimensionLibraryB1.use(player);
+                        // DimensionLibraryB1.use(player);
                         switch (action) {
                             case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
                                 if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {

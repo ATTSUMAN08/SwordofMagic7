@@ -13,6 +13,8 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -21,7 +23,7 @@ import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetManager {
-    public final static HashMap<UUID, PetParameter> PetSummonedList = new HashMap<>();
+    public final static ConcurrentMap<UUID, PetParameter> PetSummonedList = new ConcurrentHashMap<>();
     public final static String ReqPetSelect = "§e[ペット]§aを選択してください";
     public final static String ReqCommandPetSelect = "§a指揮する§e[ペット]§aを選択してください";
     public final static String ReqAttackTarget = "§c[攻撃対象]§aを選択してください";

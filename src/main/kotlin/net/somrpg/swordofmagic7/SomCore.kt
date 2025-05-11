@@ -72,7 +72,8 @@ class SomCore : SuspendingJavaPlugin() {
         private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
         var blueMapEnabled = false
 
-        fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
+        //fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
+        fun isEventServer(): Boolean = false
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
         fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
     }
@@ -363,7 +364,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_EnemyData"
             while (isEnabled) {
-                for (enemyData in MobManager.EnemyTable.values.toList()) {
+                for (enemyData in MobManager.EnemyTable.values) {
                     if (enemyData == null) continue
                     val effectManager = enemyData.effectManager
                     if (effectManager.isRunnable && enemyData.isAlive) {
@@ -377,7 +378,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PlayerData"
             while (isEnabled) {
-                for (data in playerData.values.toList()) {
+                for (data in playerData.values) {
                     if (data == null) continue
                     val effectManager = data.EffectManager
                     if (effectManager.isRunnable && effectManager.playerData.player.isOnline) {
@@ -391,7 +392,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PetData"
             while (isEnabled) {
-                for (data in PetManager.PetSummonedList.values.toList()) {
+                for (data in PetManager.PetSummonedList.values) {
                     if (data == null) continue
                     val effectManager = data.effectManager
                     if (effectManager.isRunnable && effectManager.petParameter.player.isOnline) {
@@ -408,7 +409,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - PlayerBossBarUpdate"
             while (isEnabled) {
-                for (playerData in playerData.values.toList()) {
+                for (playerData in playerData.values) {
                     if (!playerData.player.isOnline) continue
                     if (!playerData.bossBarInitialized) continue
 
@@ -422,7 +423,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - SkillCoolTime"
             while (isEnabled) {
-                for (playerData in playerData.values.toList()) {
+                for (playerData in playerData.values) {
                     if (!playerData.player.isOnline) continue
                     if (playerData.Skill == null) continue
 
@@ -436,7 +437,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - PlayerInstantBuff"
             while (isEnabled) {
-                for (playerData in playerData.values.toList()) {
+                for (playerData in playerData.values) {
                     if (!playerData.player.isOnline) continue
                     if (playerData.instantBuff == null) continue
 
@@ -450,7 +451,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - PlayerTickUpdate"
             while (isEnabled) {
-                for (playerData in playerData.values.toList()) {
+                for (playerData in playerData.values) {
                     if (!playerData.player.isOnline) continue
                     if (!playerData.ViewBar.tickUpdate) continue
 
@@ -464,7 +465,7 @@ class SomCore : SuspendingJavaPlugin() {
         launch(asyncDispatcher) {
             Thread.currentThread().name = "SwordofMagic7-Thread - PetInventory"
             while (isEnabled) {
-                for (playerData in playerData.values.toList()) {
+                for (playerData in playerData.values) {
                     if (!playerData.player.isOnline) continue
                     if (playerData.PetInventory == null) continue
                     if (playerData.PetInventory.List.isEmpty()) continue
