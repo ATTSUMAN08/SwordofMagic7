@@ -3,6 +3,10 @@ package swordofmagic7.Party;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.somrpg.swordofmagic7.translater.JapanizeType;
+import net.somrpg.swordofmagic7.translater.Japanizer;
+import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,6 +16,7 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
@@ -143,8 +148,15 @@ public class PartyData {
     }
 
     public void chat(PlayerData playerData, String message) {
-        for (Player member : playerData.Party.Members) {
-            Function.sendMessage(member, "§6[P]" + playerData.getNick() + "§a: " + colored(message, "§f"), SoundList.TICK);
-        }
+        NewMultiThread.INSTANCE.runTaskAsync(() -> {
+            Component chatComponent = Component.text(message);
+            if (Japanizer.isNeedToJapanize(message)) {
+                String japaneseText = Japanizer.japanize(message, JapanizeType.GOOGLE_IME, Collections.emptyMap());
+                chatComponent = Component.text(japaneseText).hoverEvent(HoverEvent.showText(chatComponent));
+            }
+            for (Player member : playerData.Party.Members) {
+                Function.sendMessage(member, Component.text("§6[P]" + playerData.getNick() + "§a: §f").append(chatComponent), SoundList.TICK);
+            }
+        }, "PartyChatJapaneseThread");
     }
 }

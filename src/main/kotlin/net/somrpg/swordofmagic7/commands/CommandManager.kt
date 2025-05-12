@@ -6,6 +6,14 @@ import net.somrpg.swordofmagic7.commands.builder.FlySpeedCommand
 import net.somrpg.swordofmagic7.commands.builder.GmCommand
 import net.somrpg.swordofmagic7.commands.builder.PlayModeCommand
 import net.somrpg.swordofmagic7.commands.developer.SomCommand
+import net.somrpg.swordofmagic7.commands.user.AttributeCommand
+import net.somrpg.swordofmagic7.commands.user.settings.DamageHoloCommand
+import net.somrpg.swordofmagic7.commands.user.settings.DamageLogCommand
+import net.somrpg.swordofmagic7.commands.user.settings.DropLogCommand
+import net.somrpg.swordofmagic7.commands.user.settings.EffectLogCommand
+import net.somrpg.swordofmagic7.commands.user.settings.ExpLogCommand
+import net.somrpg.swordofmagic7.commands.user.MenuCommand
+import net.somrpg.swordofmagic7.commands.user.SkillCommand
 import org.bukkit.Bukkit
 import java.util.*
 
@@ -17,6 +25,16 @@ object CommandManager {
 
         registerConditions(manager)
         registerCompletions(manager)
+
+        // User Commands
+        manager.registerCommand(MenuCommand())
+        manager.registerCommand(SkillCommand())
+        manager.registerCommand(AttributeCommand())
+        manager.registerCommand(DamageHoloCommand())
+        manager.registerCommand(DamageLogCommand())
+        manager.registerCommand(ExpLogCommand())
+        manager.registerCommand(DropLogCommand())
+        manager.registerCommand(EffectLogCommand())
 
         // Builder Commands
         manager.registerCommand(GmCommand())

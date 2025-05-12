@@ -285,38 +285,6 @@ bukkit {
             aliases = listOf("tr")
         }
 
-        register("menu") {
-            permission = "som7.user"
-        }
-
-        register("m") {
-            permission = "som7.user"
-        }
-
-        register("skill") {
-            aliases = listOf("s")
-        }
-
-        register("attribute") {
-            aliases = listOf("attr", "a")
-        }
-
-        register("damageHolo") {
-            permission = "som7.user"
-        }
-
-        register("damageLog") {
-            permission = "som7.user"
-        }
-
-        register("expLog") {
-            permission = "som7.user"
-        }
-
-        register("dropLog") {
-            permission = "som7.user"
-        }
-
         register("pvpMode") {
             permission = "som7.user"
         }
@@ -326,10 +294,6 @@ bukkit {
         }
 
         register("castMode") {
-            permission = "som7.user"
-        }
-
-        register("effectLog") {
             permission = "som7.user"
         }
 
@@ -459,10 +423,6 @@ bukkit {
 
         register("mobInfo") {
             aliases = listOf("mi")
-        }
-
-        register("serverInfo") {
-            aliases = listOf("si")
         }
 
         register("itemInfo") {

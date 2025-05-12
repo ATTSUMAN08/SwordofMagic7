@@ -32,16 +32,16 @@ public final class PlayerList {
     }
 
     public static Set<Player> getNear(Location loc, double radius) {
-        Set<Player> List = new HashSet<>();
+        Set<Player> list = new HashSet<>();
         try {
             for (Player player : get()) {
                 if (player.isOnline()) {
-                    if (player.getLocation().distance(loc) <= radius) List.add(player);
+                    if (player.getLocation().distance(loc) <= radius) list.add(player);
                 }
             }
-            return List;
+            return list;
         } catch (Exception e) {
-            return List;
+            return list;
         }
     }
 
@@ -60,27 +60,28 @@ public final class PlayerList {
     }
 
     public static Set<Player> getNearNonDead(Location loc, double radius) {
-        Set<Player> List = new HashSet<>();
+        Set<Player> list = new HashSet<>();
         for (Player player : get()) {
             if (player.isOnline() && player.getGameMode() == GameMode.SURVIVAL) {
-                if (player.getLocation().distance(loc) <= radius) List.add(player);
+                if (player.getLocation().distance(loc) <= radius) list.add(player);
             }
         }
-        return List;
+        return list;
     }
 
     public static Set<LivingEntity> getNearLivingEntity(Location loc, double radius) {
-        Set<LivingEntity> List = new HashSet<>();
+        Set<LivingEntity> list = new HashSet<>();
         for (Player player : get()) {
             if (Function.isAlive(player)) {
-                if (player.getLocation().distance(loc) <= radius) List.add(player);
+                if (player.getLocation().distance(loc) <= radius) list.add(player);
                 for (PetParameter pet : playerData(player).PetSummon) {
                     try {
-                        if (pet.entity.getLocation().distance(loc) <= radius) List.add(pet.entity);
-                    } catch (Exception ignored) {}
+                        if (pet.entity.getLocation().distance(loc) <= radius) list.add(pet.entity);
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
-        return List;
+        return list;
     }
 }

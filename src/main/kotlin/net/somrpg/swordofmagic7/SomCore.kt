@@ -371,7 +371,7 @@ class SomCore : SuspendingJavaPlugin() {
                         effectManager.onTaskRun()
                     }
                 }
-                MultiThread.sleepTick(EffectManager.period);
+                MultiThread.sleepTick(EffectManager.period)
             }
         }
 
@@ -385,7 +385,7 @@ class SomCore : SuspendingJavaPlugin() {
                         effectManager.onTaskRun()
                     }
                 }
-                MultiThread.sleepTick(EffectManager.period);
+                MultiThread.sleepTick(EffectManager.period)
             }
         }
 
@@ -399,7 +399,7 @@ class SomCore : SuspendingJavaPlugin() {
                         effectManager.onTaskRun()
                     }
                 }
-                MultiThread.sleepTick(EffectManager.period);
+                MultiThread.sleepTick(EffectManager.period)
             }
         }
     }
@@ -611,37 +611,6 @@ class SomCore : SuspendingJavaPlugin() {
             }
 
             when (cmd.name.lowercase()) {
-                "menu", "m" -> {
-                    playerData.Menu.UserMenuView()
-                    playSound(sender, SoundList.MENU_OPEN)
-                    return true
-                }
-                "skill" -> {
-                    playerData.Skill.SkillMenuView()
-                    playSound(sender, SoundList.MENU_OPEN)
-                    return true
-                }
-                "attribute" -> {
-                    playerData.Attribute.AttributeMenuView()
-                    playSound(sender, SoundList.MENU_OPEN)
-                    return true
-                }
-                "damageholo" -> {
-                    playerData.DamageHolo()
-                    return true
-                }
-                "damagelog" -> {
-                    playerData.DamageLog()
-                    return true
-                }
-                "explog" -> {
-                    playerData.ExpLog()
-                    return true
-                }
-                "droplog" -> {
-                    playerData.DropLog()
-                    return true
-                }
                 "pvpmode" -> {
                     playerData.PvPMode()
                     return true
@@ -758,15 +727,6 @@ class SomCore : SuspendingJavaPlugin() {
                         sender.sendMessage("§a称号を外しました")
                         playSound(sender, SoundList.TICK)
                     }
-                    return true
-                }
-                "serverinfo" -> {
-                    val runtime = Runtime.getRuntime()
-                    val mb = 1048576 // Convert bytes to MB
-                    sender.sendMessage(decoLore("UseRAM") + (runtime.totalMemory() - runtime.freeMemory()) / mb)
-                    sender.sendMessage(decoLore("FreeRAM") + runtime.freeMemory() / mb)
-                    sender.sendMessage(decoLore("TotalRAM") + runtime.totalMemory() / mb)
-                    sender.sendMessage(decoLore("MaxRAM") + runtime.maxMemory() / mb)
                     return true
                 }
                 "setfishingcombo" -> {

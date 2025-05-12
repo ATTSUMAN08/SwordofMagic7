@@ -86,6 +86,7 @@ import static swordofmagic7.Title.TitleManager.DefaultTitle;
 
 public class PlayerData {
     public static final ConcurrentMap<Player, PlayerData> playerData = new ConcurrentHashMap<>();
+
     public synchronized static PlayerData playerData(Player player) {
         if (player.isOnline()) {
             if (!playerData.containsKey(player)) {

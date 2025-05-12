@@ -5,13 +5,18 @@ import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import eu.decentsoftware.holograms.api.actions.ClickType;
 import eu.decentsoftware.holograms.event.HologramClickEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import me.attsuman08.abysslib.paper.events.RedisMessageReceivedEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
+import net.somrpg.swordofmagic7.translater.JapanizeType;
+import net.somrpg.swordofmagic7.translater.Japanizer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -512,16 +517,21 @@ public class Events implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    void onChat(AsyncPlayerChatEvent event) {
+    void onChat(AsyncChatEvent event) {
         event.setCancelled(true);
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
+        String message = PlainTextComponentSerializer.plainText().serialize(event.message());
         if (playerData.isPTChat) {
-            playerData.Party.chat(playerData, event.getMessage());
+            playerData.Party.chat(playerData, message);
             return;
         }
-        String message = event.getMessage();
-        Client.sendPlayerChat(player, new TextView(message));
+        if (Japanizer.isNeedToJapanize(message)) {
+            String japaneseText = Japanizer.japanize(message, JapanizeType.GOOGLE_IME, Collections.emptyMap());
+            Client.sendPlayerChat(player, new TextView(japaneseText).addHover(message));
+        } else {
+            Client.sendPlayerChat(player, new TextView(message));
+        }
     }
 
     @EventHandler

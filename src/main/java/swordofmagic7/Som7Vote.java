@@ -21,7 +21,7 @@ public class Som7Vote implements Listener {
 
     private static final File file = new File(DataBase.DataBasePath, "OfflineVote.yml");
 
-    @EventHandler
+    /*@EventHandler
     public void onVotifierEvent(VotifierEvent event) {
         Vote vote = event.getVote();
         MultiThread.TaskRun(() -> {
@@ -53,5 +53,5 @@ public class Som7Vote implements Listener {
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         String uuid = player.getUniqueId().toString();
         voteReward(player, data.getInt(uuid, 0));
-    }
+    }*/
 }
