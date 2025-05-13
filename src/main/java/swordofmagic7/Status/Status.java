@@ -284,8 +284,12 @@ public class Status {
 
         String color = "§f";
         String prefix = "";
-        if (player.hasPermission(Som7VIP)) prefix = "§aⓋ";
-        if (player.hasPermission(Som7Premium)) prefix = "§bⓅ";
+        if (player.hasPermission(Som7Premium)) {
+            prefix = "§bⓅ";
+        } else if (player.hasPermission(Som7VIP)) {
+            prefix = "§aⓋ";
+        }
+
         if (playerData.PvPMode) color = "§c";
         if (playerData.isAFK()) color = "§7";
         StringBuilder classText = new StringBuilder();
