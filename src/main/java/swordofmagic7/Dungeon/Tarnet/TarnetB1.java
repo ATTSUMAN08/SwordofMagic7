@@ -20,7 +20,7 @@ import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class TarnetB1 {
 
-    private static final Location EventLocation = new Location(world,2958, 48, 1570);
+    private static final Location EventLocation = new Location(world,2968, 1, 1853);
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
