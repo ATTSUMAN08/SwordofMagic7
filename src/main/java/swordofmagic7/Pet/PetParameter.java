@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import com.google.common.collect.MultimapBuilder;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.kyori.adventure.text.Component;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
@@ -104,7 +105,7 @@ public class PetParameter implements Cloneable {
     }
 
     public void addExp(int add) {
-        if (MaxLevel > Level && PlayerData.MaxLevel > Level) {
+        if (MaxLevel > Level && SomCore.PLAYER_MAX_LEVEL > Level) {
             Exp += add;
             while (ReqExp() <= Exp) {
                 Exp -= ReqExp();
@@ -161,7 +162,7 @@ public class PetParameter implements Cloneable {
     }
 
     public void updateStatus() {
-        if (petData.BossPet) MaxLevel = PlayerData.MaxLevel;
+        if (petData.BossPet) MaxLevel = SomCore.PLAYER_MAX_LEVEL;
         HashMap<StatusParameter, Double> baseMultiplyStatusRev = new HashMap<>();
         HashMap<StatusParameter, Double> multiplyStatusRev = new HashMap<>();
         boolean isNotDummy = !petData.Id.equals("訓練用ダミー");
@@ -337,7 +338,7 @@ public class PetParameter implements Cloneable {
             Lore.add(decoLore("状態") + "ケージ内 [" + AIState.Display + "]");
         }
         Lore.add(decoLore("成長率") + String.format(format, GrowthRate * 100) + "%");
-        Lore.add(decoLore("レベル") + Level + "/" + Math.min(PlayerData.MaxLevel, MaxLevel));
+        Lore.add(decoLore("レベル") + Level + "/" + Math.min(SomCore.PLAYER_MAX_LEVEL, MaxLevel));
         Lore.add(decoLore("経験値") + Exp + "/" + ReqExp());
         Lore.add(decoText("ペットステータス"));
         Lore.add(decoLore("スタミナ") + String.format(format, Stamina) + "/" + String.format(format, MaxStamina));

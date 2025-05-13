@@ -637,20 +637,18 @@ public class PlayerData {
 
     public void addPlayerLevel(int addLevel) {
         Level += addLevel;
-        if (Level > MaxLevel) {
-            Level = MaxLevel;
+        if (Level > SomCore.PLAYER_MAX_LEVEL) {
+            Level = SomCore.PLAYER_MAX_LEVEL;
             Exp = 0;
         } else {
             changeHealth(Status.MaxHealth);
             changeMana(Status.MaxMana);
             BroadCast(getNick() + "§aさんが§eLv" + Level + "§aになりました", true);
             Attribute.addPoint(addLevel * 5);
-            if (Level == MaxLevel) Exp = 0;
+            if (Level == SomCore.PLAYER_MAX_LEVEL) Exp = 0;
             playSound(player, SoundList.LEVEL_UP);
         }
     }
-
-    public static final int MaxLevel = 55;
 
     public synchronized void addPlayerExp(int addExp) {
         Exp += addExp;
@@ -664,7 +662,7 @@ public class PlayerData {
             else if (Level >= 50) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv50"), 1);
             else if (Level >= 30) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv30"), 1);
             else if (Level >= 10) ItemInventory.addItemParameter(getItemParameter("レベル報酬箱Lv10"), 1);
-            if (Level < MaxLevel) addPlayerLevel(addLevel);
+            if (Level < SomCore.PLAYER_MAX_LEVEL) addPlayerLevel(addLevel);
         }
         if (ExpLog) player.sendMessage("§e経験値[キャラ]§7: §a+" + addExp + " §7(" + String.format(format, (double) addExp/ swordofmagic7.classes.Classes.reqExp(Level)*100) + "%)");
     }

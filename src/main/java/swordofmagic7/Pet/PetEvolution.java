@@ -1,5 +1,6 @@
 package swordofmagic7.Pet;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -67,7 +68,7 @@ public class PetEvolution {
                 PetParameter petParameter = playerData.PetInventory.getPetParameter(index);
                 if (Cache[0] == null || Cache[1] == null) {
                     if (Cache[0] == null) {
-                        if (petParameter.MaxLevel < PlayerData.MaxLevel) {
+                        if (petParameter.MaxLevel < SomCore.PLAYER_MAX_LEVEL) {
                             Cache[0] = petParameter;
                             playerData.PetInventory.removePetParameter(index);
                         } else {
@@ -99,7 +100,7 @@ public class PetEvolution {
             }
             if (Cache[0] != null && Cache[1] != null) {
                 Cache[2] = Cache[0].clone();
-                Cache[2].MaxLevel = Math.min(Cache[2].MaxLevel + 5,  PlayerData.MaxLevel);
+                Cache[2].MaxLevel = Math.min(Cache[2].MaxLevel + 5,  SomCore.PLAYER_MAX_LEVEL);
                 inv.setItem(AnvilUISlot[2], Cache[2].viewPet(format));
             } else {
                 inv.setItem(AnvilUISlot[2], AirItem);

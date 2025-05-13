@@ -531,7 +531,7 @@ public class EnemyData {
                                 PetData petData = getPetData(mobData.Id);
                                 if (petData.BossPet) {
                                     if (random.nextDouble() <= 0.0005 * percentMultiply) {
-                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, PlayerData.MaxLevel, 0, 2);
+                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, SomCore.PLAYER_MAX_LEVEL, 0, 2);
                                         playerData.PetInventory.addPetParameter(pet);
                                         TextView text = new TextView(playerData.getNick() + "§aさんが§e[" + mobData.Id + "]§aを§b懐柔§aしました");
                                         text.setSound(SoundList.TICK);
@@ -539,7 +539,7 @@ public class EnemyData {
                                     }
                                 } else {
                                     if (playerData.PetTame && random.nextDouble() <= 0.01 * percentMultiply) {
-                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, PlayerData.MaxLevel), 0, random.nextDouble() + 0.5);
+                                        PetParameter pet = new PetParameter(player, playerData, petData, Level, Math.min(Level + 10, SomCore.PLAYER_MAX_LEVEL), 0, random.nextDouble() + 0.5);
                                         playerData.PetInventory.addPetParameter(pet);
                                         Function.sendMessage(player, "§e[" + mobData.Id + "]§aを§b懐柔§aしました", SoundList.TICK);
                                     }

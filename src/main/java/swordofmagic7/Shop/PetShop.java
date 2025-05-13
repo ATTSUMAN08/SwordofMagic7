@@ -1,5 +1,6 @@
 package swordofmagic7.Shop;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -28,7 +29,7 @@ public class PetShop {
     public static final String PetSellDisplay = "§lペット売却";
     private static final ItemStack PetShopFreeWolf = new ItemStackData(Material.WOLF_SPAWN_EGG, decoText("オースオオカミ"), "§a§l100メルの配布ペットです").view();
     private static final ItemStack PetSynthetic = new ItemStackData(Material.HEART_OF_THE_SEA, decoText("ペット配合"), "§a§l同種のペットを配合して成長率を上げます\n§a§l成長率は合計の70%の値になります\n§a§l成長率の上限は200%です").view();
-    private static final ItemStack PetEvolution = new ItemStackData(Material.END_CRYSTAL, decoText("ペット進化"), "§a§l同種のペットを配合して\n§a§l最大レベルを上げます\n§a§l上限は§e§lLv" + PlayerData.MaxLevel + "§a§lです").view();
+    private static final ItemStack PetEvolution = new ItemStackData(Material.END_CRYSTAL, decoText("ペット進化"), "§a§l同種のペットを配合して\n§a§l最大レベルを上げます\n§a§l上限は§e§lLv" + SomCore.PLAYER_MAX_LEVEL + "§a§lです").view();
     private static final ItemStack PetSellItem = new ItemStackData(Material.GOLD_NUGGET, decoText("ペット売却"), "§a§lペットショップにペットを売ります").view();
 
     private final Player player;

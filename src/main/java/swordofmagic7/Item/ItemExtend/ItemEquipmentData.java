@@ -1,5 +1,6 @@
 package swordofmagic7.Item.ItemExtend;
 
+import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -23,7 +24,7 @@ public class ItemEquipmentData implements Cloneable {
     public ItemAccessory itemAccessory = new ItemAccessory();
 
     public HashMap<StatusParameter, Double> Parameter() {
-        return Parameter(PlayerData.MaxLevel);
+        return Parameter(SomCore.PLAYER_MAX_LEVEL);
     }
 
     public boolean isAccessory() {

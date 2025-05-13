@@ -1,5 +1,6 @@
 package swordofmagic7.Command.Player;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class RuneInfo implements SomCommand, SomTabComplete {
             } else if (RuneList.containsKey(args[0])) {
                 RuneParameter rune = getRuneParameter(args[0]);
                 try {
-                    if (args[1] != null) rune.Level = Math.min(Math.max(Integer.parseInt(args[1]), 1), PlayerData.MaxLevel);
+                    if (args[1] != null) rune.Level = Math.min(Math.max(Integer.parseInt(args[1]), 1), SomCore.PLAYER_MAX_LEVEL);
                     if (args[2] != null) rune.Quality = Math.min(Math.max(Double.parseDouble(args[2])/100f, 0), 200);
                 } catch (Exception ignore) {}
                 ItemStack itemStack = rune.viewRune(playerData.ViewFormat(), rune.isLoreHide);

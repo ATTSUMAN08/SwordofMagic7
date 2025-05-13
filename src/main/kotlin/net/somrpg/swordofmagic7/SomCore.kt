@@ -64,13 +64,15 @@ class SomCore : SuspendingJavaPlugin() {
     companion object {
         lateinit var world: World
         lateinit var instance: SomCore
-        
         lateinit var random: Random
         val gson = Gson()
+        var blueMapEnabled = false
+
         const val AFK_TIME_PERIOD = 1
         const val AFK_TIME = 300
         private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
-        var blueMapEnabled = false
+        const val PLAYER_MAX_LEVEL = 55
+        const val CLASS_MAX_LEVEL = 25
 
         //fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isEventServer(): Boolean = false

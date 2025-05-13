@@ -1,5 +1,6 @@
 package swordofmagic7.classes;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -18,7 +19,6 @@ import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {
     public static final int maxSlot = 4;
-    public static final int maxLevel = 25;
     public static final int[] slotReqLevel = {1, 10, 30, 50};
     public static final ClassData defaultClass = getClassData("Novice");
     private final Player player;
@@ -40,7 +40,7 @@ public class Classes {
 
     public static int reqExp(int Level) {
         if (reqExpList == null) {
-            reqExpList = new int[PlayerData.MaxLevel+1];
+            reqExpList = new int[SomCore.PLAYER_MAX_LEVEL+1];
             for (int level = 0; level < reqExpList.length; level++) {
                 double reqExp = 100f;
                 reqExp *= Math.pow(level, 1.8);
@@ -53,7 +53,7 @@ public class Classes {
             }
         }
         if (Level < 0) return 100;
-        if (Level > PlayerData.MaxLevel) return Integer.MAX_VALUE;
+        if (Level > SomCore.PLAYER_MAX_LEVEL) return Integer.MAX_VALUE;
         return reqExpList[Level];
     }
 
@@ -73,7 +73,7 @@ public class Classes {
 
     public void addClassLevel(ClassData classData, int addLevel) {
         classLevels.put(classData, getClassLevel(classData) + addLevel);
-        if (getClassLevel(classData) >= maxLevel) {
+        if (getClassLevel(classData) >= SomCore.CLASS_MAX_LEVEL) {
             setClassExp(classData, 0);
         }
     }
@@ -90,7 +90,7 @@ public class Classes {
     }
 
     public synchronized void addClassExp(ClassData classData, int addExp) {
-        if (getClassLevel(classData) >= maxLevel) {
+        if (getClassLevel(classData) >= SomCore.CLASS_MAX_LEVEL) {
             classExp.put(classData, 0);
             addExp = 0;
         } else {

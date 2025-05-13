@@ -1,6 +1,7 @@
 package swordofmagic7.Menu;
 
 import net.kyori.adventure.text.Component;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -58,7 +59,7 @@ public class StatusInfo {
                 statusLore.add(decoLore("現在位置") + playerData.Map.Display);
                 statusLore.add(decoLore("所持メル") + playerData.Mel + "メル");
                 statusLore.add(decoLore("所持称号数") + playerData.titleManager.TitleList.size() + "個 §8(" + APTitle + ")");
-                statusLore.add(decoLore("レベル") + playerData.Level + "/" + PlayerData.MaxLevel);
+                statusLore.add(decoLore("レベル") + playerData.Level + "/" + SomCore.PLAYER_MAX_LEVEL);
                 statusLore.add(decoLore("経験値") + playerData.viewExpPercent() + "%");
                 statusLore.add(decoLore("戦闘力") + String.format(format, playerData.Status.getCombatPower()));
                 statusLore.add(decoText("§3§l基本ステータス"));
@@ -97,7 +98,7 @@ public class StatusInfo {
                 classLore.add(decoText("§e§lクラス情報"));
                 for (String str : DataBase.ClassDataMap.values()) {
                     ClassData classData = getClassData(str);
-                    if (classData != null) classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + Classes.maxLevel + " §a§l" + playerData.Classes.viewExpPercent(classData));
+                    if (classData != null) classLore.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + "/" + SomCore.CLASS_MAX_LEVEL + " §a§l" + playerData.Classes.viewExpPercent(classData));
                 }
                 List<String> lifeLore = new ArrayList<>();
                 for (LifeType type : LifeType.values()) {

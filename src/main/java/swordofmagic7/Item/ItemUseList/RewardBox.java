@@ -1,5 +1,6 @@
 package swordofmagic7.Item.ItemUseList;
 
+import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Client;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
@@ -82,7 +83,7 @@ public class RewardBox {
             }
              */
         } else if (DataBase.PetList.containsKey(rewardBoxData.id)) {
-            PetParameter pet = new PetParameter(playerData.player, playerData, getPetData(rewardBoxData.id), rewardBoxData.Level, PlayerData.MaxLevel, 0, rewardBoxData.GrowthRate);
+            PetParameter pet = new PetParameter(playerData.player, playerData, getPetData(rewardBoxData.id), rewardBoxData.Level, SomCore.PLAYER_MAX_LEVEL, 0, rewardBoxData.GrowthRate);
             playerData.PetInventory.addPetParameter(pet);
             message.add("§7・§e" + rewardBoxData.id);
             /*
