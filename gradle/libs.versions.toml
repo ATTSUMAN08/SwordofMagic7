@@ -15,6 +15,7 @@ abyssLib = "1.0.0-SNAPSHOT"
 worldBorderApi = "1.214.0"
 fawe = "2.13.0"
 blueMap = "2.7.4"
+papi = "2.11.6"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -36,3 +37,4 @@ worldBorderApi = { group = "com.github.yannicklamprecht", name = "worldborderapi
 faweCore = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Core", version.ref = "fawe" }
 faweBukkit = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 blueMap = { group = "de.bluecolored", name = "bluemap-api", version.ref = "blueMap" }
+papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }

@@ -4,6 +4,7 @@ public enum StrafeType {
     DoubleJump("ダブルジャンプ"),
     AirDash("空中ダッシュ"),
     All("すべての条件"),
+    NONE("無効"),
     ;
 
     public final String Display;
@@ -13,10 +14,12 @@ public enum StrafeType {
     }
 
     public boolean isAirDash() {
+        if (this == NONE) return false;
         return this == AirDash || this == All;
     }
 
     public boolean isDoubleJump() {
+        if (this == NONE) return false;
         return this == DoubleJump || this == All;
     }
 

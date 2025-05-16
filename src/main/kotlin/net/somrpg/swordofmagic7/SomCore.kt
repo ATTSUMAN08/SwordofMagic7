@@ -19,6 +19,7 @@ import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
+import net.somrpg.swordofmagic7.placeholders.SomPlaceholder
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.Location
@@ -68,9 +69,9 @@ class SomCore : SuspendingJavaPlugin() {
         val gson = Gson()
         var blueMapEnabled = false
 
+        private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
         const val AFK_TIME_PERIOD = 1
         const val AFK_TIME = 300
-        private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
         const val PLAYER_MAX_LEVEL = 55
         const val CLASS_MAX_LEVEL = 25
 
@@ -224,6 +225,8 @@ class SomCore : SuspendingJavaPlugin() {
             blueMapEnabled = true
             initBlueMap()
         }
+
+        SomPlaceholder().register()
 
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
     }
@@ -613,52 +616,10 @@ class SomCore : SuspendingJavaPlugin() {
             }
 
             when (cmd.name.lowercase()) {
-                "pvpmode" -> {
-                    playerData.PvPMode()
-                    return true
-                }
-                "effectlog" -> {
-                    playerData.EffectLog()
-                    return true
-                }
-                "particledensity" -> {
-                    playerData.ParticleDensity()
-                    return true
-                }
-                "strafemode" -> {
-                    playerData.StrafeMode()
-                    return true
-                }
-                "fishingdisplaynum" -> {
-                    playerData.FishingDisplayNum()
-                    return true
-                }
-                "castmode" -> {
-                    playerData.CastMode()
-                    return true
-                }
-                "pettame" -> {
-                    playerData.PetTame()
-                    return true
-                }
-                "viewformat" -> {
-                    playerData.changeViewFormat()
-                    return true
-                }
-                "holoselfview" -> {
-                    playerData.HoloSelfView()
-                    return true
-                }
                 "spawn" -> {
                     if (TagGame.isTagPlayerNonMessage(sender)) return true
                     if (playerData.isPvPModeNonMessage()) return true
                     spawnPlayer(sender)
-                    return true
-                }
-                "ticktime" -> {
-                    Bukkit.getWorlds().forEach {
-                        sender.sendMessage("§e${it.name}§7: §a${it.fullTime}")
-                    }
                     return true
                 }
                 "iteminventorysort" -> {
@@ -748,32 +709,6 @@ class SomCore : SuspendingJavaPlugin() {
                         sender.sendMessage("§a現在の§e[釣獲モード]§aでは利用できません")
                     }
                     playSound(sender, SoundList.TICK)
-                    return true
-                }
-                "ch" -> {
-                    if (playerData.isPlayDungeonQuest) {
-                        sendMessage(sender, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.NOPE)
-                        return true
-                    }
-                    if (args.size == 1) {
-                        val teleportServer = when (args[0].lowercase()) {
-                            "1" -> "CH1"
-                            "2" -> "CH2"
-                            "3" -> "CH3"
-                            "4" -> "CH4"
-                            "5" -> "CH5"
-                            "ev", "event" -> "Event"
-                            "dev" -> "Dev"
-                            else -> {
-                                sender.sendMessage("存在しないチャンネルです")
-                                return true
-                            }
-                        }
-                        playerData.saveTeleportServer = "SOM7$teleportServer"
-                        playerData.save()
-                    } else {
-                        sender.sendMessage("§e/channel <channel>")
-                    }
                     return true
                 }
                 "nickreset" -> {

@@ -2,18 +2,7 @@ package net.somrpg.swordofmagic7.commands
 
 import me.attsuman08.abysslib.shade.acf.*
 import net.somrpg.swordofmagic7.SomCore
-import net.somrpg.swordofmagic7.commands.builder.FlySpeedCommand
-import net.somrpg.swordofmagic7.commands.builder.GmCommand
-import net.somrpg.swordofmagic7.commands.builder.PlayModeCommand
-import net.somrpg.swordofmagic7.commands.developer.SomCommand
-import net.somrpg.swordofmagic7.commands.user.AttributeCommand
-import net.somrpg.swordofmagic7.commands.user.settings.DamageHoloCommand
-import net.somrpg.swordofmagic7.commands.user.settings.DamageLogCommand
-import net.somrpg.swordofmagic7.commands.user.settings.DropLogCommand
-import net.somrpg.swordofmagic7.commands.user.settings.EffectLogCommand
-import net.somrpg.swordofmagic7.commands.user.settings.ExpLogCommand
-import net.somrpg.swordofmagic7.commands.user.MenuCommand
-import net.somrpg.swordofmagic7.commands.user.SkillCommand
+import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
 import java.util.*
 
@@ -26,23 +15,17 @@ object CommandManager {
         registerConditions(manager)
         registerCompletions(manager)
 
-        // User Commands
-        manager.registerCommand(MenuCommand())
-        manager.registerCommand(SkillCommand())
-        manager.registerCommand(AttributeCommand())
-        manager.registerCommand(DamageHoloCommand())
-        manager.registerCommand(DamageLogCommand())
-        manager.registerCommand(ExpLogCommand())
-        manager.registerCommand(DropLogCommand())
-        manager.registerCommand(EffectLogCommand())
-
-        // Builder Commands
-        manager.registerCommand(GmCommand())
-        manager.registerCommand(FlySpeedCommand())
-        manager.registerCommand(PlayModeCommand())
-
-        // Developer Commands
-        manager.registerCommand(SomCommand())
+        // コマンドを登録する
+        PackageClassFinder.getClasses("net.somrpg.swordofmagic7.commands").forEach { clazz ->
+            try {
+                if (BaseCommand::class.java.isAssignableFrom(clazz)) {
+                    val command = clazz.getDeclaredConstructor().newInstance() as BaseCommand
+                    manager.registerCommand(command)
+                }
+            } catch (e: Exception) {
+                SomCore.instance.logger.warning("[CommandManager] ${clazz.name}のコマンドの登録に失敗しました: ${e.message}")
+            }
+        }
     }
 
     private fun registerConditions(manager: PaperCommandManager) {
@@ -83,5 +66,10 @@ object CommandManager {
         manager.commandCompletions.registerCompletion("players") { _ ->
             return@registerCompletion Bukkit.getOnlinePlayers().map { it.name }
         }
+
+        manager.commandCompletions.registerCompletion("channels") { _ ->
+            return@registerCompletion listOf("1", "2", "3", "4", "5", "event", "dev")
+        }
     }
+
 }

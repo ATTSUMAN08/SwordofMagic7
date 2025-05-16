@@ -3,8 +3,6 @@ package net.somrpg.swordofmagic7.commands.developer
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.sk89q.worldedit.bukkit.BukkitAdapter
-import com.sk89q.worldedit.math.BlockVector3
 import me.attsuman08.abysslib.shade.acf.BaseCommand
 import me.attsuman08.abysslib.shade.acf.annotation.CommandAlias
 import me.attsuman08.abysslib.shade.acf.annotation.CommandPermission
@@ -14,7 +12,6 @@ import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.translater.JapanizeType
 import net.somrpg.swordofmagic7.translater.Japanizer
-import net.somrpg.swordofmagic7.utils.SchematicUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -117,15 +114,10 @@ class SomCommand : BaseCommand() {
     }
 
     @Subcommand("paste")
-    @Syntax("<schematic>")
-    fun somPaste(sender: CommandSender, schematic: String) {
-        if (sender !is Player) return
-        SomCore.instance.launch(asyncDispatcher) {
-            SchematicUtils.paste(schematic, BukkitAdapter.adapt(sender.world), BlockVector3.at(sender.x, sender.y, sender.z),
-                ignoreAirBlocks = true,
-                bypassCache = true
-            )
-        }
+    @Syntax("<schem>")
+    fun paste(player: Player, schem: String) {
+        player.performCommand("schem load $schem")
+        player.performCommand("/paste")
     }
 
 }

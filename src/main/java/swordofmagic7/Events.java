@@ -12,15 +12,11 @@ import me.attsuman08.abysslib.paper.events.RedisMessageReceivedEvent;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.translater.JapanizeType;
 import net.somrpg.swordofmagic7.translater.Japanizer;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -42,7 +38,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Life.FishingCommand;
 import swordofmagic7.Mob.MobManager;
@@ -700,5 +695,13 @@ public class Events implements Listener {
     @EventHandler
     void onDecay(LeavesDecayEvent e) {
         e.setCancelled(true);
+    }
+
+    @EventHandler
+    void onCoral(BlockFadeEvent e) {
+        Material type = e.getBlock().getType();
+        if (Tag.CORAL_BLOCKS.isTagged(type) || Tag.CORAL_PLANTS.isTagged(type)) {
+            e.setCancelled(true);
+        }
     }
 }

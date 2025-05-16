@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Data.Type.StrafeType;
 import swordofmagic7.MultiThread.MultiThread;
 
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -12,8 +13,9 @@ import static swordofmagic7.Function.inAir;
 public class CharaController {
 
     static void WallKick(Player player) {
+        PlayerData playerData = playerData(player);
+        if (playerData.StrafeMode == StrafeType.NONE) return;
         MultiThread.TaskRun(() -> {
-            PlayerData playerData = playerData(player);
             if (!playerData.EffectManager.isCrowdControl) {
                 Location loc = player.getLocation();
                 loc.setPitch(0);

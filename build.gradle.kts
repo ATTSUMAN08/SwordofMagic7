@@ -26,6 +26,7 @@ repositories {
     maven(url = "https://eldonexus.de/repository/maven-releases/") // WorldBorderAPI
     maven(url = "https://maven.enginehub.org/repo/") // FastAsyncWorldEdit
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
+    maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
 }
 
 dependencies {
@@ -46,6 +47,7 @@ dependencies {
     compileOnly(libs.faweCore)
     compileOnly(libs.faweBukkit) { isTransitive = false }
     compileOnly(libs.blueMap)
+    compileOnly(libs.papi)
 }
 
 
@@ -285,36 +287,12 @@ bukkit {
             aliases = listOf("tr")
         }
 
-        register("pvpMode") {
-            permission = "som7.user"
-        }
-
-        register("strafeMode") {
-            permission = "som7.user"
-        }
-
-        register("castMode") {
-            permission = "som7.user"
-        }
-
-        register("particleDensity") {
-            permission = "som7.user"
-        }
-
-        register("viewFormat") {
-            permission = "som7.user"
-        }
-
         register("spawn") {
             permission = "som7.user"
         }
 
         register("playerInfo") {
             aliases = listOf("info", "i")
-        }
-
-        register("tickTime") {
-            permission = "som7.user"
         }
 
         register("reqExp") {
@@ -381,20 +359,8 @@ bukkit {
             aliases = listOf("sbtd")
         }
 
-        register("fishingDisplayNum") {
-            aliases = listOf("fdn")
-        }
-
-        register("fishingUseCombo") {
-            aliases = listOf("fuc")
-        }
-
         register("setTitle") {
             permission = "som7.user"
-        }
-
-        register("HoloSelfView") {
-            aliases = listOf("hsv")
         }
 
         register("checkTitle") {
@@ -431,10 +397,6 @@ bukkit {
 
         register("runeInfo") {
             aliases = listOf("ri")
-        }
-
-        register("ch") {
-            aliases = listOf("channel")
         }
 
         register("nickReset") {
@@ -484,13 +446,11 @@ bukkit {
         register("damageSimulator") {
             aliases = listOf("ds")
         }
-
-        register("petTame") {
-            permission = "som7.user"
-        }
     }
 }
 
-kotlin {
-    jvmToolchain(21)
+tasks {
+    kotlin {
+        jvmToolchain(21)
+    }
 }

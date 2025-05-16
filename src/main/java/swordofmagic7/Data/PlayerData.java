@@ -533,7 +533,8 @@ public class PlayerData {
         switch (StrafeMode) {
             case DoubleJump -> StrafeMode(StrafeType.AirDash);
             case AirDash -> StrafeMode(StrafeType.All);
-            case All -> StrafeMode(StrafeType.DoubleJump);
+            case All -> StrafeMode(StrafeType.NONE);
+            case NONE -> StrafeMode(StrafeType.DoubleJump);
         }
     }
 
