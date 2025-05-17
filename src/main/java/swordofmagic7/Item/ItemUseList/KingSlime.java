@@ -30,7 +30,7 @@ public class KingSlime {
 
     public static final String SummonQuestFailed = "§c§l《召喚クエスト失敗》";
 
-    private static final Location EventLocation = new Location(world, 4178, 99, 617);
+    private static final Location EventLocation = new Location(world, 2599, 7, 2472);
     private static EnemyData Enemy;
     public static int Time;
     public static int StartTime = 1800;

@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.geysermc.floodgate.api.FloodgateApi;
 import swordofmagic7.Client;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.ViewInventoryType;
@@ -147,7 +148,7 @@ public class Menu {
                 }
             }
         } catch (Exception ignored) {}
-        if (ClickInventory != null && ClickInventory.getType() == InventoryType.CRAFTING) {
+        if (!FloodgateApi.getInstance().isFloodgateId(player.getUniqueId()) && ClickInventory != null && ClickInventory.getType() == InventoryType.CRAFTING) {
             switch (Slot) {
                 case 1 -> playerData.setView(ViewInventoryType.ItemInventory);
                 case 2 -> playerData.setView(ViewInventoryType.RuneInventory);

@@ -39,9 +39,9 @@ object ServerUtils {
             // 40mspt以下は最適なパフォーマンス (0%)
             mspt <= 40.0 -> "§a0%"
 
-            // 40msptを超える場合、1msptごとに5%増加
+            // 40msptを超える場合、1msptごとに2%増加
             else -> {
-                val percent = ((mspt - 40.0) * 5).toInt().coerceAtMost(100)
+                val percent = ((mspt - 40.0) * 2).toInt().coerceAtMost(100)
                 val color = when {
                     percent <= 50 -> "§e"
                     else -> "§c"

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.geysermc.floodgate.api.FloodgateApi;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.classes.ClassData;
@@ -256,6 +257,10 @@ public class PlayerData {
     public int HoloAnim = 0;
 
     public void sendMenuPacket() {
+        if (FloodgateApi.getInstance().isFloodgateId(player.getUniqueId())) {
+            return;
+        }
+
         ArrayList<WrapperPlayServerSetSlot> packets = new ArrayList<>();
         packets.add(new WrapperPlayServerSetSlot(0, 0, 1,
                 SpigotConversionUtil.fromBukkitItemStack(Data.UserMenu_ItemInventory)

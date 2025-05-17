@@ -28,8 +28,8 @@ import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class KingSlime {
-
     private final EnemySkillManager Manager;
+
     public KingSlime(EnemySkillManager manager) {
         this.Manager = manager;
     }

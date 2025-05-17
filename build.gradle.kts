@@ -27,6 +27,7 @@ repositories {
     maven(url = "https://maven.enginehub.org/repo/") // FastAsyncWorldEdit
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
+    maven(url = "https://repo.opencollab.dev/main/") // Floodgate
 }
 
 dependencies {
@@ -48,6 +49,7 @@ dependencies {
     compileOnly(libs.faweBukkit) { isTransitive = false }
     compileOnly(libs.blueMap)
     compileOnly(libs.papi)
+    compileOnly(libs.floodgate)
 }
 
 
@@ -59,16 +61,16 @@ remotes {
             setProperty("user", properties["SFTP_USER_SOM7_EVENT"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
-        "create"("ch1") {
-            setProperty("host", properties["SFTP_HOST_SOM7"] ?: "localhost")
-            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
-            setProperty("user", properties["SFTP_USER_SOM7_CH1"] ?: "som7")
-            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
-        }
         "create"("ch2") {
             setProperty("host", properties["SFTP_HOST_SOM7_2"] ?: "localhost")
             setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
             setProperty("user", properties["SFTP_USER_SOM7_CH2"] ?: "som7")
+            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
+        }
+        "create"("ch3") {
+            setProperty("host", properties["SFTP_HOST_SOM7_3"] ?: "localhost")
+            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
+            setProperty("user", properties["SFTP_USER_SOM7_CH3"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
     }
@@ -86,13 +88,13 @@ tasks.register("deploy") {
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            session(remotes["ch1"], delegateClosureOf<SessionHandler> {
+            session(remotes["ch2"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            session(remotes["ch2"], delegateClosureOf<SessionHandler> {
+            session(remotes["ch3"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"

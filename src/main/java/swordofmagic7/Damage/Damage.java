@@ -24,6 +24,7 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -83,8 +84,9 @@ public final class Damage {
     }
 
     public static void makeDamage(LivingEntity attacker, Set<LivingEntity> victims, DamageCause damageCause, String damageSource, double damageMultiply, int count, double perforate, boolean invariably, int wait) {
+        Set<LivingEntity> copiedVictims = new HashSet<>(victims);
         MultiThread.TaskRun(() -> {
-            for (LivingEntity victim : victims) {
+            for (LivingEntity victim : copiedVictims) {
                 makeDamage(attacker, victim, damageCause, damageSource, damageMultiply, count, perforate, invariably, false);
                 MultiThread.sleepTick(wait);
             }

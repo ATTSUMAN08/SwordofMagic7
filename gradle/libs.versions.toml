@@ -16,6 +16,7 @@ worldBorderApi = "1.214.0"
 fawe = "2.13.0"
 blueMap = "2.7.4"
 papi = "2.11.6"
+floodgate = "2.2.4-SNAPSHOT"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -38,3 +39,4 @@ faweCore = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Core",
 faweBukkit = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 blueMap = { group = "de.bluecolored", name = "bluemap-api", version.ref = "blueMap" }
 papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
+floodgate = { group = "org.geysermc.floodgate", name = "api", version.ref = "floodgate" }

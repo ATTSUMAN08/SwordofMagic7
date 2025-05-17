@@ -51,10 +51,12 @@ public class Japanizer {
         String japanized = YukiKanaConverter.conv(keywordLocked);
 
         // IME変換
-        if ( type == JapanizeType.GOOGLE_IME ) {
-            japanized = IMEConverter.convByGoogleIME(japanized);
-//        } else if ( type == JapanizeType.SOCIAL_IME ) {
-//            japanized = IMEConverter.convBySocialIME(japanized);
+        if (type == JapanizeType.GOOGLE_IME) {
+            try {
+                japanized = IMEConverter.convByGoogleIME(japanized);
+            } catch (Exception e) {
+                return org;
+            }
         }
 
         // キーワードのアンロック
