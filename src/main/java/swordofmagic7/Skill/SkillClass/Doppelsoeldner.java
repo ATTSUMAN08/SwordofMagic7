@@ -17,6 +17,7 @@ import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
@@ -95,17 +96,18 @@ public class Doppelsoeldner extends BaseSkillClass {
                 Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
                 Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, count, 2);
                 ShapedParticle(new ParticleData(Particle.SWEEP_ATTACK), player.getLocation(), radius, angle, angle / 2, 1, true);
-                if (playerData.Equipment.isEquipRune("平常運転のルーン")) {
-                    MultiThread.sleepTick(10);
-                    skillData = DataBase.getSkillData("Zucken");
-                    victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
-                    Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, count, 2);
-                    ShapedParticle(new ParticleData(Particle.SWEEP_ATTACK), player.getLocation(), radius, angle, angle / 2, 1, true);
-                    MultiThread.sleepTick(10);
-                    skillData = DataBase.getSkillData("Redel");
-                    victims = FanShapedCollider(player.getLocation(), radius, angle, skillProcess.Predicate(), false);
-                    Damage.makeDamage(player, victims, DamageCause.ATK, skillData.Id, skillData.Parameter.get(0).Value / 100, count, 2);
-                    ShapedParticle(new ParticleData(Particle.SWEEP_ATTACK), player.getLocation(), radius, angle, angle / 2, 1, true);
+                if (playerData.Equipment.isEquipRune("平常運転のルーン") && Objects.equals(skillData.Id, "Zornhau")) {
+                    SkillData skillDataZucken = DataBase.getSkillData("Zucken");
+                    SkillData skillDataRedel = DataBase.getSkillData("Redel");
+
+                    playerData.Skill.useStack(skillDataZucken);
+                    playerData.Skill.setSkillCoolTime(skillDataZucken);
+                    playerData.Skill.useStack(skillDataRedel);
+                    playerData.Skill.setSkillCoolTime(skillDataRedel);
+
+                    ComboSkill(skillDataZucken, 7, 120, 1, null, null);
+                    MultiThread.sleepTick(15);
+                    ComboSkill(skillDataRedel, 8, 160, 1, null, null);
                 } else if (addEffect != null) playerData.EffectManager.addEffect(addEffect, 40);
             } else {
                 skill.resetSkillCoolTimeWaited(skillData);

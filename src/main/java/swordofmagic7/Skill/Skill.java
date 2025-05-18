@@ -428,7 +428,7 @@ public class Skill {
         SkillCoolTime.put(skillData.Id, time);
     }
 
-    void setSkillCoolTime(SkillData skillData) {
+    public void setSkillCoolTime(SkillData skillData) {
         SkillCoolTime.put(skillData.Id, skillData.CoolTime);
     }
 
@@ -436,7 +436,7 @@ public class Skill {
         return SkillStack.getOrDefault(skillData.Id, skillData.Stack);
     }
 
-    void useStack(SkillData skillData) {
+    public void useStack(SkillData skillData) {
         SkillStack.put(skillData.Id, SkillStack(skillData)-1);
     }
 

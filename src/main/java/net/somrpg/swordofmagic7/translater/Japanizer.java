@@ -52,11 +52,7 @@ public class Japanizer {
 
         // IME変換
         if (type == JapanizeType.GOOGLE_IME) {
-            try {
-                japanized = IMEConverter.convByGoogleIME(japanized);
-            } catch (Exception e) {
-                return org;
-            }
+            japanized = IMEConverter.convByGoogleIME(japanized);
         }
 
         // キーワードのアンロック

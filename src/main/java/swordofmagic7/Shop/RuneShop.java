@@ -120,6 +120,7 @@ public class RuneShop {
     public ItemParameter RuneCache;
     public final RuneParameter[] RuneUpgradeCache = new RuneParameter[3];
     public final ItemParameter RunePowder = getItemParameter("ルーンの粉");
+
     public void RuneMenuClick(InventoryView view, Inventory ClickInventory, ClickType clickType, ItemStack currentItem, int index, int Slot) {
         String format = playerData.ViewFormat();
         if (equalInv(view, RuneShopMenuDisplay)) {
@@ -256,7 +257,7 @@ public class RuneShop {
                     } else {
                         RuneIndex = Slot - 26;
                     }
-                    if (RuneIndex < RuneCache.itemEquipmentData.getRuneSize()) {
+                    if (RuneCache != null && RuneCache.itemEquipmentData != null && RuneIndex < RuneCache.itemEquipmentData.getRuneSize()) {
                         playerData.RuneInventory.addRuneParameter(RuneCache.itemEquipmentData.getRune(RuneIndex));
                         RuneCache.itemEquipmentData.removeRune(RuneIndex);
                         playSound(player, SoundList.CLICK);

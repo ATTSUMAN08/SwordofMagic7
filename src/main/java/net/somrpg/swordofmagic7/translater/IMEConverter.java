@@ -66,12 +66,8 @@ public class IMEConverter {
 
             return parsed;
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return org;
         } finally {
             if ( urlconn != null ) {
                 urlconn.disconnect();
@@ -83,7 +79,5 @@ public class IMEConverter {
                 }
             }
         }
-
-        return "";
     }
 }
