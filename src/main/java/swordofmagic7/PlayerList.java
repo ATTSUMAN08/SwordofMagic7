@@ -9,12 +9,13 @@ import swordofmagic7.Pet.PetParameter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 
 public final class PlayerList {
-    public static final Set<Player> PlayerList = new HashSet<>();
-    public static final Set<String> ResetPlayer = new HashSet<>();
+    public static final Set<Player> PlayerList = ConcurrentHashMap.newKeySet();
+    public static final Set<String> ResetPlayer = ConcurrentHashMap.newKeySet();
 
     public static void load() {
         PlayerList.clear();

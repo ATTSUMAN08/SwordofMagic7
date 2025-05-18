@@ -7,9 +7,11 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.somrpg.swordofmagic7.translater.JapanizeType;
 import net.somrpg.swordofmagic7.translater.Japanizer;
 import net.somrpg.swordofmagic7.utils.NewMultiThread;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.ServerOperator;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Function;
 import swordofmagic7.MultiThread.MultiThread;
@@ -157,6 +159,10 @@ public class PartyData {
             for (Player member : playerData.Party.Members) {
                 Function.sendMessage(member, Component.text("§6[P]" + playerData.getNick() + "§a: §f").append(chatComponent), SoundList.TICK);
             }
+            for (Player operator : Bukkit.getOnlinePlayers().stream().filter(Player::isOp).toList()) {
+                Function.sendMessage(operator, Component.text("§6[" + Display + "]" + playerData.getNick() + "§a: §f").append(chatComponent));
+            }
+            Bukkit.getConsoleSender().sendMessage(Component.text("§6[" + Display + "]" + playerData.getNick() + "§a: §f").append(chatComponent));
         }, "PartyChatJapaneseThread");
     }
 }

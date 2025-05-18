@@ -238,6 +238,15 @@ class SomCore : SuspendingJavaPlugin() {
             it.sendMessage("§cSystem Reloading")
         }
 
+        delay(100)
+
+        // Save all player data
+        Bukkit.getOnlinePlayers().forEach {
+            playerData(it).save()
+        }
+
+        delay(100)
+
         var count = 0
         MobManager.getEnemyList().forEach { enemyData ->
             enemyData.entity?.remove()

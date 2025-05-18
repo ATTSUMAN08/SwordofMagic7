@@ -61,12 +61,7 @@ class SomCommand : BaseCommand() {
 
     @Subcommand("reload")
     fun reload(sender: CommandSender) {
-        for (p in Bukkit.getOnlinePlayers()) {
-            PlayerData.playerData(p).saveCloseInventory()
-        }
-        MultiThread.TaskRunSynchronizedLater({
-            Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
-        }, 5)
+        Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
     }
 
     @Subcommand("lunachat")

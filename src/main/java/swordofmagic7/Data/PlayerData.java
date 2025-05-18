@@ -851,19 +851,20 @@ public class PlayerData {
         try {
             data.save(playerFile);
             player.sendMessage("§eプレイヤデータ§aの§bセーブ§aが完了しました");
-            MultiThread.TaskRunSynchronizedLater(() -> {
-                if (saveTeleportServer != null) {
-                    isNonSave = true;
-                    Function.teleportServer(player, saveTeleportServer);
-                }
+            if (saveTeleportServer != null) {
+                isNonSave = true;
                 MultiThread.TaskRunSynchronizedLater(() -> {
-                    if (player.isOnline() && saveTeleportServer != null) {
-                        saveTeleportServer = null;
-                        isNonSave = false;
-                        player.sendMessage("§eチャンネル§aの移動に失敗しました");
-                    }
-                }, 20);
-            }, 5);
+                    Function.teleportServer(player, saveTeleportServer);
+
+                    MultiThread.TaskRunSynchronizedLater(() -> {
+                        if (player.isOnline()) {
+                            saveTeleportServer = null;
+                            isNonSave = false;
+                            player.sendMessage("§eチャンネル§aの移動に失敗しました");
+                        }
+                    }, 20);
+                }, 5);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -875,8 +876,8 @@ public class PlayerData {
             FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
 
             Mel = data.getInt("Mel", 10000);
-            Status.Health = data.getDouble("Health", -1);
-            Status.Mana = data.getDouble("Mana", -1);
+            Status.Health = data.getDouble("Health", 50);
+            Status.Mana = data.getDouble("Mana", 50);
             Map = getMapData(data.getString("Map", "Alden"));
             Nick = data.getString("Nick", player.getName());
 
@@ -1012,6 +1013,8 @@ public class PlayerData {
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
                 ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
                 player.teleport(SpawnLocation);
+                Status.Health = Status.MaxHealth;
+                Status.Mana = Status.MaxMana;
                 // Tutorial.tutorialTrigger(player, 0);
             }, 10, "TutorialTrigger");
         }
@@ -1020,8 +1023,8 @@ public class PlayerData {
             MultiThread.TaskRunSynchronizedLater(() -> {
                 Status.StatusUpdate();
                 ViewBar.tickUpdate();
-                Status.Health = Status.MaxHealth;
-                Status.Mana = Status.MaxMana;
+                // Status.Health = Status.MaxHealth;
+                // Status.Mana = Status.MaxMana;
                 viewUpdate();
             }, 20, "LoadUpdate");
         }, 5);

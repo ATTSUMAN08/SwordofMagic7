@@ -35,28 +35,28 @@ public class SkillData implements Cloneable {
         ItemStack item = new ItemStack(Icon);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text(decoText(Display)));
-        List<String> Lore = new ArrayList<>(this.Lore);
-        Lore.add(decoText("§3§lスキルステータス"));
+        List<String> lore = new ArrayList<>(this.Lore);
+        lore.add(decoText("§3§lスキルステータス"));
         for (SkillParameter param : Parameter) {
-            Lore.add(decoLore(param.Display) + param.valueView());
+            lore.add(decoLore(param.Display) + param.valueView());
         }
-        Lore.add(decoText("§3§lスキル情報"));
-        Lore.add(decoLore("スキルタイプ") + SkillType.Display);
+        lore.add(decoText("§3§lスキル情報"));
+        lore.add(decoLore("スキルタイプ") + SkillType.Display);
         if (SkillType.isActive()) {
-            Lore.add(decoLore("消費マナ") + IncreasedConsumptionMana(Mana, playerData.Level));
-            Lore.add(decoLore("詠唱時間") + (double) CastTime / 20 + "秒");
-            Lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
-            Lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");
+            lore.add(decoLore("消費マナ") + IncreasedConsumptionMana(Mana, playerData.Level));
+            lore.add(decoLore("詠唱時間") + (double) CastTime / 20 + "秒");
+            lore.add(decoLore("硬直時間") + (double) RigidTime / 20 + "秒");
+            lore.add(decoLore("再使用時間") + (double) CoolTime / 20 + "秒");
         }
-        Lore.add(decoText("§3§l使用条件"));
-        Lore.add(decoLore("クラスレベル") + ReqLevel);
+        lore.add(decoText("§3§l使用条件"));
+        lore.add(decoLore("クラスレベル") + ReqLevel);
         for (EquipmentCategory category : ReqMainHand) {
-            Lore.add("§7・§e§l" + category.Display);
+            lore.add("§7・§e§l" + category.Display);
         }
         for (EquipmentCategory category : ReqOffHand) {
-            Lore.add("§7・§e§l" + category.Display);
+            lore.add("§7・§e§l" + category.Display);
         }
-        meta.setLore(Lore);
+        meta.setLore(lore);
         meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
