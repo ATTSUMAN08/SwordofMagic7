@@ -8,17 +8,18 @@ import me.attsuman08.abysslib.shade.acf.annotation.CommandAlias
 import me.attsuman08.abysslib.shade.acf.annotation.CommandPermission
 import me.attsuman08.abysslib.shade.acf.annotation.Subcommand
 import me.attsuman08.abysslib.shade.acf.annotation.Syntax
+import net.kyori.adventure.text.Component
 import net.somrpg.swordofmagic7.SomCore
-import net.somrpg.swordofmagic7.extensions.asyncDispatcher
-import net.somrpg.swordofmagic7.translater.JapanizeType
-import net.somrpg.swordofmagic7.translater.Japanizer
 import org.bukkit.Bukkit
+import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Display
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
 import swordofmagic7.Data.PlayerData
-import swordofmagic7.MultiThread.MultiThread
 import java.io.File
 
 @CommandAlias("som")
@@ -64,25 +65,8 @@ class SomCommand : BaseCommand() {
         Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
     }
 
-    @Subcommand("lunachat")
-    @Syntax("<message>")
-    fun somLunaChat(sender: CommandSender, message: String) {
-        SomCore.instance.launch(asyncDispatcher) {
-            sender.sendMessage("メッセージ: $message")
-            sender.sendMessage("変換済みメッセージ: ${Japanizer.japanize(message, JapanizeType.GOOGLE_IME, emptyMap())}")
-            sender.sendMessage("変換が必要か: ${Japanizer.isNeedToJapanize(message)}")
-        }
-    }
-
-    @Subcommand("test")
-    fun somTest(sender: CommandSender) {
-        if (sender !is Player) return
-        PlayerData.playerData(sender).dead()
-    }
-
     @Subcommand("test2")
-    fun somTest2(sender: CommandSender) {
-        if (sender !is Player) return
+    fun somTest2(sender: Player) {
 
         val file = File(SomCore.instance.dataFolder, "input.txt")
         if (!file.exists()) {
@@ -101,18 +85,22 @@ class SomCommand : BaseCommand() {
         sender.sendMessage("完了")
     }
 
-    @Subcommand("test3")
-    fun somTest3(sender: CommandSender) {
-        if (sender !is Player) return
-
-        sender.sendMessage("${sender.inventory.itemInMainHand.itemMeta.asComponentString}")
-    }
-
     @Subcommand("paste")
     @Syntax("<schem>")
     fun paste(player: Player, schem: String) {
         player.performCommand("schem load $schem")
         player.performCommand("/paste")
+    }
+
+    @Subcommand("text_display")
+    fun textDisplay(sender: Player) {
+        val playerData = PlayerData.playerData(sender)
+        val textDisplay = sender.world.spawnEntity(sender.location.clone().apply { pitch = 0F }, EntityType.TEXT_DISPLAY) as TextDisplay
+        textDisplay.billboard = Display.Billboard.VERTICAL
+        val text = playerData.ViewBar.nameTagText
+        textDisplay.backgroundColor = Color.fromARGB(0, 0, 0, 0)
+        textDisplay.text(Component.text(text).appendNewline().append(Component.empty()))
+        sender.addPassenger(textDisplay)
     }
 
 }

@@ -625,12 +625,6 @@ class SomCore : SuspendingJavaPlugin() {
             }
 
             when (cmd.name.lowercase()) {
-                "spawn" -> {
-                    if (TagGame.isTagPlayerNonMessage(sender)) return true
-                    if (playerData.isPvPModeNonMessage()) return true
-                    spawnPlayer(sender)
-                    return true
-                }
                 "iteminventorysort" -> {
                     playerData.ItemInventory.ItemInventorySort()
                     return true

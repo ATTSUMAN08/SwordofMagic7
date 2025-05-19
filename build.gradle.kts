@@ -88,7 +88,7 @@ tasks.register("deploy") {
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            session(remotes["ch2"], delegateClosureOf<SessionHandler> {
+            /*session(remotes["ch2"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
@@ -99,7 +99,7 @@ tasks.register("deploy") {
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
                 ))
-            })
+            })*/
         })
     }
 }
@@ -287,10 +287,6 @@ bukkit {
         register("titleReload") {
             permission = "som7.title.editor"
             aliases = listOf("tr")
-        }
-
-        register("spawn") {
-            permission = "som7.user"
         }
 
         register("playerInfo") {

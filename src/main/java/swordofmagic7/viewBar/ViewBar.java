@@ -20,6 +20,8 @@ import swordofmagic7.TagGame;
 
 import java.util.*;
 
+import static swordofmagic7.Data.DataBase.Som7Premium;
+import static swordofmagic7.Data.DataBase.Som7VIP;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 
@@ -297,5 +299,25 @@ public class ViewBar {
             }
         }
         player.setScoreboard(board);
+    }
+
+    public String getNameTagText() {
+        String titleText = playerData.holoTitle;
+
+        String prefix = "";
+        if (player.hasPermission(Som7Premium)) {
+            prefix = "§bⓅ";
+        } else if (player.hasPermission(Som7VIP)) {
+            prefix = "§aⓋ";
+        }
+        String nameText = "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower());
+
+        int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
+        int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
+        int x2 = 20 - x;
+        if (s > 0) x2 = 0;
+        String healthText = HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s);
+
+        return titleText + "\n" + nameText + "\n" + healthText;
     }
 }
