@@ -1,7 +1,9 @@
 package swordofmagic7.Map;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import swordofmagic7.Data.PlayerData;
@@ -90,7 +92,7 @@ public class MapManager {
     public void TeleportGateUse(TeleportGateParameter teleport) {
         if (teleport.DefaultActive || playerData.ActiveTeleportGate.contains(teleport.Id) || player.hasPermission("som7.builder")) {
             MultiThread.TaskRunSynchronizedLater(() -> {
-                player.teleportAsync(teleport.Location);
+                player.teleportAsync(teleport.Location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
                 playSound(player, SoundList.LEVEL_UP);
                 lastTeleportGate = teleport.Id;

@@ -1,10 +1,12 @@
 package swordofmagic7.Mob.Skill;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
@@ -198,7 +200,7 @@ public class Hind extends EnemySkillBase {
             MultiThread.TaskRunSynchronized(() -> {
                 Location loc = new Location(world, 6905, 117, 1415, 90, 0);
                 for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
-                    if (target() != victim) victim.teleportAsync(loc);
+                    if (target() != victim) victim.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 }
             });
             MultiThread.sleepTick(10);

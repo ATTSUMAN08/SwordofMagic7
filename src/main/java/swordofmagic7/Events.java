@@ -161,8 +161,11 @@ public class Events implements Listener {
         if (TagGame.isPlayer(player)) {
             TagGame.leave(player);
         }
-        MultiThread.TaskRunLater(() -> {
-            if (playerData.hologram != null) playerData.hologram.delete();
+        MultiThread.TaskRunSynchronizedLater(() -> {
+            if (playerData.hologram != null) {
+                playerData.hologram.remove();
+                playerData.hologram = null;
+            }
             playerData.remove();
         }, 5, "PlayerQuit");
     }

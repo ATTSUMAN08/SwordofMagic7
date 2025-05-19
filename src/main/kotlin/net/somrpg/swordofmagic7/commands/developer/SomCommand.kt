@@ -92,15 +92,10 @@ class SomCommand : BaseCommand() {
         player.performCommand("/paste")
     }
 
-    @Subcommand("text_display")
+    @Subcommand("afkIncrease")
     fun textDisplay(sender: Player) {
         val playerData = PlayerData.playerData(sender)
-        val textDisplay = sender.world.spawnEntity(sender.location.clone().apply { pitch = 0F }, EntityType.TEXT_DISPLAY) as TextDisplay
-        textDisplay.billboard = Display.Billboard.VERTICAL
-        val text = playerData.ViewBar.nameTagText
-        textDisplay.backgroundColor = Color.fromARGB(0, 0, 0, 0)
-        textDisplay.text(Component.text(text).appendNewline().append(Component.empty()))
-        sender.addPassenger(textDisplay)
+        playerData.AFKTime = 295
     }
 
 }

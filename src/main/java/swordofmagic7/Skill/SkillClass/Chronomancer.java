@@ -1,9 +1,11 @@
 package swordofmagic7.Skill.SkillClass;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;
@@ -217,7 +219,7 @@ public class Chronomancer extends BaseSkillClass {
                     if (player != null) {
                         playerData.setHealth(BackMaskingHealth);
                         playerData.setMana(BackMaskingMana);
-                        player.teleportAsync(BackMaskingLocation);
+                        player.teleportAsync(BackMaskingLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                         BackMaskingMapData.enter(player);
                         player.sendMessage("§a情報を巻き戻しました");
                         playSound(player, SoundList.WARP);

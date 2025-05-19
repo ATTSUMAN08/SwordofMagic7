@@ -1,9 +1,11 @@
 package swordofmagic7.Skill.SkillClass;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -59,7 +61,7 @@ public class Sage extends BaseSkillClass {
             origin.add(player.getLocation().getDirection().multiply(-1));
             MultiThread.TaskRunSynchronized(() -> {
                 for (Player player : players) {
-                    player.teleportAsync(origin);
+                    player.teleportAsync(origin, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     playSound(player, SoundList.LEVEL_UP);
                 }
             });

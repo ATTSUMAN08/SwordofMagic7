@@ -3,6 +3,7 @@ package swordofmagic7.Mob;
 import com.destroystokyo.paper.entity.Pathfinder;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import io.papermc.paper.entity.TeleportFlag;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import swordofmagic7.classes.ClassData;
@@ -262,7 +264,7 @@ public class EnemyData {
                         NextLocation = targetLocation;
                         MultiThread.TaskRunSynchronized(() -> {
                             if (entity.isInLava()) {
-                                entity.teleportAsync(SpawnLocation);
+                                entity.teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             } else if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
                                 mob.lookAt(NextLocation);
                                 pathfinder.moveTo(NextLocation, mobData.Mov*MovementMultiply);

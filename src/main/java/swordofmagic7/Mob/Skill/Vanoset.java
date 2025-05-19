@@ -1,9 +1,11 @@
 package swordofmagic7.Mob.Skill;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -336,7 +338,7 @@ public class Vanoset {
                     for (Player player : PlayerList.getNearNonDead(location, 96)) {
                         Location location = player.getLocation();
                         location.setDirection(Vector.getRandom());
-                        player.teleportAsync(location);
+                        player.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     }
                 });
                 MultiThread.sleepTick(40);

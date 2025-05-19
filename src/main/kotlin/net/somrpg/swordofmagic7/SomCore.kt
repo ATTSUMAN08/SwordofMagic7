@@ -13,6 +13,7 @@ import de.bluecolored.bluemap.api.math.Color
 import de.bluecolored.bluemap.api.math.Shape
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
+import io.papermc.paper.entity.TeleportFlag
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
@@ -23,10 +24,16 @@ import net.somrpg.swordofmagic7.placeholders.SomPlaceholder
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Display
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
+import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.persistence.PersistentDataType
 import swordofmagic7.*
 import swordofmagic7.Command.Developer.*
 import swordofmagic7.Command.Player.*
@@ -72,7 +79,7 @@ class SomCore : SuspendingJavaPlugin() {
         private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
         const val AFK_TIME_PERIOD = 1
         const val AFK_TIME = 300
-        const val PLAYER_MAX_LEVEL = 55
+        const val PLAYER_MAX_LEVEL = 65
         const val CLASS_MAX_LEVEL = 25
 
         //fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
@@ -254,6 +261,12 @@ class SomCore : SuspendingJavaPlugin() {
         }
         world.entities.filterNot { it is Player || ignoreEntity(it) }.forEach {
             it.remove()
+            count++
+        }
+        world.entities.filter {
+            it.persistentDataContainer.getOrDefault(NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN, false) == true
+        }.forEach { entity ->
+            entity.remove()
             count++
         }
         Log("CleanEnemy: $count")
@@ -844,11 +857,21 @@ class SomCore : SuspendingJavaPlugin() {
                 player.apply {
                     isFlying = false
                     setGravity(true)
-                    teleportAsync(SpawnLocation)
+                    teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS)
                 }
                 nextSpawnPlayer.remove(player)
             }, 1, "spawnPlayer")
         }
+    }
+
+    fun createTextDisplay(loc: Location, defaultText: Component): TextDisplay {
+        val textDisplayLocation = loc.clone().apply { pitch = 0F }
+        val textDisplay = loc.world.spawnEntity(textDisplayLocation, EntityType.TEXT_DISPLAY) as TextDisplay
+        textDisplay.billboard = Display.Billboard.VERTICAL
+        textDisplay.backgroundColor = org.bukkit.Color.fromARGB(0, 0, 0, 0)
+        textDisplay.text(defaultText)
+        textDisplay.persistentDataContainer[NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN] = true
+        return textDisplay
     }
 
 

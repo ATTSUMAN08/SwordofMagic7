@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import io.papermc.paper.entity.TeleportFlag;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -13,8 +14,8 @@ import net.somrpg.swordofmagic7.TaskUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -251,7 +252,7 @@ public class PlayerData {
         //MultiThread.TaskRun(this::sendMenuPacket, "UserMenuPacket");
     }
 
-    public Hologram hologram;
+    public TextDisplay hologram;
     public String holoTitle;
     public int HoloWait = 0;
     public int HoloAnim = 0;
@@ -279,34 +280,59 @@ public class PlayerData {
         }
     }
 
+    public boolean isCanVisibleHologram() {
+        return isAlive(player) && !hideFlag && !Map.Id.equals("DefenseBattle") && playMode && !isAFK();
+        //return isAlive(player) && !player.isSneaking() && !hideFlag && !Map.Id.equals("DefenseBattle") && playMode;
+    }
+
     private void initHologram() {
         MultiThread.TaskRunSynchronized(() -> {
-            if (hologram != null && !hologram.isDisabled()) hologram.delete();
-            hologram = SomCore.instance.createHologram(playerHoloLocation());
-            if (!HoloSelfView) hologram.setHidePlayer(player);
-            DHAPI.addHologramLine(hologram, DefaultTitle.Display[0]);
-            DHAPI.addHologramLine(hologram, "NameTag");
-            DHAPI.addHologramLine(hologram, "HealthBar");
+            if (hologram != null) {
+                hologram.remove();
+                hologram = null;
+            }
+
+            hologram = instance.createTextDisplay(player.getLocation(), ViewBar.getNameTagText());
+            player.addPassenger(hologram);
+
+            if (!HoloSelfView) player.hideEntity(instance, hologram);
 
             TaskUtils.runTaskTimerAsync(count -> {
-                if (hologram.isDefaultVisibleState()) {
-                    hologram.getShowPlayers().clear();
-                    hologram.getHidePlayers().clear();
+                if (!playerWhileCheck(this) || hologram == null) return false;
+                if (isCanVisibleHologram()) {
+                    Set<Player> nonViewers = PlayerList.getNear(player.getLocation(), 64+1);
+                    nonViewers.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
+                    nonViewers.addAll(BlockListAtPlayer());
+                    if (Party != null) {
+                        for (Player partyPlayer : Party.Members) {
+                            if (!playerData(partyPlayer).isAFK()) nonViewers.remove(partyPlayer);
+                        }
+                    }
 
-                    if (HoloSelfView && !isAFK()) hologram.setShowPlayer(player);
-                    else hologram.setHidePlayer(player);
-                    Set<Player> nonViewer = PlayerList.getNear(player.getLocation(), 64+1);
-                    nonViewer.removeAll(PlayerList.getNearNonAFK(player.getLocation(), 16));
-                    nonViewer.addAll(BlockListAtPlayer());
-                    if (Party != null) for (Player player : Party.Members) {
-                        if (!playerData(player).isAFK()) nonViewer.remove(player);
-                    }
-                    for (Player player : nonViewer) {
-                        hologram.setHidePlayer(player);
-                    }
+                    MultiThread.TaskRunSynchronized(() -> {
+                        if (HoloSelfView && !player.canSee(hologram)) player.showEntity(instance, hologram);
+                        else if (!HoloSelfView && player.canSee(hologram)) player.hideEntity(instance, hologram);
+
+                        for (Player p : PlayerList.get()) {
+                            if (p == player) continue;
+
+                            if (nonViewers.contains(p) && p.canSee(hologram)) {
+                                p.hideEntity(instance, hologram);
+                            } else if (!nonViewers.contains(p) && !p.canSee(hologram)) {
+                                p.showEntity(instance, hologram);
+                            }
+                        }
+                    }, "HideHologram");
+                } else {
+                    MultiThread.TaskRunSynchronized(() -> {
+                        for (Player p : PlayerList.get()) {
+                            if (p.canSee(hologram)) p.hideEntity(instance, hologram);
+                        }
+                    }, "HideHologram");
                 }
-                return playerWhileCheck(this);
-            }, 0, 30);
+
+                return playerWhileCheck(this) && hologram != null;
+            }, 0, 5);
 
             TaskUtils.runTaskTimerAsync(count -> {
                 if (titleManager.Title.flame > 1) {
@@ -328,12 +354,9 @@ public class PlayerData {
                     holoTitle = titleManager.Title.Display[0];
                 }
 
-                if (holoTitle != null) {
-                    DHAPI.setHologramLine(hologram, 0, holoTitle);
-                }
-                DHAPI.moveHologram(hologram, playerHoloLocation());
+                hologram.text(ViewBar.getNameTagText());
 
-                return playerWhileCheck(this);
+                return playerWhileCheck(this) && hologram != null;
             }, 0, 1);
         }, "HologramInitialize");
     }
@@ -369,12 +392,6 @@ public class PlayerData {
             otherTargetEntity = null;
             player.hideBossBar(BossBarOther);
         }
-    }
-
-    public Location playerHoloLocation() {
-        Location loc = player.getEyeLocation().clone();
-        loc.setY(loc.getY()+1.3);
-        return loc;
     }
 
     public boolean isBlockPlayer(Player player) {
@@ -593,8 +610,8 @@ public class PlayerData {
 
     void HoloSelfView(boolean bool, boolean message) {
         HoloSelfView = bool;
-        if (bool) hologram.setShowPlayer(player);
-        else hologram.setHidePlayer(player);
+        if (bool) player.showEntity(instance, hologram);
+        else player.hideEntity(instance, hologram);
         if (message) {
             String msg = "§e[自視点ステータスバー]§aを" + (bool ? "§b[表示]" : "§c[非表示]") + "§aにしました";
             sendMessage(player, msg, SoundList.CLICK);
@@ -995,8 +1012,9 @@ public class PlayerData {
                 float yaw = (float) data.getDouble("Location.yaw", SpawnLocation.getYaw());
                 float pitch = (float) data.getDouble("Location.pitch", SpawnLocation.getPitch());
                 Location loc = new Location(world, x, y, z, yaw, pitch);
-                player.teleportAsync(loc);
+                player.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 player.setGameMode(GameMode.SURVIVAL);
+                player.getInventory().setHeldItemSlot(8);
             } else {
                 player.setGameMode(GameMode.CREATIVE);
             }
@@ -1258,11 +1276,11 @@ public class PlayerData {
                         Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(10), Duration.ofSeconds(1))
                 ));
                 deadTime = 1200;
-                Hologram hologram = SomCore.instance.createHologram(player.getEyeLocation());
-                DHAPI.addHologramLine(hologram, this.hologram.getPage(0).getLine(1).getText());
+                Hologram deadHologram = SomCore.instance.createHologram(player.getEyeLocation());
+                DHAPI.addHologramLine(deadHologram, ViewBar.getNameTagName());
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
-                DHAPI.addHologramLine(hologram, head);
+                DHAPI.addHologramLine(deadHologram, head);
                 new BukkitRunnable() {
                     final ParticleData particleData = new ParticleData(Particle.END_ROD, 0.1f);
                     @Override
@@ -1272,28 +1290,28 @@ public class PlayerData {
                             this.cancel();
                             logoutLocation = null;
                             isDead = false;
-                            player.teleportAsync(player.getWorld().getSpawnLocation());
+                            player.teleportAsync(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             player.setGameMode(GameMode.SURVIVAL);
                             Status.Health = Status.MaxHealth;
                             Status.Mana = Status.MaxMana;
                             player.resetTitle();
                             Map = getMapData("Alden");
-                            hologram.delete();
+                            deadHologram.delete();
                             statistics.DeathCount++;
                         } else if (RevivalReady) {
                             this.cancel();
                             logoutLocation = null;
                             isDead = false;
                             RevivalReady = false;
-                            player.teleportAsync(LastDeadLocation);
+                            player.teleportAsync(LastDeadLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             player.setGameMode(GameMode.SURVIVAL);
                             player.resetTitle();
-                            hologram.delete();
+                            deadHologram.delete();
                             statistics.RevivalCount++;
                         } else {
                             LastDeadLocation.setPitch(player.getLocation().getPitch());
                             LastDeadLocation.setYaw(player.getLocation().getYaw());
-                            player.teleportAsync(LastDeadLocation);
+                            player.teleportAsync(LastDeadLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             ParticleManager.RandomVectorParticle(particleData, Function.playerHipsLocation(player), 10);
                             MultiThread.TaskRun(() -> {
                                 for (int i = 0; i < 10; i++) {

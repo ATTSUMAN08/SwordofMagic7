@@ -1,8 +1,10 @@
 package swordofmagic7.Skill.SkillClass;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectType;
@@ -63,7 +65,7 @@ public class Mage extends BaseSkillClass {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
                 ParticleManager.CircleParticle(particleData, origin, 1, 10);
                 origin.setDirection(player.getLocation().getDirection());
-                MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
+                MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS));
             }
             playSound(player, SoundList.WARP);
             skillProcess.SkillRigid(skillData);

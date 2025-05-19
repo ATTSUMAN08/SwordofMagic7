@@ -1,8 +1,10 @@
 package swordofmagic7.Skill.SkillClass;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectManager;
@@ -58,7 +60,7 @@ public class Assassin extends BaseSkillClass {
             playSound(player, SoundList.SHUN);
             if (!playerData.Equipment.isEquipRune("手練のルーン")) {
                 MultiThread.TaskRunSynchronized(() -> {
-                    player.teleportAsync(origin);
+                    player.teleportAsync(origin, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     MultiThread.TaskRunLater( () -> player.setVelocity(origin.getDirection()), 1, "InstantAccel");
                 });
             }

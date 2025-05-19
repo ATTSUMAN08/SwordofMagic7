@@ -145,7 +145,14 @@ public final class Function {
     }
 
     public static boolean ignoreEntity(Entity entity) {
-        return (entity instanceof ItemFrame || entity.getType() == EntityType.ARMOR_STAND || entity instanceof Minecart || CitizensAPI.getNPCRegistry().isNPC(entity) || entity instanceof Player);
+        return (
+                entity instanceof ItemFrame ||
+                entity.getType() == EntityType.ARMOR_STAND ||
+                        entity instanceof Minecart ||
+                        CitizensAPI.getNPCRegistry().isNPC(entity) ||
+                        entity instanceof Player ||
+                        entity instanceof Display
+        );
     }
 
     public static boolean StringEqual(String str, String str2) {

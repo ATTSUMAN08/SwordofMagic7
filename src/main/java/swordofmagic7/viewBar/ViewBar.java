@@ -1,6 +1,5 @@
 package swordofmagic7.viewBar;
 
-import eu.decentsoftware.holograms.api.DHAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -217,22 +216,6 @@ public class ViewBar {
                         "§e§l《§eDPS: " + playerData.getDPS() + "§e§l》"
                 );
 
-                if (playerData.hologram != null && !playerData.hologram.isDisabled()) {
-                    int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
-                    int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
-                    int x2 = 20 - x;
-                    if (s > 0) x2 = 0;
-                    DHAPI.setHologramLine(playerData.hologram, 2, HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s));
-
-                    if (!isAlive(player) || player.isSneaking() || playerData.hideFlag || playerData.Map.Id.equals("DefenseBattle")) {
-                        if (playerData.hologram.isDefaultVisibleState()) {
-                            playerData.hologram.setDefaultVisibleState(false);
-                        }
-                    } else if (!playerData.hologram.isDefaultVisibleState()) {
-                        playerData.hologram.setDefaultVisibleState(true);
-                    }
-                }
-
                 ViewSideBar();
                 playerData.HotBar.UpdateHotBar();
             }
@@ -301,16 +284,20 @@ public class ViewBar {
         player.setScoreboard(board);
     }
 
-    public String getNameTagText() {
-        String titleText = playerData.holoTitle;
-
+    public String getNameTagName() {
         String prefix = "";
         if (player.hasPermission(Som7Premium)) {
             prefix = "§bⓅ";
         } else if (player.hasPermission(Som7VIP)) {
             prefix = "§aⓋ";
         }
-        String nameText = "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower());
+        return "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower());
+    }
+
+    public Component getNameTagText() {
+        String titleText = playerData.holoTitle != null ? playerData.holoTitle : player.getName();
+
+        String nameText = getNameTagName();
 
         int x = (int) Math.max(0, Math.min(20, Math.floor(HealthPercent * 20)));
         int s = (int) Math.max(0, Math.min(20, Math.floor(status.Shield/status.MaxHealth * 20)));
@@ -318,6 +305,11 @@ public class ViewBar {
         if (s > 0) x2 = 0;
         String healthText = HealthPercentColor + "|".repeat(x) + "§7§l" + "|".repeat(x2) + "§e§l" + "|".repeat(s);
 
-        return titleText + "\n" + nameText + "\n" + healthText;
+        return Component.text(titleText).appendNewline()
+                .append(Component.text(nameText))
+                .appendNewline()
+                .append(Component.text(healthText))
+                .appendNewline()
+                .append(Component.empty()); // ホログラムの位置調整
     }
 }

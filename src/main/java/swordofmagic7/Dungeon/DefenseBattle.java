@@ -1,8 +1,10 @@
 package swordofmagic7.Dungeon;
 
+import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Client;
@@ -88,7 +90,7 @@ public class DefenseBattle {
     }
 
     public static void teleport(Player player) {
-        player.teleport(teleportLocation);
+        player.teleport(teleportLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
         MapList.get("DefenseBattle").enter(player);
     }
 

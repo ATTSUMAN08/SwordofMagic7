@@ -2,6 +2,7 @@ package swordofmagic7.Pet;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.google.common.collect.MultimapBuilder;
+import io.papermc.paper.entity.TeleportFlag;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
@@ -10,6 +11,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -425,7 +427,7 @@ public class PetParameter implements Cloneable {
                             }
                         }
                         if (entity.getLocation().distance(player.getLocation()) > 48) {
-                            entity.teleportAsync(player.getLocation());
+                            entity.teleportAsync(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
