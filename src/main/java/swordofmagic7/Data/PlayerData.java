@@ -888,8 +888,11 @@ public class PlayerData {
     }
 
     public void load() {
+        player.setHealthScaled(true);
         File playerFile = new File(DataBasePath, "PlayerData/" + player.getUniqueId() + ".yml");
+        final boolean firstLogin;
         if (playerFile.exists()) {
+            firstLogin = false;
             FileConfiguration data = YamlConfiguration.loadConfiguration(playerFile);
 
             Mel = data.getInt("Mel", 10000);
@@ -1021,29 +1024,27 @@ public class PlayerData {
 
             statistics.load(data);
         } else {
-            // 初回ログイン
-            MultiThread.TaskRunSynchronizedLater(() -> {
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスブレード"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスメイス"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスロッド"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアクトガン"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスシールド"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
-                ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
-                player.teleport(SpawnLocation);
-                Status.Health = Status.MaxHealth;
-                Status.Mana = Status.MaxMana;
-                // Tutorial.tutorialTrigger(player, 0);
-            }, 10, "TutorialTrigger");
+            firstLogin = true;
         }
         MultiThread.TaskRunSynchronizedLater(() -> {
             isLoaded = true;
             MultiThread.TaskRunSynchronizedLater(() -> {
                 Status.StatusUpdate();
                 ViewBar.tickUpdate();
-                // Status.Health = Status.MaxHealth;
-                // Status.Mana = Status.MaxMana;
                 viewUpdate();
+
+                if (firstLogin) { // 初回ログイン
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスブレード"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスメイス"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスロッド"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアクトガン"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスシールド"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービストリンケット"), 1);
+                    ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
+                    Status.Health = Status.MaxHealth;
+                    Status.Mana = Status.MaxMana;
+                    player.teleport(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                }
             }, 20, "LoadUpdate");
         }, 5);
     }

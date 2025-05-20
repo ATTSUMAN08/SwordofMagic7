@@ -67,12 +67,12 @@ remotes {
             setProperty("user", properties["SFTP_USER_SOM7_CH2"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
-        "create"("ch3") {
+        /*"create"("ch3") {
             setProperty("host", properties["SFTP_HOST_SOM7_3"] ?: "localhost")
             setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
             setProperty("user", properties["SFTP_USER_SOM7_CH3"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
-        }
+        }*/
     }
 }
 
@@ -88,13 +88,13 @@ tasks.register("deploy") {
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            /*session(remotes["ch2"], delegateClosureOf<SessionHandler> {
+            session(remotes["ch2"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            session(remotes["ch3"], delegateClosureOf<SessionHandler> {
+            /*session(remotes["ch3"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"

@@ -1,6 +1,5 @@
 package swordofmagic7.Status;
 
-import eu.decentsoftware.holograms.api.DHAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -284,10 +283,12 @@ public class Status {
 
         String color = "§f";
         String prefix = "";
-        if (player.hasPermission(Som7Premium)) {
-            prefix = "§bⓅ";
-        } else if (player.hasPermission(Som7VIP)) {
-            prefix = "§aⓋ";
+        if (!player.hasPermission(Som7HideTag)) {
+            if (player.hasPermission(Som7Premium)) {
+                prefix = "§bⓅ";
+            } else if (player.hasPermission(Som7VIP)) {
+                prefix = "§aⓋ";
+            }
         }
 
         if (playerData.PvPMode) color = "§c";

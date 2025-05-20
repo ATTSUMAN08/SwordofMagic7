@@ -19,8 +19,7 @@ import swordofmagic7.TagGame;
 
 import java.util.*;
 
-import static swordofmagic7.Data.DataBase.Som7Premium;
-import static swordofmagic7.Data.DataBase.Som7VIP;
+import static swordofmagic7.Data.DataBase.*;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.*;
 
@@ -286,10 +285,12 @@ public class ViewBar {
 
     public String getNameTagName() {
         String prefix = "";
-        if (player.hasPermission(Som7Premium)) {
-            prefix = "§bⓅ";
-        } else if (player.hasPermission(Som7VIP)) {
-            prefix = "§aⓋ";
+        if (!player.hasPermission(Som7HideTag)) {
+            if (player.hasPermission(Som7Premium)) {
+                prefix = "§bⓅ";
+            } else if (player.hasPermission(Som7VIP)) {
+                prefix = "§aⓋ";
+            }
         }
         return "§eLv" + playerData.Level + " " + prefix + (playerData.PvPMode ? "§c" : "§f") + playerData.Nick + " §e" + String.format("%.0f", playerData.Status.getCombatPower());
     }
