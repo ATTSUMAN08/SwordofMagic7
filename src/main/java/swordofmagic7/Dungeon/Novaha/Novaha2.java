@@ -21,12 +21,12 @@ import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class Novaha2 {
 
-    private static final Location EventLocation = new Location(world,5391, 0, 2476);
+    private static final Location EventLocation = new Location(world,5391.5, 0, 2476.5);
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
     public static int StartTime = 600;
-    private static final double Radius = 96;
+    private static final double Radius = 128;
     private static final int ElevatorActiveTime = Dungeon.ElevatorActiveTime*2;
     private static final String sidebarId = "NovahaMiddleBoss";
     private static EnemyData Enemy;
