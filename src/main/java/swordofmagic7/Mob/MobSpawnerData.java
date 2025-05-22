@@ -26,6 +26,7 @@ public class MobSpawnerData {
     public int Radius = 5;
     public int RadiusY = 5;
     public int PerSpawn = 1;
+    public int PerSpawnTick = 30;
     public String DeathTrigger;
     public File file;
 
@@ -61,7 +62,7 @@ public class MobSpawnerData {
                         }, "EnemySpawnerSpawn");
                     }
                 }
-            }, 30);
+            }, PerSpawnTick);
         }
     }
 

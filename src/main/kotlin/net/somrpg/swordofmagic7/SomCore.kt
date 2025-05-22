@@ -186,7 +186,7 @@ class SomCore : SuspendingJavaPlugin() {
                                         Component.empty(),
                                         Title.Times.times(
                                             Duration.ZERO,
-                                            Duration.ofSeconds(AFK_TIME_PERIOD + 5L),
+                                            Duration.ofSeconds(AFK_TIME_PERIOD + 4L),
                                             Duration.ZERO
                                         )
                                     )

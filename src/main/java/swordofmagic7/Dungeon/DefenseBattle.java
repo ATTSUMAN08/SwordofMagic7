@@ -69,13 +69,13 @@ public class DefenseBattle {
             DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
             String display = format.format(time);
             switch (display) {
-                case "13:55", "18:55", "21:55", "23:55" -> {
+                case "13:55", "18:55", "21:55" -> {
                     if (!isAlarm) {
                         Client.sendBroadCast(new TextView("§aまもなく§c防衛戦§aが開始されます"));
                         isAlarm = true;
                     }
                 }
-                case "14:00", "19:00", "22:00", "00:00" -> {
+                case "14:00", "19:00", "22:00" -> {
                     if (!isStart) {
                         startWave(1);
                         isStart = true;

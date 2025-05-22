@@ -280,26 +280,6 @@ public class Status {
             player.setWalkSpeed((float) Math.min(Movement, 1));
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 0, false, false, false));
         });
-
-        String color = "§f";
-        String prefix = "";
-        if (!player.hasPermission(Som7HideTag)) {
-            if (player.hasPermission(Som7Premium)) {
-                prefix = "§bⓅ";
-            } else if (player.hasPermission(Som7VIP)) {
-                prefix = "§aⓋ";
-            }
-        }
-
-        if (playerData.PvPMode) color = "§c";
-        if (playerData.isAFK()) color = "§7";
-        StringBuilder classText = new StringBuilder();
-        for (ClassData classData : playerData.Classes.classSlot) {
-            classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
-        }
-        player.displayName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
-        player.playerListName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
-        player.displayName(Component.text(prefix + "§f" + playerData.Nick));
         playerData.updateBlockPlayer();
     }
 

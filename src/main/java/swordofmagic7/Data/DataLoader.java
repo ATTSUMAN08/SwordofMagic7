@@ -938,6 +938,7 @@ public class DataLoader {
                 mobSpawnerData.RadiusY = data.getInt("RadiusY");
                 mobSpawnerData.MaxMob = data.getInt("MaxMob");
                 mobSpawnerData.PerSpawn = data.getInt("PerSpawn");
+                mobSpawnerData.PerSpawnTick = data.getInt("PerSpawnTick", 30);
                 mobSpawnerData.file = file;
                 mobSpawnerData.DeathTrigger = data.getString("DeathTrigger", null);
                 double x = data.getDouble("Location.x");

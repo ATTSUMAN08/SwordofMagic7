@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
+import swordofmagic7.classes.ClassData;
 import swordofmagic7.classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
@@ -217,6 +218,27 @@ public class ViewBar {
 
                 ViewSideBar();
                 playerData.HotBar.UpdateHotBar();
+
+                // 名前を更新
+                String color = "§f";
+                String prefix = "";
+                if (!player.hasPermission(Som7HideTag)) {
+                    if (player.hasPermission(Som7Premium)) {
+                        prefix = "§bⓅ";
+                    } else if (player.hasPermission(Som7VIP)) {
+                        prefix = "§aⓋ";
+                    }
+                }
+
+                if (playerData.PvPMode) color = "§c";
+                if (playerData.isAFK()) color = "§7";
+                StringBuilder classText = new StringBuilder();
+                for (ClassData classData : playerData.Classes.classSlot) {
+                    classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
+                }
+                player.displayName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
+                player.playerListName(Component.text(classText + "§e| " + prefix + color + playerData.Nick));
+                player.displayName(Component.text(prefix + "§f" + playerData.Nick));
             }
         } catch (Exception e) {
             e.printStackTrace();

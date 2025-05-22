@@ -21,7 +21,7 @@ import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class Novaha2 {
 
-    private static final Location EventLocation = new Location(world,5396, 115, 2402);
+    private static final Location EventLocation = new Location(world,5391, 0, 2476);
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
