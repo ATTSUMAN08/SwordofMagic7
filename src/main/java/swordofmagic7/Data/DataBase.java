@@ -50,7 +50,7 @@ public final class DataBase {
     public static final String Som7VIP = "som7.VIP";
     public static final String Som7Premium = "som7.Premium";
     public static final String Som7HideTag = "som7.hidetag";
-    public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), 27.5, 0, -11.5, 45, 0);
+    public static final Location SpawnLocation = new Location(Bukkit.getWorld("world"), -265.5, 29, 1206.5, 180, 0);
     public static final ItemStack AirItem = new ItemStack(Material.AIR);
     public static ItemStack FlameItem(int i) {
         return new ItemStackData(Material.IRON_BARS, "§7§l空スロット[" + i + "]", 1).view();

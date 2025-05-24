@@ -36,9 +36,9 @@ import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class DefenseBattle {
     private static final Location location = new Location(world, 2234.5,139,2345.5);
-    private static final Location targetLocation = new Location(world, 2234.5,81,2345.5);
-    private static final Location teleportLocation = new Location(world,2234.5, 97, 2357.5);
-    private static final Location[] spawnLocation = new Location[9];
+    private static final Location targetLocation = new Location(world, 733.5,9,629.5);
+    private static final Location teleportLocation = new Location(world,733.5, 41, 621.5);
+    private static final Location[] spawnLocation = new Location[8];
     public static final List<MobData> MobList = new ArrayList<>();
     public static final List<EnemyData> EnemyList = new ArrayList<>();
     public static int EnemyCount = 0;
@@ -54,15 +54,14 @@ public class DefenseBattle {
     static boolean isAlarm = false;
 
     public static void onLoad() {
-        spawnLocation[0] = new Location(world, 2279.5,66,2274.5);
-        spawnLocation[1] = new Location(world, 2220.5,64,2274.5);
-        spawnLocation[2] = new Location(world, 2168.5,65,2301.5);
-        spawnLocation[3] = new Location(world, 2151.5,64,2348.5);
-        spawnLocation[4] = new Location(world, 2181.5,64,2416.5);
-        spawnLocation[5] = new Location(world, 2224.5,65,2439.5);
-        spawnLocation[6] = new Location(world, 2279.5,66,2274.5);
-        spawnLocation[7] = new Location(world, 2300.5,64,2407.5);
-        spawnLocation[8] = new Location(world, 2314.5,64,2370.5);
+        spawnLocation[0] = new Location(world, 732.5,0,724.5);
+        spawnLocation[1] = new Location(world, 667.5,0,695.5);
+        spawnLocation[2] = new Location(world, 640.5,0,627.5);
+        spawnLocation[3] = new Location(world, 666.5,0,562.5);
+        spawnLocation[4] = new Location(world, 733.5,0,534.5);
+        spawnLocation[5] = new Location(world, 800.5,0,562.5);
+        spawnLocation[6] = new Location(world, 827.5,0,629.5);
+        spawnLocation[7] = new Location(world, 800.5,0,696.5);
 
         if (SomCore.Companion.isEventServer()) MultiThread.TaskRunTimer(() -> {
             LocalDateTime time = LocalDateTime.now();
@@ -118,6 +117,7 @@ public class DefenseBattle {
                             MobData mobData = MobList.get(random.nextInt(MobList.size() - 1));
                             Location location = spawnLocation[random.nextInt(spawnLocation.length)];
                             EnemyData enemyData = MobManager.mobSpawn(mobData, wave * 5, location);
+                            enemyData.entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION, 0, false, false));
                             if (random.nextDouble() < 0.5) {
                                 enemyData.overrideTargetLocation = targetLocation;
                             } else {
@@ -132,7 +132,7 @@ public class DefenseBattle {
                 EnemyList.removeIf(EnemyData::isDead);
                 boolean isAttack = false;
                 for (EnemyData enemyData : EnemyList) {
-                    if (enemyData.entity.getLocation().distance(targetLocation) < 8) {
+                    if (enemyData.entity.getLocation().distance(targetLocation) < 5) {
                         Health -= (100+enemyData.Level);
                         MultiThread.TaskRunSynchronized(() -> {
                             enemyData.entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 21, 0, false, false));
@@ -178,7 +178,7 @@ public class DefenseBattle {
                     PlayerData playerData = playerData(player);
                     if (!playerData.isAFK()) playerData.ItemInventory.addItemParameter(DataBase.getItemParameter("防衛戦ランダム報酬箱"), (int) Math.ceil(wave/1.5));
                 }
-                Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Waveに進みます", null, SoundList.LEVEL_UP);
+                Message(PlayerList.getNear(targetLocation, Radius), "§b§l《Wave" + wave + " クリア》", "§a10秒後Wave" + (wave+1) + "に進みます", null, SoundList.LEVEL_UP);
                 MultiThread.sleepTick(200);
                 wave++;
                 startWave(wave);

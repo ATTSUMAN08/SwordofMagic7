@@ -1032,6 +1032,7 @@ public class PlayerData {
                 Status.StatusUpdate();
                 ViewBar.tickUpdate();
                 viewUpdate();
+                player.displayName(Component.text(getPrefix() + "§f" + Nick));
 
                 if (firstLogin) { // 初回ログイン
                     ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスブレード"), 1);
@@ -1291,7 +1292,7 @@ public class PlayerData {
                             this.cancel();
                             logoutLocation = null;
                             isDead = false;
-                            player.teleportAsync(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                            player.teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             player.setGameMode(GameMode.SURVIVAL);
                             Status.Health = Status.MaxHealth;
                             Status.Mana = Status.MaxMana;
@@ -1332,6 +1333,31 @@ public class PlayerData {
                 }.runTaskTimer(instance, 0, 10);
             }, "PlayerDead");
         }
+    }
+
+    public String getPrefix() {
+        String prefix = "";
+        if (!player.hasPermission(Som7HideTag)) {
+            if (player.hasPermission(Som7Premium)) {
+                prefix = "§bⓅ";
+            } else if (player.hasPermission(Som7VIP)) {
+                prefix = "§aⓋ";
+            }
+        }
+
+        return prefix;
+    }
+
+    public String getDisplayName() {
+        String color = "§f";
+
+        if (PvPMode) color = "§c";
+        if (isAFK()) color = "§7";
+        StringBuilder classText = new StringBuilder();
+        for (ClassData classData : Classes.classSlot) {
+            classText.append("§e|").append(classData != null ? classData.Color + classData.Nick : "§8Non");
+        }
+        return classText + "§e| " + getPrefix() + color + Nick;
     }
 
 }

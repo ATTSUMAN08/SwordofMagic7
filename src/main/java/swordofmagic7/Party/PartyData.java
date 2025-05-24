@@ -152,10 +152,10 @@ public class PartyData {
     public void chat(PlayerData playerData, String message) {
         NewMultiThread.INSTANCE.runTaskAsync(() -> {
             Component chatComponent = Component.text(message);
-            if (Japanizer.isNeedToJapanize(message)) {
+            /*if (Japanizer.isNeedToJapanize(message)) {
                 String japaneseText = Japanizer.japanize(message, JapanizeType.GOOGLE_IME, Collections.emptyMap());
                 chatComponent = Component.text(japaneseText).hoverEvent(HoverEvent.showText(chatComponent));
-            }
+            }*/
             for (Player member : playerData.Party.Members) {
                 Function.sendMessage(member, Component.text("§6[P]" + playerData.getNick() + "§a: §f").append(chatComponent), SoundList.TICK);
             }

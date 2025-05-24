@@ -1,6 +1,7 @@
 package net.somrpg.swordofmagic7.placeholders
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
+import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.ServerUtils
 import org.bukkit.OfflinePlayer
 
@@ -22,6 +23,11 @@ class SomPlaceholder : PlaceholderExpansion() {
             "tps" -> ServerUtils.getColoredTPS()
             "mspt" -> ServerUtils.getColoredMSPT()
             "lag" -> ServerUtils.getLagPercent()
+            "displayname" -> {
+                val p = player.player
+                if (p == null || !p.isOnline) ""
+                else p.getPlayerData().displayName
+            }
             else -> ""
         }
     }

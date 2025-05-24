@@ -2,24 +2,21 @@
 package net.somrpg.swordofmagic7.commands.developer
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import kotlinx.coroutines.delay
 import me.attsuman08.abysslib.shade.acf.BaseCommand
-import me.attsuman08.abysslib.shade.acf.annotation.CommandAlias
-import me.attsuman08.abysslib.shade.acf.annotation.CommandPermission
-import me.attsuman08.abysslib.shade.acf.annotation.Subcommand
-import me.attsuman08.abysslib.shade.acf.annotation.Syntax
-import net.kyori.adventure.text.Component
+import me.attsuman08.abysslib.shade.acf.annotation.*
 import net.somrpg.swordofmagic7.SomCore
+import net.somrpg.swordofmagic7.extensions.asyncDispatcher
+import net.somrpg.swordofmagic7.extensions.minecraftDispatcher
+import net.somrpg.swordofmagic7.utils.TimeUtils
 import org.bukkit.Bukkit
-import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Display
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
-import swordofmagic7.Data.PlayerData
+import swordofmagic7.Data.DataBase
+import swordofmagic7.Function
+import swordofmagic7.Sound.SoundList
 import java.io.File
 
 @CommandAlias("som")
@@ -78,7 +75,7 @@ class SomCommand : BaseCommand() {
             val locText = line.split(",").map { text -> text.toDouble() }
             val loc = Location(sender.world, locText[0], locText[1], locText[2])
 
-            SomCore.instance.launch(SomCore.instance.minecraftDispatcher) {
+            SomCore.instance.launch(minecraftDispatcher) {
                 loc.block.type = Material.SAND
             }
         }
@@ -92,10 +89,26 @@ class SomCommand : BaseCommand() {
         player.performCommand("/paste")
     }
 
-    @Subcommand("afkIncrease")
-    fun textDisplay(sender: Player) {
-        val playerData = PlayerData.playerData(sender)
-        playerData.AFKTime = 295
+    @Subcommand("restart")
+    @Syntax("<seconds>")
+    fun restart(sender: CommandSender, @Conditions("limits:min=10,max=1800") seconds: Int) {
+        SomCore.instance.launch(asyncDispatcher) {
+            for (i in seconds downTo 1) {
+                if (SomCore.restartNotifyTimes.contains(i)) {
+                    for (p in Bukkit.getOnlinePlayers()) {
+                        Function.sendMessage(p, "§b[${DataBase.ServerId}] §a現在接続しているチャンネルは${TimeUtils.formatSeconds(i)}後に再起動されます", SoundList.CLICK)
+                    }
+                }
+                delay(1000)
+            }
+            for (p in Bukkit.getOnlinePlayers()) {
+                Function.sendMessage(p, "§b[${DataBase.ServerId}] §aサーバーを再起動します", SoundList.CLICK)
+            }
+            delay(1000)
+            SomCore.instance.launch(minecraftDispatcher) {
+                Bukkit.getServer().shutdown()
+            }
+        }
     }
 
 }

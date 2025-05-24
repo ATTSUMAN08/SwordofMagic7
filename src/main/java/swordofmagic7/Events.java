@@ -524,12 +524,13 @@ public class Events implements Listener {
             playerData.Party.chat(playerData, message);
             return;
         }
-        if (Japanizer.isNeedToJapanize(message)) {
+        /*if (Japanizer.isNeedToJapanize(message)) {
             String japaneseText = Japanizer.japanize(message, JapanizeType.GOOGLE_IME, Collections.emptyMap());
             Client.sendPlayerChat(player, new TextView(japaneseText).addHover(message));
         } else {
             Client.sendPlayerChat(player, new TextView(message));
-        }
+        }*/
+        Client.sendPlayerChat(player, new TextView(message));
     }
 
     @EventHandler

@@ -37,14 +37,14 @@ public class Vanoset {
     private final EnemySkillManager Manager;
     private LivingEntity entity;
     public EnemyData Altar;
-    private final Location location = new Location(world, 5371.5, 173, 3902.5);
+    private final Location location = new Location(world, 712.5, 14, 3111.5);
     private final Location[] SacrificeLocation = new Location[4];
     public Vanoset(EnemySkillManager manager) {
         this.Manager = manager;
-        SacrificeLocation[0] = new Location(world, 5371.5, 172, 3858.5);
-        SacrificeLocation[1] = new Location(world, 5327.5, 172, 3902.5);
-        SacrificeLocation[2] = new Location(world, 5371.5, 172, 3946.5);
-        SacrificeLocation[3] = new Location(world, 5415.5, 172, 3902.5);
+        SacrificeLocation[0] = new Location(world, 712.5, 10, 3079.5);
+        SacrificeLocation[1] = new Location(world, 680.5, 10, 3111.5);
+        SacrificeLocation[2] = new Location(world, 712.5, 10, 3143.5);
+        SacrificeLocation[3] = new Location(world, 744.5, 10, 3111.5);
 
         MultiThread.TaskRunSynchronizedLater(() -> {
             Altar = MobManager.mobSpawn(DataBase.getMobData("ノヴァハ祭壇"), Manager.enemyData.Level, location);

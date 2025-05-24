@@ -55,24 +55,12 @@ dependencies {
 
 remotes {
     withGroovyBuilder {
-        "create"("event") {
+        "create"("dev") {
             setProperty("host", properties["SFTP_HOST_SOM7"] ?: "localhost")
             setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
-            setProperty("user", properties["SFTP_USER_SOM7_EVENT"] ?: "som7")
+            setProperty("user", properties["SFTP_USER_SOM7_DEV"] ?: "som7")
             setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
         }
-        "create"("ch2") {
-            setProperty("host", properties["SFTP_HOST_SOM7_2"] ?: "localhost")
-            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
-            setProperty("user", properties["SFTP_USER_SOM7_CH2"] ?: "som7")
-            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
-        }
-        /*"create"("ch3") {
-            setProperty("host", properties["SFTP_HOST_SOM7_3"] ?: "localhost")
-            setProperty("port", properties["SFTP_PORT"].toString().toIntOrNull() ?: 22)
-            setProperty("user", properties["SFTP_USER_SOM7_CH3"] ?: "som7")
-            setProperty("password", properties["SFTP_PASSWORD"] ?: "som7")
-        }*/
     }
 }
 
@@ -82,24 +70,12 @@ tasks.register("deploy") {
     dependsOn("build")
     doLast {
         ssh.run(delegateClosureOf<RunHandler> {
-            session(remotes["event"], delegateClosureOf<SessionHandler> {
+            session(remotes["dev"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
                     "into" to "plugins/${project.name}.jar"
                 ))
             })
-            session(remotes["ch2"], delegateClosureOf<SessionHandler> {
-                put(hashMapOf(
-                    "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
-                    "into" to "plugins/${project.name}.jar"
-                ))
-            })
-            /*session(remotes["ch3"], delegateClosureOf<SessionHandler> {
-                put(hashMapOf(
-                    "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
-                    "into" to "plugins/${project.name}.jar"
-                ))
-            })*/
         })
     }
 }

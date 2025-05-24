@@ -19,7 +19,7 @@ import static swordofmagic7.Dungeon.Dungeon.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class Novaha4 {
-    private static final Location EventLocation = new Location(world, 5371.5, 174, 3902.5);
+    private static final Location EventLocation = new Location(world, 712.5, 10, 3075.5);
     private static boolean Start = false;
     public static int Time;
     public static int StartTime = 1200;

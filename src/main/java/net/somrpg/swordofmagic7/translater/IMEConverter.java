@@ -51,6 +51,8 @@ public class IMEConverter {
             URL url = new URL(baseurl);
 
             urlconn = (HttpURLConnection)url.openConnection();
+            urlconn.setConnectTimeout(1000);
+            urlconn.setReadTimeout(1000);
             urlconn.setRequestMethod("GET");
             urlconn.setInstanceFollowRedirects(false);
             urlconn.connect();

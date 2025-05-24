@@ -73,6 +73,7 @@ class SomCore : SuspendingJavaPlugin() {
         lateinit var world: World
         lateinit var instance: SomCore
         lateinit var random: Random
+        val restartNotifyTimes: Set<Int> = setOf(1800, 1200, 600, 300, 240, 180, 120, 60, 30, 20, 10, 5, 4, 3, 2, 1)
         val gson = Gson()
         var blueMapEnabled = false
 
@@ -82,8 +83,7 @@ class SomCore : SuspendingJavaPlugin() {
         const val PLAYER_MAX_LEVEL = 65
         const val CLASS_MAX_LEVEL = 25
 
-        //fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
-        fun isEventServer(): Boolean = false
+        fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
         fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
     }
@@ -209,10 +209,13 @@ class SomCore : SuspendingJavaPlugin() {
         ParticleManager.onLoad()
 
         // Initialize holograms
-        createTouchHologram("", Location(world, 12.5, 0.5, -13.9)) { player ->
+        createTouchHologram("", Location(world, -196.2, 24.0, 1187.5, 90F, 0F)) { player ->
             playerData(player).Menu.Smith.SmithMenuView()
         }
-        createTouchHologram("", Location(world, 17.5, 0.5, -13.9)) { player ->
+        createTouchHologram("", Location(world, -203.5, 20.0, 1112.0, 0F, 0F)) { player ->
+            playerData(player).Menu.Cook.CookMenuView()
+        }
+        createTouchHologram("", Location(world, -207.5, 20.0, 1112.0, 0F, 0F)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
 

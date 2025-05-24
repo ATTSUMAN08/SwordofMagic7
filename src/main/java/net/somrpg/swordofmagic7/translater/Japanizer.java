@@ -5,6 +5,8 @@
  */
 package net.somrpg.swordofmagic7.translater;
 
+import net.somrpg.swordofmagic7.SomCore;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +54,9 @@ public class Japanizer {
 
         // IME変換
         if (type == JapanizeType.GOOGLE_IME) {
+            long start = System.currentTimeMillis();
             japanized = IMEConverter.convByGoogleIME(japanized);
+            SomCore.instance.getLogger().info("IME変換時間: " + (System.currentTimeMillis() - start) + "ms");
         }
 
         // キーワードのアンロック

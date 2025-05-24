@@ -31,11 +31,11 @@ public class Exta extends EnemySkillBase {
     private final Location[] location = new Location[5];
     public Exta(EnemySkillManager manager) {
         super(manager);
-        location[0] = new Location(world,5396, 115, 2402);
-        location[1] = new Location(world,5425, 115, 2402);
-        location[2] = new Location(world,5368, 115, 2402);
-        location[3] = new Location(world,5396, 115, 2429);
-        location[4] = new Location(world,5396, 115, 2375);
+        location[0] = new Location(world,5391.5, 1, 2476.5);
+        location[1] = new Location(world,5421.5, 1, 2476.5);
+        location[2] = new Location(world,5391.5, 1, 2508.5);
+        location[3] = new Location(world,5361.5, 1, 2476.5);
+        location[4] = new Location(world,5391.5, 1, 2444.5);
     }
 
     public void Launch(int CastTime) {

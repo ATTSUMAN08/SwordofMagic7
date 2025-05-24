@@ -26,7 +26,7 @@ public class Novaha2 {
     private static boolean Start = false;
     public static int Time;
     public static int StartTime = 600;
-    private static final double Radius = 128;
+    private static final double Radius = 130;
     private static final int ElevatorActiveTime = Dungeon.ElevatorActiveTime*2;
     private static final String sidebarId = "NovahaMiddleBoss";
     private static EnemyData Enemy;
