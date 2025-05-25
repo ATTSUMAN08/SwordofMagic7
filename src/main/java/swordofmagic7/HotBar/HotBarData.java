@@ -62,10 +62,8 @@ public class HotBarData implements Cloneable {
                     break;
                 }
                 SkillData skillData = getSkillData(Icon);
-                if (Icon.equals("BackMasking")) {
-                    if (playerData.Skill.chronomancer.BackMaskingLocation != null) {
-                        glow = true;
-                    }
+                if (Icon.equals("BackMasking") && playerData.Skill.chronomancer.BackMaskingLocation != null) {
+                    glow = true;
                 }
                 item = skillData.view(playerData).clone();
                 if (playerData.Skill.SkillStack(skillData) > 0) {
@@ -118,7 +116,7 @@ public class HotBarData implements Cloneable {
             }
         }
         if (glow) {
-            item.addUnsafeEnchantment(Enchantment.UNBREAKING, 0);
+            item.addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
             item.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         item.setAmount(Math.max(Math.min(99, amount), 1));
