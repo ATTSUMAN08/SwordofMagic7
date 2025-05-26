@@ -1,2 +1,4 @@
 serverId: Dev
 databasePath: plugins/SwordofMagic7/Database
+discordWebhookEnabled: false
+discordWebhook: null

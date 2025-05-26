@@ -1,7 +1,7 @@
 package swordofmagic7;
 
-import com.vexsoftware.votifier.model.Vote;
-import com.vexsoftware.votifier.model.VotifierEvent;
+// import com.vexsoftware.votifier.model.Vote;
+// import com.vexsoftware.votifier.model.VotifierEvent;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

@@ -1,15 +1,21 @@
 package swordofmagic7;
 
+import club.minnced.discord.webhook.send.AllowedMentions;
+import club.minnced.discord.webhook.send.WebhookMessage;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import me.attsuman08.abysslib.RedisManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
+
+import java.util.Objects;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
@@ -104,6 +110,15 @@ public class Client {
                     }
                 }
 
+                if (SomCore.Companion.isDevServer() && !isMute && !Objects.equals(from, "Discord")) {
+                    WebhookMessage webhookMessage = new WebhookMessageBuilder()
+                            .setContent(Function.unColored(PlainTextComponentSerializer.plainText().serialize(textComponentFromPacket(data))))
+                            .setAllowedMentions(AllowedMentions.none())
+                            .setUsername("[" + from + "] " + Function.unColored(display))
+                            .setAvatarUrl("https://crafthead.net/avatar/" + uuid)
+                            .build();
+                    SomCore.instance.sendDiscordMessage(webhookMessage);
+                }
                 Bukkit.getConsoleSender().sendMessage(PlainTextComponentSerializer.plainText().serialize(text) + " [ミュート: " + isMute + "]");
             }
             case "Check" -> {}

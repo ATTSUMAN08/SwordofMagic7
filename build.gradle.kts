@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.hidetakeSSH)
     alias(libs.plugins.grgit)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.paperweight)
 }
 
 group = "swordofmagic7"
@@ -19,7 +20,7 @@ repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public")
     maven(url = "https://oss.sonatype.org/content/groups/public")
     maven(url = "https://repo.md-5.net/content/groups/public") // LibsDisguises
-    maven(url = "https://jitpack.io") // NuVotifier, DecentHolograms
+    maven(url = "https://jitpack.io") // DecentHolograms
     maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
     maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
     maven(url = "https://repo.lavafuse.net/releases") // AbyssLib
@@ -31,10 +32,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.paperApi)
+    paperweight.paperDevBundle(libs.versions.paperApi.get())
     compileOnly(libs.packetEvents)
     compileOnly(libs.libsDisguises)
-    compileOnly(libs.nuVotifier)
     compileOnly(libs.decentHolograms)
     compileOnly(libs.citizens) {
         exclude(group = "*", module = "*")

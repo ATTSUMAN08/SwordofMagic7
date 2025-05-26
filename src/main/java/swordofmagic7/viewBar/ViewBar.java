@@ -156,8 +156,8 @@ public class ViewBar {
     public void tickUpdate() {
         if (tickUpdate) return;
         tickUpdate = true;
-        player.setHealthScaled(true);
-        player.setGlowing(false);
+        if (!player.isHealthScaled()) player.setHealthScaled(true);
+        if (player.isGlowing()) player.setGlowing(false);
         if (playerData.playMode) {
             player.setFlying(false);
             player.setAllowFlight(false);

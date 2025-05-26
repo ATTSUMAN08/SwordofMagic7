@@ -381,7 +381,7 @@ public class PlayerData {
             BossBarTargetInfo.name(Component.text("§c§l" + entity.getName() + " §e§l[HP:" + String.format("%.2f", percent*100) + "%]"));
             BossBarTargetInfo.progress(percent);
         } else {
-            player.hideBossBar(BossBarTargetInfo);
+            if (player != null) player.hideBossBar(BossBarTargetInfo);
         }
         if (otherTargetEntity != null && !otherTargetEntity.isDead()) {
             player.showBossBar(BossBarOther);
@@ -390,7 +390,7 @@ public class PlayerData {
             BossBarOther.progress(percent);
         } else if (otherTargetEntity != null && otherTargetEntity.isDead()) {
             otherTargetEntity = null;
-            player.hideBossBar(BossBarOther);
+            if (player != null) player.hideBossBar(BossBarOther);
         }
     }
 

@@ -1,5 +1,8 @@
 package net.somrpg.swordofmagic7
 
+import club.minnced.discord.webhook.WebhookClient
+import club.minnced.discord.webhook.WebhookClientBuilder
+import club.minnced.discord.webhook.send.WebhookMessage
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerCommon
 import com.github.retrooper.packetevents.event.PacketListenerPriority
@@ -86,6 +89,9 @@ class SomCore : SuspendingJavaPlugin() {
         fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
         fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
+    }
+    val discordWebhookClient by lazy {
+        initDiscordWebhookClient()
     }
     private lateinit var packetEventsListener: PacketListenerCommon
     private val hologramMap = HashMap<String, Hologram>()
@@ -335,6 +341,25 @@ class SomCore : SuspendingJavaPlugin() {
 
             logger.info("BlueMapのマーカーセットを初期化しました")
         }
+    }
+
+    private fun initDiscordWebhookClient(): WebhookClient {
+        val webhookUrl: String = config.getString("discordWebhook") ?: ""
+
+        val webhookBuilder = WebhookClientBuilder(webhookUrl)
+        webhookBuilder.setThreadFactory { r: Runnable? ->
+            val thread = Thread(r)
+            thread.name = "Webhookly"
+            thread.isDaemon = true
+            return@setThreadFactory thread
+        }
+        webhookBuilder.setWait(true)
+        return webhookBuilder.build()
+    }
+
+    fun sendDiscordMessage(message: WebhookMessage) {
+        if (!isDevServer() || !config.getBoolean("discordWebhookEnabled", false)) return
+        discordWebhookClient.send(message)
     }
 
     private fun initWarpGate() {
