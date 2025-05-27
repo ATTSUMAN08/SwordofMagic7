@@ -2,6 +2,7 @@ package net.somrpg.swordofmagic7.commands
 
 import me.attsuman08.abysslib.shade.acf.*
 import net.somrpg.swordofmagic7.SomCore
+import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
 import java.util.*
@@ -68,7 +69,12 @@ object CommandManager {
         }
 
         manager.commandCompletions.registerCompletion("channels") { _ ->
-            return@registerCompletion listOf("1", "2", "3", "4", "5", "event", "dev")
+            return@registerCompletion listOf("1", "2", "3", "event")
+        }
+
+        manager.commandCompletions.registerCompletion("items") { context ->
+            val playerData = context.player.getPlayerData()
+            return@registerCompletion playerData.ItemInventory.list.map { it.itemParameter.Id }
         }
     }
 

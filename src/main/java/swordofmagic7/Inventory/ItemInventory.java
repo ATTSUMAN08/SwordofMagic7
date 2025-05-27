@@ -221,4 +221,25 @@ public class ItemInventory extends BasicInventory {
         }
         return false;
     }
+
+    public int getItemAmount(String name) {
+        for (ItemParameterStack stack : list) {
+            if (stack.itemParameter.Id.equals(name)) {
+                return stack.Amount;
+            }
+        }
+        return 0;
+    }
+
+    public int getItemSlot(String name) {
+        int i = 0;
+        while (i < list.size()) {
+            ItemParameterStack stack = list.get(i);
+            if (stack.itemParameter.Id.equals(name)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
 }
