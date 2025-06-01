@@ -17,7 +17,9 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Title.TitleManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static swordofmagic7.Function.decoLore;
 
@@ -38,6 +40,7 @@ public class Statistics {
     public int AFKTime = 0;
     public int MaxFishingCombo = 0;
     public double MaxFishingCPS = 0;
+    public Map<String, Integer> EnemyKills = new HashMap<>();
     public int TotalEnemyKills = 0;
     public int TotalBossEnemyKills = 0;
     public int DownCount = 0;
@@ -140,6 +143,7 @@ public class Statistics {
 
     public void enemyKill(MobData mobData) {
         playerData.statistics.TotalEnemyKills++;
+        EnemyKills.put(mobData.Id, EnemyKills.getOrDefault(mobData.Id, 0) + 1);
         if (mobData.enemyType.isBoss()) TotalBossEnemyKills++;
         switch (mobData.Id) {
             case "サイモア" -> {
@@ -186,6 +190,7 @@ public class Statistics {
         data.set("Statistics.AFKTime", AFKTime);
         data.set("Statistics.MaxFishingCombo", MaxFishingCombo);
         data.set("Statistics.MaxFishingCPS", MaxFishingCPS);
+        data.set("Statistics.EnemyKills", EnemyKills);
         data.set("Statistics.TotalEnemyKills", TotalEnemyKills);
         data.set("Statistics.TotalBossEnemyKills", TotalBossEnemyKills);
         data.set("Statistics.DownCount", DownCount);
@@ -201,7 +206,7 @@ public class Statistics {
         data.set("Statistics.MakeEquipmentCount", MakeEquipmentCount);
         data.set("Statistics.MakePotionCount", MakePotionCount);
         data.set("Statistics.StrafeCount", StrafeCount);
-        data.set("Statistics.WallJumpCount", WallJumpCount);
+        data.set("Statistics.WallJumpCount", WallJumpCount);;
     }
 
     public void load(FileConfiguration data) {
@@ -209,6 +214,14 @@ public class Statistics {
         AFKTime = data.getInt("Statistics.AFKTime", 0);
         MaxFishingCombo = data.getInt("Statistics.MaxFishingCombo", 0);
         MaxFishingCPS = data.getDouble("Statistics.MaxFishingCPS", 0d);
+
+        if (data.isConfigurationSection("Statistics.EnemyKills")) {
+            EnemyKills.clear();
+            for (String key : data.getConfigurationSection("Statistics.EnemyKills").getKeys(false)) {
+                EnemyKills.put(key, data.getInt("Statistics.EnemyKills." + key, 0));
+            }
+        }
+
         TotalEnemyKills = data.getInt("Statistics.TotalEnemyKills", 0);
         TotalBossEnemyKills = data.getInt("Statistics.TotalBossEnemyKills", 0);
         DownCount = data.getInt("Statistics.DownCount", 0);

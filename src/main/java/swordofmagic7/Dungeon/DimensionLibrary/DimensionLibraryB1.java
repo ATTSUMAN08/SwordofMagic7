@@ -17,7 +17,7 @@ import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
 
 public class DimensionLibraryB1 {
-    private static final Location locationB2 = new Location(world, 2395.5,66, 105.5);
+    private static final Location locationB2 = new Location(world, 1363.5,0, 1200.5);
     private static final Location[] locations = new Location[25];
     private static final String[] text = new String[25];
     private static final HashMap<Player, DimensionLibraryB1Data> data = new HashMap<>();

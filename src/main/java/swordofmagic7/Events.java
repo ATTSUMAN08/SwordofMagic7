@@ -38,6 +38,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
 import swordofmagic7.Life.FishingCommand;
 import swordofmagic7.Mob.MobManager;
@@ -254,7 +255,7 @@ public class Events implements Listener {
             MultiThread.TaskRun(() -> {
                 if (playerData.playMode && player.getGameMode() != GameMode.SPECTATOR) {
                     if (event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND) {
-                        // DimensionLibraryB1.use(player);
+                        DimensionLibraryB1.use(player);
                         switch (action) {
                             case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
                                 if (playerData.CastMode.isLegacy() && !Function.isHoldFishingRod(player)) {
@@ -517,20 +518,14 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     void onChat(AsyncChatEvent event) {
         event.setCancelled(true);
-        Player player = event.getPlayer();
+        /*Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         String message = PlainTextComponentSerializer.plainText().serialize(event.message());
         if (playerData.isPTChat) {
             playerData.Party.chat(playerData, message);
             return;
         }
-        /*if (Japanizer.isNeedToJapanize(message)) {
-            String japaneseText = Japanizer.japanize(message, JapanizeType.GOOGLE_IME, Collections.emptyMap());
-            Client.sendPlayerChat(player, new TextView(japaneseText).addHover(message));
-        } else {
-            Client.sendPlayerChat(player, new TextView(message));
-        }*/
-        Client.sendPlayerChat(player, new TextView(message));
+        Client.sendPlayerChat(player, new TextView(message));*/
     }
 
     @EventHandler

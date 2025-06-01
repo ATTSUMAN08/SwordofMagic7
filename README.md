@@ -15,4 +15,3 @@
 - DecentHolograms
 - LibsDisguises
 - PacketEvents
-- Votifier

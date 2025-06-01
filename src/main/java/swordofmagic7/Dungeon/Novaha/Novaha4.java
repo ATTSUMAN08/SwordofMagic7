@@ -55,6 +55,7 @@ public class Novaha4 {
                     Function.setPlayDungeonQuest(Players, false);
                     if (Enemy.isDead()) {
                         MessageTeleport(list, DungeonQuestClear, ClearText, SoundList.LEVEL_UP, getWarpGate("Novaha1_to_Vieta").getLocation());
+                        getWarpGate("Novaha4_to_Novaha3").ActiveAtTime(20 * 20); // 20秒間ワープゲートを有効化
                     } else {
                         Enemy.delete();
                         MessageTeleport(list, DungeonQuestFailed, null, SoundList.DUNGEON_TRIGGER, getWarpGate("Novaha3_to_Novaha4").getLocation());

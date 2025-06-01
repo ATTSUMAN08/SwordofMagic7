@@ -34,18 +34,19 @@ public class Nias extends EnemySkillBase {
     private final Location[] locations = new Location[12];
     public Nias(EnemySkillManager manager) {
         super(manager);
-        locations[0] = new Location(world, 5977.5, 72, 1781.5);
-        locations[1] = new Location(world, 5976.5, 72, 1773.5);
-        locations[2] = new Location(world, 5975.5, 72, 1765.5);
-        locations[3] = new Location(world, 5975.5, 72, 1757.5);
-        locations[4] = new Location(world, 5976.5, 72, 1749.5);
-        locations[5] = new Location(world, 5977.5, 72, 1741.5);
-        locations[6] = new Location(world, 6038.5, 72, 1740.5);
-        locations[7] = new Location(world, 6039.5, 72, 1748.5);
-        locations[8] = new Location(world, 6040.5, 72, 1756.5);
-        locations[9] = new Location(world, 6041.5, 72, 1764.5);
-        locations[10] = new Location(world, 6040.5, 72, 1772.5);
-        locations[11] = new Location(world, 6039.5, 72, 1780.5);
+        locations[0] = new Location(world, -263.5, 15, 3180.5);
+        locations[1] = new Location(world, -263.5, 15, 3186.5);
+        locations[2] = new Location(world, -263.5, 15, 3192.5);
+        locations[3] = new Location(world, -263.5, 15, 3198.5);
+        locations[4] = new Location(world, -263.5, 15, 3204.5);
+        locations[5] = new Location(world, -263.5, 15, 3210.5);
+
+        locations[6] = new Location(world, -205.5, 15, 3180.5);
+        locations[7] = new Location(world, -205.5, 15, 3186.5);
+        locations[8] = new Location(world, -205.5, 15, 3192.5);
+        locations[9] = new Location(world, -205.5, 15, 3198.5);
+        locations[10] = new Location(world, -205.5, 15, 3204.5);
+        locations[11] = new Location(world, -205.5, 15, 3210.5);
         MultiThread.TaskRun(() -> {
             while (Manager.enemyData.isRunnableAI()) {
                 enemyList.removeIf(EnemyData::isDead);

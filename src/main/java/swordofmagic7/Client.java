@@ -1,8 +1,5 @@
 package swordofmagic7;
 
-import club.minnced.discord.webhook.send.AllowedMentions;
-import club.minnced.discord.webhook.send.WebhookMessage;
-import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import me.attsuman08.abysslib.RedisManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -110,15 +107,6 @@ public class Client {
                     }
                 }
 
-                if (SomCore.Companion.isDevServer() && !isMute && !Objects.equals(from, "Discord")) {
-                    WebhookMessage webhookMessage = new WebhookMessageBuilder()
-                            .setContent(Function.unColored(PlainTextComponentSerializer.plainText().serialize(textComponentFromPacket(data))))
-                            .setAllowedMentions(AllowedMentions.none())
-                            .setUsername("[" + from + "] " + Function.unColored(display))
-                            .setAvatarUrl("https://crafthead.net/avatar/" + uuid)
-                            .build();
-                    SomCore.instance.sendDiscordMessage(webhookMessage);
-                }
                 Bukkit.getConsoleSender().sendMessage(PlainTextComponentSerializer.plainText().serialize(text) + " [ミュート: " + isMute + "]");
             }
             case "Check" -> {}
