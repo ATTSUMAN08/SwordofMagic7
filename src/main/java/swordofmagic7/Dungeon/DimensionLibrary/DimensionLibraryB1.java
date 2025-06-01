@@ -26,7 +26,7 @@ public class DimensionLibraryB1 {
         int x = 0;
         for (int i = 0; i < 5; i++) {
             for (int i2 = 0; i2 < 5; i2++) {
-                locations[x] = new Location(world, 2070-(35*i), 65, 270-(35*i2));
+                locations[x] = new Location(world, 2070-(35*i), 65, 770-(35*i2));
                 x++;
             }
         }
