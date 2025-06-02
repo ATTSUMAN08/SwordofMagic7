@@ -491,4 +491,13 @@ public final class Function {
         if (maxHealthInstance == null) throw new NullPointerException("Attribute.MAX_HEALTH is null");
         return maxHealthInstance.getValue();
     }
+
+    public static double safeMultiply(double x, double y) throws ArithmeticException {
+        if (y > 0 ? x > Integer.MAX_VALUE/y || x < Integer.MIN_VALUE/y :
+                (y < -1 ? x > Integer.MIN_VALUE/y || x < Integer.MAX_VALUE/y :
+                        y == -1 && x == Integer.MIN_VALUE) ) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return x * y;
+    }
 }

@@ -92,7 +92,7 @@ public class Market {
                                     Mel = Integer.parseInt(args[3]);
                                 }
                                 if (Mel < 1) Mel = 1;
-                                int reqMel = (int) Math.ceil(Mel * stack.Amount * 0.01);
+                                int reqMel = (int) Math.ceil(safeMultiply(Mel, stack.Amount * 0.01));
                                 if (reqMel > 0 && playerData.Mel >= reqMel) {
                                     MarketData marketData = new MarketData(stack, Mel, player.getUniqueId(), System.currentTimeMillis());
                                     market.marketData.add(marketData);
