@@ -2,7 +2,7 @@
 kotlin = "2.1.20"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.11.2"
-grgit = "5.3.0"
+grgit = "5.3.2"
 sonarqube = "6.1.0.5360"
 paperweight = "2.0.0-beta.17"
 
