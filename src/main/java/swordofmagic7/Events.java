@@ -37,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
@@ -517,7 +518,9 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     void onChat(AsyncChatEvent event) {
-        event.setCancelled(true);
+        if (!SomCore.Companion.isDevServer()) {
+            event.setCancelled(true);
+        }
         /*Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         String message = PlainTextComponentSerializer.plainText().serialize(event.message());

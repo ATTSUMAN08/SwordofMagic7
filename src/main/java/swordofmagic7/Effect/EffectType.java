@@ -113,6 +113,8 @@ public enum EffectType {
     IceThorns("氷の棘", true, "魔法与ダメージが上昇します", true),
     EnchantSlow("エンチャントスロー", true, "この状態で敵を攻撃すると確率でスローが入るようになります", false),
     PsychicPressure("サイキックプレッシャー", true, true, "前方にダメージ判定が発生します", false),
+    Sticky("纏着", 15, false, "移動速度低下、防御力低下が付きます", false),
+    Dissolution("溶解", 100, false, "解けちゃうよ！", false),
     ;
 
     public final String Display;

@@ -4,7 +4,6 @@ import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.papermc.paper.entity.TeleportFlag;
 import net.somrpg.swordofmagic7.SomCore;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -21,6 +20,8 @@ import swordofmagic7.Dungeon.AusMine.AusMineB4;
 import swordofmagic7.Dungeon.Novaha.Novaha2;
 import swordofmagic7.Dungeon.Novaha.Novaha3;
 import swordofmagic7.Dungeon.Novaha.Novaha4;
+import swordofmagic7.Dungeon.SlimeCave.SlimeCaveB2;
+import swordofmagic7.Dungeon.SlimeCave.SlimeCaveB3;
 import swordofmagic7.Dungeon.Tarnet.TarnetB1;
 import swordofmagic7.Dungeon.Tarnet.TarnetB3;
 import swordofmagic7.Function;
@@ -29,8 +30,6 @@ import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Sound.SoundList;
 
 import static swordofmagic7.Data.DataBase.WarpGateList;
-import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class WarpGateParameter {
@@ -69,6 +68,8 @@ public class WarpGateParameter {
             if (Trigger.equals("AsharkB1_Check") && !AsharkB1.Check(player)) return;
             if (Trigger.equals("AsharkB2") && AsharkB2.Start()) return;
             if (Trigger.equals("AsharkB4") && AsharkB4.Start()) return;
+            if (Trigger.equals("SlimeCaveB2") && SlimeCaveB2.Start()) return;
+            if (Trigger.equals("SlimeCaveB3")) SlimeCaveB3.Start();
         }
         if (!isActive || isTrigger) return;
         NextMap.enter(player);

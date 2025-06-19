@@ -1,5 +1,6 @@
 package swordofmagic7.Mob;
 
+import net.somrpg.swordofmagic7.mob.skill.QueenSlime;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -38,6 +39,9 @@ public class EnemySkillManager {
     public Nias nias;
     public Hind hind;
     public Nias2 nias2;
+    public RoyalKnightSlime royalKnightSlime;
+    public QueenSlime queenSlime;
+    public Faras faras;
 
     public EnemySkillManager(EnemyData enemyData) {
         this.enemyData = enemyData;
@@ -53,6 +57,9 @@ public class EnemySkillManager {
             case "ナイアス" -> nias = new Nias(this);
             case "ハインド" -> hind = new Hind(this);
             case "ナイアス2" -> nias2 = new Nias2(this);
+            case "ロイヤルナイトスライム" -> royalKnightSlime = new RoyalKnightSlime(this);
+            case "ファラス" -> faras = new Faras(this);
+            case "クイーンスライム" -> queenSlime = new QueenSlime(this);
         }
     }
 
@@ -83,8 +90,8 @@ public class EnemySkillManager {
     public void mobSkillCast(MobSkillData mobSkillData) {
         if (mobSkillData.Available != -1) Available.put(mobSkillData.Skill, Available.getOrDefault(mobSkillData.Skill, 0)+1);
         switch (mobSkillData.Skill) {
-            case "PullUpper" -> PullUpper(8, 90, 20);
-            case "PileUpper" -> PullUpper(13, 160, 40);
+            case "PullUpper" -> PullUpper(8, 90, 20, 2);
+            case "PileUpper" -> PullUpper(13, 160, 40, 2);
 
             case "SkillLaser" -> basicSkills.SkillLaser();
             //サイモア
@@ -167,6 +174,21 @@ public class EnemySkillManager {
             //ナイアス2
             case "Regret2" -> nias2.Regret2();
             case "Execution2" -> nias2.Execution2();
+            // ファラス (スライム洞窟)
+            case "Rush" -> faras.rush(60);
+            case "MuteCry" -> faras.muteCry();
+            case "Quickening" -> faras.quickening();
+            case "RapidRush" -> faras.rapidRush(20);
+            // ロイヤルナイトスライム (スライム洞窟)
+            case "Cleave" -> royalKnightSlime.cleave();
+            case "Nova" -> royalKnightSlime.nova();
+            case "Resolve" -> royalKnightSlime.resolve();
+            case "RapidCleave" -> royalKnightSlime.rapidCleave();
+            // クイーンスライム (スライム洞窟)
+            case "StickyTrap" -> queenSlime.stickyTrap();
+            case "StickySplit" -> queenSlime.stickySplit();
+            case "StickyWave" -> queenSlime.stickyWave();
+            case "StickyImpact" -> queenSlime.stickyImpact();
         }
         MultiThread.TaskRun(() -> {
             if (!CoolTime.containsKey(mobSkillData.Skill)) {
@@ -199,7 +221,7 @@ public class EnemySkillManager {
 
     public final int period = 5;
 
-    void PullUpper(double radius, double angle, int CastTime) {
+    public void PullUpper(double radius, double angle, int CastTime, double damageMultiplier) {
         if (enemyData.entity.getLocation().distance(enemyData.target.getLocation()) <= radius) {
             Location origin = enemyData.entity.getLocation().clone();
             CastSkill(true);
@@ -212,7 +234,7 @@ public class EnemySkillManager {
                         ParticleManager.FanShapedParticle(particleActivate, origin, radius, angle, 3);
                         Set<LivingEntity> Targets = getNearLivingEntity(enemyData.entity.getLocation(), radius);
                         Set<LivingEntity> victims = ParticleManager.FanShapedCollider(origin, Targets, angle);
-                        Damage.makeDamage(enemyData.entity, victims, DamageCause.ATK, "PullUpper", 2, 1, 2);
+                        Damage.makeDamage(enemyData.entity, victims, DamageCause.ATK, "PullUpper", damageMultiplier, 1, 2);
                         break;
                     }
                     i += period;
@@ -222,5 +244,27 @@ public class EnemySkillManager {
                 CastSkill(false);
             }, "PullUpper");
         }
+    }
+
+    public void shapeDamage(double radius, int castTime, double damageMultiplier) {
+        Location origin = enemyData.entity.getLocation().clone();
+        CastSkill(true);
+        MultiThread.TaskRun(() -> {
+            int i = 0;
+            while (enemyData.isAlive() || !setCancel) {
+                if (i < castTime) {
+                    ParticleManager.CircleParticle(particleCasting, origin, radius, 3);
+                } else {
+                    ParticleManager.CircleParticle(particleActivate, origin, radius, 3);
+                    Set<LivingEntity> victims = getNearLivingEntity(enemyData.entity.getLocation(), radius);
+                    Damage.makeDamage(enemyData.entity, victims, DamageCause.ATK, "ShapeDamage", damageMultiplier, 1, 2);
+                    break;
+                }
+                i += period;
+                MultiThread.sleepTick(period);
+            }
+            MultiThread.sleepTick(10);
+            CastSkill(false);
+        }, "ShapeDamage");
     }
 }

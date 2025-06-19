@@ -7,6 +7,8 @@ import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
@@ -200,6 +202,16 @@ public final class Damage {
             switch (damageCause) {
                 case ATK -> Resistance = playerData.Status.DamageResistanceATK;
                 case MAT -> Resistance = playerData.Status.DamageResistanceMAT;
+            }
+            if (playerData.EffectManager.hasEffect(EffectType.Sticky)) {
+                int stickyStack = playerData.EffectManager.getData(EffectType.Sticky).stack;
+                if (stickyStack >= 12) {
+                    Resistance = Resistance * 0.25;
+                } else if (stickyStack >= 9) {
+                    Resistance *= 0.5;
+                } else if (stickyStack >= 3) {
+                    Resistance *= 0.75;
+                }
             }
             if (player.isInsideVehicle()) {
                 DEF = 0;

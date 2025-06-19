@@ -64,6 +64,7 @@ import java.net.URI
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -91,6 +92,7 @@ class SomCore : SuspendingJavaPlugin() {
     private val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
+    val repeatingTaskScheduler = Executors.newScheduledThreadPool(10)
     
 
     fun createHologram(location: Location): Hologram {
@@ -285,6 +287,8 @@ class SomCore : SuspendingJavaPlugin() {
                 markerSet?.markers?.clear()
             }
         }
+
+        repeatingTaskScheduler.shutdown()
     }
 
     private fun deleteHolograms() {
@@ -337,183 +341,153 @@ class SomCore : SuspendingJavaPlugin() {
         }
     }
 
-    private fun initWarpGate() {
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - WarpGateParticle"
-            val counts = mutableMapOf<WarpGateParameter, Int>()
-            val increment = (2 * Math.PI) / 90
-            val radius = 2.0
+    private fun createRepeatTask(delay: Long, threadName: String, block: () -> Unit) {
+        repeatingTaskScheduler.execute({
+            Thread.currentThread().name = "SwordofMagic7-Thread - $threadName"
             while (isEnabled) {
-                for (warpGate in WarpGateList.values) {
-                    if (!warpGate.isStarted) continue
-                    val i = counts[warpGate] ?: 0
-                    val angle = i * increment
-                    val x = radius * cos(angle)
-                    val z = radius * sin(angle)
-                    val nLoc = Location(world, warpGate.location.x + x, warpGate.location.y, warpGate.location.z + z)
-                    val nLoc2 = Location(world, warpGate.location.x - x, warpGate.location.y, warpGate.location.z - z)
-                    ParticleManager.spawnParticle(warpGate.particleData, nLoc)
-                    ParticleManager.spawnParticle(warpGate.particleData, nLoc2)
-                    counts[warpGate] = i + 1
-                    if ((i+1) >= 90) {
-                        counts[warpGate] = 0
-                    }
+                block()
+                Thread.sleep(delay)
+            }
+        })
+    }
+
+    private fun initWarpGate() {
+        val counts = mutableMapOf<WarpGateParameter, Int>()
+        val increment = (2 * Math.PI) / 90
+        val radius = 2.0
+
+        createRepeatTask(10, "WarpGateParticle") {
+            for (warpGate in WarpGateList.values) {
+                if (!warpGate.isStarted) continue
+                val i = counts[warpGate] ?: 0
+                val angle = i * increment
+                val x = radius * cos(angle)
+                val z = radius * sin(angle)
+                val nLoc = Location(world, warpGate.location.x + x, warpGate.location.y, warpGate.location.z + z)
+                val nLoc2 = Location(world, warpGate.location.x - x, warpGate.location.y, warpGate.location.z - z)
+                ParticleManager.spawnParticle(warpGate.particleData, nLoc)
+                ParticleManager.spawnParticle(warpGate.particleData, nLoc2)
+                counts[warpGate] = i + 1
+                if ((i+1) >= 90) {
+                    counts[warpGate] = 0
                 }
-                MultiThread.sleepMillis(10)
             }
         }
     }
 
     private fun initTeleportGate() {
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - TeleportGateParticle"
-            val counts = mutableMapOf<TeleportGateParameter, Int>()
-            val increment = (2 * Math.PI) / 90
-            val radius = 1.5
-            while (isEnabled) {
-                for (teleportGate in TeleportGateList.values) {
-                    val i = counts[teleportGate] ?: 0
-                    val angle = i * increment
-                    val x = radius * cos(angle)
-                    val z = radius * sin(angle)
-                    val nLoc = Location(world, teleportGate.Location.x + x, teleportGate.Location.y, teleportGate.Location.z + z)
-                    val nLoc2 = Location(world, teleportGate.Location.x - x, teleportGate.Location.y, teleportGate.Location.z - z)
-                    ParticleManager.spawnParticle(teleportGate.particleData, nLoc)
-                    ParticleManager.spawnParticle(teleportGate.particleData, nLoc2)
-                    counts[teleportGate] = i + 1
-                    if ((i+1) >= 90) {
-                        counts[teleportGate] = 0
-                    }
+        val counts = mutableMapOf<TeleportGateParameter, Int>()
+        val increment = (2 * Math.PI) / 90
+        val radius = 1.5
+
+        createRepeatTask(25, "TeleportGateParticle") {
+            for (teleportGate in TeleportGateList.values) {
+                val i = counts[teleportGate] ?: 0
+                val angle = i * increment
+                val x = radius * cos(angle)
+                val z = radius * sin(angle)
+                val nLoc = Location(world, teleportGate.Location.x + x, teleportGate.Location.y, teleportGate.Location.z + z)
+                val nLoc2 = Location(world, teleportGate.Location.x - x, teleportGate.Location.y, teleportGate.Location.z - z)
+                ParticleManager.spawnParticle(teleportGate.particleData, nLoc)
+                ParticleManager.spawnParticle(teleportGate.particleData, nLoc2)
+                counts[teleportGate] = i + 1
+                if ((i+1) >= 90) {
+                    counts[teleportGate] = 0
                 }
-                MultiThread.sleepMillis(25)
             }
         }
     }
 
     private fun initEffectManager() {
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_EnemyData"
-            while (isEnabled) {
-                for (enemyData in MobManager.EnemyTable.values) {
-                    if (enemyData == null) continue
-                    val effectManager = enemyData.effectManager
-                    if (effectManager.isRunnable && enemyData.isAlive) {
-                        effectManager.onTaskRun()
-                    }
+        val effectManagerPeriod = EffectManager.period * 50 // tickをミリ秒に変換
+
+        createRepeatTask(effectManagerPeriod, "EffectManager_EnemyData") {
+            for (enemyData in MobManager.EnemyTable.values) {
+                if (enemyData == null) continue
+                val effectManager = enemyData.effectManager
+                if (effectManager.isRunnable && enemyData.isAlive) {
+                    effectManager.onTaskRun()
                 }
-                MultiThread.sleepTick(EffectManager.period)
             }
         }
 
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PlayerData"
-            while (isEnabled) {
-                for (data in playerData.values) {
-                    if (data == null) continue
-                    val effectManager = data.EffectManager
-                    if (effectManager.isRunnable && effectManager.playerData.player.isOnline) {
-                        effectManager.onTaskRun()
-                    }
+        createRepeatTask(effectManagerPeriod, "EffectManager_PlayerData") {
+            for (data in playerData.values) {
+                if (data == null) continue
+                val effectManager = data.EffectManager
+                if (effectManager.isRunnable && effectManager.playerData.player.isOnline) {
+                    effectManager.onTaskRun()
                 }
-                MultiThread.sleepTick(EffectManager.period)
             }
         }
 
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - EffectManager_PetData"
-            while (isEnabled) {
-                for (data in PetManager.PetSummonedList.values) {
-                    if (data == null) continue
-                    val effectManager = data.effectManager
-                    if (effectManager.isRunnable && effectManager.petParameter.player.isOnline) {
-                        effectManager.onTaskRun()
-                    }
+        createRepeatTask(effectManagerPeriod, "EffectManager_PetData") {
+            for (data in PetManager.PetSummonedList.values) {
+                if (data == null) continue
+                val effectManager = data.effectManager
+                if (effectManager.isRunnable && effectManager.petParameter.player.isOnline) {
+                    effectManager.onTaskRun()
                 }
-                MultiThread.sleepTick(EffectManager.period)
             }
         }
     }
 
     private fun initPlayerThread() {
-        // BossBarUpdate
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerBossBarUpdate"
-            while (isEnabled) {
-                for (playerData in playerData.values) {
-                    if (!playerData.player.isOnline) continue
-                    if (!playerData.bossBarInitialized) continue
+        createRepeatTask(500, "PlayerBossBarUpdate") {
+            for (playerData in playerData.values) {
+                if (!playerData.player.isOnline) continue
+                if (!playerData.bossBarInitialized) continue
 
-                    playerData.updateBossbar()
-                }
-                MultiThread.sleepTick(10)
+                playerData.updateBossbar()
             }
         }
 
-        // SkillCoolTimeTask
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - SkillCoolTime"
-            while (isEnabled) {
-                for (playerData in playerData.values) {
-                    if (!playerData.player.isOnline) continue
-                    if (playerData.Skill == null) continue
 
-                    playerData.Skill.onTick()
-                }
-                MultiThread.sleepTick(1)
+        createRepeatTask(50, "SkillCoolTime") {
+            for (playerData in playerData.values) {
+                if (!playerData.player.isOnline) continue
+                if (playerData.Skill == null) continue
+
+                playerData.Skill.onTick()
             }
         }
 
-        // InstantBuff
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerInstantBuff"
-            while (isEnabled) {
-                for (playerData in playerData.values) {
-                    if (!playerData.player.isOnline) continue
-                    if (playerData.instantBuff == null) continue
+        createRepeatTask(1000, "PlayerInstantBuff") {
+            for (playerData in playerData.values) {
+                if (!playerData.player.isOnline) continue
+                if (playerData.instantBuff == null) continue
 
-                    playerData.instantBuff.onSecond()
-                }
-                MultiThread.sleepTick(20)
+                playerData.instantBuff.onSecond()
             }
         }
 
-        // TickUpdate
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - PlayerTickUpdate"
-            while (isEnabled) {
-                for (playerData in playerData.values) {
-                    if (!playerData.player.isOnline) continue
-                    if (!playerData.ViewBar.tickUpdate) continue
+        createRepeatTask(ViewBar.period * 50, "PlayerTickUpdate") {
+            for (playerData in playerData.values) {
+                if (!playerData.player.isOnline) continue
+                if (!playerData.ViewBar.tickUpdate) continue
 
-                    playerData.ViewBar.onTickUpdate()
-                }
-                MultiThread.sleepTick(ViewBar.period)
+                playerData.ViewBar.onTickUpdate()
             }
         }
 
-        // PetInventory
-        launch(asyncDispatcher) {
-            Thread.currentThread().name = "SwordofMagic7-Thread - PetInventory"
-            while (isEnabled) {
-                for (playerData in playerData.values) {
-                    if (!playerData.player.isOnline) continue
-                    if (playerData.PetInventory == null) continue
-                    if (playerData.PetInventory.List.isEmpty()) continue
+        createRepeatTask(1000, "PlayerPetInventory") {
+            for (playerData in playerData.values) {
+                if (!playerData.player.isOnline) continue
+                if (playerData.PetInventory == null) continue
+                if (playerData.PetInventory.List.isEmpty()) continue
 
-                    for (pet in playerData.PetInventory.List) {
-                        if (!pet.Summoned) {
-                            pet.changeStamina(1)
-                        }
-                        pet.Health += pet.HealthRegen / 5
-                        pet.Mana += pet.ManaRegen / 5
-                        if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth
-                        if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana
+                for (pet in playerData.PetInventory.List) {
+                    if (!pet.Summoned) {
+                        pet.changeStamina(1)
                     }
-                    if (playerData.ViewInventory.isPet) {
-                        playerData.PetInventory.viewPet()
-                    }
+                    pet.Health += pet.HealthRegen / 5
+                    pet.Mana += pet.ManaRegen / 5
+                    if (pet.Health > pet.MaxHealth) pet.Health = pet.MaxHealth
+                    if (pet.Mana > pet.MaxMana) pet.Mana = pet.MaxMana
                 }
-                MultiThread.sleepTick(20)
+                if (playerData.ViewInventory.isPet) {
+                    playerData.PetInventory.viewPet()
+                }
             }
         }
     }

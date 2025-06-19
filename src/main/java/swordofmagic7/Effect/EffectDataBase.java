@@ -46,6 +46,7 @@ public class EffectDataBase {
                 }
             }
         }
+        // todo これがダメージ耐性変化のやつ
         switch (effectType) {
             case CrossGuardCounter -> MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, DataBase.getSkillData("CrossGuard").ParameterValue(2) / 100);
             case InsufficientFilling -> MultiplyStatusAdd(StatusParameter.ATK, -0.9);

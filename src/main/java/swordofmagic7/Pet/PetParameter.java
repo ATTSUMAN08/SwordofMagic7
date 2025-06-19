@@ -473,7 +473,7 @@ public class PetParameter implements Cloneable {
         delete();
         Summoned = false;
         Stamina = 0;
-        sendMessage(player, "§e[" + petData.Display + "]§aを§eケージ§aに戻りました§b[" + getSummonId() + "]", SoundList.CLICK);
+        sendMessage(player, "§e[" + petData.Display + "]§aが§eケージ§aに戻りました§b[" + getSummonId() + "]", SoundList.CLICK);
         playerData.PetSummon.remove(this);
         PetManager.PetSummonedList.remove(entity.getUniqueId());
         delete();

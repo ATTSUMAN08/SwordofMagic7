@@ -1300,6 +1300,7 @@ public class PlayerData {
                             Map = getMapData("Alden");
                             deadHologram.delete();
                             statistics.DeathCount++;
+                            EffectManager.clearEffect();
                         } else if (RevivalReady) {
                             this.cancel();
                             logoutLocation = null;

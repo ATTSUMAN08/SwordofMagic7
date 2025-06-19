@@ -44,7 +44,15 @@ class SomCommand : BaseCommand() {
         for (task in tasks) {
             sender.sendMessage("§e- ${task.taskId} | ${task.thread.name}")
         }
-        sender.sendMessage("${tasks.size} tasks")
+        sender.sendMessage("${tasks.size} bukkit tasks")
+
+        val threads = Thread.getAllStackTraces().keys.filter { thread ->
+            thread.name.startsWith("SwordofMagic7")
+        }
+        for (thread in threads) {
+            sender.sendMessage("§e- ${thread.name}")
+        }
+        sender.sendMessage("${threads.size} craft scheduler threads")
     }
 
     @Suppress("UnstableApiUsage")
@@ -91,7 +99,7 @@ class SomCommand : BaseCommand() {
 
     @Subcommand("restart")
     @Syntax("<seconds>")
-    fun restart(sender: CommandSender, @Conditions("limits:min=10,max=1800") seconds: Int) {
+    fun restart(sender: CommandSender, @Conditions("limits:min=10,max=86400") seconds: Int) {
         SomCore.instance.launch(asyncDispatcher) {
             for (i in seconds downTo 1) {
                 if (SomCore.restartNotifyTimes.contains(i)) {

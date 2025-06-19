@@ -218,6 +218,7 @@ public class ViewBar {
 
                 ViewSideBar();
                 playerData.HotBar.UpdateHotBar();
+                player.playerListName(Component.text(playerData.getDisplayName()));
             }
         } catch (Exception e) {
             e.printStackTrace();

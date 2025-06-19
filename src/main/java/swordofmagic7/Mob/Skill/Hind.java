@@ -32,15 +32,15 @@ import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Hind extends EnemySkillBase {
 
-    Location pivot = new Location(world, 6781, 117, 1421);
+    Location pivot = new Location(world, -408, 54, 3985);
     Location[] locations = new Location[4];
     public Hind(EnemySkillManager manager) {
         super(manager);
         setMessageRadius(150);
-        locations[0] = new Location(world, 6723, 100, 1481);
-        locations[1] = new Location(world, 6723, 100, 1360);
-        locations[2] = new Location(world, 6844, 100, 1359);
-        locations[3] = new Location(world, 6842, 100, 1479);
+        locations[0] = new Location(world, -330, 51, 3908);
+        locations[1] = new Location(world, -481, 51, 3908);
+        locations[2] = new Location(world, -486, 51, 4060);
+        locations[3] = new Location(world, -321, 51, 4060);
 
         MultiThread.TaskRun(() -> {
             int i = 0;
@@ -176,7 +176,7 @@ public class Hind extends EnemySkillBase {
             radiusMessage("§c「誰か止めて」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
-                EnemyData enemyData = MobManager.mobSpawn(DataBase.getMobData("執行装置"), enemyData().Level, new Location(world, 6929, 117, 1415));
+                EnemyData enemyData = MobManager.mobSpawn(DataBase.getMobData("執行装置"), enemyData().Level, new Location(world, -239.5, 69, 3961));
                 MultiThread.TaskRun(() -> {
                     MultiThread.sleepTick(600);
                     if (enemyData.isAlive()) {
@@ -198,7 +198,7 @@ public class Hind extends EnemySkillBase {
             radiusMessage("§c「なんで助けないの」", SoundList.DUNGEON_TRIGGER);
 
             MultiThread.TaskRunSynchronized(() -> {
-                Location loc = new Location(world, 6905, 117, 1415, 90, 0);
+                Location loc = new Location(world, -239.5, 69, 3958.5, -180, 0);
                 for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
                     if (target() != victim) victim.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 }

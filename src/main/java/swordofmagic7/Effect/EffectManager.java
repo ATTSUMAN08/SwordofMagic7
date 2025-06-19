@@ -3,6 +3,7 @@ package swordofmagic7.Effect;
 import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ import java.util.Set;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
+import static swordofmagic7.Particle.ParticleManager.spawnParticle;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleActivate;
 import static net.somrpg.swordofmagic7.SomCore.instance;
@@ -50,6 +52,8 @@ public class EffectManager {
     public Location isFixed;
 
     public static final Long period = 5L;
+    private int stickyCount = 0;
+    private int dissolutionTimer = 0;
 
     public Map<EffectType, EffectData> Effect = new HashMap<>();
 
@@ -110,6 +114,49 @@ public class EffectManager {
                                 Set<LivingEntity> victims = FanShapedCollider(player.getLocation(), radius, angle, playerData.Skill.SkillProcess.Predicate(), false);
                                 Damage.makeDamage(player, victims, DamageCause.MAT, "PsychicPressure", value, 1, 1);
                                 ShapedParticle(new ParticleData(Particle.REVERSE_PORTAL), player.getLocation(), radius, angle, angle/2, 1, true);
+                            }
+                            case Sticky -> {
+                                for (int i = 0; i < 3; i++) {
+                                    spawnParticle(new ParticleData(Particle.ITEM_SLIME), player.getLocation());
+                                }
+                                if (effectData.stack == 15) {
+                                    removeEffect(EffectType.Sticky);
+                                    playerData.dead();
+                                } else if (effectData.stack >= 12) {
+                                    MultiThread.TaskRunSynchronized(() -> {
+                                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 2, false, false));
+                                    });
+                                } else if (effectData.stack >= 9) {
+                                    MultiThread.TaskRunSynchronized(() -> {
+                                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 1, false, false));
+                                    });
+                                } else if (effectData.stack >= 3) {
+                                    MultiThread.TaskRunSynchronized(() -> {
+                                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false));
+                                    });
+                                }
+                                stickyCount++;
+                                if (stickyCount >= 12) {
+                                    stickyCount = 0;
+                                    if (player.getLocation().getBlock().getType() == Material.WATER) {
+                                        effectData.stack = Math.max(0, effectData.stack - 3);
+                                    } else {
+                                        effectData.stack = Math.max(0, effectData.stack - 1);
+                                    }
+                                }
+                            }
+                            case Dissolution -> {
+                                int dissolutionStack = effectData.stack;
+                                dissolutionTimer += 1;
+
+                                if (dissolutionTimer == 4) {
+                                    playerData.changeHealth(-(playerData.Status.MaxHealth * (0.01 * dissolutionStack)));
+                                } else if (dissolutionTimer >= 12) {
+                                    dissolutionTimer = 0;
+                                    if (player.getLocation().getBlock().getType() != Material.WATER) {
+                                        effectData.stack = Math.max(0, effectData.stack - 1);
+                                    }
+                                }
                             }
                         }
                     }

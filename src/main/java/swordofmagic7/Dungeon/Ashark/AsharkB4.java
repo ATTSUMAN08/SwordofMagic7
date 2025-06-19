@@ -19,7 +19,7 @@ import static swordofmagic7.Dungeon.Dungeon.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class AsharkB4 {
-    private static final Location EventLocation = new Location(world, 6781, 100, 1487);
+    private static final Location EventLocation = new Location(world, -403.5, 48, 3915.5);
     private static boolean Able = false;
     private static boolean Start = false;
     public static int Time;
