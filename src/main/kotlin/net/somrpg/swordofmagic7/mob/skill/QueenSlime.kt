@@ -3,9 +3,13 @@ package net.somrpg.swordofmagic7.mob.skill
 import org.bukkit.entity.LivingEntity
 import swordofmagic7.Damage.Damage
 import swordofmagic7.Damage.DamageCause
+import swordofmagic7.Data.DataBase
+import swordofmagic7.Dungeon.AusMine.AusMineB4
 import swordofmagic7.Effect.EffectManager
 import swordofmagic7.Effect.EffectType
+import swordofmagic7.Mob.EnemyData
 import swordofmagic7.Mob.EnemySkillManager
+import swordofmagic7.Mob.MobManager
 import swordofmagic7.Mob.Skill.EnemySkillBase
 import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
@@ -61,7 +65,35 @@ class QueenSlime(manager: EnemySkillManager) : EnemySkillBase(manager) {
     }
 
     fun stickySplit() {
-        // TODO
+        Manager.CastSkill(true)
+        val spawnedEntities = mutableListOf<EnemyData>()
+        MultiThread.TaskRun({
+            effectManager().addEffect(EffectType.Invincible, 30 * 20) // 30秒間の無敵
+
+            repeat(4) {
+                spawnedEntities.add(MobManager.mobSpawn(DataBase.getMobData("ミニクイーンスライム"), 40, entity().location))
+            }
+            MultiThread.sleep(30000)
+
+            var isAlive = false
+            for (entity in spawnedEntities) {
+                if (!entity.isDead) {
+                    isAlive = true
+                    entity.delete()
+                }
+            }
+
+            if (isAlive) {
+                val players = PlayerList.getNearNonDead(entity().location, radius)
+                for (player in players) {
+                    EffectManager.addEffect(player, EffectType.Sticky, 1200, 6, null)
+                }
+            }
+            // todo ダメージ増加とか防御力低下とかノコード
+
+            MultiThread.sleepTick(10)
+            Manager.CastSkill(false)
+        }, "StickySplit")
     }
 
     fun stickyWave() {

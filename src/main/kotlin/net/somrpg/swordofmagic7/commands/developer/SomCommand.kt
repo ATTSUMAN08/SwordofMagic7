@@ -15,6 +15,7 @@ import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import swordofmagic7.Data.DataBase
+import swordofmagic7.Data.DataLoader
 import swordofmagic7.Function
 import swordofmagic7.Sound.SoundList
 import java.io.File
@@ -66,8 +67,40 @@ class SomCommand : BaseCommand() {
     }
 
     @Subcommand("reload")
-    fun reload(sender: CommandSender) {
-        Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
+    @Syntax("<data>")
+    @CommandCompletion("@reloadable")
+    fun reload(sender: CommandSender, @Default("all") data: String) {
+        when (data.lowercase()) {
+            "all" -> {
+                Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
+            }
+            "title" -> {
+                DataLoader.TitleDataLoad()
+                sender.sendMessage("§a称号データをリロードしました")
+            }
+            "item" -> {
+                DataLoader.ItemDataLoad()
+                DataLoader.ItemInfoDataLoad()
+                sender.sendMessage("§aアイテムデータをリロードしました")
+            }
+            "rune" -> {
+                DataLoader.RuneDataLoad()
+                DataLoader.RuneInfoDataLoad()
+                sender.sendMessage("§aルーンデータをリロードしました")
+            }
+            "skill" -> {
+                DataLoader.SkillDataLoad()
+                sender.sendMessage("§aスキルデータをリロードしました")
+            }
+            "shop" -> {
+                DataLoader.ShopDataLoad()
+                sender.sendMessage("§aショップデータをリロードしました")
+            }
+            else -> {
+                sender.sendMessage("§cリロード可能なデータ [$data] は存在しません")
+                return
+            }
+        }
     }
 
     @Subcommand("test2")

@@ -72,6 +72,10 @@ object CommandManager {
             return@registerCompletion listOf("1", "2", "3", "event")
         }
 
+        manager.commandCompletions.registerCompletion("reloadable") { _ ->
+            return@registerCompletion listOf("all", "title", "item", "rune", "skill", "shop")
+        }
+
         manager.commandCompletions.registerCompletion("items") { context ->
             val playerData = context.player.getPlayerData()
             return@registerCompletion playerData.ItemInventory.list.map { it.itemParameter.Id }

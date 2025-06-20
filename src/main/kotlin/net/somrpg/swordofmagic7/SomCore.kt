@@ -39,7 +39,6 @@ import swordofmagic7.Command.Developer.*
 import swordofmagic7.Command.Player.*
 import swordofmagic7.Command.SomCommand
 import swordofmagic7.Data.DataBase.*
-import swordofmagic7.Data.DataLoader
 import swordofmagic7.Data.Editor
 import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
@@ -59,12 +58,11 @@ import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
 import swordofmagic7.viewBar.ViewBar
 import java.io.*
-import java.net.HttpURLConnection
-import java.net.URI
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -86,13 +84,12 @@ class SomCore : SuspendingJavaPlugin() {
 
         fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
-        fun isDevEventServer(): Boolean = isEventServer() || isDevServer()
     }
     private lateinit var packetEventsListener: PacketListenerCommon
     private val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
-    val repeatingTaskScheduler = Executors.newScheduledThreadPool(10)
+    val repeatingTaskScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(10)
     
 
     fun createHologram(location: Location): Hologram {
@@ -116,7 +113,7 @@ class SomCore : SuspendingJavaPlugin() {
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
         ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
-        // TODO 投票機能使わんから無効化
+        // 投票機能使わないから無効化
         // server.pluginManager.registerEvents(Som7Vote(), this)
 
         // Initialize folders
@@ -342,13 +339,13 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     private fun createRepeatTask(delay: Long, threadName: String, block: () -> Unit) {
-        repeatingTaskScheduler.execute({
+        repeatingTaskScheduler.execute {
             Thread.currentThread().name = "SwordofMagic7-Thread - $threadName"
             while (isEnabled) {
                 block()
                 Thread.sleep(delay)
             }
-        })
+        }
     }
 
     private fun initWarpGate() {
@@ -580,40 +577,6 @@ class SomCore : SuspendingJavaPlugin() {
                 }
             }
 
-            if (sender.hasPermission("som7.data.reload")) {
-                when (cmd.name.lowercase()) {
-                    "datareload" -> {
-                        Bukkit.getOnlinePlayers().forEach { playerData(it).save() }
-                        DataLoader.AllLoad()
-                        Bukkit.getOnlinePlayers().forEach { playerData(it).load() }
-                        return true
-                    }
-                    "itemreload" -> {
-                        DataLoader.ItemDataLoad()
-                        DataLoader.ItemInfoDataLoad()
-                        return true
-                    }
-                    "runereload" -> {
-                        DataLoader.RuneDataLoad()
-                        DataLoader.RuneInfoDataLoad()
-                        return true
-                    }
-                    "skillreload" -> {
-                        DataLoader.SkillDataLoad()
-                        return true
-                    }
-                    "shopreload" -> {
-                        DataLoader.ShopDataLoad()
-                        return true
-                    }
-                }
-            }
-
-            if (sender.hasPermission("som7.title.editor") && cmd.name.equals("titlereload", ignoreCase = true)) {
-                DataLoader.TitleDataLoad()
-                return true
-            }
-
             when (cmd.name.lowercase()) {
                 "iteminventorysort" -> {
                     playerData.ItemInventory.ItemInventorySort()
@@ -650,19 +613,6 @@ class SomCore : SuspendingJavaPlugin() {
                 }
                 "textview" -> {
                     TextViewManager.TextView(sender, args)
-                    return true
-                }
-                "checktitle" -> {
-                    playerData.statistics.checkTitle()
-                    return true
-                }
-                "uuid" -> {
-                    val target = if (args.size == 1) Bukkit.getPlayer(args[0]) else sender
-                    if (target == null) {
-                        sender.sendMessage("§c${args[0]}は存在しないプレイヤーです")
-                    } else {
-                        sender.sendMessage("${target.name}: ${target.uniqueId}")
-                    }
                     return true
                 }
                 "sidebartodo" -> {
@@ -715,29 +665,6 @@ class SomCore : SuspendingJavaPlugin() {
                 }
                 "entities" -> {
                     sendMessage(sender, "EntityCount: ${sender.world.entityCount}")
-                    return true
-                }
-                "loadonliveserver" -> {
-                    if (TagGame.isTagPlayerNonMessage(sender)) return true
-                    MultiThread.TaskRun({
-                        if (ServerId.equals("Dev", ignoreCase = true)) {
-                            try {
-                                val dataInStream = getDataInputStream(sender)
-                                DataOutputStream(BufferedOutputStream(FileOutputStream("$DataBasePath/PlayerData/${sender.uniqueId}.yml"))).use { dataOutStream ->
-                                    val buffer = ByteArray(4096)
-                                    var bytesRead: Int
-                                    while (dataInStream.read(buffer).also { bytesRead = it } != -1) {
-                                        dataOutStream.write(buffer, 0, bytesRead)
-                                    }
-                                }
-                                MultiThread.TaskRunSynchronizedLater({ playerData.load() }, 5)
-                            } catch (e: Exception) {
-                                sendMessage(sender, "§cデータのダウンロードに失敗しました。${e.message}")
-                            }
-                        } else {
-                            sendMessage(sender, "§b開発鯖§a以外では利用できません")
-                        }
-                    }, "loadOnLiveServer")
                     return true
                 }
                 "setfastupgrade" -> {
@@ -793,22 +720,6 @@ class SomCore : SuspendingJavaPlugin() {
             }
         }
         return false
-    }
-
-    @Throws(Exception::class)
-    private fun getDataInputStream(player: Player): DataInputStream {
-        val url = URI("http://192.168.0.18:81/PlayerData/${player.uniqueId}.yml").toURL()
-        val conn = url.openConnection() as HttpURLConnection
-        conn.apply {
-            allowUserInteraction = false
-            instanceFollowRedirects = true
-            requestMethod = "GET"
-            connect()
-        }
-        if (conn.responseCode != HttpURLConnection.HTTP_OK) {
-            throw Exception("HTTP Status ${conn.responseCode}")
-        }
-        return DataInputStream(conn.inputStream)
     }
 
     private fun getString(args: Array<out String>): String {

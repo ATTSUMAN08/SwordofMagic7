@@ -240,31 +240,6 @@ bukkit {
             permission = "som7.developer"
         }
 
-        register("dataReload") {
-            permission = "som7.data.reload"
-        }
-
-        register("itemReload") {
-            permission = "som7.data.reload"
-        }
-
-        register("runeReload") {
-            permission = "som7.data.reload"
-        }
-
-        register("skillReload") {
-            permission = "som7.data.reload"
-        }
-
-        register("shopReload") {
-            permission = "som7.data.reload"
-        }
-
-        register("titleReload") {
-            permission = "som7.title.editor"
-            aliases = listOf("tr")
-        }
-
         register("playerInfo") {
             aliases = listOf("info", "i")
         }
@@ -321,10 +296,6 @@ bukkit {
             permission = "som7.user"
         }
 
-        register("uuid") {
-            permission = "som7.user"
-        }
-
         register("effectInfo") {
             aliases = listOf("ei")
         }
@@ -334,10 +305,6 @@ bukkit {
         }
 
         register("setTitle") {
-            permission = "som7.user"
-        }
-
-        register("checkTitle") {
             permission = "som7.user"
         }
 
@@ -386,10 +353,6 @@ bukkit {
         }
 
         register("entities") {
-            permission = "som7.user"
-        }
-
-        register("loadOnLiveServer") {
             permission = "som7.user"
         }
 
