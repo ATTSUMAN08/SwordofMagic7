@@ -5,6 +5,8 @@ import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
+import swordofmagic7.Data.DataBase
+import swordofmagic7.Life.LifeType
 import java.util.*
 
 object CommandManager {
@@ -79,6 +81,18 @@ object CommandManager {
         manager.commandCompletions.registerCompletion("items") { context ->
             val playerData = context.player.getPlayerData()
             return@registerCompletion playerData.ItemInventory.list.map { it.itemParameter.Id }
+        }
+
+        manager.commandCompletions.registerCompletion("recipes") { _ ->
+            return@registerCompletion DataBase.getItemRecipeList().keys
+        }
+
+        manager.commandCompletions.registerCompletion("lifes") { _ ->
+            return@registerCompletion LifeType.entries.map { it.name }
+        }
+
+        manager.commandCompletions.registerCompletion("classes") { _ ->
+            return@registerCompletion DataBase.getClassList().keys
         }
     }
 

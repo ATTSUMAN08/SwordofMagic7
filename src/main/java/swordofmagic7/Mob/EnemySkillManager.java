@@ -1,6 +1,6 @@
 package swordofmagic7.Mob;
 
-import net.somrpg.swordofmagic7.mob.skill.QueenSlime;
+import net.somrpg.swordofmagic7.enemy.skill.QueenSlime;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;

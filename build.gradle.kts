@@ -300,10 +300,6 @@ bukkit {
             aliases = listOf("ei")
         }
 
-        register("sideBarToDo") {
-            aliases = listOf("sbtd")
-        }
-
         register("setTitle") {
             permission = "som7.user"
         }

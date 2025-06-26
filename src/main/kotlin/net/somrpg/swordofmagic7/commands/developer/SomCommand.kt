@@ -1,6 +1,7 @@
 @file:Suppress("unused")
 package net.somrpg.swordofmagic7.commands.developer
 
+import com.github.retrooper.packetevents.PacketEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.delay
 import me.attsuman08.abysslib.shade.acf.BaseCommand
@@ -72,6 +73,9 @@ class SomCommand : BaseCommand() {
     fun reload(sender: CommandSender, @Default("all") data: String) {
         when (data.lowercase()) {
             "all" -> {
+                SomCore.instance.repeatingTaskScheduler.shutdown()
+                PacketEvents.getAPI().eventManager.unregisterListener(SomCore.instance.packetEventsListener)
+                Bukkit.getScheduler().cancelTasks(SomCore.instance)
                 Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
             }
             "title" -> {

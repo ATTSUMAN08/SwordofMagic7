@@ -1,4 +1,4 @@
-package net.somrpg.swordofmagic7.mob.skill
+package net.somrpg.swordofmagic7.enemy.skill
 
 import org.bukkit.entity.LivingEntity
 import swordofmagic7.Damage.Damage

@@ -85,7 +85,7 @@ class SomCore : SuspendingJavaPlugin() {
         fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
         fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
     }
-    private lateinit var packetEventsListener: PacketListenerCommon
+    lateinit var packetEventsListener: PacketListenerCommon
     private val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
@@ -113,8 +113,6 @@ class SomCore : SuspendingJavaPlugin() {
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
         ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
-        // 投票機能使わないから無効化
-        // server.pluginManager.registerEvents(Som7Vote(), this)
 
         // Initialize folders
         if (!dataFolder.exists()) {
@@ -613,10 +611,6 @@ class SomCore : SuspendingJavaPlugin() {
                 }
                 "textview" -> {
                     TextViewManager.TextView(sender, args)
-                    return true
-                }
-                "sidebartodo" -> {
-                    playerData.SideBarToDo.SideBarToDoCommand(args)
                     return true
                 }
                 "settitle" -> {

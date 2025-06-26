@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.TaskUtils;
+import net.somrpg.swordofmagic7.player.sidebar.SideBarToDo;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -70,7 +71,6 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Title.TitleManager;
 import swordofmagic7.Tutorial;
-import swordofmagic7.viewBar.SideBarToDo.SideBarToDo;
 import swordofmagic7.viewBar.ViewBar;
 
 import java.io.File;
