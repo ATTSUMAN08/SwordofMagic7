@@ -88,8 +88,9 @@ class QueenSlime(manager: EnemySkillManager) : EnemySkillBase(manager) {
                 for (player in players) {
                     EffectManager.addEffect(player, EffectType.Sticky, 1200, 6, null)
                 }
+                enemyData().DamageResistanceATK = 1.25 // ボスが受けるダメージを25%減少
+                enemyData().DamageResistanceMAT = 1.25 // ボスが受ける魔法ダメージを25%減少
             }
-            // todo ダメージ増加とか防御力低下とかノコード
 
             MultiThread.sleepTick(10)
             Manager.CastSkill(false)
