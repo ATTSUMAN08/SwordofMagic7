@@ -1,22 +1,17 @@
 [versions]
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 pluginYml = "0.6.0"
 hidetakeSSH = "2.12.0"
 grgit = "5.3.2"
 sonarqube = "6.1.0.5360"
 paperweight = "2.0.0-beta.17"
 
-paperApi = "1.21.4-R0.1-SNAPSHOT"
-packetEvents = "2.7.0"
+paperApi = "1.21.5-R0.1-SNAPSHOT"
+packetEvents = "2.8.0"
 libsDisguises = "10.0.44-SNAPSHOT"
-nuVotifier = "2.7.2"
-decentHolograms = "2.8.17"
-citizens = "2.0.35-SNAPSHOT"
+decentHolograms = "2.9.2"
 abyssLib = "1.0.0-SNAPSHOT"
-worldBorderApi = "1.214.0"
-fawe = "2.13.0"
 blueMap = "2.7.4"
-papi = "2.11.6"
 floodgate = "2.2.4-SNAPSHOT"
 
 [plugins]
@@ -31,13 +26,7 @@ paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweigh
 [libraries]
 packetEvents = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetEvents" }
 libsDisguises = { group = "LibsDisguises", name = "LibsDisguises", version.ref = "libsDisguises" }
-nuVotifier = { group = "com.github.NuVotifier", name = "NuVotifier", version.ref = "nuVotifier" }
 decentHolograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentHolograms" }
-citizens = { group = "net.citizensnpcs", name = "citizens-main", version.ref = "citizens" }
 abyssLib = { group = "me.attsuman08", name = "abysslib-paper", version.ref = "abyssLib" }
-worldBorderApi = { group = "com.github.yannicklamprecht", name = "worldborderapi", version.ref = "worldBorderApi" }
-faweCore = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Core", version.ref = "fawe" }
-faweBukkit = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
 blueMap = { group = "de.bluecolored", name = "bluemap-api", version.ref = "blueMap" }
-papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 floodgate = { group = "org.geysermc.floodgate", name = "api", version.ref = "floodgate" }

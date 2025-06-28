@@ -2,12 +2,12 @@ package swordofmagic7;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.citizensnpcs.api.CitizensAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.exceptions.SomStackTraceException;
+import net.somrpg.swordofmagic7.npc.NPCManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -149,9 +149,9 @@ public final class Function {
                 entity instanceof ItemFrame ||
                 entity.getType() == EntityType.ARMOR_STAND ||
                         entity instanceof Minecart ||
-                        CitizensAPI.getNPCRegistry().isNPC(entity) ||
                         entity instanceof Player ||
-                        entity instanceof Display
+                        entity instanceof Display ||
+                        NPCManager.INSTANCE.isNPC(entity.getUniqueId())
         );
     }
 

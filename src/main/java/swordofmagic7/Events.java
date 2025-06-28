@@ -9,13 +9,11 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import me.attsuman08.abysslib.paper.events.RedisMessageReceivedEvent;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.npc.NPCRegistry;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
-import net.somrpg.swordofmagic7.translater.JapanizeType;
-import net.somrpg.swordofmagic7.translater.Japanizer;
+import net.somrpg.swordofmagic7.npc.NPCData;
+import net.somrpg.swordofmagic7.npc.NPCManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,7 +35,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.Dungeon.Dungeon;
@@ -52,7 +49,6 @@ import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
-import swordofmagic7.TextView.TextView;
 
 import java.io.File;
 import java.util.*;
@@ -315,12 +311,13 @@ public class Events implements Listener {
         PlayerData playerData = playerData(player);
         Entity entity = event.getRightClicked();
         if (player.getGameMode() != GameMode.CREATIVE && ignoreEntity(entity)) event.setCancelled(true);
-        if (playerData.playMode && event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && entity.getCustomName() != null) {
+        if (NPCManager.INSTANCE.isNPC(entity.getUniqueId())) event.setCancelled(true);
+        Component customName = entity.customName();
+        if (playerData.playMode && event.getHand() == org.bukkit.inventory.EquipmentSlot.HAND && customName != null) {
             event.setCancelled(true);
-            NPCRegistry npcRegistry = CitizensAPI.getNPCRegistry();
-            if (npcRegistry.isNPC(entity)) {
-                NPC npc = npcRegistry.getNPC(entity);
-                String shop = unColored(entity.getCustomName());
+            if (NPCManager.INSTANCE.getSpawnedNPCs().containsKey(entity.getUniqueId())) {
+                NPCData.NPC npcData = NPCManager.INSTANCE.getSpawnedNPCs().get(entity.getUniqueId());
+                String shop = PlainTextComponentSerializer.plainText().serialize(customName);
                 if (ShopList.containsKey(shop)) {
                     playerData.Shop.ShopOpen(getShopData(shop));
                     playSound(player, SoundList.MENU_OPEN);
@@ -352,8 +349,10 @@ public class Events implements Listener {
                 } else {
                     Dungeon.Trigger(shop);
                 }
-                if (NpcList.containsKey(npc.getId())) {
-                    MultiThread.TaskRun(() -> NpcMessage.ShowMessage(player, npc), "ShowMessage");
+
+
+                if (npcData.getMessageId() != -1) {
+                    MultiThread.TaskRun(() -> NpcMessage.ShowMessage(player, npcData), "ShowMessage");
                 }
             }
         }

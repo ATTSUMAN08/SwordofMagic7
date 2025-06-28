@@ -20,7 +20,7 @@ import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
-import net.somrpg.swordofmagic7.placeholders.SomPlaceholder
+import net.somrpg.swordofmagic7.npc.NPCManager
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.Location
@@ -222,6 +222,7 @@ class SomCore : SuspendingJavaPlugin() {
 
         commandRegister()
         CommandManager.registerCommands()
+        NPCManager.spawnAllNPCs()
 
         initWarpGate()
         initTeleportGate()
@@ -232,8 +233,6 @@ class SomCore : SuspendingJavaPlugin() {
             blueMapEnabled = true
             initBlueMap()
         }
-
-        SomPlaceholder().register()
 
         logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
     }

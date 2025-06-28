@@ -21,11 +21,8 @@ repositories {
     maven(url = "https://oss.sonatype.org/content/groups/public")
     maven(url = "https://repo.md-5.net/content/groups/public") // LibsDisguises
     maven(url = "https://jitpack.io") // DecentHolograms
-    maven(url = "https://maven.citizensnpcs.co/repo") // Citizens
     maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
     maven(url = "https://repo.lavafuse.net/releases") // AbyssLib
-    maven(url = "https://eldonexus.de/repository/maven-releases/") // WorldBorderAPI
-    maven(url = "https://maven.enginehub.org/repo/") // FastAsyncWorldEdit
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven(url = "https://repo.opencollab.dev/main/") // Floodgate
@@ -36,19 +33,8 @@ dependencies {
     compileOnly(libs.packetEvents)
     compileOnly(libs.libsDisguises)
     compileOnly(libs.decentHolograms)
-    compileOnly(libs.citizens) {
-        exclude(group = "*", module = "*")
-    }
     compileOnly(libs.abyssLib)
-    compileOnly(libs.worldBorderApi) {
-        artifact {
-            classifier = "dev"
-        }
-    }
-    compileOnly(libs.faweCore)
-    compileOnly(libs.faweBukkit) { isTransitive = false }
     compileOnly(libs.blueMap)
-    compileOnly(libs.papi)
     compileOnly(libs.floodgate)
 }
 
