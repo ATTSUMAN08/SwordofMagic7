@@ -228,7 +228,7 @@ public class EnemyData {
 
     private boolean runAITask = true;
 
-    void stopAI() {
+    public void stopAI() {
         runAITask = false;
         if (asyncAITask != null) asyncAITask.cancel();
     }
@@ -240,7 +240,7 @@ public class EnemyData {
     public Location LastLocation;
     private Location NextLocation;
     public BukkitTask asyncAITask;
-    void runAI() {
+    public void runAI() {
         stopAI();
         SpawnLocation = entity.getLocation();
         LastLocation = SpawnLocation;

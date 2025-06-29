@@ -18,6 +18,7 @@ import org.bukkit.entity.Player
 import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.DataLoader
 import swordofmagic7.Function
+import swordofmagic7.Mob.MobManager
 import swordofmagic7.Sound.SoundList
 import java.io.File
 
@@ -154,6 +155,20 @@ class SomCommand : BaseCommand() {
                 Bukkit.getServer().shutdown()
             }
         }
+    }
+
+    @Subcommand("enemies")
+    fun enemies(sender: CommandSender) {
+        val enemies = MobManager.getEnemyList()
+        if (enemies.isEmpty()) {
+            sender.sendMessage("§c現在、敵は存在しません。")
+            return
+        }
+        sender.sendMessage("§e現在の敵:")
+        for (enemy in enemies) {
+            sender.sendMessage("§a- ${enemy.mobData.Display}")
+        }
+        sender.sendMessage("§e合計: §a${enemies.size}体")
     }
 
 }

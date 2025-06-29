@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
+import net.somrpg.swordofmagic7.lisiteners.MainListener
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import net.somrpg.swordofmagic7.npc.NPCManager
 import org.bukkit.Bukkit
@@ -127,6 +128,7 @@ class SomCore : SuspendingJavaPlugin() {
 
         Tutorial.onLoad()
         Events(this)
+        server.pluginManager.registerEvents(MainListener, this)
         Dungeon.Initialize()
         PlayerList.load()
 
@@ -283,6 +285,7 @@ class SomCore : SuspendingJavaPlugin() {
         }
 
         repeatingTaskScheduler.shutdown()
+        Bukkit.getScheduler().cancelTasks(this)
     }
 
     private fun deleteHolograms() {

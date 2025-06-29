@@ -1,6 +1,7 @@
 package swordofmagic7.Dungeon;
 
 import io.papermc.paper.entity.TeleportFlag;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -97,7 +98,13 @@ public class DefenseBattle {
     public static void startWave(int i) {
         if (i == 1) time = startTime;
         isStarted = true;
-        Client.sendBroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
+        if (SomCore.Companion.isDevServer()) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                player.sendMessage("§c防衛戦Wave" + i + "§aが開始されました [開発サーバー]");
+            });
+        } else {
+            Client.sendBroadCast(new TextView("§c防衛戦Wave" + i + "§aが開始されました"));
+        }
         MultiThread.TaskRun(() -> {
             wave = i;
             Health = 10000 + 1000*(i-1);
@@ -168,7 +175,7 @@ public class DefenseBattle {
                 });
                 MultiThread.sleepTick(20);
             }
-            ViewBar.resetSideBar(Players, sidebarId);
+            ViewBar.resetSideBar(PlayerList.get(), sidebarId);
             for (EnemyData enemyData : EnemyList) {
                 enemyData.delete();
             }
@@ -185,7 +192,13 @@ public class DefenseBattle {
             } else {
                 isStarted = false;
                 Message(PlayerList.getNear(targetLocation, Radius), "§c§l《防衛戦終了》", "", null, SoundList.DUNGEON_TRIGGER);
-                Client.sendBroadCast(new TextView("§c防衛戦§aが終了しました"));
+                if (SomCore.Companion.isDevServer()) {
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        player.sendMessage("§c防衛戦§aが終了しました [開発サーバー]");
+                    });
+                } else {
+                    Client.sendBroadCast(new TextView("§c防衛戦§aが終了しました"));
+                }
             }
         }, "DefenseBattle");
     }

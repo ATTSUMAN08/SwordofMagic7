@@ -7,7 +7,6 @@ import org.bukkit.entity.Slime;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -44,6 +43,8 @@ public final class MobManager {
         entity.setAI(!baseData.NoAI);
         entity.setInvisible(baseData.Invisible);
         entity.setGlowing(baseData.Glowing);
+        entity.setRemoveWhenFarAway(false);
+        entity.setPersistent(true);
         EnemyData enemyData = new EnemyData(entity, baseData, level);
         EnemyTable.put(entity.getUniqueId().toString(), enemyData);
         enemyData.runAI();
