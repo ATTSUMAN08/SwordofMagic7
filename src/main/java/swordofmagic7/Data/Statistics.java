@@ -171,7 +171,7 @@ public class Statistics {
                 if ((Novaha4.StartTime - Novaha4.Time) < 300) titleManager.addTitle("ヴァノセト討伐2");
                 if ((Novaha4.StartTime - Novaha4.Time) < 125) titleManager.addTitle("ヴァノセト討伐ThePeriod");
             }
-            case "ナイアス討伐" -> {
+            case "ナイアス" -> {
                 titleManager.addTitle("ナイアス討伐");
                 if ((AsharkB2.StartTime - AsharkB2.Time) < 150) titleManager.addTitle("ナイアス討伐2");
             }
