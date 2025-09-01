@@ -36,7 +36,7 @@ public class Hind extends EnemySkillBase {
     Location[] locations = new Location[4];
     public Hind(EnemySkillManager manager) {
         super(manager);
-        setMessageRadius(150);
+        setMessageRadius(200);
         locations[0] = new Location(world, -330, 51, 3908);
         locations[1] = new Location(world, -481, 51, 3908);
         locations[2] = new Location(world, -486, 51, 4060);
