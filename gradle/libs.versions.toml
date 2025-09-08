@@ -8,7 +8,7 @@ paperweight = "2.0.0-beta.17"
 
 paperApi = "1.21.7-R0.1-SNAPSHOT"
 packetEvents = "2.8.0"
-libsDisguises = "10.0.44-SNAPSHOT"
+libsDisguises = "10.0.44"
 decentHolograms = "2.9.2"
 abyssLib = "1.0.0-SNAPSHOT"
 blueMap = "2.7.4"
