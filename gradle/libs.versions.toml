@@ -7,7 +7,7 @@ sonarqube = "6.1.0.5360"
 paperweight = "2.0.0-beta.17"
 
 paperApi = "1.21.7-R0.1-SNAPSHOT"
-packetEvents = "2.8.0"
+packetEvents = "2.9.5"
 libsDisguises = "10.0.44-SNAPSHOT"
 decentHolograms = "2.9.2"
 abyssLib = "1.0.0-SNAPSHOT"
