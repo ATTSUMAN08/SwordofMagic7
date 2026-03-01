@@ -21,7 +21,9 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.playerHandLocation;
+import static swordofmagic7.Function.playerWhileCheck;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 

@@ -15,12 +15,22 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
+import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.BrownItemFlame;
+import static swordofmagic7.Data.DataBase.DownScrollItem;
+import static swordofmagic7.Data.DataBase.MakeDataList;
+import static swordofmagic7.Data.DataBase.MakeGUIMap;
+import static swordofmagic7.Data.DataBase.NextPageItem;
+import static swordofmagic7.Data.DataBase.PreviousPageItem;
+import static swordofmagic7.Data.DataBase.UpScrollItem;
 import static swordofmagic7.Data.DataLoader.MaxMakeSlot;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class SmithMake {
     private final Player player;

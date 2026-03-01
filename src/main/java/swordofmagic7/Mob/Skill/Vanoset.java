@@ -1,11 +1,9 @@
 package swordofmagic7.Mob.Skill;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
@@ -27,10 +25,10 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Dungeon.Dungeon.world;
-import static swordofmagic7.Function.sendMessage;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Dungeon.Dungeon.world;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Vanoset {
@@ -338,7 +336,7 @@ public class Vanoset {
                     for (Player player : PlayerList.getNearNonDead(location, 96)) {
                         Location location = player.getLocation();
                         location.setDirection(Vector.getRandom());
-                        player.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        player.teleportAsync(location);
                     }
                 });
                 MultiThread.sleepTick(40);

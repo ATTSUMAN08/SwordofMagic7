@@ -9,8 +9,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import swordofmagic7.Attribute.AttributeType;
-import swordofmagic7.classes.ClassData;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -19,6 +17,8 @@ import swordofmagic7.Life.LifeType;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Status.StatusParameter;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,9 @@ import java.util.List;
 import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
 import static swordofmagic7.Data.DataBase.getClassData;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Menu.Data.StatusInfoDisplay;
 
 public class StatusInfo {

@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.sendMessage;
-import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class LibraryGovernor {

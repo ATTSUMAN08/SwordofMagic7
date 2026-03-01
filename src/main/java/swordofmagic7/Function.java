@@ -13,7 +13,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -42,9 +48,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Data.PlayerData.playerData;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Data.DataBase.AnvilUIFlame;
+import static swordofmagic7.Data.DataBase.AnvilUISlot;
+import static swordofmagic7.Data.DataBase.NoneFlame;
+import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public final class Function {

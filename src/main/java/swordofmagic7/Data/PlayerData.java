@@ -5,18 +5,23 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import io.papermc.paper.entity.TeleportFlag;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.TaskUtils;
 import net.somrpg.swordofmagic7.player.sidebar.SideBarToDo;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.*;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -24,8 +29,6 @@ import org.bukkit.util.Vector;
 import org.geysermc.floodgate.api.FloodgateApi;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
-import swordofmagic7.classes.ClassData;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.Type.DamageLogType;
 import swordofmagic7.Data.Type.DropLogType;
 import swordofmagic7.Data.Type.StrafeType;
@@ -39,7 +42,13 @@ import swordofmagic7.Function;
 import swordofmagic7.HotBar.HotBar;
 import swordofmagic7.HotBar.HotBarData;
 import swordofmagic7.InstantBuff.InstantBuff;
-import swordofmagic7.Inventory.*;
+import swordofmagic7.Inventory.ItemInventory;
+import swordofmagic7.Inventory.ItemParameterStack;
+import swordofmagic7.Inventory.ItemSortType;
+import swordofmagic7.Inventory.PetInventory;
+import swordofmagic7.Inventory.PetSortType;
+import swordofmagic7.Inventory.RuneInventory;
+import swordofmagic7.Inventory.RuneSortType;
 import swordofmagic7.Item.ItemExtend.ItemPotionType;
 import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
@@ -71,20 +80,51 @@ import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.Title.TitleManager;
 import swordofmagic7.Tutorial;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 import swordofmagic7.viewBar.ViewBar;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static swordofmagic7.classes.Classes.maxSlot;
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Data.DataBase.DataBasePath;
+import static swordofmagic7.Data.DataBase.DownScrollItem;
+import static swordofmagic7.Data.DataBase.ItemStackPlayerHead;
+import static swordofmagic7.Data.DataBase.MapList;
+import static swordofmagic7.Data.DataBase.RuneList;
+import static swordofmagic7.Data.DataBase.Som7HideTag;
+import static swordofmagic7.Data.DataBase.Som7Premium;
+import static swordofmagic7.Data.DataBase.Som7VIP;
+import static swordofmagic7.Data.DataBase.SpawnLocation;
+import static swordofmagic7.Data.DataBase.TitleDataList;
+import static swordofmagic7.Data.DataBase.UpScrollItem;
+import static swordofmagic7.Data.DataBase.format;
+import static swordofmagic7.Data.DataBase.getClassData;
+import static swordofmagic7.Data.DataBase.getClassList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.getMapData;
+import static swordofmagic7.Function.BroadCast;
+import static swordofmagic7.Function.CloseInventory;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.isAlive;
+import static swordofmagic7.Function.playerWhileCheck;
+import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.Function.teleportServer;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Title.TitleManager.DefaultTitle;
+import static swordofmagic7.classes.Classes.maxSlot;
 
 public class PlayerData {
     public static final ConcurrentMap<Player, PlayerData> playerData = new ConcurrentHashMap<>();
@@ -1015,7 +1055,7 @@ public class PlayerData {
                 float yaw = (float) data.getDouble("Location.yaw", SpawnLocation.getYaw());
                 float pitch = (float) data.getDouble("Location.pitch", SpawnLocation.getPitch());
                 Location loc = new Location(world, x, y, z, yaw, pitch);
-                player.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                player.teleportAsync(loc);
                 player.setGameMode(GameMode.SURVIVAL);
                 player.getInventory().setHeldItemSlot(8);
             } else {
@@ -1044,7 +1084,7 @@ public class PlayerData {
                     ItemInventory.addItemParameter(DataBase.getItemParameter("ノービスアーマー"), 1);
                     Status.Health = Status.MaxHealth;
                     Status.Mana = Status.MaxMana;
-                    player.teleport(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    player.teleport(SpawnLocation);
                 }
             }, 20, "LoadUpdate");
         }, 5);
@@ -1292,7 +1332,7 @@ public class PlayerData {
                             this.cancel();
                             logoutLocation = null;
                             isDead = false;
-                            player.teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                            player.teleportAsync(SpawnLocation);
                             player.setGameMode(GameMode.SURVIVAL);
                             Status.Health = Status.MaxHealth;
                             Status.Mana = Status.MaxMana;
@@ -1306,7 +1346,7 @@ public class PlayerData {
                             logoutLocation = null;
                             isDead = false;
                             RevivalReady = false;
-                            player.teleportAsync(LastDeadLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                            player.teleportAsync(LastDeadLocation);
                             player.setGameMode(GameMode.SURVIVAL);
                             player.resetTitle();
                             deadHologram.delete();
@@ -1314,7 +1354,7 @@ public class PlayerData {
                         } else {
                             LastDeadLocation.setPitch(player.getLocation().getPitch());
                             LastDeadLocation.setYaw(player.getLocation().getYaw());
-                            player.teleportAsync(LastDeadLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                            player.teleportAsync(LastDeadLocation);
                             ParticleManager.RandomVectorParticle(particleData, Function.playerHipsLocation(player), 10);
                             MultiThread.TaskRun(() -> {
                                 for (int i = 0; i < 10; i++) {

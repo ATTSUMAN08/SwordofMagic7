@@ -1,12 +1,8 @@
 @file:Suppress("unused")
 package net.somrpg.swordofmagic7.commands.builder
 
-import me.attsuman08.abysslib.shade.acf.BaseCommand
-import me.attsuman08.abysslib.shade.acf.annotation.CommandAlias
-import me.attsuman08.abysslib.shade.acf.annotation.CommandPermission
-import me.attsuman08.abysslib.shade.acf.annotation.Conditions
-import me.attsuman08.abysslib.shade.acf.annotation.Default
-import me.attsuman08.abysslib.shade.acf.annotation.Syntax
+import co.aikar.commands.BaseCommand
+import co.aikar.commands.annotation.*
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 

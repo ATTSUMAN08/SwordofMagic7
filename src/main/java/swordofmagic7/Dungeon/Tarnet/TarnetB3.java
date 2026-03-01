@@ -19,11 +19,16 @@ import swordofmagic7.viewBar.ViewBar;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.MessageTeleport;
+import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.VectorUp;
-import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class TarnetB3 {

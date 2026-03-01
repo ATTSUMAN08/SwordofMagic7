@@ -13,7 +13,9 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.CheckBlockPlayer;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 

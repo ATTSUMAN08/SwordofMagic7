@@ -2,7 +2,6 @@ package swordofmagic7.Data;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import swordofmagic7.classes.ClassData;
 import swordofmagic7.Dungeon.Ashark.AsharkB2;
 import swordofmagic7.Dungeon.Ashark.AsharkB4;
 import swordofmagic7.Dungeon.AusMine.AusMineB2;
@@ -15,6 +14,7 @@ import swordofmagic7.Life.LifeType;
 import swordofmagic7.Mob.MobData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Title.TitleManager;
+import swordofmagic7.classes.ClassData;
 
 import java.util.ArrayList;
 import java.util.HashMap;

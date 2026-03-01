@@ -16,10 +16,15 @@ import swordofmagic7.viewBar.ViewBar;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
-import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.ElevatorActiveTime;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.world;
 
 public class SlimeCaveB2 {
     private static final Location EventLocation = new Location(world,871.5, -43, -1541.5);

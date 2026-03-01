@@ -11,7 +11,9 @@ import swordofmagic7.Effect.EffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 
 public class EffectInfo implements SomCommand, SomTabComplete {
     @Override

@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.FlameItem;
+import static swordofmagic7.Data.DataBase.SkillDataList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
 

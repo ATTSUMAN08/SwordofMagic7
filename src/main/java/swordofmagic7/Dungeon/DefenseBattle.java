@@ -1,11 +1,10 @@
 package swordofmagic7.Dungeon;
 
-import io.papermc.paper.entity.TeleportFlag;
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Client;
@@ -16,15 +15,20 @@ import swordofmagic7.Mob.MobData;
 import swordofmagic7.Mob.MobManager;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
-import net.somrpg.swordofmagic7.SomCore;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
 import swordofmagic7.viewBar.ViewBar;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.DataBase.MapList;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.PlayerData.playerData;
@@ -32,8 +36,6 @@ import static swordofmagic7.Dungeon.Dungeon.Message;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
-import static net.somrpg.swordofmagic7.SomCore.instance;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class DefenseBattle {
     private static final Location location = new Location(world, 2234.5,139,2345.5);
@@ -90,7 +92,7 @@ public class DefenseBattle {
     }
 
     public static void teleport(Player player) {
-        player.teleport(teleportLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        player.teleport(teleportLocation);
         MapList.get("DefenseBattle").enter(player);
     }
 

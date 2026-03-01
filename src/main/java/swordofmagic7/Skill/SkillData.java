@@ -12,7 +12,9 @@ import swordofmagic7.Equipment.EquipmentCategory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.IncreasedConsumptionMana;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 
 public class SkillData implements Cloneable {
     public String Id;

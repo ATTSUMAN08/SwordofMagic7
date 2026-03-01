@@ -1,9 +1,7 @@
 package swordofmagic7.Map;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import swordofmagic7.Data.PlayerData;
@@ -14,8 +12,13 @@ import swordofmagic7.TagGame;
 import java.util.HashMap;
 import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.TeleportGateList;
+import static swordofmagic7.Data.DataBase.TeleportGateMenu;
+import static swordofmagic7.Data.DataBase.WarpGateList;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class MapManager {
@@ -92,7 +95,7 @@ public class MapManager {
     public void TeleportGateUse(TeleportGateParameter teleport) {
         if (teleport.DefaultActive || playerData.ActiveTeleportGate.contains(teleport.Id) || player.hasPermission("som7.builder")) {
             MultiThread.TaskRunSynchronizedLater(() -> {
-                player.teleportAsync(teleport.Location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                player.teleportAsync(teleport.Location);
                 player.sendTitle(teleport.Title, teleport.Subtitle, 20, 40, 20);
                 playSound(player, SoundList.LEVEL_UP);
                 lastTeleportGate = teleport.Id;

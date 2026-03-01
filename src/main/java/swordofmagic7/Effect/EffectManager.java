@@ -1,13 +1,11 @@
 package swordofmagic7.Effect;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Damage.Damage;
@@ -34,7 +32,6 @@ import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
 import static swordofmagic7.Particle.ParticleManager.spawnParticle;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleActivate;
-import static net.somrpg.swordofmagic7.SomCore.instance;
 
 public class EffectManager {
     public LivingEntity entity;
@@ -168,7 +165,7 @@ public class EffectManager {
             if (entity != null) {
                 MultiThread.TaskRunSynchronized(() -> {
                     if (!ownerType.isEnemy() || !enemyData.mobData.enemyType.isIgnoreCrowdControl()) {
-                        if (isFixed != null) entity.teleportAsync(isFixed, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        if (isFixed != null) entity.teleportAsync(isFixed);
                         if (isCrowdControl) {
                             entity.removePotionEffect(PotionEffectType.SLOWNESS);
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 255, false, false, false));

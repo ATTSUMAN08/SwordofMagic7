@@ -1,5 +1,6 @@
 package swordofmagic7.Renderer;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,7 +10,6 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
-import net.somrpg.swordofmagic7.SomCore;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

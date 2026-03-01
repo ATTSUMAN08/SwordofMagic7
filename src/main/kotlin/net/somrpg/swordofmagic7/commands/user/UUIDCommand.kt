@@ -1,8 +1,8 @@
 @file:Suppress("unused")
 package net.somrpg.swordofmagic7.commands.user
 
-import me.attsuman08.abysslib.shade.acf.BaseCommand
-import me.attsuman08.abysslib.shade.acf.annotation.*
+import co.aikar.commands.BaseCommand
+import co.aikar.commands.annotation.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Bukkit

@@ -12,7 +12,11 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Tutorial;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.ItemFlame;
 import static swordofmagic7.Sound.CustomSound.playSound;

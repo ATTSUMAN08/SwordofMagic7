@@ -13,12 +13,15 @@ import swordofmagic7.viewBar.ViewBar;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Data.DataBase.getMobData;
-import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.sendMessage;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.getMobData;
+import static swordofmagic7.Data.DataBase.getWarpGate;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Function.sendMessage;
 
 public class AsharkB1 {
     private static final int x = 4;

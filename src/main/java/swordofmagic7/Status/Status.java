@@ -1,12 +1,9 @@
 package swordofmagic7.Status;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Attribute.AttributeType;
-import swordofmagic7.classes.ClassData;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectDataBase;
@@ -18,12 +15,19 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Skill.Skill;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillParameter;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static swordofmagic7.Attribute.AttributeType.*;
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Attribute.AttributeType.DEX;
+import static swordofmagic7.Attribute.AttributeType.INT;
+import static swordofmagic7.Attribute.AttributeType.SPI;
+import static swordofmagic7.Attribute.AttributeType.STR;
+import static swordofmagic7.Attribute.AttributeType.TEC;
+import static swordofmagic7.Attribute.AttributeType.VIT;
+import static swordofmagic7.Data.DataBase.getSkillData;
 
 public class Status {
     private final Player player;

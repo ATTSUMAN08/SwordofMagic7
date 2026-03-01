@@ -3,7 +3,6 @@ package swordofmagic7.Mob;
 import com.destroystokyo.paper.entity.Pathfinder;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
-import io.papermc.paper.entity.TeleportFlag;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
@@ -12,16 +11,17 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import swordofmagic7.classes.ClassData;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Client;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Effect.*;
+import swordofmagic7.Effect.EffectData;
+import swordofmagic7.Effect.EffectDataBase;
+import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectOwnerType;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Function;
 import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.MultiThread.MultiThread;
@@ -37,14 +37,30 @@ import swordofmagic7.Quest.QuestReqContentKey;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
+import swordofmagic7.classes.ClassData;
+import swordofmagic7.classes.Classes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
-import static swordofmagic7.Data.DataBase.*;
+import static net.somrpg.swordofmagic7.SomCore.instance;
+import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.format;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Data.DataBase.getPetList;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
-import static net.somrpg.swordofmagic7.SomCore.*;
+import static swordofmagic7.Function.ItemGetLog;
+import static swordofmagic7.Function.RuneGetLog;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class EnemyData {
@@ -264,7 +280,7 @@ public class EnemyData {
                         NextLocation = targetLocation;
                         MultiThread.TaskRunSynchronized(() -> {
                             if (entity.isInLava()) {
-                                entity.teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                                entity.teleportAsync(SpawnLocation);
                             } else if (NextLocation != null && entity.getLocation().distance(NextLocation) > mobData.Reach) {
                                 mob.lookAt(NextLocation);
                                 pathfinder.moveTo(NextLocation, mobData.Mov*MovementMultiply);

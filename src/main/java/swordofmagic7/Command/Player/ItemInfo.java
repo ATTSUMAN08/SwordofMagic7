@@ -11,7 +11,9 @@ import swordofmagic7.Item.ItemParameter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.ItemInfoData;
+import static swordofmagic7.Data.DataBase.ItemList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.sendMessage;
 

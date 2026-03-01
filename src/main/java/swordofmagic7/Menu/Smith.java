@@ -7,8 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.Data.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
+import static swordofmagic7.Menu.Data.SmithMenuDisplay;
+import static swordofmagic7.Menu.Data.SmithMenu_DecryptionIcon;
+import static swordofmagic7.Menu.Data.SmithMenu_MakeEquipmentIcon;
+import static swordofmagic7.Menu.Data.SmithMenu_MaterializationIcon;
+import static swordofmagic7.Menu.Data.SmithMenu_SmeltingIcon;
+import static swordofmagic7.Menu.Data.SmithMenu_UpgradeEquipmentIcon;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Smith {

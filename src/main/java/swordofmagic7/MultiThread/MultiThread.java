@@ -4,8 +4,8 @@ import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import static swordofmagic7.Function.Log;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Function.Log;
 
 public class MultiThread extends Thread {
     /*

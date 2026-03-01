@@ -16,7 +16,11 @@ import swordofmagic7.Status.StatusParameter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.DataBasePath;
 

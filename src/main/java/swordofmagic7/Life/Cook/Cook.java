@@ -14,14 +14,25 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Shop.Shop;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.CookDataList;
+import static swordofmagic7.Data.DataBase.NextPageItem;
+import static swordofmagic7.Data.DataBase.PreviousPageItem;
+import static swordofmagic7.Data.DataBase.ShopFlame;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Shop.Shop.ItemFlame;
 import static swordofmagic7.Shop.Shop.ItemFlameAmount;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Cook {
 

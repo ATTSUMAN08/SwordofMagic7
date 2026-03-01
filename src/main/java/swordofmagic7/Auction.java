@@ -10,8 +10,8 @@ import swordofmagic7.TextView.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.PlayerData.playerData;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Auction {

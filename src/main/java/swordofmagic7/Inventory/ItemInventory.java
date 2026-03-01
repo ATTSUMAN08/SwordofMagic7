@@ -11,10 +11,16 @@ import swordofmagic7.Item.RuneParameter;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static swordofmagic7.Data.DataBase.AirItem;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class ItemInventory extends BasicInventory {

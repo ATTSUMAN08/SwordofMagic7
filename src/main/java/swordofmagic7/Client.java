@@ -1,18 +1,15 @@
 package swordofmagic7;
 
-import me.attsuman08.abysslib.RedisManager;
+import cz.foresttech.forestredis.shared.RedisManager;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.TextView.TextView;
-
-import java.util.Objects;
 
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Function.Log;
@@ -51,7 +48,7 @@ public class Client {
     }
 
     public static void send(String str) {
-        RedisManager.Companion.getAPI().publishMessage("SNC", str);
+        RedisManager.getAPI().publishMessage("SNC", str);
     }
 
     public static void Trigger(String packet) {

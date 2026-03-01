@@ -9,7 +9,9 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashMap;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PartyManager {

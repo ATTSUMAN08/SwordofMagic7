@@ -2,13 +2,10 @@ package swordofmagic7.InstantBuff;
 
 import org.bukkit.entity.Player;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Status.StatusParameter;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static swordofmagic7.Function.playerWhileCheck;
 
 public class InstantBuff {
     private final Player player;

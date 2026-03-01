@@ -9,9 +9,17 @@ import swordofmagic7.Data.TitleData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.BrownItemFlame;
+import static swordofmagic7.Data.DataBase.DownScrollItem;
+import static swordofmagic7.Data.DataBase.HiddenTitleDataList;
+import static swordofmagic7.Data.DataBase.ItemFlame;
+import static swordofmagic7.Data.DataBase.TitleDataList;
+import static swordofmagic7.Data.DataBase.TitleGUIMap;
+import static swordofmagic7.Data.DataBase.UpScrollItem;
 import static swordofmagic7.Data.DataLoader.MaxTitleSlot;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Menu.Data.TitleMenuDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 

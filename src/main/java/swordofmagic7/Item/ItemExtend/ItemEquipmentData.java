@@ -1,7 +1,6 @@
 package swordofmagic7.Item.ItemExtend;
 
 import net.somrpg.swordofmagic7.SomCore;
-import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Item.RuneParameter;

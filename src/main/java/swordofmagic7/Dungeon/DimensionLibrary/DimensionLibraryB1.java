@@ -1,9 +1,7 @@
 package swordofmagic7.Dungeon.DimensionLibrary;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
@@ -88,7 +86,7 @@ public class DimensionLibraryB1 {
                 } else {
                     sendMessage(player, "§c次元の歪みに吸い込まれます...", SoundList.TICK);
                     MultiThread.TaskRunSynchronized(() -> {
-                        player.teleportAsync(locationB2, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        player.teleportAsync(locationB2);
                         DataBase.getMapData("DimensionLibraryB2").enter(player);
                     });
                     DimensionLibraryB1.data.remove(player);

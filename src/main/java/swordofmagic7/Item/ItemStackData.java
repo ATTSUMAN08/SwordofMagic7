@@ -1,6 +1,5 @@
 package swordofmagic7.Item;
 
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.google.common.collect.MultimapBuilder;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.kyori.adventure.text.Component;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
-import swordofmagic7.Menu.Data;
 
 import java.util.ArrayList;
 import java.util.List;

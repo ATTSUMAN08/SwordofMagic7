@@ -11,10 +11,21 @@ import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.ClassDataMap;
+import static swordofmagic7.Data.DataBase.format;
+import static swordofmagic7.Data.DataBase.getClassData;
+import static swordofmagic7.Function.BroadCast;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Classes {

@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
 import static swordofmagic7.Menu.Data.AttributeMenuDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 

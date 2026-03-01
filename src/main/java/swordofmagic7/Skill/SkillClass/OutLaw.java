@@ -16,12 +16,12 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Function.playerHandLocation;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
-import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class OutLaw extends BaseSkillClass {

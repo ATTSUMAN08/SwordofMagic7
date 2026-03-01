@@ -23,7 +23,8 @@ import static swordofmagic7.Function.playerHandLocation;
 import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
-import static swordofmagic7.Skill.SkillProcess.*;
+import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
+import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Matador extends BaseSkillClass {

@@ -1,6 +1,5 @@
 package swordofmagic7.Command.Developer;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,9 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.ItemList;
+import static swordofmagic7.Data.DataBase.getItemList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.sendMessage;
 
 public class GetItem implements SomCommand, SomTabComplete {
     @Override

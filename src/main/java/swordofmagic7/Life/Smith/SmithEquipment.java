@@ -13,8 +13,16 @@ import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.Upgrade;
 import swordofmagic7.Sound.SoundList;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Data.DataBase.AnvilUISlot;
+import static swordofmagic7.Data.DataBase.ItemFlame;
+import static swordofmagic7.Data.DataBase.ItemList;
+import static swordofmagic7.Data.DataBase.MaterializationMap;
+import static swordofmagic7.Function.ItemGetLog;
+import static swordofmagic7.Function.decoAnvil;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class SmithEquipment {

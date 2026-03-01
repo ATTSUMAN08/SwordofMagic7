@@ -3,8 +3,6 @@ package swordofmagic7.Mob.Skill;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import swordofmagic7.Effect.EffectManager;
 import swordofmagic7.Effect.EffectType;

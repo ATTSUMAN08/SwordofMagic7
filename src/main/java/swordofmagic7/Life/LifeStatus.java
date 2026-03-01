@@ -6,9 +6,9 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.HashMap;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.DataBase.format;
 import static swordofmagic7.Function.BroadCast;
-import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class LifeStatus {

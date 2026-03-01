@@ -11,8 +11,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static swordofmagic7.Function.Log;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Function.Log;
 
 public final class MobManager {
 

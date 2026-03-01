@@ -2,13 +2,11 @@ package swordofmagic7.Map;
 
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
-import io.papermc.paper.entity.TeleportFlag;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.Ashark.AsharkB1;
 import swordofmagic7.Dungeon.Ashark.AsharkB2;
@@ -74,7 +72,7 @@ public class WarpGateParameter {
         if (!isActive || isTrigger) return;
         NextMap.enter(player);
         if (Target != null) TargetLocation = WarpGateList.get(Target).getLocation();
-        player.teleportAsync(TargetLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        player.teleportAsync(TargetLocation);
         MultiThread.TaskRun(() -> {
             MultiThread.sleepTick(1);
             playSound(player, SoundList.WARP);

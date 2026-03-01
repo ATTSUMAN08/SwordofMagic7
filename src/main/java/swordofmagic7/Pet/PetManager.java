@@ -11,7 +11,6 @@ import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.RayTrace.RayTrace;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

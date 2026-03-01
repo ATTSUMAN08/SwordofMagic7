@@ -1,6 +1,6 @@
 package net.somrpg.swordofmagic7.commands
 
-import me.attsuman08.abysslib.shade.acf.*
+import co.aikar.commands.*
 import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder

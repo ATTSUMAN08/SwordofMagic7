@@ -21,13 +21,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.classes.Classes.maxSlot;
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.DownScrollItem;
+import static swordofmagic7.Data.DataBase.ItemFlame;
+import static swordofmagic7.Data.DataBase.UpScrollItem;
+import static swordofmagic7.Data.DataBase.getSkillData;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
 import static swordofmagic7.Menu.Data.TriggerMenuDisplay;
 import static swordofmagic7.Menu.Data.TriggerMenu_Reset;
 import static swordofmagic7.Menu.TitleMenu.nonSlotVertical;
 import static swordofmagic7.Sound.CustomSound.playSound;
+import static swordofmagic7.classes.Classes.maxSlot;
 
 public class Trigger {
 

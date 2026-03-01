@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class TagGame {
     public static final String Prefix = "§c[鬼ごっこ]§r ";

@@ -1,11 +1,10 @@
 package net.somrpg.swordofmagic7.translater;
 
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Map;
 
 /**
  * 「ローマ字」から「かな文字」へ正確に変換するクラス

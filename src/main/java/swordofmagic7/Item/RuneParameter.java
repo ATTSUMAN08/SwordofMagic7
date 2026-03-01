@@ -12,7 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.getRuneParameter;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.isZero;
+import static swordofmagic7.Function.loreText;
 
 public class RuneParameter implements Cloneable {
     public String Id;

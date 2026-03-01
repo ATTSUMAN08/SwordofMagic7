@@ -13,9 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static swordofmagic7.Data.DataBase.ShopFlame;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Inventory.ItemInventory.ItemStackCheck;
-import static swordofmagic7.Shop.Shop.*;
+import static swordofmagic7.Shop.Shop.ItemFlame;
+import static swordofmagic7.Shop.Shop.ItemFlameAmount;
+import static swordofmagic7.Shop.Shop.ShopSellDisplay;
+import static swordofmagic7.Shop.Shop.ShopSellPrefix;
 
 public class SellInventory extends BasicInventory {
     private final List<ItemParameterStack> List = new ArrayList<>();

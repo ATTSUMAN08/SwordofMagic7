@@ -1,10 +1,8 @@
 package swordofmagic7.Skill.SkillClass;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Effect.EffectType;
@@ -23,7 +21,9 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.VectorDown;
+import static swordofmagic7.Function.VectorUp;
+import static swordofmagic7.Function.getRightDirection;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.particleActivate;
@@ -65,7 +65,7 @@ public class Mage extends BaseSkillClass {
                 ParticleManager.CircleParticle(particleData, player.getLocation(), 1, 10);
                 ParticleManager.CircleParticle(particleData, origin, 1, 10);
                 origin.setDirection(player.getLocation().getDirection());
-                MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS));
+                MultiThread.TaskRunSynchronized(() -> player.teleportAsync(origin.add(0, 0.2, 0)));
             }
             playSound(player, SoundList.WARP);
             skillProcess.SkillRigid(skillData);

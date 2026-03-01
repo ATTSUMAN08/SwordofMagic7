@@ -13,7 +13,8 @@ import swordofmagic7.Item.RuneParameter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.RuneList;
+import static swordofmagic7.Data.DataBase.getRuneParameter;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.sendMessage;
 

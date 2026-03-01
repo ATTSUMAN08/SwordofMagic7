@@ -17,10 +17,16 @@ import swordofmagic7.TextView.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.Data.UpgradeDisplay;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Data.DataBase.AnvilUISlot;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Function.decoAnvil;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.sendMessage;
+import static swordofmagic7.Menu.Data.UpgradeDisplay;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Upgrade {

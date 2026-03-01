@@ -1,15 +1,16 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.session.SessionHandler
+import xyz.jpenilla.resourcefactory.bukkit.Permission
 
 plugins {
-    alias(libs.plugins.pluginYml)
+    id("java")
+    alias(libs.plugins.resourceFactory)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.hidetakeSSH)
     alias(libs.plugins.grgit)
-    alias(libs.plugins.sonarqube)
     alias(libs.plugins.paperweight)
+    alias(libs.plugins.shadow)
 }
 
 group = "swordofmagic7"
@@ -19,10 +20,9 @@ repositories {
     mavenCentral()
     maven(url = "https://repo.papermc.io/repository/maven-public")
     maven(url = "https://oss.sonatype.org/content/groups/public")
-    maven(url = "https://repo.md-5.net/content/groups/public") // LibsDisguises
-    maven(url = "https://jitpack.io") // DecentHolograms
-    maven(url = "https://repo.codemc.io/repository/maven-public") // ItemNBTAPI, PacketEvents
-    maven(url = "https://repo.lavafuse.net/releases") // AbyssLib
+    maven(url = "https://mvn.lib.co.nz/public") // LibsDisguises
+    maven(url = "https://jitpack.io") // DecentHolograms, ForestRedisAPI
+    maven(url = "https://repo.codemc.io/repository/maven-public") // PacketEvents
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven(url = "https://repo.opencollab.dev/main/") // Floodgate
@@ -33,9 +33,11 @@ dependencies {
     compileOnly(libs.packetEvents)
     compileOnly(libs.libsDisguises)
     compileOnly(libs.decentHolograms)
-    compileOnly(libs.abyssLib)
     compileOnly(libs.blueMap)
     compileOnly(libs.floodgate)
+    compileOnly(libs.forestRedisApi)
+
+    implementation(libs.bundles.libraries)
 }
 
 
@@ -50,10 +52,30 @@ remotes {
     }
 }
 
+tasks.shadowJar {
+    archiveClassifier.set("")
+    exclude {
+        it.name.startsWith("acf-") && !it.name.endsWith("_ja.properties")
+    }
+
+    fun relocateLibs(packageName: String, targetPackageName: String) {
+        relocate(packageName, "net.somrpg.swordofmagic7.libs.$targetPackageName")
+    }
+
+    relocateLibs("de.tr7zw.changeme.nbtapi", "nbtapi")
+
+    relocateLibs("com.ezylang.evalex", "evalex")
+
+    relocateLibs("co.aikar.commands", "acf")
+    relocateLibs("co.aikar.locales", "locales")
+
+    relocateLibs("dev.triumphteam.gui", "gui")
+}
+
 tasks.register("deploy") {
     description = "Deploy the plugin to the server"
     group = JavaBasePlugin.BUILD_TASK_NAME
-    dependsOn("build")
+    dependsOn("shadowJar")
     doLast {
         ssh.run(delegateClosureOf<RunHandler> {
             session(remotes["dev"], delegateClosureOf<SessionHandler> {
@@ -78,52 +100,43 @@ fun versionMetadata(): String {
     return grgit.head().abbreviatedId
 }
 
-sonar {
-    properties {
-        property("sonar.projectKey", "ATTSUMAN08_SwordofMagic7")
-        property("sonar.organization", "attsuman08")
-        property("sonar.host.url", "https://sonarcloud.io")
-    }
-}
-
-bukkit {
+bukkitPluginYaml {
     name = project.name
-    version = "${project.version}"
     description = "Sword of Magic 7のプラグインのFork"
     authors = listOf("MomiNeko", "SomNetworkMembers", "ATTSUMAN08")
     apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    softDepend = listOf("AbyssLib", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "BlueMap")
+    softDepend = listOf("ForestRedisAPI", "DecentHolograms", "Citizens", "LibsDisguises", "PacketEvents", "BlueMap")
 
     permissions {
         register("som7.developer") {
-            default = BukkitPluginDescription.Permission.Default.OP
+            default = Permission.Default.OP
             description = "SOM7の開発者権限"
         }
 
         register("som7.builder") {
-            default = BukkitPluginDescription.Permission.Default.OP
+            default = Permission.Default.OP
             description = "SOM7の建築者権限"
         }
 
         register("som7.data.reload") {
-            default = BukkitPluginDescription.Permission.Default.OP
+            default = Permission.Default.OP
             description = "SOM7のデータリロード権限"
         }
 
         register("som7.title.editor") {
-            default = BukkitPluginDescription.Permission.Default.OP
+            default = Permission.Default.OP
             description = "SOM7のタイトルエディタ権限"
         }
 
         register("som7.user") {
-            default = BukkitPluginDescription.Permission.Default.TRUE
+            default = Permission.Default.TRUE
             description = "SOM7のユーザー権限"
         }
 
         register("som7.chat") {
-            default = BukkitPluginDescription.Permission.Default.TRUE
+            default = Permission.Default.TRUE
             description = "チャットする権限"
         }
     }

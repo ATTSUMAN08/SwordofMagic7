@@ -1,32 +1,56 @@
 [versions]
-kotlin = "2.2.0"
-pluginYml = "0.6.0"
+kotlin = "2.3.10"
+resourceFactory = "1.3.1"
 hidetakeSSH = "2.12.0"
 grgit = "5.3.2"
-sonarqube = "6.1.0.5360"
-paperweight = "2.0.0-beta.17"
+paperweight = "2.0.0-beta.19"
+shadow = "9.3.2"
 
-paperApi = "1.21.7-R0.1-SNAPSHOT"
-packetEvents = "2.8.0"
-libsDisguises = "10.0.44-SNAPSHOT"
-decentHolograms = "2.9.2"
-abyssLib = "1.0.0-SNAPSHOT"
-blueMap = "2.7.4"
+paperApi = "1.21.11-R0.1-SNAPSHOT"
+packetEvents = "2.11.2"
+libsDisguises = "11.0.13"
+decentHolograms = "2.9.9"
+blueMap = "2.7.7"
 floodgate = "2.2.4-SNAPSHOT"
+forestRedisApi = "1.3.11"
+
+evalEx = "3.6.0"
+coroutines = "1.10.2"
+mcCoroutine = "2.22.0"
+serializationJson = "1.10.0"
+kaml = "0.104.0"
+nbtApi = "2.15.5"
+fastBoard = "2.1.5"
+acfPaper = "0.5.1-SNAPSHOT"
+triumphGui = "3.1.13"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-pluginYml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginYml" }
+resourceFactory = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
 hidetakeSSH = { id = "org.hidetake.ssh", version.ref = "hidetakeSSH" }
 grgit = { id = "org.ajoberstar.grgit", version.ref = "grgit" }
-sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
-packetEvents = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetEvents" }
-libsDisguises = { group = "LibsDisguises", name = "LibsDisguises", version.ref = "libsDisguises" }
-decentHolograms = { group = "com.github.decentsoftware-eu", name = "decentholograms", version.ref = "decentHolograms" }
-abyssLib = { group = "me.attsuman08", name = "abysslib-paper", version.ref = "abyssLib" }
-blueMap = { group = "de.bluecolored", name = "bluemap-api", version.ref = "blueMap" }
-floodgate = { group = "org.geysermc.floodgate", name = "api", version.ref = "floodgate" }
+packetEvents = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetEvents" }
+libsDisguises = { module = "me.libraryaddict.disguises:libsdisguises", version.ref = "libsDisguises" }
+decentHolograms = { module = "com.github.decentsoftware-eu:decentholograms", version.ref = "decentHolograms" }
+blueMap = { module = "de.bluecolored:bluemap-api", version.ref = "blueMap" }
+floodgate = { module = "org.geysermc.floodgate:api", version.ref = "floodgate" }
+forestRedisApi = { module = "com.github.ATTSUMAN08:ForestRedisAPI", version.ref = "forestRedisApi" }
+
+evalEx = { module = "com.ezylang:EvalEx", version.ref = "evalEx" }
+coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+mcCoroutinePaperApi = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-api", version.ref = "mcCoroutine" }
+mcCoroutinePaperCore = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mcCoroutine" }
+serializationJson = { group = "org.jetbrains.kotlinx", name ="kotlinx-serialization-json", version.ref = "serializationJson" }
+kaml = { group = "com.charleskorn.kaml", name ="kaml-jvm", version.ref = "kaml" }
+itemNbtApi = { group = "de.tr7zw", name = "item-nbt-api", version.ref = "nbtApi" }
+fastBoard = { group = "fr.mrmicky", name = "fastboard", version.ref = "fastBoard" }
+acfPaper = { group = "co.aikar", name = "acf-paper", version.ref = "acfPaper" }
+triumphGui = { group = "dev.triumphteam", name = "triumph-gui", version.ref = "triumphGui" }
+
+[bundles]
+libraries = ["evalEx", "coroutinesCore", "mcCoroutinePaperApi", "mcCoroutinePaperCore", "serializationJson", "kaml", "itemNbtApi", "fastBoard", "acfPaper", "triumphGui"]

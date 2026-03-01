@@ -3,18 +3,22 @@ package swordofmagic7;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
+import cz.foresttech.forestredis.spigot.events.RedisMessageReceivedEvent;
 import eu.decentsoftware.holograms.api.actions.ClickType;
 import eu.decentsoftware.holograms.event.HologramClickEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
-import me.attsuman08.abysslib.paper.events.RedisMessageReceivedEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.npc.NPCData;
 import net.somrpg.swordofmagic7.npc.NPCManager;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -23,12 +27,36 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -51,17 +79,27 @@ import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.DataBasePath;
+import static swordofmagic7.Data.DataBase.IgnoreIPList;
+import static swordofmagic7.Data.DataBase.ShopList;
+import static swordofmagic7.Data.DataBase.Som7Premium;
+import static swordofmagic7.Data.DataBase.Som7VIP;
+import static swordofmagic7.Data.DataBase.getShopData;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.ignoreEntity;
+import static swordofmagic7.Function.isHoldFishingRod;
 import static swordofmagic7.Mob.MobManager.EnemyTable;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
-
-    Plugin plugin;
+    private static final String OverLogin = "som7.OverLogin";
+    private final Plugin plugin;
 
     public Events(Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -77,27 +115,21 @@ public class Events implements Listener {
         }
     }
 
-    private static final String OverLogin = "som7.OverLogin";
     @EventHandler
-    public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-
-    }
-
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
+    public void onLogin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         boolean bypass = player.hasPermission(OverLogin) || player.hasPermission(Som7Premium) || player.hasPermission(Som7VIP);
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
         if ((!bypass || SomCore.Companion.isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
             for (Player player2 : Bukkit.getOnlinePlayers()) {
-                if (getIP(player2.getAddress()).equals(getIP(event.getAddress()))) {
-                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください");
+                if (Objects.requireNonNull(player2.getAddress()).equals(event.getPlayer().getAddress())) {
+                    player.kick(Component.text("§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください"));
                     return;
                 }
             }
         }
         if (!bypass && (PlayerList.ResetPlayer.contains(player.getName()) && !PlayerData.ContainPlayer(player)) && !SomCore.Companion.isDevServer()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§c連続§aで§b同CH§aに§e変更§aすることは出来ません");
+            player.kick(Component.text("§c連続§aで§b同CH§aに§e変更§aすることは出来ません"));
             return;
         }
         int playerCount = 0;
@@ -120,11 +152,11 @@ public class Events implements Listener {
             if (vip &&player.hasPermission(Som7VIP)) return;
             if (premium && player.hasPermission(Som7Premium)) return;
             if (vip) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§eVIP枠は開いています");
+                player.kick(Component.text("§bCH§aは§c満員§aです。§eVIP枠は開いています"));
             } else if (premium) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§ePremium枠は開いています");
+                player.kick(Component.text("§bCH§aは§c満員§aです。§ePremium枠は開いています"));
             } else {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "§bCH§aは§c満員§aです。§e全ての枠が埋まっています");
+                player.kick(Component.text("§bCH§aは§c満員§aです。§e全ての枠が埋まっています"));
             }
         }
     }

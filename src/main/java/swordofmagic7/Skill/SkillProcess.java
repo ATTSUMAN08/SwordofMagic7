@@ -23,11 +23,19 @@ import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.RayTrace.Ray;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.ignoreEntity;
+import static swordofmagic7.Function.isAlive;
+import static swordofmagic7.Function.playerEyeLocation;
+import static swordofmagic7.Function.playerHandLocation;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Sound.CustomSound.playSound;
 import static swordofmagic7.Sound.SoundList.GUN_ATTACK;

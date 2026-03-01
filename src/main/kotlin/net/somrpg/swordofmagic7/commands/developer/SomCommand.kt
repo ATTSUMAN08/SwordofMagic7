@@ -1,11 +1,11 @@
 @file:Suppress("unused")
 package net.somrpg.swordofmagic7.commands.developer
 
+import co.aikar.commands.BaseCommand
+import co.aikar.commands.annotation.*
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.delay
-import me.attsuman08.abysslib.shade.acf.BaseCommand
-import me.attsuman08.abysslib.shade.acf.annotation.*
 import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.extensions.minecraftDispatcher

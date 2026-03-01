@@ -11,8 +11,8 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Sound.CustomSound.playSound;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class TarnetEnter {
 

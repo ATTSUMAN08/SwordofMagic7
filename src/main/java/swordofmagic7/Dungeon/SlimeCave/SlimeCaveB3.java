@@ -21,7 +21,12 @@ import java.util.Set;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.MessageTeleport;
+import static swordofmagic7.Dungeon.Dungeon.world;
 
 public class SlimeCaveB3 {
     private static final Location EventLocation = new Location(world,705.5, -27, -1460.5);

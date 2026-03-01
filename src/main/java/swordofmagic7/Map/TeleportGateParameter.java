@@ -6,15 +6,14 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Item.ItemStackData;
-import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Particle.ParticleManager.spawnParticle;
-import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Function.VectorUp;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 
 public class TeleportGateParameter {
     public String Id;

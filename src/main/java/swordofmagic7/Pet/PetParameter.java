@@ -2,7 +2,6 @@ package swordofmagic7.Pet;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.google.common.collect.MultimapBuilder;
-import io.papermc.paper.entity.TeleportFlag;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
@@ -11,18 +10,20 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
-import swordofmagic7.Effect.*;
+import swordofmagic7.Effect.EffectData;
+import swordofmagic7.Effect.EffectDataBase;
+import swordofmagic7.Effect.EffectManager;
+import swordofmagic7.Effect.EffectOwnerType;
+import swordofmagic7.Effect.EffectType;
 import swordofmagic7.Equipment.EquipmentCategory;
 import swordofmagic7.Equipment.EquipmentSlot;
 import swordofmagic7.Function;
@@ -34,14 +35,22 @@ import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 import swordofmagic7.Status.StatusParameter;
 import swordofmagic7.TextView.TextView;
+import swordofmagic7.classes.Classes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static swordofmagic7.Data.DataBase.getPetData;
-import static swordofmagic7.Data.DataBase.getSkillData;
-import static swordofmagic7.Function.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Data.DataBase.getSkillData;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class PetParameter implements Cloneable {
@@ -427,7 +436,7 @@ public class PetParameter implements Cloneable {
                             }
                         }
                         if (entity.getLocation().distance(player.getLocation()) > 48) {
-                            entity.teleportAsync(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                            entity.teleportAsync(player.getLocation());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

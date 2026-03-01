@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.RuneList;
+import static swordofmagic7.Data.DataBase.getRuneList;
+import static swordofmagic7.Data.DataBase.getRuneParameter;
 
 public class GetRune implements SomCommand, SomTabComplete {
     @Override

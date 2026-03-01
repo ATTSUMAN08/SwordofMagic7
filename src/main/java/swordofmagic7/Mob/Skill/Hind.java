@@ -1,12 +1,10 @@
 package swordofmagic7.Mob.Skill;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
 import swordofmagic7.Data.DataBase;
@@ -27,8 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Dungeon.Dungeon.world;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Dungeon.Dungeon.world;
 
 public class Hind extends EnemySkillBase {
 
@@ -200,7 +198,7 @@ public class Hind extends EnemySkillBase {
             MultiThread.TaskRunSynchronized(() -> {
                 Location loc = new Location(world, -239.5, 69, 3958.5, -180, 0);
                 for (Player victim : PlayerList.getNearNonDead(pivot, radius)) {
-                    if (target() != victim) victim.teleportAsync(loc, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    if (target() != victim) victim.teleportAsync(loc);
                 }
             });
             MultiThread.sleepTick(10);

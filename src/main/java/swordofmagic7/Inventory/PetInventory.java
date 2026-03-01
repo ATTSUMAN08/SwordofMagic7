@@ -10,7 +10,11 @@ import swordofmagic7.Data.Type.ViewInventoryType;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import static swordofmagic7.Data.DataBase.AirItem;
 import static swordofmagic7.Function.sendMessage;

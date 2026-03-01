@@ -2,9 +2,9 @@ package swordofmagic7.Command.Player;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import swordofmagic7.classes.Classes;
 import swordofmagic7.Command.SomCommand;
 import swordofmagic7.Data.PlayerData;
+import swordofmagic7.classes.Classes;
 
 public class ReqExp implements SomCommand {
     @Override

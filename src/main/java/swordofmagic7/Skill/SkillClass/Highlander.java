@@ -23,7 +23,10 @@ import java.util.Set;
 import static swordofmagic7.Particle.ParticleManager.ShapedParticle;
 import static swordofmagic7.RayTrace.RayTrace.rayLocationEntity;
 import static swordofmagic7.Skill.Skill.millis;
-import static swordofmagic7.Skill.SkillProcess.*;
+import static swordofmagic7.Skill.SkillProcess.FanShapedCollider;
+import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
+import static swordofmagic7.Skill.SkillProcess.particleActivate;
+import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Highlander extends BaseSkillClass {

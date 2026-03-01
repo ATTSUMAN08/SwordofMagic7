@@ -5,9 +5,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.*;
-import swordofmagic7.classes.ClassData;
-import swordofmagic7.classes.Classes;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
@@ -17,12 +19,20 @@ import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.PlayerList;
 import swordofmagic7.Status.Status;
 import swordofmagic7.TagGame;
+import swordofmagic7.classes.Classes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static swordofmagic7.Data.DataBase.*;
+import static swordofmagic7.Data.DataBase.Som7HideTag;
+import static swordofmagic7.Data.DataBase.Som7Premium;
+import static swordofmagic7.Data.DataBase.Som7VIP;
 import static swordofmagic7.Data.PlayerData.playerData;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
 
 public class ViewBar {
 

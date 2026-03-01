@@ -21,7 +21,10 @@ import swordofmagic7.Skill.SkillData;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;

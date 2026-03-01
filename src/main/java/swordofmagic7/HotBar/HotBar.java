@@ -12,9 +12,9 @@ import swordofmagic7.TagGame;
 
 import java.util.UUID;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.DataBase.getSkillData;
 import static swordofmagic7.Function.sendMessage;
-import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class HotBar {

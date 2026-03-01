@@ -20,7 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static swordofmagic7.Skill.Skill.millis;
-import static swordofmagic7.Skill.SkillProcess.*;
+import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
+import static swordofmagic7.Skill.SkillProcess.particleActivate;
+import static swordofmagic7.Skill.SkillProcess.particleCasting;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Peltast extends BaseSkillClass {

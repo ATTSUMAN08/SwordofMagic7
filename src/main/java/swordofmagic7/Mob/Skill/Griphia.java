@@ -18,10 +18,10 @@ import swordofmagic7.Sound.SoundList;
 
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Dungeon.Dungeon.world;
 import static swordofmagic7.Sound.CustomSound.playSound;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public class Griphia extends EnemySkillBase {
     final Location[] Candle = new Location[4];

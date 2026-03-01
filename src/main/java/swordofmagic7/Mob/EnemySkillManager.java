@@ -7,7 +7,20 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Damage.DamageCause;
-import swordofmagic7.Mob.Skill.*;
+import swordofmagic7.Mob.Skill.BasicEnemySkills;
+import swordofmagic7.Mob.Skill.Exta;
+import swordofmagic7.Mob.Skill.Faras;
+import swordofmagic7.Mob.Skill.Griphia;
+import swordofmagic7.Mob.Skill.Hind;
+import swordofmagic7.Mob.Skill.KingSlime;
+import swordofmagic7.Mob.Skill.LeeLai;
+import swordofmagic7.Mob.Skill.LibraryGovernor;
+import swordofmagic7.Mob.Skill.Nias;
+import swordofmagic7.Mob.Skill.Nias2;
+import swordofmagic7.Mob.Skill.RoyalKnightSlime;
+import swordofmagic7.Mob.Skill.Symmore;
+import swordofmagic7.Mob.Skill.Synosas;
+import swordofmagic7.Mob.Skill.Vanoset;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Particle.ParticleData;
 import swordofmagic7.Particle.ParticleManager;
@@ -15,8 +28,8 @@ import swordofmagic7.Particle.ParticleManager;
 import java.util.HashMap;
 import java.util.Set;
 
-import static swordofmagic7.PlayerList.getNearLivingEntity;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.PlayerList.getNearLivingEntity;
 
 public class EnemySkillManager {
     public final EnemyData enemyData;

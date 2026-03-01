@@ -15,7 +15,11 @@ import swordofmagic7.Item.ItemParameter;
 import swordofmagic7.Item.ItemStackData;
 import swordofmagic7.Sound.SoundList;
 
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class AccessoryShop {

@@ -20,10 +20,10 @@ import swordofmagic7.Sound.SoundList;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Skill.Skill.millis;
 import static swordofmagic7.Skill.SkillProcess.RectangleCollider;
 import static swordofmagic7.Skill.SkillProcess.particleCasting;
-import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Cryomancer extends BaseSkillClass {

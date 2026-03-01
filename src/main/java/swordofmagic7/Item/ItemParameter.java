@@ -1,9 +1,9 @@
 package swordofmagic7.Item;
 
 import com.google.common.collect.MultimapBuilder;
-import me.attsuman08.abysslib.shade.nbtapi.NBT;
-import me.attsuman08.abysslib.shade.nbtapi.NbtApiException;
-import me.attsuman08.abysslib.shade.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.NbtApiException;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -12,7 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import swordofmagic7.Function;
-import swordofmagic7.Item.ItemExtend.*;
+import swordofmagic7.Item.ItemExtend.ItemCook;
+import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
+import swordofmagic7.Item.ItemExtend.ItemPetEgg;
+import swordofmagic7.Item.ItemExtend.ItemPetFood;
+import swordofmagic7.Item.ItemExtend.ItemPotion;
 import swordofmagic7.Item.ItemUseList.RewardBox;
 import swordofmagic7.Item.ItemUseList.RewardBoxData;
 import swordofmagic7.Status.StatusParameter;
@@ -23,8 +27,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.MaxStackAmount;
+import static swordofmagic7.Data.DataBase.RewardBoxList;
+import static swordofmagic7.Data.DataBase.itemInformation;
+import static swordofmagic7.Data.DataBase.itemParameter;
+import static swordofmagic7.Data.DataBase.itemRune;
+import static swordofmagic7.Function.Log;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.isZero;
+import static swordofmagic7.Function.loreText;
 
 public class ItemParameter implements Cloneable {
     public String Id;

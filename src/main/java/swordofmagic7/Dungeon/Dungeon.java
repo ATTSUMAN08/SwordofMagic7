@@ -1,12 +1,10 @@
 package swordofmagic7.Dungeon;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Dungeon.DimensionLibrary.DimensionLibraryB1;
 import swordofmagic7.MultiThread.MultiThread;
@@ -52,7 +50,7 @@ public class Dungeon {
                 playerData.logoutLocation = location;
                 playSound(player, sound);
                 MultiThread.TaskRunSynchronizedLater(() -> {
-                    player.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    player.teleportAsync(location);
                     playerData.logoutLocation = null;
                 }, 200);
             }

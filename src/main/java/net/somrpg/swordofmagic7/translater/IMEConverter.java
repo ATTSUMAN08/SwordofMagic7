@@ -5,16 +5,14 @@
  */
 package net.somrpg.swordofmagic7.translater;
 
+import com.google.common.io.CharStreams;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import com.google.common.io.CharStreams;
 
 /**
  * ひらがなのみの文章を、IMEを使用して変換します。

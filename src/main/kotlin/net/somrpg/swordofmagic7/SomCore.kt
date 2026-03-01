@@ -13,7 +13,6 @@ import de.bluecolored.bluemap.api.math.Color
 import de.bluecolored.bluemap.api.math.Shape
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
-import io.papermc.paper.entity.TeleportFlag
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
@@ -22,20 +21,14 @@ import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.lisiteners.MainListener
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import net.somrpg.swordofmagic7.npc.NPCManager
-import org.bukkit.Bukkit
-import org.bukkit.GameRule
-import org.bukkit.Location
-import org.bukkit.NamespacedKey
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Display
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
-import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
-import swordofmagic7.*
 import swordofmagic7.Command.Developer.*
 import swordofmagic7.Command.Player.*
 import swordofmagic7.Command.SomCommand
@@ -46,6 +39,7 @@ import swordofmagic7.Data.PlayerData.playerData
 import swordofmagic7.Dungeon.DefenseBattle
 import swordofmagic7.Dungeon.Dungeon
 import swordofmagic7.Effect.EffectManager
+import swordofmagic7.Events
 import swordofmagic7.Function.*
 import swordofmagic7.Map.TeleportGateParameter
 import swordofmagic7.Map.WarpGateParameter
@@ -53,12 +47,15 @@ import swordofmagic7.Mob.MobManager
 import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
 import swordofmagic7.Pet.PetManager
+import swordofmagic7.PlayerList
 import swordofmagic7.Sound.CustomSound.playSound
 import swordofmagic7.Sound.SoundList
+import swordofmagic7.TagGame
 import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
+import swordofmagic7.Tutorial
 import swordofmagic7.viewBar.ViewBar
-import java.io.*
+import java.io.File
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.*
@@ -137,19 +134,19 @@ class SomCore : SuspendingJavaPlugin() {
         WarpGateList.values.forEach { it.start() }
 
         world.apply {
-            setGameRule(GameRule.DO_WEATHER_CYCLE, false)
-            setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false)
-            setGameRule(GameRule.DO_MOB_SPAWNING, false)
-            setGameRule(GameRule.DO_FIRE_TICK, false)
-            setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false)
-            setGameRule(GameRule.DO_PATROL_SPAWNING, false)
-            setGameRule(GameRule.SHOW_DEATH_MESSAGES, false)
-            setGameRule(GameRule.NATURAL_REGENERATION, false)
-            setGameRule(GameRule.MOB_GRIEFING, false)
-            setGameRule(GameRule.DO_MOB_LOOT, false)
-            setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
-            setGameRule(GameRule.RANDOM_TICK_SPEED, 0)
-            setGameRule(GameRule.SPAWN_RADIUS, 0)
+            setGameRule(GameRules.ADVANCE_WEATHER, false)
+            setGameRule(GameRules.COMMAND_BLOCK_OUTPUT, false)
+            setGameRule(GameRules.SPAWN_MOBS, false)
+            setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0)
+            setGameRule(GameRules.SEND_COMMAND_FEEDBACK, false)
+            setGameRule(GameRules.SPAWN_PATROLS, false)
+            setGameRule(GameRules.SHOW_DEATH_MESSAGES, false)
+            setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, false)
+            setGameRule(GameRules.MOB_GRIEFING, false)
+            setGameRule(GameRules.MOB_DROPS, false)
+            setGameRule(GameRules.ADVANCE_TIME, false)
+            setGameRule(GameRules.RANDOM_TICK_SPEED, 0)
+            setGameRule(GameRules.RESPAWN_RADIUS, 0)
             this.time = 6000L
         }
 
@@ -741,7 +738,7 @@ class SomCore : SuspendingJavaPlugin() {
                 player.apply {
                     isFlying = false
                     setGravity(true)
-                    teleportAsync(SpawnLocation, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                    teleportAsync(SpawnLocation)
                 }
                 nextSpawnPlayer.remove(player)
             }, 1, "spawnPlayer")

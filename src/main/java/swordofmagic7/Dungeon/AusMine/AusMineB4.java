@@ -14,10 +14,15 @@ import swordofmagic7.viewBar.ViewBar;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Data.DataBase.getMobData;
 import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
-import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.MessageTeleport;
+import static swordofmagic7.Dungeon.Dungeon.world;
 
 public class AusMineB4 {
     private static final Location EventLocation = new Location(world,704, 119, 1979);

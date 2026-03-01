@@ -4,7 +4,6 @@ import org.bukkit.entity.LivingEntity
 import swordofmagic7.Damage.Damage
 import swordofmagic7.Damage.DamageCause
 import swordofmagic7.Data.DataBase
-import swordofmagic7.Dungeon.AusMine.AusMineB4
 import swordofmagic7.Effect.EffectManager
 import swordofmagic7.Effect.EffectType
 import swordofmagic7.Mob.EnemyData

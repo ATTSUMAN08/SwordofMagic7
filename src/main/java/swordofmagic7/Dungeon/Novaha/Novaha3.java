@@ -12,9 +12,13 @@ import swordofmagic7.viewBar.ViewBar;
 import java.util.HashSet;
 import java.util.Set;
 
-import static swordofmagic7.Data.DataBase.getWarpGate;
-import static swordofmagic7.Dungeon.Dungeon.*;
 import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Data.DataBase.getWarpGate;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestClear;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestFailed;
+import static swordofmagic7.Dungeon.Dungeon.DungeonQuestTrigger;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.world;
 
 public class Novaha3 {
     private static boolean Able = false;

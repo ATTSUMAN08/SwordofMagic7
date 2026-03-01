@@ -6,8 +6,28 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import swordofmagic7.Data.PlayerData;
 
-import static swordofmagic7.Function.*;
-import static swordofmagic7.Menu.Data.*;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
+import static swordofmagic7.Menu.Data.SettingMenuDisplay;
+import static swordofmagic7.Menu.Data.SettingMenu_CastModeIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_DamageLogIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_DropLogIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_ExpLogIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_FishingDisplayNumIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_FishingUseCombo;
+import static swordofmagic7.Menu.Data.SettingMenu_HoloSelfViewIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_ItemInventorySort;
+import static swordofmagic7.Menu.Data.SettingMenu_ItemInventorySortReverse;
+import static swordofmagic7.Menu.Data.SettingMenu_NaturalMessageIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_PetInventorySort;
+import static swordofmagic7.Menu.Data.SettingMenu_PetInventorySortReverse;
+import static swordofmagic7.Menu.Data.SettingMenu_PvPModeIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_RuneInventorySort;
+import static swordofmagic7.Menu.Data.SettingMenu_RuneInventorySortReverse;
+import static swordofmagic7.Menu.Data.SettingMenu_ShopAmountResetIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_StrafeModeIcon;
+import static swordofmagic7.Menu.Data.SettingMenu_ViewFormat;
 
 public class Setting {
 

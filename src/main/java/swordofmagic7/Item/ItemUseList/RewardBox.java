@@ -13,9 +13,16 @@ import swordofmagic7.TextView.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
 import static net.somrpg.swordofmagic7.SomCore.random;
+import static swordofmagic7.Data.DataBase.RewardBoxList;
+import static swordofmagic7.Data.DataBase.RuneList;
+import static swordofmagic7.Data.DataBase.getItemParameter;
+import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Data.DataBase.getRuneParameter;
+import static swordofmagic7.Function.ItemGetLog;
+import static swordofmagic7.Function.RuneGetLog;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 
 public class RewardBox {
 

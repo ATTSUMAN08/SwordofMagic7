@@ -16,8 +16,15 @@ import swordofmagic7.Sound.SoundList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static swordofmagic7.Data.DataBase.*;
-import static swordofmagic7.Function.*;
+import static swordofmagic7.Data.DataBase.AirItem;
+import static swordofmagic7.Data.DataBase.AnvilUISlot;
+import static swordofmagic7.Data.DataBase.getPetData;
+import static swordofmagic7.Function.decoAnvil;
+import static swordofmagic7.Function.decoInv;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.equalInv;
+import static swordofmagic7.Function.equalItem;
+import static swordofmagic7.Function.sendMessage;
 import static swordofmagic7.Menu.Data.NonMel;
 import static swordofmagic7.Sound.CustomSound.playSound;
 

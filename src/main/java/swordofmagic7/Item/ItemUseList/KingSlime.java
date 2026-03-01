@@ -20,11 +20,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.instance;
 import static swordofmagic7.Data.DataBase.ServerId;
 import static swordofmagic7.Data.DataBase.getItemParameter;
-import static swordofmagic7.Dungeon.Dungeon.*;
-import static swordofmagic7.Function.*;
-import static net.somrpg.swordofmagic7.SomCore.instance;
+import static swordofmagic7.Dungeon.Dungeon.Message;
+import static swordofmagic7.Dungeon.Dungeon.Radius;
+import static swordofmagic7.Dungeon.Dungeon.world;
+import static swordofmagic7.Function.decoLore;
+import static swordofmagic7.Function.decoText;
+import static swordofmagic7.Function.sendMessage;
 
 public class KingSlime {
 

@@ -1,11 +1,9 @@
 package swordofmagic7;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.MultiThread.MultiThread;
 import swordofmagic7.Sound.SoundList;
@@ -55,7 +53,7 @@ public class Tutorial {
                 }
             }
             if (start || TutorialProcess.getOrDefault(player, -1)+1 == i) {
-                if (TutorialLocation[i] != null) player.teleportAsync(TutorialLocation[i], PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                if (TutorialLocation[i] != null) player.teleportAsync(TutorialLocation[i]);
                 TutorialProcess.put(player, i);
                 MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LEVEL_UP), 1);
                 for (TutorialData data : TutorialList) {
@@ -69,7 +67,7 @@ public class Tutorial {
     }
 
     public static void tutorialHub(Player player) {
-        player.teleportAsync(TutorialLocation[4], PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        player.teleportAsync(TutorialLocation[4]);
         MultiThread.TaskRunSynchronizedLater(() -> playSound(player, SoundList.LEVEL_UP), 1);
     }
 }

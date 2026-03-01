@@ -1,10 +1,10 @@
 package swordofmagic7.Quest;
 
 import org.bukkit.entity.Player;
-import swordofmagic7.classes.ClassData;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Inventory.ItemParameterStack;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.classes.ClassData;
 
 import java.util.HashMap;
 import java.util.Map;

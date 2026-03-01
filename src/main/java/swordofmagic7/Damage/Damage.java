@@ -3,12 +3,9 @@ package swordofmagic7.Damage;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import net.somrpg.swordofmagic7.SomCore;
-import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
@@ -30,9 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static net.somrpg.swordofmagic7.SomCore.random;
 import static swordofmagic7.Data.PlayerData.playerData;
 import static swordofmagic7.Function.sendMessage;
-import static net.somrpg.swordofmagic7.SomCore.random;
 
 public final class Damage {
 

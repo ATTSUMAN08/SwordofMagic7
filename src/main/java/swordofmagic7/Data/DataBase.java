@@ -1,12 +1,16 @@
 package swordofmagic7.Data;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import net.somrpg.swordofmagic7.SomCore;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import swordofmagic7.classes.ClassData;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemParameter;
@@ -32,7 +36,7 @@ import swordofmagic7.Shop.ItemRecipe;
 import swordofmagic7.Shop.ShopData;
 import swordofmagic7.Skill.SkillClass.Alchemist.AlchemyData;
 import swordofmagic7.Skill.SkillData;
-import net.somrpg.swordofmagic7.SomCore;
+import swordofmagic7.classes.ClassData;
 
 import java.io.File;
 import java.util.ArrayList;

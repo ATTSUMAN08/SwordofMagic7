@@ -12,7 +12,7 @@ import org.bukkit.entity.Villager
 import org.bukkit.persistence.PersistentDataType
 import swordofmagic7.Data.DataBase
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 object NPCManager {
     val spawnedNPCs: MutableMap<UUID, NPCData.NPC> = mutableMapOf()
