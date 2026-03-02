@@ -12,7 +12,9 @@ import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
 import swordofmagic7.Data.DataBase
+import swordofmagic7.Effect.EffectType
 import swordofmagic7.Life.LifeType
+import swordofmagic7.classes.Classes
 import java.util.Locale
 
 object CommandManager {
@@ -80,6 +82,29 @@ object CommandManager {
                 }
             },
         )
+
+        // Double | limits
+        manager.commandConditions.addCondition(
+            Double::class.java,
+            "limits",
+            CommandConditions.ParameterCondition {
+                c: ConditionContext<BukkitCommandIssuer>,
+                _: BukkitCommandExecutionContext,
+                value: Double?,
+                ->
+                if (value == null) {
+                    return@ParameterCondition
+                }
+                val min = c.getConfigValue("min", "0").toDouble()
+                val max = c.getConfigValue("max", "3").toDouble()
+                if (c.hasConfig("min") && min > value) {
+                    throw ConditionFailedException("値の最低値は${min}です")
+                }
+                if (c.hasConfig("max") && max < value) {
+                    throw ConditionFailedException("値の最高値は${max}です")
+                }
+            },
+        )
     }
 
     private fun registerCompletions(manager: PaperCommandManager) {
@@ -110,6 +135,48 @@ object CommandManager {
 
         manager.commandCompletions.registerCompletion("classes") { _ ->
             return@registerCompletion DataBase.getClassList().keys
+        }
+
+        manager.commandCompletions.registerCompletion("allItems") { _ ->
+            return@registerCompletion DataBase.getItemList().keys
+        }
+
+        manager.commandCompletions.registerCompletion("visibleItems") { _ ->
+            return@registerCompletion DataBase.ItemList.values
+                .filter { !it.isHide }
+                .map { it.Id }
+        }
+
+        manager.commandCompletions.registerCompletion("allRunes") { _ ->
+            return@registerCompletion DataBase.getRuneList().keys
+        }
+
+        manager.commandCompletions.registerCompletion("visibleRunes") { _ ->
+            return@registerCompletion DataBase.RuneList.values
+                .filter { !it.isHide }
+                .map { it.Id }
+        }
+
+        manager.commandCompletions.registerCompletion("mobs") { _ ->
+            return@registerCompletion DataBase.getMobList().keys
+        }
+
+        manager.commandCompletions.registerCompletion("visibleMobs") { _ ->
+            return@registerCompletion DataBase.MobList.values
+                .filter { !it.isHide }
+                .map { it.Id }
+        }
+
+        manager.commandCompletions.registerCompletion("effectDisplayNames") { _ ->
+            return@registerCompletion EffectType.entries.map { it.Display }
+        }
+
+        manager.commandCompletions.registerCompletion("titles") { _ ->
+            return@registerCompletion DataBase.TitleDataList.keys
+        }
+
+        manager.commandCompletions.registerCompletion("classSlots") { _ ->
+            return@registerCompletion (1..Classes.maxSlot).map { it.toString() }
         }
     }
 }

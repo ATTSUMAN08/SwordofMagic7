@@ -144,51 +144,6 @@ bukkitPluginYaml {
     }
 
     commands {
-        register("getItem") {
-            permission = "som7.developer"
-        }
-
-        register("getRune") {
-            permission = "som7.developer"
-        }
-
-        register("getExp") {
-            permission = "som7.developer"
-        }
-
-        register("getLevel") {
-            permission = "som7.developer"
-        }
-
-        register("getClassExp") {
-            permission = "som7.developer"
-        }
-
-        register("getEffect") {
-            permission = "som7.developer"
-        }
-
-        register("mobSpawn") {
-            permission = "som7.developer"
-            aliases = listOf("ms")
-        }
-
-        register("save") {
-            permission = "som7.developer"
-        }
-
-        register("load") {
-            permission = "som7.developer"
-        }
-
-        register("bukkitTasks") {
-            permission = "som7.developer"
-        }
-
-        register("loadedPlayer") {
-            permission = "som7.developer"
-        }
-
         register("test") {
             permission = "som7.developer"
         }
@@ -217,48 +172,12 @@ bukkitPluginYaml {
             permission = "som7.developer"
         }
 
-        register("sendData") {
-            permission = "som7.developer"
-        }
-
-        register("classSelect") {
-            permission = "som7.developer"
-        }
-
-        register("skillCTReset") {
-            permission = "som7.developer"
-        }
-
-        register("setNick") {
-            permission = "som7.developer"
-        }
-
-        register("addTitle") {
-            permission = "som7.developer"
-        }
-
         register("killMob") {
             permission = "som7.developer"
         }
 
-        register("playerInfo") {
-            aliases = listOf("info", "i")
-        }
-
-        register("reqExp") {
-            permission = "som7.user"
-        }
-
         register("reqExpAll") {
             permission = "som7.user"
-        }
-
-        register("taggame") {
-            permission = "som7.user"
-        }
-
-        register("party") {
-            aliases = listOf("pt")
         }
 
         register("itemInventorySort") {
@@ -297,15 +216,7 @@ bukkitPluginYaml {
             permission = "som7.user"
         }
 
-        register("effectInfo") {
-            aliases = listOf("ei")
-        }
-
         register("setTitle") {
-            permission = "som7.user"
-        }
-
-        register("reqlifeExp") {
             permission = "som7.user"
         }
 
@@ -313,28 +224,8 @@ bukkitPluginYaml {
             permission = "som7.user"
         }
 
-        register("auction") {
-            aliases = listOf("auc")
-        }
-
-        register("market") {
-            permission = "som7.user"
-        }
-
         register("setFishingCombo") {
             permission = "som7.user"
-        }
-
-        register("mobInfo") {
-            aliases = listOf("mi")
-        }
-
-        register("itemInfo") {
-            aliases = listOf("ii")
-        }
-
-        register("runeInfo") {
-            aliases = listOf("ri")
         }
 
         register("nickReset") {
@@ -343,10 +234,6 @@ bukkitPluginYaml {
 
         register("skillSlot") {
             aliases = listOf("ss")
-        }
-
-        register("runeFilter") {
-            aliases = listOf("rf")
         }
 
         register("entities") {
@@ -371,10 +258,6 @@ bukkitPluginYaml {
 
         register("petSearch") {
             aliases = listOf("ps")
-        }
-
-        register("blockPlayer") {
-            permission = "som7.user"
         }
 
         register("damageSimulator") {
