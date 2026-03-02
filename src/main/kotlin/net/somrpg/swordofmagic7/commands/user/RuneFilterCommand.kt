@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.CatchUnknown
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Conditions
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
@@ -19,15 +20,11 @@ import swordofmagic7.Function
 @CommandPermission("som7.user")
 class RuneFilterCommand : BaseCommand() {
     @Subcommand("quality|Q")
-    @Syntax("<0~100>")
+    @Syntax("<value>")
     fun quality(
         player: Player,
-        value: Double,
+        @Conditions("limits:min=0,max=100") value: Double,
     ) {
-        if (value < 0 || value > 100) {
-            Function.sendMessage(player, "§e/runeFilter Quality <0~100>")
-            return
-        }
         player.getPlayerData().RuneQualityFilter = value / 100
         Function.sendMessage(player, "§eルーンフィルター[品質] §b-> §a$value%")
     }

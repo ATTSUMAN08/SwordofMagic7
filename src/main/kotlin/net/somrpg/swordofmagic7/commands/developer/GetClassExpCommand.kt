@@ -16,15 +16,15 @@ import swordofmagic7.Data.DataBase
 @CommandPermission("som7.developer")
 class GetClassExpCommand : BaseCommand() {
     @Default
-    @Syntax("<amount> <class>")
-    @CommandCompletion("* @classes")
+    @Syntax("<class> <amount>")
+    @CommandCompletion("@classes 1000")
     fun default(
         player: Player,
-        amount: Int,
         className: String,
+        amount: Int,
     ) {
         if (!DataBase.getClassList().containsKey(className)) {
-            player.sendMessage("§c/getClassExp <exp> <class>")
+            player.sendMessage("§c/getClassExp <class> <exp>")
             return
         }
         player.getPlayerData().Classes.addClassExp(DataBase.getClassData(className), amount)

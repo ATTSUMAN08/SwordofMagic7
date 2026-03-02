@@ -17,7 +17,7 @@ import swordofmagic7.Function
 class ItemInfoCommand : BaseCommand() {
     @Default
     @Syntax("<id>")
-    @CommandCompletion("@visibleItems")
+    @CommandCompletion("@visibleItems @nothing")
     fun default(
         player: Player,
         id: String,

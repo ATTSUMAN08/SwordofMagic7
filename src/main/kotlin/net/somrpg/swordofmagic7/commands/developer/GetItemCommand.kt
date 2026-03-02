@@ -18,7 +18,7 @@ import swordofmagic7.Inventory.ItemParameterStack
 class GetItemCommand : BaseCommand() {
     @Default
     @Syntax("<id> [amount] [plus]")
-    @CommandCompletion("@allItems * *")
+    @CommandCompletion("@allItems 1 *")
     fun default(
         player: Player,
         id: String,
@@ -32,13 +32,13 @@ class GetItemCommand : BaseCommand() {
         }
         val stack = ItemParameterStack(DataBase.getItemParameter(id))
         stack.Amount = amount
-        if (plus > 0 && stack.itemParameter.Category.isEquipment()) {
+        if (plus > 0 && stack.itemParameter.Category.isEquipment) {
             stack.itemParameter.itemEquipmentData.Plus = plus
         }
         playerData.ItemInventory.addItemParameter(stack)
         playerData.ItemInventory.viewInventory()
         val textView = stack.itemParameter.getTextView(stack.Amount, playerData.ViewFormat())
-        textView.addText("§aを§e獲得§aしました")
+        textView.addText("§aを${amount}個§e獲得§aしました")
         player.sendMessage(textView.toComponent())
     }
 }

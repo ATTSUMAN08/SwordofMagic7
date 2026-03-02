@@ -17,16 +17,12 @@ import swordofmagic7.Effect.EffectType
 class GetEffectCommand : BaseCommand() {
     @Default
     @Syntax("<effect> [time]")
-    @CommandCompletion("@effects *")
+    @CommandCompletion("* 200")
     fun default(
         player: Player,
-        effectName: String,
+        effect: EffectType,
         @Default("200") time: Int,
     ) {
-        try {
-            player.getPlayerData().EffectManager.addEffect(EffectType.valueOf(effectName), time)
-        } catch (e: Exception) {
-            player.sendMessage("§c/getEffect <effect> [<time=200>]")
-        }
+        player.getPlayerData().EffectManager.addEffect(effect, time)
     }
 }
