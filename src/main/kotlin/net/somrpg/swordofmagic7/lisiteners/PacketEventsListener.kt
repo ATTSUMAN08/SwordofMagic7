@@ -13,15 +13,20 @@ import swordofmagic7.Data.PlayerData
 import swordofmagic7.Life.Gathering.ChangeBlock
 
 class PacketEventsListener : PacketListener {
-
     override fun onPacketSend(e: PacketSendEvent) {
-        val p: Player = e.getPlayer() ?: return
+        val p: Player = e.getPlayer()
         if (!p.isOnline) return
 
         when (e.packetType) {
             PacketType.Play.Server.BLOCK_CHANGE -> {
                 val packet = WrapperPlayServerBlockChange(e)
-                val loc = Location(p.world, packet.blockPosition.x.toDouble(), packet.blockPosition.y.toDouble(), packet.blockPosition.z.toDouble())
+                val loc =
+                    Location(
+                        p.world,
+                        packet.blockPosition.x.toDouble(),
+                        packet.blockPosition.y.toDouble(),
+                        packet.blockPosition.z.toDouble(),
+                    )
                 if (p.gameMode != GameMode.CREATIVE && ChangeBlock(p).checkLocation(loc)) {
                     val material = ChangeBlock(p)[loc]
                     val stateType = StateTypes.getByName(material.name.lowercase())
@@ -30,7 +35,10 @@ class PacketEventsListener : PacketListener {
                     }
                 }
             }
-            PacketType.Play.Server.PARTICLE, PacketType.Play.Server.STOP_SOUND, PacketType.Play.Server.ENTITY_SOUND_EFFECT, PacketType.Play.Server.SOUND_EFFECT, PacketType.Play.Server.NAMED_SOUND_EFFECT -> {
+
+            PacketType.Play.Server.PARTICLE, PacketType.Play.Server.STOP_SOUND, PacketType.Play.Server.ENTITY_SOUND_EFFECT,
+            PacketType.Play.Server.SOUND_EFFECT, PacketType.Play.Server.NAMED_SOUND_EFFECT,
+            -> {
                 val playerData = PlayerData.playerData(p) ?: return
                 if (playerData.isAFK) {
                     e.isCancelled = true

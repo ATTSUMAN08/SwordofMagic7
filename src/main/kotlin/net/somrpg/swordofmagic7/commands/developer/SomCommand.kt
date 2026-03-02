@@ -1,8 +1,15 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.developer
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.*
+import co.aikar.commands.annotation.CommandAlias
+import co.aikar.commands.annotation.CommandCompletion
+import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Conditions
+import co.aikar.commands.annotation.Default
+import co.aikar.commands.annotation.Subcommand
+import co.aikar.commands.annotation.Syntax
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.delay
@@ -25,7 +32,6 @@ import java.io.File
 @CommandAlias("som")
 @CommandPermission("som7.developer")
 class SomCommand : BaseCommand() {
-
     @Subcommand("info")
     fun version(sender: CommandSender) {
         sender.sendMessage("§eサーバー: §a${Bukkit.getServer().name} ${Bukkit.getServer().version}")
@@ -40,38 +46,43 @@ class SomCommand : BaseCommand() {
 
     @Subcommand("tasks")
     fun tasks(sender: CommandSender) {
-        val tasks = Bukkit.getScheduler().activeWorkers.filter { bukkitWorker ->
-            bukkitWorker.owner == SomCore.instance
-        }
+        val tasks =
+            Bukkit.getScheduler().activeWorkers.filter { bukkitWorker ->
+                bukkitWorker.owner == SomCore.instance
+            }
 
         for (task in tasks) {
             sender.sendMessage("§e- ${task.taskId} | ${task.thread.name}")
         }
         sender.sendMessage("${tasks.size} bukkit tasks")
 
-        val threads = Thread.getAllStackTraces().keys.filter { thread ->
-            thread.name.startsWith("SwordofMagic7")
-        }
+        val threads =
+            Thread.getAllStackTraces().keys.filter { thread ->
+                thread.name.startsWith("SwordofMagic7")
+            }
         for (thread in threads) {
             sender.sendMessage("§e- ${thread.name}")
         }
         sender.sendMessage("${threads.size} craft scheduler threads")
     }
 
-    @Suppress("UnstableApiUsage")
     private fun getPluginVersion(name: String): String {
-        val plugin = if (name == "NuVotifier") {
-            Bukkit.getPluginManager().getPlugin("Votifier")
-        } else {
-            Bukkit.getPluginManager().getPlugin(name)
-        }
+        val plugin =
+            if (name == "NuVotifier") {
+                Bukkit.getPluginManager().getPlugin("Votifier")
+            } else {
+                Bukkit.getPluginManager().getPlugin(name)
+            }
         return plugin?.pluginMeta?.version ?: "不明"
     }
 
     @Subcommand("reload")
     @Syntax("<data>")
     @CommandCompletion("@reloadable")
-    fun reload(sender: CommandSender, @Default("all") data: String) {
+    fun reload(
+        sender: CommandSender,
+        @Default("all") data: String,
+    ) {
         when (data.lowercase()) {
             "all" -> {
                 SomCore.instance.repeatingTaskScheduler.shutdown()
@@ -79,28 +90,34 @@ class SomCommand : BaseCommand() {
                 Bukkit.getScheduler().cancelTasks(SomCore.instance)
                 Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
             }
+
             "title" -> {
                 DataLoader.TitleDataLoad()
                 sender.sendMessage("§a称号データをリロードしました")
             }
+
             "item" -> {
                 DataLoader.ItemDataLoad()
                 DataLoader.ItemInfoDataLoad()
                 sender.sendMessage("§aアイテムデータをリロードしました")
             }
+
             "rune" -> {
                 DataLoader.RuneDataLoad()
                 DataLoader.RuneInfoDataLoad()
                 sender.sendMessage("§aルーンデータをリロードしました")
             }
+
             "skill" -> {
                 DataLoader.SkillDataLoad()
                 sender.sendMessage("§aスキルデータをリロードしました")
             }
+
             "shop" -> {
                 DataLoader.ShopDataLoad()
                 sender.sendMessage("§aショップデータをリロードしました")
             }
+
             else -> {
                 sender.sendMessage("§cリロード可能なデータ [$data] は存在しません")
                 return
@@ -110,7 +127,6 @@ class SomCommand : BaseCommand() {
 
     @Subcommand("test2")
     fun somTest2(sender: Player) {
-
         val file = File(SomCore.instance.dataFolder, "input.txt")
         if (!file.exists()) {
             sender.sendMessage("ファイルが存在しません")
@@ -130,19 +146,29 @@ class SomCommand : BaseCommand() {
 
     @Subcommand("paste")
     @Syntax("<schem>")
-    fun paste(player: Player, schem: String) {
+    fun paste(
+        player: Player,
+        schem: String,
+    ) {
         player.performCommand("schem load $schem")
         player.performCommand("/paste")
     }
 
     @Subcommand("restart")
     @Syntax("<seconds>")
-    fun restart(sender: CommandSender, @Conditions("limits:min=10,max=86400") seconds: Int) {
+    fun restart(
+        sender: CommandSender,
+        @Conditions("limits:min=10,max=86400") seconds: Int,
+    ) {
         SomCore.instance.launch(asyncDispatcher) {
             for (i in seconds downTo 1) {
                 if (SomCore.restartNotifyTimes.contains(i)) {
                     for (p in Bukkit.getOnlinePlayers()) {
-                        Function.sendMessage(p, "§b[${DataBase.ServerId}] §a現在接続しているチャンネルは${TimeUtils.formatSeconds(i)}後に再起動されます", SoundList.CLICK)
+                        Function.sendMessage(
+                            p,
+                            "§b[${DataBase.ServerId}] §a現在接続しているチャンネルは${TimeUtils.formatSeconds(i)}後に再起動されます",
+                            SoundList.CLICK,
+                        )
                     }
                 }
                 delay(1000)
@@ -170,5 +196,4 @@ class SomCommand : BaseCommand() {
         }
         sender.sendMessage("§e合計: §a${enemies.size}体")
     }
-
 }

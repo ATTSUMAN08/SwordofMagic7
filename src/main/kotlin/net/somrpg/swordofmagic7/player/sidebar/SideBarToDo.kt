@@ -6,7 +6,7 @@ import swordofmagic7.Function
 import swordofmagic7.Life.LifeType
 
 class SideBarToDo(
-    private val playerData: PlayerData
+    private val playerData: PlayerData,
 ) {
     private val dataList: MutableList<SideBarToDoData> = mutableListOf()
 
@@ -89,13 +89,22 @@ class SideBarToDo(
                     val amount = playerData.ItemInventory.getItemParameterStack(itemParameter).Amount
                     lines.add(Function.decoLore("アイテム数[" + itemParameter.Display + "]") + amount + "個")
                 }
+
                 SideBarToDoType.LIFE_INFO -> {
                     val lifeType = LifeType.getData(key) ?: continue
-                    lines.add("§7・§e§l" + lifeType.Display + " Lv" + playerData.LifeStatus.getLevel(lifeType) + " " + playerData.LifeStatus.viewExpPercent(lifeType))
+                    lines.add(
+                        "§7・§e§l" + lifeType.Display + " Lv" + playerData.LifeStatus.getLevel(lifeType) + " " +
+                            playerData.LifeStatus.viewExpPercent(lifeType),
+                    )
                 }
+
                 SideBarToDoType.CLASS_INFO -> {
                     val classData = DataBase.getClassData(key) ?: continue
-                    lines.add("§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) + " §a§l" + playerData.Classes.viewExpPercent(classData))
+                    lines.add(
+                        "§7・" + classData.Color + "§l" + classData.Display + " §e§lLv" + playerData.Classes.getClassLevel(classData) +
+                            " §a§l" +
+                            playerData.Classes.viewExpPercent(classData),
+                    )
                 }
             }
         }

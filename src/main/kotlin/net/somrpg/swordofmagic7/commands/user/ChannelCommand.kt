@@ -1,8 +1,14 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.*
+import co.aikar.commands.annotation.CommandAlias
+import co.aikar.commands.annotation.CommandCompletion
+import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Default
+import co.aikar.commands.annotation.HelpCommand
+import co.aikar.commands.annotation.Syntax
 import net.somrpg.swordofmagic7.extensions.getPlayerData
 import org.bukkit.entity.Player
 import swordofmagic7.Function.sendMessage
@@ -11,29 +17,53 @@ import swordofmagic7.Sound.SoundList
 @CommandAlias("channel|ch")
 @CommandPermission("som7.user")
 class ChannelCommand : BaseCommand() {
-
     @Default
     @Syntax("<channel>")
     @CommandCompletion("@channels")
-    fun default(player: Player, channel: String) {
+    fun default(
+        player: Player,
+        channel: String,
+    ) {
         val playerData = player.getPlayerData()
         if (playerData.isPlayDungeonQuest) {
             sendMessage(player, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.NOPE)
             return
         }
-        val teleportServer = when (channel.lowercase()) {
-            "1" -> "CH1"
-            "2" -> "CH2"
-            "3" -> "CH3"
-            "4" -> "CH4"
-            "5" -> "CH5"
-            "ev", "event" -> "Event"
-            "dev" -> "Dev"
-            else -> {
-                player.sendMessage("存在しないチャンネルです")
-                return
+        val teleportServer =
+            when (channel.lowercase()) {
+                "1" -> {
+                    "CH1"
+                }
+
+                "2" -> {
+                    "CH2"
+                }
+
+                "3" -> {
+                    "CH3"
+                }
+
+                "4" -> {
+                    "CH4"
+                }
+
+                "5" -> {
+                    "CH5"
+                }
+
+                "ev", "event" -> {
+                    "Event"
+                }
+
+                "dev" -> {
+                    "Dev"
+                }
+
+                else -> {
+                    player.sendMessage("存在しないチャンネルです")
+                    return
+                }
             }
-        }
         playerData.saveTeleportServer = "SOM7$teleportServer"
         playerData.save()
     }

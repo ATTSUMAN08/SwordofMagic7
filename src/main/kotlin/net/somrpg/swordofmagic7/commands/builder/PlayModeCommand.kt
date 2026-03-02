@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.builder
 
 import co.aikar.commands.BaseCommand
@@ -12,7 +13,6 @@ import swordofmagic7.Data.PlayerData
 @CommandAlias("playmode|pm")
 @CommandPermission("som7.builder")
 class PlayModeCommand : BaseCommand() {
-
     @Default
     fun playMode(sender: Player) {
         val playerData = PlayerData.playerData(sender)

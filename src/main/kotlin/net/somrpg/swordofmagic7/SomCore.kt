@@ -21,7 +21,11 @@ import net.somrpg.swordofmagic7.extensions.asyncDispatcher
 import net.somrpg.swordofmagic7.lisiteners.MainListener
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import net.somrpg.swordofmagic7.npc.NPCManager
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.GameRules
+import org.bukkit.Location
+import org.bukkit.NamespacedKey
+import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Display
@@ -29,10 +33,37 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
 import org.bukkit.persistence.PersistentDataType
-import swordofmagic7.Command.Developer.*
-import swordofmagic7.Command.Player.*
+import swordofmagic7.Command.Developer.AddTitle
+import swordofmagic7.Command.Developer.BukkitTasks
+import swordofmagic7.Command.Developer.ClassSelect
+import swordofmagic7.Command.Developer.GetClassExp
+import swordofmagic7.Command.Developer.GetEffect
+import swordofmagic7.Command.Developer.GetExp
+import swordofmagic7.Command.Developer.GetItem
+import swordofmagic7.Command.Developer.GetLevel
+import swordofmagic7.Command.Developer.GetRune
+import swordofmagic7.Command.Developer.Load
+import swordofmagic7.Command.Developer.LoadedPlayer
+import swordofmagic7.Command.Developer.MobSpawn
+import swordofmagic7.Command.Developer.Save
+import swordofmagic7.Command.Developer.SendData
+import swordofmagic7.Command.Developer.SetNick
+import swordofmagic7.Command.Developer.SkillCTReset
+import swordofmagic7.Command.Player.AuctionCommand
+import swordofmagic7.Command.Player.BlockPlayer
+import swordofmagic7.Command.Player.EffectInfo
+import swordofmagic7.Command.Player.ItemInfo
+import swordofmagic7.Command.Player.MarketCommand
+import swordofmagic7.Command.Player.MobInfo
+import swordofmagic7.Command.Player.Party
+import swordofmagic7.Command.Player.ReqExp
+import swordofmagic7.Command.Player.ReqLifeExp
+import swordofmagic7.Command.Player.RuneFilter
+import swordofmagic7.Command.Player.RuneInfo
+import swordofmagic7.Command.Player.TagGameCommand
+import swordofmagic7.Command.Player.playerInfo
 import swordofmagic7.Command.SomCommand
-import swordofmagic7.Data.DataBase.*
+import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.Editor
 import swordofmagic7.Data.PlayerData
 import swordofmagic7.Data.PlayerData.playerData
@@ -40,7 +71,7 @@ import swordofmagic7.Dungeon.DefenseBattle
 import swordofmagic7.Dungeon.Dungeon
 import swordofmagic7.Effect.EffectManager
 import swordofmagic7.Events
-import swordofmagic7.Function.*
+import swordofmagic7.Function
 import swordofmagic7.Map.TeleportGateParameter
 import swordofmagic7.Map.WarpGateParameter
 import swordofmagic7.Mob.MobManager
@@ -58,7 +89,8 @@ import swordofmagic7.viewBar.ViewBar
 import java.io.File
 import java.security.SecureRandom
 import java.time.Duration
-import java.util.*
+import java.util.Random
+import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import kotlin.math.cos
@@ -80,15 +112,16 @@ class SomCore : SuspendingJavaPlugin() {
         const val PLAYER_MAX_LEVEL = 65
         const val CLASS_MAX_LEVEL = 25
 
-        fun isEventServer(): Boolean = ServerId.equals("Event", ignoreCase = true)
-        fun isDevServer(): Boolean = ServerId.equals("Dev", ignoreCase = true)
+        fun isEventServer(): Boolean = DataBase.ServerId.equals("Event", ignoreCase = true)
+
+        fun isDevServer(): Boolean = DataBase.ServerId.equals("Dev", ignoreCase = true)
     }
+
     lateinit var packetEventsListener: PacketListenerCommon
     private val hologramMap = HashMap<String, Hologram>()
     val hologramTouchActions = HashMap<String, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
     val repeatingTaskScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(10)
-    
 
     fun createHologram(location: Location): Hologram {
         val hologram = DHAPI.createHologram("SOM7_${UUID.randomUUID()}", location)
@@ -96,7 +129,11 @@ class SomCore : SuspendingJavaPlugin() {
         return hologram
     }
 
-    private fun createTouchHologram(display: String, location: Location, action: (Player) -> Unit) {
+    private fun createTouchHologram(
+        display: String,
+        location: Location,
+        action: (Player) -> Unit,
+    ) {
         val hologram = createHologram(location)
         DHAPI.addHologramLine(hologram, display)
         hologramTouchActions[hologram.id] = action
@@ -109,19 +146,19 @@ class SomCore : SuspendingJavaPlugin() {
         instance = this
         random = SecureRandom()
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
-        ServerId = config.getString("serverId") ?: "Default"
+        DataBase.ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
 
         // Initialize folders
         if (!dataFolder.exists()) {
-            createFolder(dataFolder)
+            Function.createFolder(dataFolder)
         }
-        val marketFolder = File(DataBasePath, "Market")
+        val marketFolder = File(DataBase.DataBasePath, "Market")
         if (!marketFolder.exists()) {
-            createFolder(marketFolder)
+            Function.createFolder(marketFolder)
         }
 
-        DataLoad()
+        DataBase.DataLoad()
 
         Tutorial.onLoad()
         Events(this)
@@ -131,7 +168,7 @@ class SomCore : SuspendingJavaPlugin() {
 
         packetEventsListener = PacketEvents.getAPI().eventManager.registerListener(PacketEventsListener(), PacketListenerPriority.NORMAL)
 
-        WarpGateList.values.forEach { it.start() }
+        DataBase.WarpGateList.values.forEach { it.start() }
 
         world.apply {
             setGameRule(GameRules.ADVANCE_WEATHER, false)
@@ -150,25 +187,30 @@ class SomCore : SuspendingJavaPlugin() {
             this.time = 6000L
         }
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
-            val start = System.currentTimeMillis()
-            broadcastNoConsole("§e[オートセーブ]§aを§b開始§aします")
-            PlayerList.ResetPlayer.clear()
-            val playerDataList = PlayerData.getPlayerData().values.toSet()
-            playerDataList.forEach { data ->
-                val player = data.player
-                if (player != null) {
-                    if (player.isOnline) data.save() else PlayerData.remove(player)
+        Bukkit.getScheduler().runTaskTimerAsynchronously(
+            this,
+            Runnable {
+                val start = System.currentTimeMillis()
+                Function.broadcastNoConsole("§e[オートセーブ]§aを§b開始§aします")
+                PlayerList.ResetPlayer.clear()
+                val playerDataList = PlayerData.getPlayerData().values.toSet()
+                playerDataList.forEach { data ->
+                    val player = data.player
+                    if (player != null) {
+                        if (player.isOnline) data.save() else PlayerData.remove(player)
+                    }
                 }
-            }
-            broadcastNoConsole("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
-        }, 200, 6000)
+                Function.broadcastNoConsole("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
+            },
+            200,
+            6000,
+        )
 
         MultiThread.TaskRunTimer({
             Bukkit.getOnlinePlayers().forEach { player ->
                 if (!PlayerData.ContainPlayer(player) && !isDevServer()) {
-                    sendMessage(player, "§cPlayer data not loaded")
-                    teleportServer(player, "Lobby")
+                    Function.sendMessage(player, "§cPlayer data not loaded")
+                    Function.teleportServer(player, "Lobby")
                 } else {
                     val playerData = playerData(player)
                     playerLastLocation[player]?.let { location ->
@@ -183,11 +225,11 @@ class SomCore : SuspendingJavaPlugin() {
                                         Title.Times.times(
                                             Duration.ZERO,
                                             Duration.ofSeconds(AFK_TIME_PERIOD + 4L),
-                                            Duration.ZERO
-                                        )
-                                    )
+                                            Duration.ZERO,
+                                        ),
+                                    ),
                                 )
-                                if (DefenseBattle.isStarted) teleportServer(player, "Lobby")
+                                if (DefenseBattle.isStarted) Function.teleportServer(player, "Lobby")
                             }
                         } else {
                             playerLastLocation[player] = player.location.clone()
@@ -215,9 +257,13 @@ class SomCore : SuspendingJavaPlugin() {
             playerData(player).Menu.Cook.CookMenuView()
         }
 
-        Bukkit.getScheduler().runTaskLater(instance, Runnable {
-            Bukkit.getOnlinePlayers().forEach { playerData(it).load() }
-        }, 20)
+        Bukkit.getScheduler().runTaskLater(
+            instance,
+            Runnable {
+                Bukkit.getOnlinePlayers().forEach { playerData(it).load() }
+            },
+            20,
+        )
 
         commandRegister()
         CommandManager.registerCommands()
@@ -257,25 +303,26 @@ class SomCore : SuspendingJavaPlugin() {
             enemyData.entity?.remove()
             count++
         }
-        world.entities.filterNot { it is Player || ignoreEntity(it) }.forEach {
+        world.entities.filterNot { it is Player || Function.ignoreEntity(it) }.forEach {
             it.remove()
             count++
         }
-        world.entities.filter {
-            it.persistentDataContainer.getOrDefault(NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN, false) == true
-        }.forEach { entity ->
-            entity.remove()
-            count++
-        }
-        Log("CleanEnemy: $count")
+        world.entities
+            .filter {
+                it.persistentDataContainer.getOrDefault(NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN, false) == true
+            }.forEach { entity ->
+                entity.remove()
+                count++
+            }
+        Function.Log("CleanEnemy: $count")
         Bukkit.getScheduler().cancelTasks(this)
-        Log("Plugin Task Cancelled")
+        Function.Log("Plugin Task Cancelled")
         PacketEvents.getAPI().eventManager.unregisterListener(packetEventsListener)
-        Log("PacketListener unregister")
+        Function.Log("PacketListener unregister")
 
         if (blueMapEnabled) {
             val blueMapApi = BlueMapAPI.getInstance().get()
-            blueMapApi.getWorld(world).get().maps.map { map ->
+            blueMapApi.getWorld(world).get().maps.forEach { map ->
                 val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID]
                 markerSet?.markers?.clear()
             }
@@ -298,36 +345,37 @@ class SomCore : SuspendingJavaPlugin() {
             val blueMapApi by lazy {
                 BlueMapAPI.getInstance().get()
             }
-            repeat(15) { // BlueMapの初期化を待つ 最大30秒
+            repeat(15) {
+                // BlueMapの初期化を待つ 最大30秒
                 if (BlueMapAPI.getInstance().isPresent) return@repeat
                 delay(2000)
             }
-            blueMapApi.getWorld(world).get().maps.map { map ->
-                map.markerSets.put(BLUEMAP_SPAWNERS_MARKERS_ID, MarkerSet.builder().label("スポナー").build())
+            blueMapApi.getWorld(world).get().maps.forEach { map ->
+                map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID] = MarkerSet.builder().label("スポナー").build()
             }
 
-            for (i in MobSpawnerList.values) {
+            for (i in DataBase.MobSpawnerList.values) {
                 val loc = i.location
                 val startX = loc.x - i.Radius
                 val endX = loc.x + i.Radius
                 val startZ = loc.z - i.Radius
                 val endZ = loc.z + i.Radius
                 val border = Shape.createRect(startX, startZ, endX, endZ)
-                val shapeMarker = ShapeMarker.builder()
-                    .label("${i.mobData.Id} (${i.Level}Lv)")
-                    .shape(border, 1F)
-                    .lineColor(Color(255, 0, 0, 1.0F))
-                    .fillColor(Color(200, 0, 0, 0.3F))
-                    .lineWidth(3)
-                    .depthTestEnabled(false)
-                    .build()
+                val shapeMarker =
+                    ShapeMarker
+                        .builder()
+                        .label("${i.mobData.Id} (${i.Level}Lv)")
+                        .shape(border, 1F)
+                        .lineColor(Color(255, 0, 0, 1.0F))
+                        .fillColor(Color(200, 0, 0, 0.3F))
+                        .lineWidth(3)
+                        .depthTestEnabled(false)
+                        .build()
 
-                blueMapApi.getWorld(world).get().maps.map { map ->
+                blueMapApi.getWorld(world).get().maps.forEach { map ->
                     val markerSet = map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID] ?: throw IllegalStateException("MarkerSet not found WTF")
-
-                    markerSet.markers.put(i.Id, shapeMarker)
-
-                    map.markerSets.put(BLUEMAP_SPAWNERS_MARKERS_ID, markerSet)
+                    markerSet.markers[i.Id] = shapeMarker
+                    map.markerSets[BLUEMAP_SPAWNERS_MARKERS_ID] = markerSet
                 }
             }
 
@@ -335,7 +383,11 @@ class SomCore : SuspendingJavaPlugin() {
         }
     }
 
-    private fun createRepeatTask(delay: Long, threadName: String, block: () -> Unit) {
+    private fun createRepeatTask(
+        delay: Long,
+        threadName: String,
+        block: () -> Unit,
+    ) {
         repeatingTaskScheduler.execute {
             Thread.currentThread().name = "SwordofMagic7-Thread - $threadName"
             while (isEnabled) {
@@ -351,7 +403,7 @@ class SomCore : SuspendingJavaPlugin() {
         val radius = 2.0
 
         createRepeatTask(10, "WarpGateParticle") {
-            for (warpGate in WarpGateList.values) {
+            for (warpGate in DataBase.WarpGateList.values) {
                 if (!warpGate.isStarted) continue
                 val i = counts[warpGate] ?: 0
                 val angle = i * increment
@@ -362,7 +414,7 @@ class SomCore : SuspendingJavaPlugin() {
                 ParticleManager.spawnParticle(warpGate.particleData, nLoc)
                 ParticleManager.spawnParticle(warpGate.particleData, nLoc2)
                 counts[warpGate] = i + 1
-                if ((i+1) >= 90) {
+                if ((i + 1) >= 90) {
                     counts[warpGate] = 0
                 }
             }
@@ -375,7 +427,7 @@ class SomCore : SuspendingJavaPlugin() {
         val radius = 1.5
 
         createRepeatTask(25, "TeleportGateParticle") {
-            for (teleportGate in TeleportGateList.values) {
+            for (teleportGate in DataBase.TeleportGateList.values) {
                 val i = counts[teleportGate] ?: 0
                 val angle = i * increment
                 val x = radius * cos(angle)
@@ -385,7 +437,7 @@ class SomCore : SuspendingJavaPlugin() {
                 ParticleManager.spawnParticle(teleportGate.particleData, nLoc)
                 ParticleManager.spawnParticle(teleportGate.particleData, nLoc2)
                 counts[teleportGate] = i + 1
-                if ((i+1) >= 90) {
+                if ((i + 1) >= 90) {
                     counts[teleportGate] = 0
                 }
             }
@@ -435,7 +487,6 @@ class SomCore : SuspendingJavaPlugin() {
                 playerData.updateBossbar()
             }
         }
-
 
         createRepeatTask(50, "SkillCoolTime") {
             for (playerData in playerData.values) {
@@ -487,7 +538,7 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     private fun commandRegister() {
-        //Developer
+        // Developer
         SomCommand.register("SendData", SendData())
         SomCommand.register("getItem", GetItem())
         SomCommand.register("getRune", GetRune())
@@ -504,7 +555,7 @@ class SomCore : SuspendingJavaPlugin() {
         SomCommand.register("classSelect", ClassSelect())
         SomCommand.register("skillCTReset", SkillCTReset())
         SomCommand.register("addTitle", AddTitle())
-        //Player
+        // Player
         SomCommand.register("reqExp", ReqExp())
         SomCommand.register("reqLifeExp", ReqLifeExp())
         SomCommand.register("tagGame", TagGameCommand())
@@ -520,7 +571,12 @@ class SomCore : SuspendingJavaPlugin() {
         SomCommand.register("runeFilter", RuneFilter())
     }
 
-    override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
+    override fun onCommand(
+        sender: CommandSender,
+        cmd: Command,
+        label: String,
+        args: Array<out String>,
+    ): Boolean {
         if (sender is Player) {
             val playerData = playerData(sender)
             if (sender.hasPermission("som7.developer")) {
@@ -529,37 +585,46 @@ class SomCore : SuspendingJavaPlugin() {
                         Editor.itemDataEditCommand(sender, args)
                         return true
                     }
+
                     "mobspawnerdataedit" -> {
                         Editor.mobSpawnerDataEditCommand(sender, args)
                         return true
                     }
+
                     "mobspawnerdatacreate" -> {
                         Editor.mobSpawnerDataCreateCommand(sender, args)
                         return true
                     }
+
                     "mobdropitemcreate" -> {
                         Editor.mobDropItemCreateCommand(sender, args)
                         return true
                     }
+
                     "defensebattlestartwave" -> {
                         val wave = args.getOrNull(0)?.toIntOrNull() ?: 1
                         DefenseBattle.startWave(wave)
                         return true
                     }
+
                     "defensebattleendwave" -> {
                         DefenseBattle.endWave()
                         return true
                     }
+
                     "killmob" -> {
                         if (args.size == 1) {
                             try {
                                 val radius = args[0].toDouble()
-                                val count = MobManager.getEnemyList().count { enemy ->
-                                    (enemy.entity?.location?.distance(sender.location) ?: Double.MAX_VALUE) < radius
-                                }
+                                val count =
+                                    MobManager.getEnemyList().count { enemy ->
+                                        (enemy.entity?.location?.distance(sender.location) ?: Double.MAX_VALUE) < radius
+                                    }
                                 MobManager.getEnemyList().forEach { enemy ->
-                                    if ((enemy.entity?.location?.distance(sender.location)
-                                            ?: Double.MAX_VALUE) < radius
+                                    if ((
+                                            enemy.entity?.location?.distance(sender.location)
+                                                ?: Double.MAX_VALUE
+                                        ) < radius
                                     ) {
                                         enemy.dead()
                                     }
@@ -579,42 +644,51 @@ class SomCore : SuspendingJavaPlugin() {
                     playerData.ItemInventory.ItemInventorySort()
                     return true
                 }
+
                 "runeinventorysort" -> {
                     playerData.RuneInventory.RuneInventorySort()
                     return true
                 }
+
                 "petinventorysort" -> {
                     playerData.PetInventory.PetInventorySort()
                     return true
                 }
+
                 "iteminventorysortreverse" -> {
                     playerData.ItemInventory.ItemInventorySortReverse()
                     return true
                 }
+
                 "runeinventorysortreverse" -> {
                     playerData.RuneInventory.RuneInventorySortReverse()
                     return true
                 }
+
                 "petinventorysortreverse" -> {
                     playerData.PetInventory.PetInventorySortReverse()
                     return true
                 }
+
                 "tutorial" -> {
                     if (TagGame.isTagPlayerNonMessage(sender)) return true
                     Tutorial.tutorialHub(sender)
                     return true
                 }
+
                 "trade" -> {
                     TradeManager.tradeCommand(sender, playerData, args)
                     return true
                 }
+
                 "textview" -> {
                     TextViewManager.TextView(sender, args)
                     return true
                 }
+
                 "settitle" -> {
                     if (args.size == 1) {
-                        val title = TitleDataList[args[0]]
+                        val title = DataBase.TitleDataList[args[0]]
                         if (title != null) {
                             playerData.titleManager.setTitle(title)
                         } else {
@@ -622,12 +696,13 @@ class SomCore : SuspendingJavaPlugin() {
                             playSound(sender, SoundList.NOPE)
                         }
                     } else {
-                        playerData.titleManager.Title = TitleDataList["称号無し"]
+                        playerData.titleManager.Title = DataBase.TitleDataList["称号無し"]
                         sender.sendMessage("§a称号を外しました")
                         playSound(sender, SoundList.TICK)
                     }
                     return true
                 }
+
                 "setfishingcombo" -> {
                     if (!playerData.Gathering.FishingUseCombo) {
                         try {
@@ -647,66 +722,87 @@ class SomCore : SuspendingJavaPlugin() {
                     playSound(sender, SoundList.TICK)
                     return true
                 }
+
                 "nickreset" -> {
                     playerData.Nick = sender.name
-                    sendMessage(sender, "§eプレイヤ名§aを§e[${playerData.nick}]§aに§cリセット§aしました", SoundList.TICK)
+                    Function.sendMessage(sender, "§eプレイヤ名§aを§e[${playerData.nick}]§aに§cリセット§aしました", SoundList.TICK)
                     return true
                 }
+
                 "skillslot" -> {
                     playerData.HotBar.SkillSlotCommand(args)
                     return true
                 }
+
                 "entities" -> {
-                    sendMessage(sender, "EntityCount: ${sender.world.entityCount}")
+                    Function.sendMessage(sender, "EntityCount: ${sender.world.entityCount}")
                     return true
                 }
+
                 "setfastupgrade" -> {
                     try {
                         val fastUpgrade = args[0].toInt().coerceIn(1, 25)
                         playerData.Upgrade.fastUpgrade = fastUpgrade
-                        sendMessage(sender, "§aFastUpgrade: $fastUpgrade")
+                        Function.sendMessage(sender, "§aFastUpgrade: $fastUpgrade")
                     } catch (_: Exception) {
-                        sendMessage(sender, "§e/setFastUpgrade <1~25>")
+                        Function.sendMessage(sender, "§e/setFastUpgrade <1~25>")
                     }
                     return true
                 }
+
                 "cast" -> {
                     try {
                         val slot = args[0].toInt() - 1
                         if (slot in 0..31) {
                             playerData.HotBar.use(slot)
                         } else {
-                            sendMessage(sender, "§e/cast <1~32>")
+                            Function.sendMessage(sender, "§e/cast <1~32>")
                         }
                     } catch (_: Exception) {
-                        sendMessage(sender, "§e/cast <1~32>")
+                        Function.sendMessage(sender, "§e/cast <1~32>")
                     }
                     return true
                 }
+
                 "itemsearch" -> {
                     playerData.ItemInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[${playerData.ItemInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
+                    Function.sendMessage(
+                        sender,
+                        "§e[インベントリサーチ] §b-> §e[アイテム] §b-> §e[${playerData.ItemInventory.wordSearch ?: "すべて"}]",
+                        SoundList.TICK,
+                    )
                     playerData.viewUpdate()
                     return true
                 }
+
                 "runesearch" -> {
                     playerData.RuneInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[${playerData.RuneInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
+                    Function.sendMessage(
+                        sender,
+                        "§e[インベントリサーチ] §b-> §e[ルーン] §b-> §e[${playerData.RuneInventory.wordSearch ?: "すべて"}]",
+                        SoundList.TICK,
+                    )
                     playerData.viewUpdate()
                     return true
                 }
+
                 "petsearch" -> {
                     playerData.PetInventory.wordSearch = args.getOrNull(0)
-                    sendMessage(sender, "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[${playerData.PetInventory.wordSearch ?: "すべて"}]", SoundList.TICK)
+                    Function.sendMessage(
+                        sender,
+                        "§e[インベントリサーチ] §b-> §e[ペット] §b-> §e[${playerData.PetInventory.wordSearch ?: "すべて"}]",
+                        SoundList.TICK,
+                    )
                     playerData.viewUpdate()
                     return true
                 }
+
                 "damagesimulator" -> {
                     if (args.size >= 2) {
                         val log = getString(args)
-                        sendMessage(sender, log)
+                        Function.sendMessage(sender, log)
                     } else {
-                        sendMessage(sender, "§e/damageSimulator <atk> <def> [<multiply>] [<perforate>]")
+                        Function.sendMessage(sender, "§e/damageSimulator <atk> <def> [<multiply>] [<perforate>]")
                     }
                     return true
                 }
@@ -734,18 +830,21 @@ class SomCore : SuspendingJavaPlugin() {
             playerData.Skill.SkillProcess.normalAttackCoolTime = 0
 
             MultiThread.TaskRunSynchronizedLater({
-                MapList["Alden"]?.enter(player)
+                DataBase.MapList["Alden"]?.enter(player)
                 player.apply {
                     isFlying = false
                     setGravity(true)
-                    teleportAsync(SpawnLocation)
+                    teleportAsync(DataBase.SpawnLocation)
                 }
                 nextSpawnPlayer.remove(player)
             }, 1, "spawnPlayer")
         }
     }
 
-    fun createTextDisplay(loc: Location, defaultText: Component): TextDisplay {
+    fun createTextDisplay(
+        loc: Location,
+        defaultText: Component,
+    ): TextDisplay {
         val textDisplayLocation = loc.clone().apply { pitch = 0F }
         val textDisplay = loc.world.spawnEntity(textDisplayLocation, EntityType.TEXT_DISPLAY) as TextDisplay
         textDisplay.billboard = Display.Billboard.VERTICAL
@@ -754,7 +853,4 @@ class SomCore : SuspendingJavaPlugin() {
         textDisplay.persistentDataContainer[NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN] = true
         return textDisplay
     }
-
-
-
 }

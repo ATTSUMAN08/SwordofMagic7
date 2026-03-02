@@ -1,16 +1,21 @@
 package net.somrpg.swordofmagic7.commands
 
-import co.aikar.commands.*
+import co.aikar.commands.BaseCommand
+import co.aikar.commands.BukkitCommandExecutionContext
+import co.aikar.commands.BukkitCommandIssuer
+import co.aikar.commands.CommandConditions
+import co.aikar.commands.ConditionContext
+import co.aikar.commands.ConditionFailedException
+import co.aikar.commands.PaperCommandManager
 import net.somrpg.swordofmagic7.SomCore
 import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
 import swordofmagic7.Data.DataBase
 import swordofmagic7.Life.LifeType
-import java.util.*
+import java.util.Locale
 
 object CommandManager {
-
     fun registerCommands() {
         val manager = PaperCommandManager(SomCore.instance)
         manager.locales.defaultLocale = Locale.JAPANESE
@@ -33,8 +38,14 @@ object CommandManager {
 
     private fun registerConditions(manager: PaperCommandManager) {
         // Int | limits
-        manager.commandConditions.addCondition(Int::class.java, "limits",
-            CommandConditions.ParameterCondition { c: ConditionContext<BukkitCommandIssuer>, _: BukkitCommandExecutionContext, value: Int? ->
+        manager.commandConditions.addCondition(
+            Int::class.java,
+            "limits",
+            CommandConditions.ParameterCondition {
+                c: ConditionContext<BukkitCommandIssuer>,
+                _: BukkitCommandExecutionContext,
+                value: Int?,
+                ->
                 if (value == null) {
                     return@ParameterCondition
                 }
@@ -44,12 +55,18 @@ object CommandManager {
                 if (c.hasConfig("max") && c.getConfigValue("max", 3) < value) {
                     throw ConditionFailedException("値の最高値は${c.getConfigValue("max", 3)}です")
                 }
-            }
+            },
         )
 
         // Float | limits
-        manager.commandConditions.addCondition(Float::class.java, "limits",
-            CommandConditions.ParameterCondition { c: ConditionContext<BukkitCommandIssuer>, _: BukkitCommandExecutionContext, value: Float? ->
+        manager.commandConditions.addCondition(
+            Float::class.java,
+            "limits",
+            CommandConditions.ParameterCondition {
+                c: ConditionContext<BukkitCommandIssuer>,
+                _: BukkitCommandExecutionContext,
+                value: Float?,
+                ->
                 if (value == null) {
                     return@ParameterCondition
                 }
@@ -61,7 +78,7 @@ object CommandManager {
                 if (c.hasConfig("max") && max < value) {
                     throw ConditionFailedException("値の最高値は${max}です")
                 }
-            }
+            },
         )
     }
 
@@ -95,5 +112,4 @@ object CommandManager {
             return@registerCompletion DataBase.getClassList().keys
         }
     }
-
 }

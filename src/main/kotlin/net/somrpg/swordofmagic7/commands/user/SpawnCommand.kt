@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user
 
 import co.aikar.commands.BaseCommand
@@ -13,7 +14,6 @@ import swordofmagic7.TagGame
 @CommandAlias("spawn")
 @CommandPermission("som7.user")
 class SpawnCommand : BaseCommand() {
-
     @Default
     fun default(sender: Player) {
         if (TagGame.isTagPlayerNonMessage(sender)) return

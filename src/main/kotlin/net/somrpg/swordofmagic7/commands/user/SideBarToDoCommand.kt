@@ -1,8 +1,14 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.*
+import co.aikar.commands.annotation.CommandAlias
+import co.aikar.commands.annotation.CommandCompletion
+import co.aikar.commands.annotation.CommandPermission
+import co.aikar.commands.annotation.Default
+import co.aikar.commands.annotation.Subcommand
+import co.aikar.commands.annotation.Syntax
 import net.somrpg.swordofmagic7.extensions.getPlayerData
 import org.bukkit.entity.Player
 import swordofmagic7.Function
@@ -10,7 +16,6 @@ import swordofmagic7.Function
 @CommandAlias("sidebartodo|sbtd")
 @CommandPermission("som7.user")
 class SideBarToDoCommand : BaseCommand() {
-
     @Default
     fun default(player: Player) {
         player.sendMessage(Function.decoText("SideBarToDo Commands"))
@@ -24,28 +29,40 @@ class SideBarToDoCommand : BaseCommand() {
     @Subcommand("itemamount")
     @Syntax("<itemName>")
     @CommandCompletion("@items")
-    fun itemAmount(player: Player, itemName: String) {
+    fun itemAmount(
+        player: Player,
+        itemName: String,
+    ) {
         player.getPlayerData().SideBarToDo.toggleItemAmount(itemName)
     }
 
     @Subcommand("recipeinfo")
     @Syntax("<recipeId>")
     @CommandCompletion("@recipes")
-    fun recipeInfo(player: Player, recipeId: String) {
+    fun recipeInfo(
+        player: Player,
+        recipeId: String,
+    ) {
         player.getPlayerData().SideBarToDo.toggleRecipeInfo(recipeId)
     }
 
     @Subcommand("lifeinfo")
     @Syntax("<lifeId>")
     @CommandCompletion("@lifes")
-    fun lifeInfo(player: Player, lifeId: String) {
+    fun lifeInfo(
+        player: Player,
+        lifeId: String,
+    ) {
         player.getPlayerData().SideBarToDo.toggleLifeInfo(lifeId)
     }
 
     @Subcommand("classinfo")
     @Syntax("<classId>")
     @CommandCompletion("@classes")
-    fun classInfo(player: Player, classId: String) {
+    fun classInfo(
+        player: Player,
+        classId: String,
+    ) {
         player.getPlayerData().SideBarToDo.toggleClassInfo(classId)
     }
 

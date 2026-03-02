@@ -14,8 +14,9 @@ import swordofmagic7.MultiThread.MultiThread
 import swordofmagic7.Particle.ParticleManager
 import swordofmagic7.PlayerList
 
-class QueenSlime(manager: EnemySkillManager) : EnemySkillBase(manager) {
-
+class QueenSlime(
+    manager: EnemySkillManager,
+) : EnemySkillBase(manager) {
     fun stickyTrap() {
         val castTime = 60 // キャスト時間 (3秒)
         val radiusBoss = 6.0 // ボスの半径

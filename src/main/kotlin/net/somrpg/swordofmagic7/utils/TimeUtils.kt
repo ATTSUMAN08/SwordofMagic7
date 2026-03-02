@@ -1,7 +1,6 @@
 package net.somrpg.swordofmagic7.utils
 
 object TimeUtils {
-
     /**
      * 秒を時間形式の文字列に変換する
      * @param seconds 秒数
@@ -28,7 +27,5 @@ object TimeUtils {
      * @param milliseconds ミリ秒数
      * @return 時間形式の文字列
      */
-    fun formatMilliseconds(milliseconds: Long): String {
-        return formatSeconds((milliseconds / 1000).toInt())
-    }
+    fun formatMilliseconds(milliseconds: Long): String = formatSeconds((milliseconds / 1000).toInt())
 }

@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.grgit)
     alias(libs.plugins.paperweight)
     alias(libs.plugins.shadow)
+    alias(libs.plugins.kotlinter)
 }
 
 group = "swordofmagic7"

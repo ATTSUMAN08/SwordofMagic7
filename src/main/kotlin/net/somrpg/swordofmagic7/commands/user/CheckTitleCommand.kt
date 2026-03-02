@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user
 
 import co.aikar.commands.BaseCommand
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player
 @CommandAlias("checktitle")
 @CommandPermission("som7.user")
 class CheckTitleCommand : BaseCommand() {
-
     @Default
     fun default(sender: Player) {
         sender.getPlayerData().statistics.checkTitle()

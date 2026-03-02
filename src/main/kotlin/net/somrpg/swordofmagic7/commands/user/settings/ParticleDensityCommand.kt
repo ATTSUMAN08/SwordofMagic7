@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user.settings
 
 import co.aikar.commands.BaseCommand
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player
 @CommandAlias("particledensity")
 @CommandPermission("som7.user")
 class ParticleDensityCommand : BaseCommand() {
-
     @Default
     fun default(sender: Player) {
         sender.getPlayerData().ParticleDensity()

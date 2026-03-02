@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package net.somrpg.swordofmagic7.commands.user
 
 import co.aikar.commands.BaseCommand
@@ -13,7 +14,6 @@ import swordofmagic7.Sound.SoundList
 @CommandAlias("menu|m")
 @CommandPermission("som7.user")
 class MenuCommand : BaseCommand() {
-
     @Default
     fun default(sender: Player) {
         sender.getPlayerData().Menu.UserMenuView()

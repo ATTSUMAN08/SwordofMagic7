@@ -8,7 +8,6 @@ import java.util.jar.JarFile
  * Utility class to find all classes within a package
  */
 object PackageClassFinder {
-
     /**
      * Find all classes in a package
      *
@@ -21,7 +20,11 @@ object PackageClassFinder {
 
         try {
             // Get the plugin's jar file
-            val pluginFile = File(plugin.javaClass.protectionDomain.codeSource.location.toURI())
+            val pluginFile =
+                File(
+                    plugin.javaClass.protectionDomain.codeSource.location
+                        .toURI(),
+                )
 
             if (pluginFile.isFile) { // It's a jar file
                 val jarFile = JarFile(pluginFile)

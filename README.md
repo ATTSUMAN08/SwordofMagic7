@@ -1,3 +1,4 @@
+[Qodana Reports](https://qodana.cloud/projects/z8b1j/reports/Db5vVe)
 # 目標
 - [ ] コードベースを整理し、読みやすくする
 - [ ] 全てのコードをKotlinに移行する

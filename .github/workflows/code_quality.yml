@@ -1,4 +1,5 @@
 name: Qodana
+
 on:
   push:
     branches:
