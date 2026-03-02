@@ -14,7 +14,7 @@ import swordofmagic7.Life.Gathering.ChangeBlock
 
 class PacketEventsListener : PacketListener {
     override fun onPacketSend(e: PacketSendEvent) {
-        val p: Player = e.getPlayer()
+        val p = e.getPlayer() as? Player ?: return
         if (!p.isOnline) return
 
         when (e.packetType) {
