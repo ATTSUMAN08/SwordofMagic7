@@ -5,7 +5,6 @@ import org.bukkit.entity.Player
 import org.geysermc.floodgate.api.FloodgateApi
 
 object BedrockAdapter {
-
     fun isBedrock(player: Player): Boolean {
         if (Bukkit.getPluginManager().isPluginEnabled("Floodgate")) {
             val api = FloodgateApi.getInstance()

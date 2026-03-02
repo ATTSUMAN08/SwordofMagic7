@@ -108,7 +108,7 @@ bukkitPluginYaml {
     apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    depend = listOf("ForestRedisAPI", "DecentHolograms", "LibsDisguises", "PacketEvents")
+    depend = listOf("ForestRedisAPI", "DecentHolograms", "LibsDisguises", "packetevents")
     softDepend = listOf("BlueMap", "Floodgate")
 
     permissions {

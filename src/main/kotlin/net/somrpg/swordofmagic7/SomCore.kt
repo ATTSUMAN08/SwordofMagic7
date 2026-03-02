@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.event.PacketListenerCommon
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.google.gson.Gson
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.bluecolored.bluemap.api.markers.ShapeMarker
@@ -103,7 +102,6 @@ class SomCore : SuspendingJavaPlugin() {
         lateinit var instance: SomCore
         lateinit var random: Random
         val restartNotifyTimes: Set<Int> = setOf(1800, 1200, 600, 300, 240, 180, 120, 60, 30, 20, 10, 5, 4, 3, 2, 1)
-        val gson = Gson()
         var blueMapEnabled = false
 
         private const val BLUEMAP_SPAWNERS_MARKERS_ID = "som7_spawners"
@@ -130,12 +128,11 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     private fun createTouchHologram(
-        display: String,
         location: Location,
         action: (Player) -> Unit,
     ) {
         val hologram = createHologram(location)
-        DHAPI.addHologramLine(hologram, display)
+        DHAPI.addHologramLine(hologram, "")
         hologramTouchActions[hologram.id] = action
     }
 
@@ -247,13 +244,13 @@ class SomCore : SuspendingJavaPlugin() {
         ParticleManager.onLoad()
 
         // Initialize holograms
-        createTouchHologram("", Location(world, -196.2, 24.0, 1187.5, 90F, 0F)) { player ->
+        createTouchHologram(Location(world, -196.2, 24.0, 1187.5, 90F, 0F)) { player ->
             playerData(player).Menu.Smith.SmithMenuView()
         }
-        createTouchHologram("", Location(world, -203.5, 20.0, 1112.0, 0F, 0F)) { player ->
+        createTouchHologram(Location(world, -203.5, 20.0, 1112.0, 0F, 0F)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
-        createTouchHologram("", Location(world, -207.5, 20.0, 1112.0, 0F, 0F)) { player ->
+        createTouchHologram(Location(world, -207.5, 20.0, 1112.0, 0F, 0F)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
 
