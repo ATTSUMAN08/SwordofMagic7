@@ -109,7 +109,7 @@ bukkitPluginYaml {
 
     main = "net.somrpg.swordofmagic7.SomCore"
     depend = listOf("ForestRedisAPI", "DecentHolograms", "LibsDisguises", "PacketEvents")
-    softDepend = listOf("BlueMap")
+    softDepend = listOf("BlueMap", "Floodgate")
 
     permissions {
         register("som7.developer") {

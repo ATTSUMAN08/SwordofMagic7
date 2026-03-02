@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.TaskUtils;
+import net.somrpg.swordofmagic7.hooks.floodgate.BedrockAdapter;
 import net.somrpg.swordofmagic7.player.sidebar.SideBarToDo;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -26,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.geysermc.floodgate.api.FloodgateApi;
 import swordofmagic7.Attribute.Attribute;
 import swordofmagic7.Attribute.AttributeType;
 import swordofmagic7.Data.Type.DamageLogType;
@@ -298,7 +298,7 @@ public class PlayerData {
     public int HoloAnim = 0;
 
     public void sendMenuPacket() {
-        if (FloodgateApi.getInstance().isFloodgateId(player.getUniqueId())) {
+        if (BedrockAdapter.INSTANCE.isBedrock(player)) {
             return;
         }
 
