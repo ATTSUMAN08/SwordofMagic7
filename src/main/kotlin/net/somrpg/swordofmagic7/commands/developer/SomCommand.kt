@@ -85,9 +85,6 @@ class SomCommand : BaseCommand() {
     ) {
         when (data.lowercase()) {
             "all" -> {
-                SomCore.instance.repeatingTaskScheduler.shutdown()
-                PacketEvents.getAPI().eventManager.unregisterListener(SomCore.instance.packetEventsListener)
-                Bukkit.getScheduler().cancelTasks(SomCore.instance)
                 Bukkit.getServer().dispatchCommand(sender, "plugman reload swordofmagic7")
             }
 

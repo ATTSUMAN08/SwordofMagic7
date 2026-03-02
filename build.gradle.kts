@@ -82,7 +82,7 @@ tasks.register("deploy") {
             session(remotes["dev"], delegateClosureOf<SessionHandler> {
                 put(hashMapOf(
                     "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
-                    "into" to "plugins/${project.name}.jar"
+                    "into" to "plugins/DevTools/pluginReloader/${project.name}.jar"
                 ))
             })
         })
