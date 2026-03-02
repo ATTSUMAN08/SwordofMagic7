@@ -32,36 +32,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
 import org.bukkit.persistence.PersistentDataType
-import swordofmagic7.Command.Developer.AddTitle
-import swordofmagic7.Command.Developer.BukkitTasks
-import swordofmagic7.Command.Developer.ClassSelect
-import swordofmagic7.Command.Developer.GetClassExp
-import swordofmagic7.Command.Developer.GetEffect
-import swordofmagic7.Command.Developer.GetExp
-import swordofmagic7.Command.Developer.GetItem
-import swordofmagic7.Command.Developer.GetLevel
-import swordofmagic7.Command.Developer.GetRune
-import swordofmagic7.Command.Developer.Load
-import swordofmagic7.Command.Developer.LoadedPlayer
-import swordofmagic7.Command.Developer.MobSpawn
-import swordofmagic7.Command.Developer.Save
-import swordofmagic7.Command.Developer.SendData
-import swordofmagic7.Command.Developer.SetNick
-import swordofmagic7.Command.Developer.SkillCTReset
-import swordofmagic7.Command.Player.AuctionCommand
-import swordofmagic7.Command.Player.BlockPlayer
-import swordofmagic7.Command.Player.EffectInfo
-import swordofmagic7.Command.Player.ItemInfo
-import swordofmagic7.Command.Player.MarketCommand
-import swordofmagic7.Command.Player.MobInfo
-import swordofmagic7.Command.Player.Party
-import swordofmagic7.Command.Player.ReqExp
-import swordofmagic7.Command.Player.ReqLifeExp
-import swordofmagic7.Command.Player.RuneFilter
-import swordofmagic7.Command.Player.RuneInfo
-import swordofmagic7.Command.Player.TagGameCommand
-import swordofmagic7.Command.Player.playerInfo
-import swordofmagic7.Command.SomCommand
 import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.Editor
 import swordofmagic7.Data.PlayerData
@@ -262,7 +232,6 @@ class SomCore : SuspendingJavaPlugin() {
             20,
         )
 
-        commandRegister()
         CommandManager.registerCommands()
         NPCManager.spawnAllNPCs()
 
@@ -532,40 +501,6 @@ class SomCore : SuspendingJavaPlugin() {
                 }
             }
         }
-    }
-
-    private fun commandRegister() {
-        // Developer
-        SomCommand.register("SendData", SendData())
-        SomCommand.register("getItem", GetItem())
-        SomCommand.register("getRune", GetRune())
-        SomCommand.register("mobSpawn", MobSpawn())
-        SomCommand.register("setNick", SetNick())
-        SomCommand.register("save", Save())
-        SomCommand.register("load", Load())
-        SomCommand.register("loadedPlayer", LoadedPlayer())
-        SomCommand.register("getExp", GetExp())
-        SomCommand.register("getLevel", GetLevel())
-        SomCommand.register("getClassExp", GetClassExp())
-        SomCommand.register("getEffect", GetEffect())
-        SomCommand.register("bukkitTasks", BukkitTasks())
-        SomCommand.register("classSelect", ClassSelect())
-        SomCommand.register("skillCTReset", SkillCTReset())
-        SomCommand.register("addTitle", AddTitle())
-        // Player
-        SomCommand.register("reqExp", ReqExp())
-        SomCommand.register("reqLifeExp", ReqLifeExp())
-        SomCommand.register("tagGame", TagGameCommand())
-        SomCommand.register("playerInfo", playerInfo())
-        SomCommand.register("party", Party())
-        SomCommand.register("effectInfo", EffectInfo())
-        SomCommand.register("itemInfo", ItemInfo())
-        SomCommand.register("runeInfo", RuneInfo())
-        SomCommand.register("mobInfo", MobInfo())
-        SomCommand.register("market", MarketCommand())
-        SomCommand.register("auction", AuctionCommand())
-        SomCommand.register("blockPlayer", BlockPlayer())
-        SomCommand.register("runeFilter", RuneFilter())
     }
 
     override fun onCommand(
