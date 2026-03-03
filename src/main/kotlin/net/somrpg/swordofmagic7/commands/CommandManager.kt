@@ -12,6 +12,7 @@ import net.somrpg.swordofmagic7.extensions.getPlayerData
 import net.somrpg.swordofmagic7.utils.PackageClassFinder
 import org.bukkit.Bukkit
 import swordofmagic7.Data.DataBase
+import swordofmagic7.Data.PlayerData
 import swordofmagic7.Effect.EffectType
 import swordofmagic7.Life.LifeType
 import swordofmagic7.classes.Classes
@@ -24,6 +25,7 @@ object CommandManager {
 
         registerConditions(manager)
         registerCompletions(manager)
+        registerContexts(manager)
 
         // コマンドを登録する
         PackageClassFinder.getClasses("net.somrpg.swordofmagic7.commands").forEach { clazz ->
@@ -177,6 +179,13 @@ object CommandManager {
 
         manager.commandCompletions.registerCompletion("classSlots") { _ ->
             return@registerCompletion (1..Classes.maxSlot).map { it.toString() }
+        }
+    }
+
+    private fun registerContexts(manager: PaperCommandManager) {
+        manager.commandContexts.registerIssuerAwareContext(PlayerData::class.java) { c ->
+            val player = c.player ?: throw ConditionFailedException("プレイヤーのみ使用可能なコマンドです")
+            return@registerIssuerAwareContext player.getPlayerData()
         }
     }
 }

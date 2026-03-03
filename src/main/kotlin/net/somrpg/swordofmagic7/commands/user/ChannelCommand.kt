@@ -9,8 +9,8 @@ import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.HelpCommand
 import co.aikar.commands.annotation.Syntax
-import net.somrpg.swordofmagic7.extensions.getPlayerData
 import org.bukkit.entity.Player
+import swordofmagic7.Data.PlayerData
 import swordofmagic7.Function.sendMessage
 import swordofmagic7.Sound.SoundList
 
@@ -21,12 +21,11 @@ class ChannelCommand : BaseCommand() {
     @Syntax("<channel>")
     @CommandCompletion("@channels")
     fun default(
-        player: Player,
+        playerData: PlayerData,
         channel: String,
     ) {
-        val playerData = player.getPlayerData()
         if (playerData.isPlayDungeonQuest) {
-            sendMessage(player, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.NOPE)
+            sendMessage(playerData.player, "§cダンジョンクエスト§a中は§eチャンネル§aを変更できません", SoundList.NOPE)
             return
         }
         val teleportServer =
@@ -60,7 +59,7 @@ class ChannelCommand : BaseCommand() {
                 }
 
                 else -> {
-                    player.sendMessage("存在しないチャンネルです")
+                    playerData.sendRichMessage("存在しないチャンネルです")
                     return
                 }
             }

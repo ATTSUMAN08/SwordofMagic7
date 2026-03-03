@@ -17,31 +17,31 @@ class GmCommand : BaseCommand() {
     @Default
     @Syntax("<mode>")
     fun gm(
-        sender: Player,
+        player: Player,
         @Optional mode: String?,
     ) {
         when (mode) {
             "0", "s", "survival" -> {
-                sender.gameMode = GameMode.SURVIVAL
+                player.gameMode = GameMode.SURVIVAL
             }
 
             "1", "c", "creative" -> {
-                sender.gameMode = GameMode.CREATIVE
+                player.gameMode = GameMode.CREATIVE
             }
 
             "2", "a", "adventure" -> {
-                sender.gameMode = GameMode.ADVENTURE
+                player.gameMode = GameMode.ADVENTURE
             }
 
             "3", "sp", "spectator" -> {
-                sender.gameMode = GameMode.SPECTATOR
+                player.gameMode = GameMode.SPECTATOR
             }
 
             else -> {
-                if (sender.gameMode == GameMode.CREATIVE) {
-                    sender.gameMode = GameMode.SURVIVAL
+                if (player.gameMode == GameMode.CREATIVE) {
+                    player.gameMode = GameMode.SURVIVAL
                 } else {
-                    sender.gameMode = GameMode.CREATIVE
+                    player.gameMode = GameMode.CREATIVE
                 }
             }
         }

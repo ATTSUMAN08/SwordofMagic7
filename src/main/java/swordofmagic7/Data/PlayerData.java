@@ -1401,4 +1401,8 @@ public class PlayerData {
         return classText + "§e| " + getPrefix() + color + Nick;
     }
 
+    public void sendRichMessage(String text) {
+        player.sendRichMessage(text);
+    }
+
 }
