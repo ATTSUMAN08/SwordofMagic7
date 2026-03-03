@@ -77,6 +77,7 @@ import swordofmagic7.Pet.PetManager;
 import swordofmagic7.Pet.PetParameter;
 import swordofmagic7.Skill.SkillProcess;
 import swordofmagic7.Sound.SoundList;
+import swordofmagic7.TextView.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -549,17 +550,15 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     void onChat(AsyncChatEvent event) {
-        if (!SomCore.Companion.isDevServer()) {
-            event.setCancelled(true);
-        }
-        /*Player player = event.getPlayer();
+        event.setCancelled(true);
+        Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         String message = PlainTextComponentSerializer.plainText().serialize(event.message());
         if (playerData.isPTChat) {
             playerData.Party.chat(playerData, message);
             return;
         }
-        Client.sendPlayerChat(player, new TextView(message));*/
+        Client.sendPlayerChat(player, new TextView(message));
     }
 
     @EventHandler

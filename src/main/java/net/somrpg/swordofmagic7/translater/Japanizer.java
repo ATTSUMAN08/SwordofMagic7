@@ -30,7 +30,7 @@ public class Japanizer {
 
         // 変換不要なら空文字列を返す
         if ( type == JapanizeType.NONE || !isNeedToJapanize(org) ) {
-            return "";
+            return null;
         }
 
         // URL削除
