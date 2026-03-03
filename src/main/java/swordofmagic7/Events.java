@@ -83,8 +83,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static swordofmagic7.Data.DataBase.DataBasePath;
 import static swordofmagic7.Data.DataBase.IgnoreIPList;
@@ -99,6 +101,7 @@ import static swordofmagic7.Mob.MobManager.EnemyTable;
 import static swordofmagic7.Sound.CustomSound.playSound;
 
 public class Events implements Listener {
+    private static final Map<Player, Boolean> cancelInteract = new ConcurrentHashMap<>();
     private static final String OverLogin = "som7.OverLogin";
     private final Plugin plugin;
 
@@ -240,7 +243,7 @@ public class Events implements Listener {
     @EventHandler
     public void onEntityInteract(EntityInteractEvent event) {
         Block block = event.getBlock();
-        if(block.getType() == Material.FARMLAND) {
+        if (block.getType() == Material.FARMLAND) {
             event.setCancelled(true);
         }
     }
@@ -256,6 +259,10 @@ public class Events implements Listener {
     @EventHandler
     void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        if (cancelInteract.getOrDefault(player, false)) {
+            event.setCancelled(true);
+            return;
+        }
         PlayerData playerData = playerData(player);
         Block block = event.getClickedBlock();
         Action action = event.getAction();
@@ -340,6 +347,8 @@ public class Events implements Listener {
 
     @EventHandler
     void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        cancelInteract.put(event.getPlayer(), true);
+        Bukkit.getScheduler().runTaskLater(SomCore.instance, () -> cancelInteract.remove(event.getPlayer()), 2);
         Player player = event.getPlayer();
         PlayerData playerData = playerData(player);
         Entity entity = event.getRightClicked();
