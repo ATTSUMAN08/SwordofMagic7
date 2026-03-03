@@ -126,7 +126,8 @@ public class Events implements Listener {
         IgnoreIPList = YamlConfiguration.loadConfiguration(new File(DataBasePath, "IgnoreIPCheck.yml")).getStringList("IgnoreUUID");
         if ((!bypass || SomCore.Companion.isEventServer()) && !IgnoreIPList.contains(player.getUniqueId().toString())) {
             for (Player player2 : Bukkit.getOnlinePlayers()) {
-                if (Objects.requireNonNull(player2.getAddress()).equals(event.getPlayer().getAddress())) {
+                if (player == player2) continue;
+                if (Objects.requireNonNull(player2.getAddress().getHostString()).equals(event.getPlayer().getAddress().getHostString())) {
                     player.kick(Component.text("§aすでに§c別アカウント§aで§bログイン§aしています。§e別CH§aをお試しください"));
                     return;
                 }
