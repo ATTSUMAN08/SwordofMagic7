@@ -1,5 +1,6 @@
 package swordofmagic7.Data;
 
+import cz.foresttech.forestredis.shared.RedisManager;
 import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Bukkit;
@@ -59,7 +60,7 @@ public final class DataBase {
     public static ItemStack FlameItem(int i) {
         return new ItemStackData(Material.IRON_BARS, "§7§l空スロット[" + i + "]", 1).view();
     }
-    public static String ServerId = "Initialize";
+    public static String ServerId = RedisManager.getAPI().getServerIdentifier();
     public static final int[] AnvilUISlot = new int[3];
     public static final ItemStack ItemFlame = new ItemStackData(Material.IRON_BARS, " ", 1).view();
     public static final ItemStack ShopFlame = new ItemStackData(Material.IRON_BARS, " ", 2).view();

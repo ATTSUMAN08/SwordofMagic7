@@ -113,7 +113,6 @@ class SomCore : SuspendingJavaPlugin() {
         instance = this
         random = SecureRandom()
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
-        DataBase.ServerId = config.getString("serverId") ?: "Default"
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
 
         // Initialize folders
