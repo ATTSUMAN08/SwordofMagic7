@@ -205,7 +205,8 @@ public class DataLoader {
                 if (data.isSet("Material")) {
                     itemParameter.Icon = Material.getMaterial(data.getString("Material", "BARRIER"));
                     if (itemParameter.Icon == Material.PLAYER_HEAD) {
-                        itemParameter.IconData = data.getString("PlayerHead");
+                        itemParameter.playerHead = data.getString("PlayerHead");
+                        itemParameter.playerHeadIdentifier = data.getString("PlayerHeadIdentifier");
                     }
                 } else if (itemParameter.Category == ItemCategory.Equipment) {
                     itemParameter.itemEquipmentData.equipmentCategory = EquipmentCategory.getEquipmentCategory(data.getString("EquipmentCategory"));

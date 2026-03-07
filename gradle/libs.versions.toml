@@ -20,7 +20,6 @@ coroutines = "1.10.2"
 mcCoroutine = "2.22.0"
 serializationJson = "1.10.0"
 kaml = "0.104.0"
-nbtApi = "2.15.5"
 fastBoard = "2.1.5"
 acfPaper = "0.5.1-SNAPSHOT"
 triumphGui = "3.1.13"
@@ -49,10 +48,9 @@ mcCoroutinePaperApi = { group = "com.github.shynixn.mccoroutine", name = "mccoro
 mcCoroutinePaperCore = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mcCoroutine" }
 serializationJson = { group = "org.jetbrains.kotlinx", name ="kotlinx-serialization-json", version.ref = "serializationJson" }
 kaml = { group = "com.charleskorn.kaml", name ="kaml-jvm", version.ref = "kaml" }
-itemNbtApi = { group = "de.tr7zw", name = "item-nbt-api", version.ref = "nbtApi" }
 fastBoard = { group = "fr.mrmicky", name = "fastboard", version.ref = "fastBoard" }
 acfPaper = { group = "co.aikar", name = "acf-paper", version.ref = "acfPaper" }
 triumphGui = { group = "dev.triumphteam", name = "triumph-gui", version.ref = "triumphGui" }
 
 [bundles]
-libraries = ["evalEx", "coroutinesCore", "mcCoroutinePaperApi", "mcCoroutinePaperCore", "serializationJson", "kaml", "itemNbtApi", "fastBoard", "acfPaper", "triumphGui"]
+libraries = ["evalEx", "coroutinesCore", "mcCoroutinePaperApi", "mcCoroutinePaperCore", "serializationJson", "kaml", "fastBoard", "acfPaper", "triumphGui"]

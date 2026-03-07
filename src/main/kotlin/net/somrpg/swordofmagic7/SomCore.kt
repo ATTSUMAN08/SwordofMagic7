@@ -244,7 +244,7 @@ class SomCore : SuspendingJavaPlugin() {
             initBlueMap()
         }
 
-        logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms")
+        logger.info("Plugin Enabled: ${System.currentTimeMillis() - time}ms (ServerID: ${DataBase.ServerId})")
     }
 
     override suspend fun onDisableAsync() {

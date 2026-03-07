@@ -63,8 +63,6 @@ tasks.shadowJar {
         relocate(packageName, "net.somrpg.swordofmagic7.libs.$targetPackageName")
     }
 
-    relocateLibs("de.tr7zw.changeme.nbtapi", "nbtapi")
-
     relocateLibs("com.ezylang.evalex", "evalex")
 
     relocateLibs("co.aikar.commands", "acf")

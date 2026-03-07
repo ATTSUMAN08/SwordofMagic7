@@ -1,9 +1,11 @@
 package swordofmagic7.Item;
 
+import com.destroystokyo.paper.profile.CraftPlayerProfile;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.MultimapBuilder;
-import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.NbtApiException;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import swordofmagic7.Function;
 import swordofmagic7.Item.ItemExtend.ItemCook;
 import swordofmagic7.Item.ItemExtend.ItemEquipmentData;
@@ -32,7 +35,6 @@ import static swordofmagic7.Data.DataBase.RewardBoxList;
 import static swordofmagic7.Data.DataBase.itemInformation;
 import static swordofmagic7.Data.DataBase.itemParameter;
 import static swordofmagic7.Data.DataBase.itemRune;
-import static swordofmagic7.Function.Log;
 import static swordofmagic7.Function.decoLore;
 import static swordofmagic7.Function.decoText;
 import static swordofmagic7.Function.isZero;
@@ -43,7 +45,8 @@ public class ItemParameter implements Cloneable {
     public String Display = "Display";
     public List<String> Lore = new ArrayList<>();
     public Material Icon = Material.BARRIER;
-    public String IconData;
+    public String playerHead;
+    public String playerHeadIdentifier;
     public Color color = Color.BLACK;
     public ItemCategory Category = ItemCategory.None;
     public int CustomModelData = 0;
@@ -163,21 +166,13 @@ public class ItemParameter implements Cloneable {
         meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build());
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        item.setItemMeta(meta);
 
         if (Icon == Material.PLAYER_HEAD) {
-            try {
-                NBT.modifyComponents(item, nbt -> {
-                    ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                    profileNbt.setUUID("id", UUID.randomUUID());
-                    ReadWriteNBT propertiesNbt = profileNbt.getCompoundList("properties").addCompound();
-                    propertiesNbt.setString("name", "textures");
-                    propertiesNbt.setString("value", IconData);
-                });
-            } catch (NbtApiException e) {
-                Log("プレイヤへッドのロード時にエラーが発生しました -> " + Display + " | " + e.getMessage());
-            }
+            PropertyMap propertyMap = new PropertyMap(ImmutableMultimap.of("textures", new Property("textures", playerHead)));
+            GameProfile gameProfile = new GameProfile(UUID.randomUUID(), playerHeadIdentifier, propertyMap);
+            ((SkullMeta) meta).setPlayerProfile(new CraftPlayerProfile(gameProfile));
         }
+        item.setItemMeta(meta);
 
         if (amount > MaxStackAmount) {
             amount = MaxStackAmount;
