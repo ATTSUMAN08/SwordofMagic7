@@ -179,6 +179,9 @@ public final class DataBase {
     }
 
     public static void DataLoad() {
+        Function.createFolder(SomCore.instance.getDataFolder());
+        Function.createFolder(new File(DataBase.DataBasePath, "Market"));
+
         LifeType.Initialize();
         AnvilUISlot[0] = 1;
         AnvilUISlot[1] = 4;

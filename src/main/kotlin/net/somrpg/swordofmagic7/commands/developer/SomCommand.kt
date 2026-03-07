@@ -10,12 +10,10 @@ import co.aikar.commands.annotation.Conditions
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
-import com.github.retrooper.packetevents.PacketEvents
-import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.delay
 import net.somrpg.swordofmagic7.SomCore
-import net.somrpg.swordofmagic7.extensions.asyncDispatcher
-import net.somrpg.swordofmagic7.extensions.minecraftDispatcher
+import net.somrpg.swordofmagic7.extensions.runAsync
+import net.somrpg.swordofmagic7.extensions.runSync
 import net.somrpg.swordofmagic7.utils.TimeUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -134,7 +132,7 @@ class SomCommand : BaseCommand() {
             val locText = line.split(",").map { text -> text.toDouble() }
             val loc = Location(sender.world, locText[0], locText[1], locText[2])
 
-            SomCore.instance.launch(minecraftDispatcher) {
+            runSync {
                 loc.block.type = Material.SAND
             }
         }
@@ -157,7 +155,7 @@ class SomCommand : BaseCommand() {
         sender: CommandSender,
         @Conditions("limits:min=10,max=86400") seconds: Int,
     ) {
-        SomCore.instance.launch(asyncDispatcher) {
+        runAsync {
             for (i in seconds downTo 1) {
                 if (SomCore.restartNotifyTimes.contains(i)) {
                     for (p in Bukkit.getOnlinePlayers()) {
@@ -174,7 +172,7 @@ class SomCommand : BaseCommand() {
                 Function.sendMessage(p, "§b[${DataBase.ServerId}] §aサーバーを再起動します", SoundList.CLICK)
             }
             delay(1000)
-            SomCore.instance.launch(minecraftDispatcher) {
+            runSync {
                 Bukkit.getServer().shutdown()
             }
         }

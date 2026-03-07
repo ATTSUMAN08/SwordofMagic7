@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerCommon
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
-import com.github.shynixn.mccoroutine.bukkit.launch
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.bluecolored.bluemap.api.markers.ShapeMarker
@@ -16,7 +15,7 @@ import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.somrpg.swordofmagic7.commands.CommandManager
-import net.somrpg.swordofmagic7.extensions.asyncDispatcher
+import net.somrpg.swordofmagic7.extensions.runAsync
 import net.somrpg.swordofmagic7.lisiteners.MainListener
 import net.somrpg.swordofmagic7.lisiteners.PacketEventsListener
 import net.somrpg.swordofmagic7.npc.NPCManager
@@ -55,7 +54,6 @@ import swordofmagic7.TextView.TextViewManager
 import swordofmagic7.Trade.TradeManager
 import swordofmagic7.Tutorial
 import swordofmagic7.viewBar.ViewBar
-import java.io.File
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.Random
@@ -65,6 +63,7 @@ import java.util.concurrent.ScheduledExecutorService
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.time.measureTime
 
 class SomCore : SuspendingJavaPlugin() {
     companion object {
@@ -115,15 +114,7 @@ class SomCore : SuspendingJavaPlugin() {
         world = Bukkit.getWorld("world") ?: throw IllegalStateException("World not found")
         server.messenger.registerOutgoingPluginChannel(this, "BungeeCord")
 
-        // Initialize folders
-        if (!dataFolder.exists()) {
-            Function.createFolder(dataFolder)
-        }
-        val marketFolder = File(DataBase.DataBasePath, "Market")
-        if (!marketFolder.exists()) {
-            Function.createFolder(marketFolder)
-        }
-
+        // データベースを初期化
         DataBase.DataLoad()
 
         Tutorial.onLoad()
@@ -306,7 +297,7 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     private fun initBlueMap() {
-        launch(asyncDispatcher) {
+        runAsync {
             val blueMapApi by lazy {
                 BlueMapAPI.getInstance().get()
             }
@@ -783,5 +774,26 @@ class SomCore : SuspendingJavaPlugin() {
         textDisplay.text(defaultText)
         textDisplay.persistentDataContainer[NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN] = true
         return textDisplay
+    }
+
+    fun startRepeatingTask(
+        intervalTicks: Long,
+        taskId: String,
+        runnable: () -> Unit,
+    ) {
+        server.scheduler.runTaskTimerAsynchronously(
+            this,
+            Runnable {
+                val time =
+                    measureTime {
+                        runnable.invoke()
+                    }
+                if (time.inWholeMilliseconds >= 50) {
+                    logger.warning("[RepeatingTask] $taskId の処理に${time.inWholeMilliseconds}msかかりました")
+                }
+            },
+            intervalTicks,
+            intervalTicks,
+        )
     }
 }
