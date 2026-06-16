@@ -11,7 +11,7 @@ paperApi = "1.21.11-R0.1-SNAPSHOT"
 packetEvents = "2.11.2"
 libsDisguises = "11.0.15"
 decentHolograms = "2.9.9"
-blueMap = "2.7.7"
+blueMap = "2.8.0"
 floodgate = "2.2.4-SNAPSHOT"
 forestRedisApi = "1.3.11"
 
