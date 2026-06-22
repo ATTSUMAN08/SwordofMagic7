@@ -8,7 +8,7 @@ shadow = "9.3.2"
 kotlinter = "5.4.2"
 
 paperApi = "1.21.11-R0.1-SNAPSHOT"
-packetEvents = "2.11.2"
+packetEvents = "2.13.0"
 libsDisguises = "11.0.15"
 decentHolograms = "2.9.9"
 blueMap = "2.7.7"
