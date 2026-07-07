@@ -38,9 +38,10 @@ dependencies {
     compileOnly(libs.floodgate)
     compileOnly(libs.forestRedisApi)
 
-    implementation(libs.bundles.libraries)
+    implementation(libs.bundles.libraries) {
+        exclude(group = "net.kyori")
+    }
 }
-
 
 remotes {
     withGroovyBuilder {
@@ -59,7 +60,10 @@ tasks.shadowJar {
         it.name.startsWith("acf-") && !it.name.endsWith("_ja.properties")
     }
 
-    fun relocateLibs(packageName: String, targetPackageName: String) {
+    fun relocateLibs(
+        packageName: String,
+        targetPackageName: String,
+    ) {
         relocate(packageName, "net.somrpg.swordofmagic7.libs.$targetPackageName")
     }
 
@@ -76,14 +80,21 @@ tasks.register("deploy") {
     group = JavaBasePlugin.BUILD_TASK_NAME
     dependsOn("shadowJar")
     doLast {
-        ssh.run(delegateClosureOf<RunHandler> {
-            session(remotes["dev"], delegateClosureOf<SessionHandler> {
-                put(hashMapOf(
-                    "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
-                    "into" to "plugins/DevTools/pluginReloader/${project.name}.jar"
-                ))
-            })
-        })
+        ssh.run(
+            delegateClosureOf<RunHandler> {
+                session(
+                    remotes["dev"],
+                    delegateClosureOf<SessionHandler> {
+                        put(
+                            hashMapOf(
+                                "from" to "${getLayout().buildDirectory.get()}/libs/${project.name}-${project.version}.jar",
+                                "into" to "plugins/DevTools/pluginReloader/${project.name}.jar",
+                            ),
+                        )
+                    },
+                )
+            },
+        )
     }
 }
 
@@ -266,6 +277,6 @@ bukkitPluginYaml {
 
 tasks {
     kotlin {
-        jvmToolchain(21)
+        jvmToolchain(25)
     }
 }
