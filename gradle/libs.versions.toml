@@ -20,7 +20,7 @@ coroutines = "1.11.0"
 mcCoroutine = "2.22.0"
 serializationJson = "1.11.0"
 kaml = "0.104.0"
-fastBoard = "2.1.5"
+fastBoard = "2.2.0"
 acfPaper = "0.5.1-SNAPSHOT"
 triumphGui = "3.1.13"
 
