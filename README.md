@@ -9,8 +9,8 @@
 何があっても責任は取りません。
 
 # 依存関係リスト
-- PaperMC 1.21.11 (build 126)
-- [DecentHolograms](https://github.com/DecentSoftware-eu/DecentHolograms/releases/tag/2.9.9)
+- AdvancedSlimePaper 26.2
+- [DecentHolograms](https://github.com/DecentSoftware-eu/DecentHolograms/releases/tag/2.10.1)
 - [ForestRedisAPI](https://github.com/ATTSUMAN08/ForestRedisAPI/releases/tag/1.3.11)
-- [LibsDisguises](https://github.com/libraryaddict/LibsDisguises/releases/tag/v11.0.15)
-- [PacketEvents](https://github.com/retrooper/packetevents/releases/tag/v2.11.2)
+- [LibsDisguises](https://ci.lib.co.nz/job/LibsDisguises/1792)
+- [PacketEvents](https://github.com/retrooper/packetevents/releases/tag/v2.13.0)

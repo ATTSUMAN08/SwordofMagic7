@@ -85,7 +85,7 @@ public class PartyData {
                 Message(playerData.getNick() + "§aさんを§e[" + Display + "]§aに§e招待§aしました");
                 TextComponent inviteMessage = Component.text(playerData(Leader).getNick() + "§aさんから§e[" + Display + "]§aに§e招待§aされました ");
                 final TextComponent accept = Component.text("§b[/party accept]")
-                        .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept"));
+                        .clickEvent(ClickEvent.runCommand("/party accept"));
                 inviteMessage = inviteMessage.append(accept);
                 player.sendMessage(inviteMessage);
                 playSound(player, SoundList.TICK);

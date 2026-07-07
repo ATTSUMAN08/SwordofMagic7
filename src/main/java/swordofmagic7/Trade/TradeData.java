@@ -48,7 +48,7 @@ public class TradeData {
     public void requestTrade() {
         TextComponent inviteMessage = Component.text(playerData[0].getNick() + "§aさんから§e[トレード]§aを§b申請§aされました ");
         final TextComponent accept = Component.text("§b[/trade accept]")
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/trade accept"));
+                .clickEvent(ClickEvent.runCommand("/trade accept"));
         inviteMessage = inviteMessage.append(accept);
         player[1].sendMessage(inviteMessage);
         player[0].sendMessage(playerData[1].getNick() + "§aさんに§e[トレード]§aを§b申請§aしました");

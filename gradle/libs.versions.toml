@@ -1,56 +1,58 @@
 [versions]
 kotlin = "2.4.0"
-resourceFactory = "1.3.1"
-hidetakeSSH = "2.12.0"
+resourcefactory = "1.3.1"
+hidetake-ssh = "2.12.0"
 grgit = "5.3.3"
 paperweight = "2.0.0-beta.21"
 shadow = "9.5.1"
 kotlinter = "5.6.0"
 
-paperApi = "1.21.11-R0.1-SNAPSHOT"
-packetEvents = "2.13.0"
-libsDisguises = "11.0.18"
-decentHolograms = "2.10.1"
-blueMap = "2.8.0"
+paper = "26.2.build.+"
+packetevents = "2.13.0"
+libsdisguises = "11.0.18"
+decentholograms = "2.10.1"
+bluemap = "2.8.0"
 floodgate = "2.2.5-SNAPSHOT"
-forestRedisApi = "1.3.11"
+forestredis = "1.3.11"
 
-evalEx = "3.6.2"
+evalex = "3.6.2"
 coroutines = "1.11.0"
-mcCoroutine = "2.22.0"
-serializationJson = "1.11.0"
+mccoroutine = "2.22.0"
+serialization-json = "1.11.0"
 kaml = "0.104.0"
-fastBoard = "2.1.5"
-acfPaper = "0.5.1-SNAPSHOT"
-triumphGui = "3.1.13"
+fastboard = "2.2.0"
+acf-paper = "0.5.1-SNAPSHOT"
+triumph-gui = "3.1.13"
+asp = "4.2.0-SNAPSHOT"
 
 [plugins]
 kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-resourceFactory = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
-hidetakeSSH = { id = "org.hidetake.ssh", version.ref = "hidetakeSSH" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+resourcefactory = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourcefactory" }
+hidetake-ssh = { id = "org.hidetake.ssh", version.ref = "hidetake-ssh" }
 grgit = { id = "org.ajoberstar.grgit", version.ref = "grgit" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 
 [libraries]
-packetEvents = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetEvents" }
-libsDisguises = { module = "me.libraryaddict.disguises:libsdisguises", version.ref = "libsDisguises" }
-decentHolograms = { module = "com.github.decentsoftware-eu:decentholograms", version.ref = "decentHolograms" }
-blueMap = { module = "de.bluecolored:bluemap-api", version.ref = "blueMap" }
+packetevents = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetevents" }
+libsdisguises = { module = "me.libraryaddict.disguises:libsdisguises", version.ref = "libsdisguises" }
+decentholograms = { module = "com.github.decentsoftware-eu:decentholograms", version.ref = "decentholograms" }
+bluemap = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap" }
 floodgate = { module = "org.geysermc.floodgate:api", version.ref = "floodgate" }
-forestRedisApi = { module = "com.github.ATTSUMAN08:ForestRedisAPI", version.ref = "forestRedisApi" }
+forestredis = { module = "com.github.ATTSUMAN08:ForestRedisAPI", version.ref = "forestredis" }
 
-evalEx = { module = "com.ezylang:EvalEx", version.ref = "evalEx" }
-coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-mcCoroutinePaperApi = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-api", version.ref = "mcCoroutine" }
-mcCoroutinePaperCore = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mcCoroutine" }
-serializationJson = { group = "org.jetbrains.kotlinx", name ="kotlinx-serialization-json", version.ref = "serializationJson" }
+evalex = { module = "com.ezylang:EvalEx", version.ref = "evalex" }
+coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+mccoroutine-paper-api = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-api", version.ref = "mccoroutine" }
+mccoroutine-paper-core = { group = "com.github.shynixn.mccoroutine", name = "mccoroutine-bukkit-core", version.ref = "mccoroutine" }
+serialization-json = { group = "org.jetbrains.kotlinx", name ="kotlinx-serialization-json", version.ref = "serialization-json" }
 kaml = { group = "com.charleskorn.kaml", name ="kaml-jvm", version.ref = "kaml" }
-fastBoard = { group = "fr.mrmicky", name = "fastboard", version.ref = "fastBoard" }
-acfPaper = { group = "co.aikar", name = "acf-paper", version.ref = "acfPaper" }
-triumphGui = { group = "dev.triumphteam", name = "triumph-gui", version.ref = "triumphGui" }
+fastboard = { group = "fr.mrmicky", name = "fastboard", version.ref = "fastboard" }
+acf-paper = { group = "co.aikar", name = "acf-paper", version.ref = "acf-paper" }
+triumph-gui = { group = "dev.triumphteam", name = "triumph-gui", version.ref = "triumph-gui" }
+asp = { module = "com.infernalsuite.asp:api", version.ref = "asp" }
 
 [bundles]
-libraries = ["evalEx", "coroutinesCore", "mcCoroutinePaperApi", "mcCoroutinePaperCore", "serializationJson", "kaml", "fastBoard", "acfPaper", "triumphGui"]
+libraries = ["evalex", "coroutines-core", "mccoroutine-paper-api", "mccoroutine-paper-core", "serialization-json", "kaml", "fastboard", "acf-paper", "triumph-gui", "asp"]

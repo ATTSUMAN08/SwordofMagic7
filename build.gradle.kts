@@ -4,10 +4,10 @@ import xyz.jpenilla.resourcefactory.bukkit.Permission
 
 plugins {
     id("java")
-    alias(libs.plugins.resourceFactory)
+    alias(libs.plugins.resourcefactory)
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.hidetakeSSH)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hidetake.ssh)
     alias(libs.plugins.grgit)
     alias(libs.plugins.paperweight)
     alias(libs.plugins.shadow)
@@ -27,16 +27,18 @@ repositories {
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven(url = "https://repo.opencollab.dev/main/") // Floodgate
+    maven("https://repo.infernalsuite.com/repository/maven-snapshots/") // AdvancedSlimePaper
 }
 
 dependencies {
-    paperweight.paperDevBundle(libs.versions.paperApi.get())
-    compileOnly(libs.packetEvents)
-    compileOnly(libs.libsDisguises)
-    compileOnly(libs.decentHolograms)
-    compileOnly(libs.blueMap)
+    paperweight.paperDevBundle(libs.versions.paper)
+    compileOnly(libs.packetevents)
+    compileOnly(libs.libsdisguises)
+    compileOnly(libs.decentholograms)
+    compileOnly(libs.bluemap)
     compileOnly(libs.floodgate)
-    compileOnly(libs.forestRedisApi)
+    compileOnly(libs.forestredis)
+    compileOnly(libs.asp)
 
     implementation(libs.bundles.libraries) {
         exclude(group = "net.kyori")
