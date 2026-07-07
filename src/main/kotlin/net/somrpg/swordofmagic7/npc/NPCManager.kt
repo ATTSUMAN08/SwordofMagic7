@@ -1,6 +1,7 @@
 package net.somrpg.swordofmagic7.npc
 
 import com.charleskorn.kaml.Yaml
+import kotlinx.serialization.decodeFromString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.somrpg.swordofmagic7.SomCore
@@ -20,7 +21,7 @@ object NPCManager {
     fun spawnAllNPCs() {
         val file = File(DataBase.DataBasePath, "npcs.yml")
         if (!file.exists()) return
-        val npcData = Yaml.default.decodeFromString(NPCData.serializer(), file.readText())
+        val npcData = Yaml.default.decodeFromString<NPCData>(file.readText())
         for (i in npcData.npcs) {
             val locSplit = i.location.split(" ").map { it.toDouble() } // X Y Z Yaw Pitch
             val npc =
