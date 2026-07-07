@@ -34,8 +34,7 @@ public class IMEConverter {
 
     // 変換の実行
     private static String conv(String org) {
-
-        if ( org.length() == 0 ) {
+        if (org.length() == 0) {
             return "";
         }
 
@@ -60,9 +59,6 @@ public class IMEConverter {
 
             String json = CharStreams.toString(reader);
             String parsed = GoogleIME.parseJson(json);
-//            if ( !Utility.isCB19orLater() ) {
-//                parsed = YukiKanaConverter.fixBrackets(parsed);
-//            }
 
             return parsed;
 

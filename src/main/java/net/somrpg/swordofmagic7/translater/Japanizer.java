@@ -21,18 +21,10 @@ public class Japanizer {
     /**
      * メッセージの日本語化をする
      * @param org
-     * @param type
      * @param dictionary
      * @return
      */
-    public static String japanize(String org, JapanizeType type,
-            Map<String, String> dictionary) {
-
-        // 変換不要なら空文字列を返す
-        if ( type == JapanizeType.NONE || !isNeedToJapanize(org) ) {
-            return null;
-        }
-
+    public static String japanize(String org, Map<String, String> dictionary) {
         // URL削除
         String deletedURL = org.replaceAll(REGEX_URL, " ");
 
@@ -53,11 +45,9 @@ public class Japanizer {
         String japanized = YukiKanaConverter.conv(keywordLocked);
 
         // IME変換
-        if (type == JapanizeType.GOOGLE_IME) {
-            long start = System.currentTimeMillis();
-            japanized = IMEConverter.convByGoogleIME(japanized);
-            SomCore.instance.getLogger().info("IME変換時間: " + (System.currentTimeMillis() - start) + "ms");
-        }
+        long start = System.currentTimeMillis();
+        japanized = IMEConverter.convByGoogleIME(japanized);
+        SomCore.instance.getLogger().info("IME変換時間: " + (System.currentTimeMillis() - start) + "ms");
 
         // キーワードのアンロック
         for ( String key : keywordMap.keySet() ) {

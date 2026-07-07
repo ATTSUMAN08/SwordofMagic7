@@ -14,6 +14,8 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.npc.NPCData;
 import net.somrpg.swordofmagic7.npc.NPCManager;
+import net.somrpg.swordofmagic7.translater.Japanizer;
+import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -81,6 +83,7 @@ import swordofmagic7.TextView.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -568,7 +571,14 @@ public class Events implements Listener {
             playerData.Party.chat(playerData, message);
             return;
         }
-        Client.sendPlayerChat(player, new TextView(message));
+        if (Japanizer.isNeedToJapanize(message)) {
+            NewMultiThread.INSTANCE.runTaskAsync(() -> {
+                String japaneseText = Japanizer.japanize(message, Collections.emptyMap());
+                Client.sendPlayerChat(player, new TextView(japaneseText).addHover(message));
+            }, "ChatJapaneseThread");
+        } else {
+            Client.sendPlayerChat(player, new TextView(message));
+        }
     }
 
     @EventHandler
