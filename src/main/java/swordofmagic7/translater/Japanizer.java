@@ -3,7 +3,7 @@
  * @license    LGPLv3
  * @copyright  Copyright ucchy 2014
  */
-package net.somrpg.swordofmagic7.translater;
+package swordofmagic7.translater;
 
 import net.somrpg.swordofmagic7.SomCore;
 

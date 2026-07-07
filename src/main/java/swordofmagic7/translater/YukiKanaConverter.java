@@ -1,4 +1,4 @@
-package net.somrpg.swordofmagic7.translater;
+package swordofmagic7.translater;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;

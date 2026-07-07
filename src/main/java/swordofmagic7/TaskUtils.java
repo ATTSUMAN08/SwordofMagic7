@@ -1,5 +1,6 @@
-package net.somrpg.swordofmagic7;
+package swordofmagic7;
 
+import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.concurrent.atomic.AtomicLong;

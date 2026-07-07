@@ -3,7 +3,7 @@
  * @license    LGPLv3
  * @copyright  Copyright ucchy 2020
  */
-package net.somrpg.swordofmagic7.translater;
+package swordofmagic7.translater;
 
 import com.google.common.io.CharStreams;
 

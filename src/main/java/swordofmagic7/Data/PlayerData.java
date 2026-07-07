@@ -9,7 +9,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.somrpg.swordofmagic7.SomCore;
-import net.somrpg.swordofmagic7.TaskUtils;
+import swordofmagic7.TaskUtils;
 import net.somrpg.swordofmagic7.hooks.floodgate.BedrockAdapter;
 import net.somrpg.swordofmagic7.player.sidebar.SideBarToDo;
 import org.bukkit.Bukkit;

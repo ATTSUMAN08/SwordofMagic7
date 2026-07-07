@@ -14,7 +14,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.somrpg.swordofmagic7.SomCore;
 import net.somrpg.swordofmagic7.npc.NPCData;
 import net.somrpg.swordofmagic7.npc.NPCManager;
-import net.somrpg.swordofmagic7.translater.Japanizer;
+import swordofmagic7.translater.Japanizer;
 import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;

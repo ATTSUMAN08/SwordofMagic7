@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.somrpg.swordofmagic7.translater.Japanizer;
+import swordofmagic7.translater.Japanizer;
 import net.somrpg.swordofmagic7.utils.NewMultiThread;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
