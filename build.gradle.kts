@@ -1,3 +1,4 @@
+import org.gradle.api.file.DuplicatesStrategy
 import org.hidetake.groovy.ssh.core.RunHandler
 import org.hidetake.groovy.ssh.session.SessionHandler
 import xyz.jpenilla.resourcefactory.bukkit.Permission
@@ -27,7 +28,7 @@ repositories {
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
     maven(url = "https://repo.opencollab.dev/main/") // Floodgate
-    maven("https://repo.infernalsuite.com/repository/maven-snapshots/") // AdvancedSlimePaper
+    maven(url = "https://repo.infernalsuite.com/repository/maven-snapshots/") // AdvancedSlimePaper
 }
 
 dependencies {
@@ -57,6 +58,9 @@ remotes {
 
 tasks.shadowJar {
     archiveClassifier.set("")
+    filesMatching("META-INF/**/*.kotlin_module") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
     exclude {
         it.name.startsWith("acf-") && !it.name.endsWith("_ja.properties")
     }
@@ -74,6 +78,10 @@ tasks.shadowJar {
     relocateLibs("co.aikar.locales", "locales")
 
     relocateLibs("dev.triumphteam.gui", "gui")
+
+    relocateLibs("fr.mrmicky.fastboard", "fastboard")
+
+    relocateLibs("com.charleskorn.kaml", "kaml")
 }
 
 tasks.register("deploy") {
@@ -115,7 +123,7 @@ bukkitPluginYaml {
     name = project.name
     description = "Sword of Magic 7のプラグインのFork"
     authors = listOf("MomiNeko", "SomNetworkMembers", "ATTSUMAN08")
-    apiVersion = "1.13"
+    apiVersion = "26.2"
 
     main = "net.somrpg.swordofmagic7.SomCore"
     depend = listOf("ForestRedisAPI", "LibsDisguises", "packetevents")

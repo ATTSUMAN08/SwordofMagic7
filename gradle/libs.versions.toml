@@ -40,6 +40,7 @@ libsdisguises = { module = "me.libraryaddict.disguises:libsdisguises", version.r
 bluemap = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap" }
 floodgate = { module = "org.geysermc.floodgate:api", version.ref = "floodgate" }
 forestredis = { module = "com.github.ATTSUMAN08:ForestRedisAPI", version.ref = "forestredis" }
+asp = { module = "com.infernalsuite.asp:api", version.ref = "asp" }
 
 evalex = { module = "com.ezylang:EvalEx", version.ref = "evalex" }
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -50,7 +51,6 @@ kaml = { group = "com.charleskorn.kaml", name ="kaml-jvm", version.ref = "kaml" 
 fastboard = { group = "fr.mrmicky", name = "fastboard", version.ref = "fastboard" }
 acf-paper = { group = "co.aikar", name = "acf-paper", version.ref = "acf-paper" }
 triumph-gui = { group = "dev.triumphteam", name = "triumph-gui", version.ref = "triumph-gui" }
-asp = { module = "com.infernalsuite.asp:api", version.ref = "asp" }
 
 [bundles]
-libraries = ["evalex", "coroutines-core", "mccoroutine-paper-api", "mccoroutine-paper-core", "serialization-json", "kaml", "fastboard", "acf-paper", "triumph-gui", "asp"]
+libraries = ["evalex", "coroutines-core", "mccoroutine-paper-api", "mccoroutine-paper-core", "serialization-json", "kaml", "fastboard", "acf-paper", "triumph-gui"]
