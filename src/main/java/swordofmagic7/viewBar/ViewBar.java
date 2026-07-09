@@ -1,14 +1,11 @@
 package swordofmagic7.viewBar;
 
+import fr.mrmicky.fastboard.FastBoard;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import swordofmagic7.Damage.Damage;
 import swordofmagic7.Data.PlayerData;
@@ -42,10 +39,20 @@ public class ViewBar {
 
     public HashMap<String, List<String>> SideBar = new HashMap<>();
 
+    private final FastBoard board;
+
+    public boolean tickUpdate = false;
+    public Team team;
+    double HealthPercent = 1;
+    double ManaPercent = 1;
+    String HealthPercentColor = "§a§l";
+
     public ViewBar(Player player, PlayerData playerData, Status status) {
         this.player = player;
         this.playerData = playerData;
         this.status = status;
+        this.board = new FastBoard(player);
+        board.updateTitle(decoText("§bSword of Magic Ⅶ"));
     }
 
     public void setSideBar(String key, String data) {
@@ -154,15 +161,6 @@ public class ViewBar {
         }
     }
 
-    public boolean tickUpdate = false;
-    public Team team;
-    double HealthPercent = 1;
-    double ManaPercent = 1;
-    String HealthPercentColor = "§a§l";
-    private final List<String> ScoreKey = new ArrayList<>();
-    private Scoreboard board;
-    private Objective sidebarObject;
-
     public void tickUpdate() {
         if (tickUpdate) return;
         tickUpdate = true;
@@ -173,10 +171,7 @@ public class ViewBar {
             player.setAllowFlight(false);
             player.setGameMode(GameMode.SURVIVAL);
         }
-        board = Bukkit.getScoreboardManager().getNewScoreboard();
-        sidebarObject = board.registerNewObjective("Sidebar", "dummy", decoText("§bSword of Magic Ⅶ"));
-        sidebarObject.setDisplaySlot(DisplaySlot.SIDEBAR);
-        team = board.registerNewTeam(player.getName());
+        team = Bukkit.getScoreboardManager().getNewScoreboard().registerNewTeam(player.getName());
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
         team.addEntry(player.getName());
         team.setCanSeeFriendlyInvisibles(true);
@@ -192,7 +187,7 @@ public class ViewBar {
     public static final long period = 5;
 
     public void onTickUpdate() {
-        double regen = 200d/period;
+        double regen = 200d / period;
         try {
             if (playerData.playMode && playerData.isLoaded) {
                 if (playerData.HealthRegenDelay > 0) {
@@ -237,11 +232,9 @@ public class ViewBar {
 
     public void ViewSideBar() {
         if (!player.isOnline()) return;
-        for (String scoreName : ScoreKey) {
-            board.resetScores(scoreName);
-        }
-        ScoreKey.clear();
-        ScoreKey.add(decoLore("メル") + playerData.Mel);
+        List<String> lines = new ArrayList<>();
+
+        lines.add(decoLore("メル") + playerData.Mel);
         playerData.SideBarToDo.refresh();
         if (playerData.Party != null) {
             List<String> data = new ArrayList<>();
@@ -278,21 +271,14 @@ public class ViewBar {
             setSideBar("EffectList", data);
         } else resetSideBar("EffectList");
         for (List<String> textList : SideBar.values()) {
-            ScoreKey.addAll(textList);
-        }
-        int i = 15;
-        for (String scoreName : ScoreKey) {
-            Score sidebarScore = sidebarObject.getScore(scoreName);
-            sidebarScore.setScore(i);
-            i--;
-            if (i < 1) break;
+            lines.addAll(textList);
         }
         for (Player player : PlayerList.get()) {
             if (!team.hasEntry(player.getName())) {
                 team.addEntry(player.getName());
             }
         }
-        player.setScoreboard(board);
+        board.updateLines(lines);
     }
 
     public String getNameTagName() {

@@ -157,6 +157,7 @@ class SomCore : SuspendingJavaPlugin() {
             setGameRule(GameRules.ADVANCE_TIME, false)
             setGameRule(GameRules.RANDOM_TICK_SPEED, 0)
             setGameRule(GameRules.RESPAWN_RADIUS, 0)
+            setGameRule(GameRules.LOCATOR_BAR, false)
             this.time = 6000L
         }
 
@@ -281,16 +282,14 @@ class SomCore : SuspendingJavaPlugin() {
         }
         world.entities
             .filter {
-                it.persistentDataContainer.getOrDefault(NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN, false) == true
+                it.persistentDataContainer.has(som7EntityKey)
             }.forEach { entity ->
                 entity.remove()
                 count++
             }
-        Function.Log("CleanEnemy: $count")
+        Function.Log("CleanEntity: $count")
         Bukkit.getScheduler().cancelTasks(this)
-        Function.Log("Plugin Task Cancelled")
         PacketEvents.getAPI().eventManager.unregisterListener(packetEventsListener)
-        Function.Log("PacketListener unregister")
 
         if (blueMapEnabled) {
             val blueMapApi = BlueMapAPI.getInstance().get()
