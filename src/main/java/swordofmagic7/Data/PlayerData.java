@@ -795,6 +795,7 @@ public class PlayerData {
         data.set("Mana", Status.Mana);
         data.set("Map", Map.Id);
         data.set("Nick", Nick);
+        data.set("PlayerName", player.getName());
 
         data.set("Setting.DamageHolo", DamageHolo);
         data.set("Setting.DamageLog", DamageLog.toString());
@@ -938,7 +939,14 @@ public class PlayerData {
             Status.Health = data.getDouble("Health", 50);
             Status.Mana = data.getDouble("Mana", 50);
             Map = getMapData(data.getString("Map", "Alden"));
-            Nick = data.getString("Nick", player.getName());
+            String currentName = player.getName();
+            String savedNick = data.getString("Nick", currentName);
+            // Nickがユーザー名(初期値)のままなら、プレイヤー名変更に追従する
+            if (data.contains("PlayerName") && savedNick.equals(data.getString("PlayerName"))) {
+                Nick = currentName;
+            } else {
+                Nick = savedNick;
+            }
 
             DamageHolo = data.getBoolean("Setting.DamageHolo", true);
             DamageLog = DamageLogType.fromString(data.getString("Setting.DamageLog"));
