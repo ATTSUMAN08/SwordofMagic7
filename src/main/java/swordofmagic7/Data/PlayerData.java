@@ -907,7 +907,6 @@ public class PlayerData {
 
         try {
             data.save(playerFile);
-            player.sendMessage("§eプレイヤデータ§aの§bセーブ§aが完了しました");
             if (saveTeleportServer != null) {
                 isNonSave = true;
                 MultiThread.TaskRunSynchronizedLater(() -> {

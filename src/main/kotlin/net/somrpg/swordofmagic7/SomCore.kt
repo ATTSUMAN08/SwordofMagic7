@@ -148,7 +148,7 @@ class SomCore : SuspendingJavaPlugin() {
             setGameRule(GameRules.COMMAND_BLOCK_OUTPUT, false)
             setGameRule(GameRules.SPAWN_MOBS, false)
             setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0)
-            setGameRule(GameRules.SEND_COMMAND_FEEDBACK, false)
+            setGameRule(GameRules.SEND_COMMAND_FEEDBACK, true)
             setGameRule(GameRules.SPAWN_PATROLS, false)
             setGameRule(GameRules.SHOW_DEATH_MESSAGES, false)
             setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, false)
@@ -165,16 +165,16 @@ class SomCore : SuspendingJavaPlugin() {
             this,
             Runnable {
                 val start = System.currentTimeMillis()
-                Function.broadcastNoConsole("§e[オートセーブ]§aを§b開始§aします")
                 PlayerList.ResetPlayer.clear()
                 val playerDataList = PlayerData.getPlayerData().values.toSet()
+                if (playerDataList.isEmpty()) return@Runnable
                 playerDataList.forEach { data ->
                     val player = data.player
                     if (player != null) {
                         if (player.isOnline) data.save() else PlayerData.remove(player)
                     }
                 }
-                Function.broadcastNoConsole("§e[オートセーブ]§aが§b完了§aしました §7(${System.currentTimeMillis() - start}ms)")
+                logger.info("${playerDataList.size}人のオートセーブが完了しました (${System.currentTimeMillis() - start}ms)")
             },
             200,
             6000,
