@@ -22,7 +22,7 @@ repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public")
     maven(url = "https://oss.sonatype.org/content/groups/public")
     maven(url = "https://mvn.lib.co.nz/public") // LibsDisguises
-    maven(url = "https://jitpack.io") // DecentHolograms, ForestRedisAPI
+    maven(url = "https://jitpack.io") // ForestRedisAPI
     maven(url = "https://repo.codemc.io/repository/maven-public") // PacketEvents
     maven(url = "https://repo.bluecolored.de/releases/") // BlueMap
     maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
@@ -34,7 +34,6 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     compileOnly(libs.packetevents)
     compileOnly(libs.libsdisguises)
-    compileOnly(libs.decentholograms)
     compileOnly(libs.bluemap)
     compileOnly(libs.floodgate)
     compileOnly(libs.forestredis)
@@ -119,7 +118,7 @@ bukkitPluginYaml {
     apiVersion = "1.13"
 
     main = "net.somrpg.swordofmagic7.SomCore"
-    depend = listOf("ForestRedisAPI", "DecentHolograms", "LibsDisguises", "packetevents")
+    depend = listOf("ForestRedisAPI", "LibsDisguises", "packetevents")
     softDepend = listOf("BlueMap", "Floodgate")
 
     permissions {

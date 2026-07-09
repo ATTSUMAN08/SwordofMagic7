@@ -1,8 +1,6 @@
 package swordofmagic7.Mob;
 
 import com.destroystokyo.paper.entity.Pathfinder;
-import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
@@ -566,15 +564,14 @@ public class EnemyData {
                             if (!playerData.isAFK()) {
                                 playerData.viewUpdate();
                                 Location loc = entity.getLocation().clone().add(0, 1 + Holo.size() * 0.25, 0);
-                                MultiThread.TaskRunSynchronized(() -> {
-                                    Hologram hologram = instance.createHologram(loc);
-                                    hologram.setDefaultVisibleState(false);
-                                    hologram.setShowPlayer(player);
-                                    for (String holo : Holo) {
-                                        DHAPI.addHologramLine(hologram, holo);
-                                    }
-                                    MultiThread.TaskRunSynchronizedLater(hologram::delete, 50, "EnemyKillRewardHoloDelete");
-                                }, "EnemyKillRewardHolo");
+                                SomCore.instance.createTemporaryTextDisplay(
+                                        loc,
+                                        SomCore.instance.legacyLinesComponent(Holo),
+                                        List.of(player),
+                                        50,
+                                        "EnemyKillRewardHolo",
+                                        "EnemyKillRewardHoloDelete"
+                                );
                             }
                         }
                     }

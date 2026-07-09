@@ -2,8 +2,6 @@ package swordofmagic7.Data;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -20,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
@@ -1318,11 +1317,17 @@ public class PlayerData {
                         Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(10), Duration.ofSeconds(1))
                 ));
                 deadTime = 1200;
-                Hologram deadHologram = SomCore.instance.createHologram(player.getEyeLocation());
-                DHAPI.addHologramLine(deadHologram, ViewBar.getNameTagName());
+                Location deadLocation = player.getEyeLocation();
+                TextDisplay deadTextDisplay = SomCore.instance.createTextDisplay(
+                        deadLocation,
+                        Component.text(ViewBar.getNameTagName())
+                );
                 ItemStack head = ItemStackPlayerHead(player);
                 head.setAmount(1);
-                DHAPI.addHologramLine(deadHologram, head);
+                ItemDisplay deadHeadDisplay = SomCore.instance.createItemDisplay(
+                        deadLocation.clone().add(0, -0.4, 0),
+                        head
+                );
                 new BukkitRunnable() {
                     final ParticleData particleData = new ParticleData(Particle.END_ROD, 0.1f);
                     @Override
@@ -1338,7 +1343,8 @@ public class PlayerData {
                             Status.Mana = Status.MaxMana;
                             player.resetTitle();
                             Map = getMapData("Alden");
-                            deadHologram.delete();
+                            deadTextDisplay.remove();
+                            deadHeadDisplay.remove();
                             statistics.DeathCount++;
                             EffectManager.clearEffect();
                         } else if (RevivalReady) {
@@ -1349,7 +1355,8 @@ public class PlayerData {
                             player.teleportAsync(LastDeadLocation);
                             player.setGameMode(GameMode.SURVIVAL);
                             player.resetTitle();
-                            deadHologram.delete();
+                            deadTextDisplay.remove();
+                            deadHeadDisplay.remove();
                             statistics.RevivalCount++;
                         } else {
                             LastDeadLocation.setPitch(player.getLocation().getPitch());

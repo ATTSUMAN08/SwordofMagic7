@@ -1,7 +1,6 @@
 package swordofmagic7.Damage;
 
-import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -498,15 +497,7 @@ public final class Damage {
         double x = random.nextDouble() * 2 - 1;
         double y = random.nextDouble() + 1;
         double z = random.nextDouble() * 2 - 1;
-        MultiThread.TaskRunSynchronized(() -> {
-            loc.add(x, y, z);
-            Hologram hologram = SomCore.instance.createHologram(loc);
-            hologram.setDefaultVisibleState(false);
-            for (Player player : players) {
-                hologram.setShowPlayer(player);
-            }
-            DHAPI.addHologramLine(hologram, string);
-            MultiThread.TaskRunSynchronizedLater(hologram::delete, 20);
-        });
+        Location displayLoc = loc.clone().add(x, y, z);
+        SomCore.instance.createTemporaryTextDisplay(displayLoc, Component.text(string), players, 20);
     }
 }

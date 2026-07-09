@@ -9,8 +9,6 @@ import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.bluecolored.bluemap.api.markers.ShapeMarker
 import de.bluecolored.bluemap.api.math.Color
 import de.bluecolored.bluemap.api.math.Shape
-import eu.decentsoftware.holograms.api.DHAPI
-import eu.decentsoftware.holograms.api.holograms.Hologram
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
@@ -27,9 +25,13 @@ import org.bukkit.World
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Interaction
+import org.bukkit.entity.ItemDisplay
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.Editor
@@ -85,24 +87,38 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     lateinit var packetEventsListener: PacketListenerCommon
-    private val hologramMap = HashMap<String, Hologram>()
-    val hologramTouchActions = HashMap<String, (Player) -> Unit>()
+    val touchActions = HashMap<UUID, (Player) -> Unit>()
     val playerLastLocation = HashMap<Player, Location>()
     val repeatingTaskScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(10)
 
-    fun createHologram(location: Location): Hologram {
-        val hologram = DHAPI.createHologram("SOM7_${UUID.randomUUID()}", location)
-        hologramMap[hologram.id] = hologram
-        return hologram
+    private val som7EntityKey: NamespacedKey
+        get() = NamespacedKey(instance, "som7entity")
+
+    private fun markSom7Entity(entity: Entity) {
+        entity.persistentDataContainer[som7EntityKey, PersistentDataType.BOOLEAN] = true
     }
 
-    private fun createTouchHologram(
+    fun legacyComponent(text: String): Component = Component.text(text)
+
+    fun legacyLinesComponent(lines: Collection<String>): Component {
+        var component = Component.empty()
+        lines.forEachIndexed { index, line ->
+            if (index > 0) component = component.appendNewline()
+            component = component.append(legacyComponent(line))
+        }
+        return component
+    }
+
+    private fun createTouchZone(
         location: Location,
         action: (Player) -> Unit,
     ) {
-        val hologram = createHologram(location)
-        DHAPI.addHologramLine(hologram, "")
-        hologramTouchActions[hologram.id] = action
+        val interaction = location.world.spawnEntity(location, EntityType.INTERACTION) as Interaction
+        interaction.interactionWidth = 1.5f
+        interaction.interactionHeight = 2.0f
+        interaction.isResponsive = true
+        markSom7Entity(interaction)
+        touchActions[interaction.uniqueId] = action
     }
 
     override suspend fun onEnableAsync() {
@@ -203,14 +219,14 @@ class SomCore : SuspendingJavaPlugin() {
 
         ParticleManager.onLoad()
 
-        // Initialize holograms
-        createTouchHologram(Location(world, -196.2, 24.0, 1187.5, 90F, 0F)) { player ->
+        // Initialize touch zones
+        createTouchZone(Location(world, -196.2, 24.0, 1187.5, 90F, 0F)) { player ->
             playerData(player).Menu.Smith.SmithMenuView()
         }
-        createTouchHologram(Location(world, -203.5, 20.0, 1112.0, 0F, 0F)) { player ->
+        createTouchZone(Location(world, -203.5, 20.0, 1112.0, 0F, 0F)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
-        createTouchHologram(Location(world, -207.5, 20.0, 1112.0, 0F, 0F)) { player ->
+        createTouchZone(Location(world, -207.5, 20.0, 1112.0, 0F, 0F)) { player ->
             playerData(player).Menu.Cook.CookMenuView()
         }
 
@@ -239,7 +255,7 @@ class SomCore : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
-        deleteHolograms()
+        touchActions.clear()
         Bukkit.getOnlinePlayers().forEach {
             it.closeInventory()
             it.sendMessage("§cSystem Reloading")
@@ -286,14 +302,6 @@ class SomCore : SuspendingJavaPlugin() {
 
         repeatingTaskScheduler.shutdown()
         Bukkit.getScheduler().cancelTasks(this)
-    }
-
-    private fun deleteHolograms() {
-        hologramMap.values.forEach { hologram ->
-            if (!hologram.isDisabled) {
-                DHAPI.removeHologram(hologram.id)
-            }
-        }
     }
 
     private fun initBlueMap() {
@@ -763,17 +771,54 @@ class SomCore : SuspendingJavaPlugin() {
         }
     }
 
+    @JvmOverloads
     fun createTextDisplay(
         loc: Location,
         defaultText: Component,
+        viewers: Collection<Player>? = null,
     ): TextDisplay {
         val textDisplayLocation = loc.clone().apply { pitch = 0F }
         val textDisplay = loc.world.spawnEntity(textDisplayLocation, EntityType.TEXT_DISPLAY) as TextDisplay
         textDisplay.billboard = Display.Billboard.VERTICAL
+        textDisplay.isShadowed = true
         textDisplay.backgroundColor = org.bukkit.Color.fromARGB(0, 0, 0, 0)
         textDisplay.text(defaultText)
-        textDisplay.persistentDataContainer[NamespacedKey(instance, "som7entity"), PersistentDataType.BOOLEAN] = true
+        markSom7Entity(textDisplay)
+        if (viewers != null) {
+            for (player in Bukkit.getOnlinePlayers()) {
+                if (player !in viewers) {
+                    player.hideEntity(this, textDisplay)
+                }
+            }
+        }
         return textDisplay
+    }
+
+    fun createItemDisplay(
+        loc: Location,
+        itemStack: ItemStack,
+    ): ItemDisplay {
+        val itemDisplayLocation = loc.clone().apply { pitch = 0F }
+        val itemDisplay = loc.world.spawnEntity(itemDisplayLocation, EntityType.ITEM_DISPLAY) as ItemDisplay
+        itemDisplay.setItemStack(itemStack)
+        itemDisplay.billboard = Display.Billboard.FIXED
+        markSom7Entity(itemDisplay)
+        return itemDisplay
+    }
+
+    @JvmOverloads
+    fun createTemporaryTextDisplay(
+        loc: Location,
+        text: Component,
+        viewers: Collection<Player>?,
+        lifetimeTicks: Int,
+        taskId: String = "TemporaryTextDisplay",
+        deleteTaskId: String = taskId,
+    ) {
+        MultiThread.TaskRunSynchronized({
+            val display = createTextDisplay(loc, text, viewers)
+            MultiThread.TaskRunSynchronizedLater({ display.remove() }, lifetimeTicks, deleteTaskId)
+        }, taskId)
     }
 
     fun startRepeatingTask(

@@ -4,8 +4,6 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import cz.foresttech.forestredis.spigot.events.RedisMessageReceivedEvent;
-import eu.decentsoftware.holograms.api.actions.ClickType;
-import eu.decentsoftware.holograms.event.HologramClickEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -24,6 +22,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -351,6 +350,13 @@ public class Events implements Listener {
 
     @EventHandler
     void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof Interaction interaction) {
+            Function1<@NotNull Player, @NotNull Unit> action = SomCore.instance.getTouchActions().get(interaction.getUniqueId());
+            if (action != null) {
+                MultiThread.TaskRunSynchronized(() -> action.invoke(event.getPlayer()));
+            }
+            return;
+        }
         cancelInteract.put(event.getPlayer(), true);
         Bukkit.getScheduler().runTaskLater(SomCore.instance, () -> cancelInteract.remove(event.getPlayer()), 2);
         Player player = event.getPlayer();
@@ -724,17 +730,6 @@ public class Events implements Listener {
     @EventHandler
     void onSpectate(PlayerStartSpectatingEntityEvent event) {
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    void onHologramClick(HologramClickEvent event) {
-        if (event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) {
-            Player player = event.getPlayer();
-            @NotNull Function1<@NotNull Player, @NotNull Unit> action = SomCore.instance.getHologramTouchActions().get(event.getHologram().getName());
-            if (action != null) {
-                MultiThread.TaskRunSynchronized(() -> action.invoke(player));
-            }
-        }
     }
 
     @EventHandler

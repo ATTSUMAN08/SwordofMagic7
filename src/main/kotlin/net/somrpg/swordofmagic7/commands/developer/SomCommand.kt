@@ -22,6 +22,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import swordofmagic7.Data.DataBase
 import swordofmagic7.Data.DataLoader
+import swordofmagic7.Data.PlayerData
 import swordofmagic7.Function
 import swordofmagic7.Mob.MobManager
 import swordofmagic7.Sound.SoundList
@@ -34,8 +35,8 @@ class SomCommand : BaseCommand() {
     fun version(sender: CommandSender) {
         sender.sendMessage("§eサーバー: §a${Bukkit.getServer().name} ${Bukkit.getServer().version}")
         sender.sendMessage("§eプレイヤー数: §a${Bukkit.getOnlinePlayers().size}/${Bukkit.getMaxPlayers()}")
-        sender.sendMessage("§eTPS: §a${String.format("%.1f", Bukkit.getTPS()[0])}/20")
-        sender.sendMessage("§eMSPT: §a${String.format("%.1f", Bukkit.getAverageTickTime())}/50")
+        sender.sendMessage("§eTPS: §a${String.format("%.1f", Bukkit.getTPS()[0])}/20.0")
+        sender.sendMessage("§eMSPT: §a${String.format("%.1f", Bukkit.getAverageTickTime())}/50.0")
         sender.sendMessage("§eプラグイン:")
         for (plugin in Bukkit.getPluginManager().plugins.map { it.name }) {
             sender.sendMessage("§e- $plugin §a(${getPluginVersion(plugin)})")
@@ -190,5 +191,10 @@ class SomCommand : BaseCommand() {
             sender.sendMessage("§a- ${enemy.mobData.Display}")
         }
         sender.sendMessage("§e合計: §a${enemies.size}体")
+    }
+
+    @Subcommand("death")
+    fun death(player: Player) {
+        PlayerData.playerData(player).dead()
     }
 }

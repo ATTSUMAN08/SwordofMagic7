@@ -10,7 +10,6 @@
 
 # 依存関係リスト
 - AdvancedSlimePaper 26.2
-- [DecentHolograms](https://github.com/DecentSoftware-eu/DecentHolograms/releases/tag/2.10.1)
 - [ForestRedisAPI](https://github.com/ATTSUMAN08/ForestRedisAPI/releases/tag/1.3.11)
 - [LibsDisguises](https://ci.lib.co.nz/job/LibsDisguises/1792)
 - [PacketEvents](https://github.com/retrooper/packetevents/releases/tag/v2.13.0)

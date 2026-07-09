@@ -1,7 +1,6 @@
 package swordofmagic7.Map;
 
-import eu.decentsoftware.holograms.api.DHAPI;
-import eu.decentsoftware.holograms.api.holograms.Hologram;
+import net.kyori.adventure.text.Component;
 import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -111,10 +110,11 @@ public class WarpGateParameter {
     public void start() {
         if (isStarted) return;
         isStarted = true;
-        Hologram hologram = SomCore.instance.createHologram(getLocation().add(0, 4, 0));
-        DHAPI.addHologramLine(hologram, Display);
-        DHAPI.addHologramLine(hologram, "");
-        DHAPI.addHologramLine(hologram, Lore);
+        Component text = Component.text(Display)
+                .appendNewline()
+                .appendNewline()
+                .append(Component.text(Lore));
+        SomCore.instance.createTextDisplay(getLocation().add(0, 4, 0), text);
         world = getLocation().getWorld();
     }
 

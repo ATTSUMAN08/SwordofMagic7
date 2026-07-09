@@ -10,7 +10,6 @@ kotlinter = "5.6.0"
 paper = "26.2.build.+"
 packetevents = "2.13.0"
 libsdisguises = "11.0.18"
-decentholograms = "2.10.1"
 bluemap = "2.8.0"
 floodgate = "2.2.5-SNAPSHOT"
 forestredis = "1.3.11"
@@ -38,7 +37,6 @@ kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 [libraries]
 packetevents = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetevents" }
 libsdisguises = { module = "me.libraryaddict.disguises:libsdisguises", version.ref = "libsdisguises" }
-decentholograms = { module = "com.github.decentsoftware-eu:decentholograms", version.ref = "decentholograms" }
 bluemap = { module = "de.bluecolored:bluemap-api", version.ref = "bluemap" }
 floodgate = { module = "org.geysermc.floodgate:api", version.ref = "floodgate" }
 forestredis = { module = "com.github.ATTSUMAN08:ForestRedisAPI", version.ref = "forestredis" }
