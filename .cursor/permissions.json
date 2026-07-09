@@ -1,0 +1,13 @@
+{
+  "terminalAllowlist": [
+    "./gradlew",
+    "gradlew",
+    "./gradlew.bat",
+    "gradlew.bat"
+  ],
+  "autoRun": {
+    "allow_instructions": [
+      "Gradle wrapper commands (./gradlew, gradlew) should run outside the sandbox with full permissions."
+    ]
+  }
+}

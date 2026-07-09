@@ -1,0 +1,19 @@
+---
+description: Run Gradle wrapper commands outside the Cursor sandbox
+alwaysApply: true
+---
+
+# Gradle Wrapper — Sandbox外で実行
+
+`./gradlew` / `gradlew` 関連のコマンドを実行するときは、Shell ツールに必ず `required_permissions: ["all"]` を指定し、サンドボックス外で実行すること。
+
+対象コマンド例:
+
+- `./gradlew build`
+- `./gradlew test`
+- `./gradlew compileJava`
+- `./gradlew compileKotlin`
+- `./gradlew runServer`
+- その他すべての `./gradlew` / `gradlew` サブコマンド
+
+Windows では `./gradlew.bat` / `gradlew.bat` も同様。
