@@ -5,7 +5,7 @@ import net.somrpg.swordofmagic7.SomCore;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import swordofmagic7.Attribute.AttributeType;
+import net.somrpg.swordofmagic7.player.attribute.AttributeType;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Data.Type.DamageLogType;

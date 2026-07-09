@@ -15,7 +15,7 @@ import swordofmagic7.Sound.SoundList
 class AttributeCommand : BaseCommand() {
     @Default
     fun default(playerData: PlayerData) {
-        playerData.Attribute.AttributeMenuView()
+        playerData.Attribute.attributeMenuView()
         CustomSound.playSound(playerData.player, SoundList.MENU_OPEN)
     }
 }

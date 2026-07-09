@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import swordofmagic7.Attribute.AttributeType;
+import net.somrpg.swordofmagic7.player.attribute.AttributeType;
 import swordofmagic7.Data.DataBase;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Equipment.EquipmentSlot;
@@ -81,7 +81,7 @@ public class StatusInfo {
                 statusLore.add(StatusParameter.SkillCastTime.DecoDisplay + String.format(format, status.SkillCastTime*100) + " (" + String.format(format, 100/status.SkillCastTime) + "%)");
                 statusLore.add(StatusParameter.SkillRigidTime.DecoDisplay + String.format(format, status.SkillRigidTime*100) + " (" + String.format(format, 100/status.SkillRigidTime) + "%)");
                 statusLore.add(StatusParameter.SkillCooltime.DecoDisplay + String.format(format, status.SkillCooltime*100) + " (" + String.format(format, 100/status.SkillCooltime) + "%)");
-                statusLore.add(decoLore("クリティカルダメージ") + String.format(format, status.CriticalMultiply*100) + "%");
+                statusLore.add(StatusParameter.CriticalMultiply.DecoDisplay + String.format(format, status.CriticalMultiply*100) + "%");
                 statusLore.add(decoLore("物理与ダメージ") + String.format(format, status.DamageMultiplyATK*100) + " (" + String.format(format, status.DamageMultiplyATK*100) + "%)");
                 statusLore.add(decoLore("魔法与ダメージ") + String.format(format, status.DamageMultiplyMAT*100) + " (" + String.format(format, status.DamageMultiplyMAT*100) + "%)");
                 statusLore.add(decoLore("物理被ダメージ耐性") + String.format(format, status.DamageResistanceATK*100) + " (" + String.format(format, 100/status.DamageResistanceATK) + "%)");
@@ -109,7 +109,7 @@ public class StatusInfo {
                 }
                 List<String> attrLore = new ArrayList<>();
                 for (AttributeType attr : AttributeType.values()) {
-                    attrLore.add(decoLore(attr.Display) + playerData.Attribute.getAttribute(attr));
+                    attrLore.add(decoLore(attr.getDisplay()) + playerData.Attribute.getAttribute(attr));
                 }
                 inv.setItem(0, statusIcon);
                 inv.setItem(1, new ItemStackData(Material.END_CRYSTAL, decoText("§e§lクラススロット"), classLore).view());

@@ -3,7 +3,7 @@ package swordofmagic7.Status;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import swordofmagic7.Attribute.AttributeType;
+import net.somrpg.swordofmagic7.player.attribute.AttributeType;
 import swordofmagic7.Data.PlayerData;
 import swordofmagic7.Effect.EffectData;
 import swordofmagic7.Effect.EffectDataBase;
@@ -21,12 +21,12 @@ import swordofmagic7.classes.Classes;
 import java.util.HashMap;
 import java.util.Map;
 
-import static swordofmagic7.Attribute.AttributeType.DEX;
-import static swordofmagic7.Attribute.AttributeType.INT;
-import static swordofmagic7.Attribute.AttributeType.SPI;
-import static swordofmagic7.Attribute.AttributeType.STR;
-import static swordofmagic7.Attribute.AttributeType.TEC;
-import static swordofmagic7.Attribute.AttributeType.VIT;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.DEX;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.INT;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.SPI;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.STR;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.TEC;
+import static net.somrpg.swordofmagic7.player.attribute.AttributeType.VIT;
 import static swordofmagic7.Data.DataBase.getSkillData;
 
 public class Status {
@@ -121,6 +121,7 @@ public class Status {
         combatPower += (BaseStatus(StatusParameter.EVA) + EquipStatus(StatusParameter.EVA))*3;
         combatPower += (BaseStatus(StatusParameter.CriticalRate) + EquipStatus(StatusParameter.CriticalRate))*0.75;
         combatPower += (BaseStatus(StatusParameter.CriticalResist) + EquipStatus(StatusParameter.CriticalResist));
+        combatPower += (BaseStatus(StatusParameter.CriticalMultiply) + EquipStatus(StatusParameter.CriticalMultiply));
         combatPower += (BaseStatus(StatusParameter.SkillCooltime) + EquipStatus(StatusParameter.SkillCooltime));
         combatPower += (BaseStatus(StatusParameter.SkillCastTime) + EquipStatus(StatusParameter.SkillCastTime));
         combatPower += (BaseStatus(StatusParameter.SkillRigidTime) + EquipStatus(StatusParameter.SkillRigidTime));
@@ -226,32 +227,30 @@ public class Status {
             }
         }
 
-        CriticalMultiply = 1.3;
-        CriticalMultiply += Attribute(AttributeType.DEX) * 0.008;
-
         double M = LevelMultiply();
-        BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * (1 + Attribute(VIT) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxHealth));
-        BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * BaseMultiplyStatus(StatusParameter.HealthRegen));
-        BaseStatus.put(StatusParameter.MaxMana, (M * 100) * (1 + Attribute(SPI) * 0.008) * BaseMultiplyStatus(StatusParameter.MaxMana));
-        BaseStatus.put(StatusParameter.ManaRegen, (M * 5) * (1 + Attribute(SPI) * 0.0005) * BaseMultiplyStatus(StatusParameter.ManaRegen));
-        BaseStatus.put(StatusParameter.ATK, (M * 10) * (1 + Attribute(STR) * 0.025 + Attribute(INT) * 0.025) * BaseMultiplyStatus(StatusParameter.ATK));
-        BaseStatus.put(StatusParameter.DEF, (M * 5) * (1 + Attribute(VIT) * 0.025) * BaseMultiplyStatus(StatusParameter.DEF));
-        BaseStatus.put(StatusParameter.HLP, (M * 5) * (1 + Attribute(SPI) * 0.025) * BaseMultiplyStatus(StatusParameter.HLP));
-        BaseStatus.put(StatusParameter.ACC, (M * 10) * (1 + Attribute(TEC) * 0.042) * BaseMultiplyStatus(StatusParameter.ACC));
-        BaseStatus.put(StatusParameter.EVA, (M * 5) * (1 + Attribute(DEX) * 0.042) * BaseMultiplyStatus(StatusParameter.EVA));
-        BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * (1 + Attribute(TEC) * 0.042) * BaseMultiplyStatus(StatusParameter.CriticalRate));
-        BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * (1 + Attribute(VIT) * 0.038) * BaseMultiplyStatus(StatusParameter.CriticalResist));
-        BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime));
-        BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime));
-        BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime));
+        BaseStatus.put(StatusParameter.MaxHealth, (M * 100) * getAttributeBuff(StatusParameter.MaxHealth) * BaseMultiplyStatus(StatusParameter.MaxHealth));
+        BaseStatus.put(StatusParameter.HealthRegen, (M * 2) * getAttributeBuff(StatusParameter.HealthRegen) + BaseMultiplyStatus(StatusParameter.HealthRegen));
+        BaseStatus.put(StatusParameter.MaxMana, (M * 100) * getAttributeBuff(StatusParameter.MaxMana) * BaseMultiplyStatus(StatusParameter.MaxMana));
+        BaseStatus.put(StatusParameter.ManaRegen, (M * 5) * getAttributeBuff(StatusParameter.ManaRegen) * BaseMultiplyStatus(StatusParameter.ManaRegen));
+        BaseStatus.put(StatusParameter.ATK, (M * 10) * getAttributeBuff(StatusParameter.ATK) * BaseMultiplyStatus(StatusParameter.ATK));
+        BaseStatus.put(StatusParameter.DEF, (M * 5) * getAttributeBuff(StatusParameter.DEF) * BaseMultiplyStatus(StatusParameter.DEF));
+        BaseStatus.put(StatusParameter.HLP, (M * 5) * getAttributeBuff(StatusParameter.HLP) * BaseMultiplyStatus(StatusParameter.HLP));
+        BaseStatus.put(StatusParameter.ACC, (M * 10) * getAttributeBuff(StatusParameter.ACC) * BaseMultiplyStatus(StatusParameter.ACC));
+        BaseStatus.put(StatusParameter.EVA, (M * 5) * getAttributeBuff(StatusParameter.EVA) * BaseMultiplyStatus(StatusParameter.EVA));
+        BaseStatus.put(StatusParameter.CriticalRate, (M * 10) * getAttributeBuff(StatusParameter.CriticalRate) * BaseMultiplyStatus(StatusParameter.CriticalRate));
+        BaseStatus.put(StatusParameter.CriticalResist, (M * 3) * getAttributeBuff(StatusParameter.CriticalResist) * BaseMultiplyStatus(StatusParameter.CriticalResist));
+        BaseStatus.put(StatusParameter.CriticalMultiply, 1.3 + getAttributeBuff(StatusParameter.CriticalMultiply));
+        BaseStatus.put(StatusParameter.SkillCastTime, BaseMultiplyStatus(StatusParameter.SkillCastTime) * getAttributeBuff(StatusParameter.SkillCastTime));
+        BaseStatus.put(StatusParameter.SkillRigidTime, BaseMultiplyStatus(StatusParameter.SkillRigidTime) * getAttributeBuff(StatusParameter.SkillRigidTime));
+        BaseStatus.put(StatusParameter.SkillCooltime, BaseMultiplyStatus(StatusParameter.SkillCooltime) * getAttributeBuff(StatusParameter.SkillCooltime));
         BaseStatus.put(StatusParameter.DamageMultiplyATK, 1d);
         BaseStatus.put(StatusParameter.DamageMultiplyMAT, 1d);
         BaseStatus.put(StatusParameter.DamageResistanceATK, 1d);
         BaseStatus.put(StatusParameter.DamageResistanceMAT, 1d);
-        MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, Attribute(STR) * 0.005);
-        MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, Attribute(INT) * 0.004);
-        MultiplyStatusAdd(StatusParameter.DamageResistanceATK, Attribute(VIT) * 0.003);
-        MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, (Attribute(INT) + Attribute(SPI) + Attribute(VIT)) * 0.001);
+        MultiplyStatusAdd(StatusParameter.DamageMultiplyATK, getAttributeBuff(StatusParameter.DamageMultiplyATK));
+        MultiplyStatusAdd(StatusParameter.DamageMultiplyMAT, getAttributeBuff(StatusParameter.DamageMultiplyMAT));
+        MultiplyStatusAdd(StatusParameter.DamageResistanceATK, getAttributeBuff(StatusParameter.DamageResistanceATK));
+        MultiplyStatusAdd(StatusParameter.DamageResistanceMAT, getAttributeBuff(StatusParameter.DamageResistanceMAT));
 
         MaxHealth = finalStatus(StatusParameter.MaxHealth);
         HealthRegen = finalStatus(StatusParameter.HealthRegen);
@@ -264,6 +263,7 @@ public class Status {
         EVA = finalStatus(StatusParameter.EVA);
         CriticalRate = finalStatus(StatusParameter.CriticalRate);
         CriticalResist = finalStatus(StatusParameter.CriticalResist);
+        CriticalMultiply = finalStatus(StatusParameter.CriticalMultiply);
         SkillCastTime = finalStatus(StatusParameter.SkillCastTime);
         SkillRigidTime = finalStatus(StatusParameter.SkillRigidTime);
         SkillCooltime = finalStatus(StatusParameter.SkillCooltime);
@@ -285,6 +285,18 @@ public class Status {
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 0, false, false, false));
         });
         playerData.updateBlockPlayer();
+    }
+
+    public double getAttributeBuff(StatusParameter param) {
+        double attributeBuff = 1;
+        for (AttributeType attr : AttributeType.getEntries()) {
+            if (!attr.getStats().containsKey(param)) {
+                continue;
+            }
+
+            attributeBuff += Attribute(attr) * (attr.getStats().get(param) / 100);
+        }
+        return attributeBuff;
     }
 
     public double finalStatus(StatusParameter param) {

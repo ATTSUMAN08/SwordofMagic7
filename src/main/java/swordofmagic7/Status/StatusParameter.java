@@ -14,6 +14,7 @@ public enum StatusParameter {
     EVA("回避"),
     CriticalRate("クリティカル発生"),
     CriticalResist("クリティカル耐性"),
+    CriticalMultiply("クリティカルダメージ"),
     SkillCooltime("スキル再使用短縮"),
     SkillCastTime("スキル詠唱短縮"),
     SkillRigidTime("スキル硬直短縮"),

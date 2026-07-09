@@ -300,7 +300,7 @@ public class Menu {
             SmithEquipment.SmeltMenuClick(view, ClickInventory, index, Slot);
             if (ClickInventory == view.getTopInventory()) {
                 playerData.Classes.classSelectClick(view, Slot);
-                playerData.Attribute.AttributeMenuClick(view, clickType, currentItem);
+                playerData.Attribute.attributeMenuClick(view, clickType, currentItem);
                 playerData.Skill.SkillMenuClick(view, Slot);
                 playerData.Shop.ShopClick(view, currentItem, clickType, Slot, index);
                 playerData.MapManager.TeleportGateMenuClick(view, Slot);
@@ -338,7 +338,7 @@ public class Menu {
                     } else if (equalItem(currentItem, UserMenu_TriggerMenuIcon)) {
                         Trigger.TriggerMenuView();
                     } else if (equalItem(currentItem, UserMenu_AttributeMenuIcon)) {
-                        playerData.Attribute.AttributeMenuView();
+                        playerData.Attribute.attributeMenuView();
                     } else if (equalItem(currentItem, UserMenu_StatusInfoIcon)) {
                         StatusInfo.StatusInfoView(player);
                     } else if (equalItem(currentItem, UserMenu_TitleMenuIcon)) {
